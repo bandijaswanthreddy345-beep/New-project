@@ -1,0 +1,949 @@
+/* =========================================================
+   PROFESSIONAL COMMENTS SECTION
+========================================================= */
+
+.comments-section {
+  width: 100%;
+  margin-top: 52px;
+}
+
+/* =========================================================
+   MAIN COMMENTS CARD
+========================================================= */
+
+.comments-card {
+  width: 100%;
+  overflow: hidden;
+
+  border: 1px solid #d7e9df;
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 12px 40px rgba(10, 58, 37, 0.07);
+}
+
+/* =========================================================
+   COMMENTS HEADER
+========================================================= */
+
+.comments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 26px 28px;
+
+  border-bottom: 1px solid #dcebe3;
+
+  background:
+    linear-gradient(
+      135deg,
+      #effaf4 0%,
+      #e4f5eb 100%
+    );
+}
+
+.comments-heading {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+}
+
+.comments-icon {
+  width: 48px;
+  height: 48px;
+
+  flex: 0 0 48px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+
+  background: #d7f1e2;
+
+  color: #087943;
+
+  font-size: 21px;
+
+  box-shadow:
+    0 6px 18px rgba(8, 121, 67, 0.08);
+}
+
+.comments-heading h2 {
+  margin: 0;
+
+  color: #10251a;
+
+  font-size: 23px;
+  line-height: 1.2;
+
+  font-weight: 800;
+}
+
+.comments-heading p {
+  margin: 5px 0 0;
+
+  color: #6c8277;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.comments-count {
+  min-width: 52px;
+  height: 38px;
+
+  padding: 0 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #c9e4d4;
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  color: #087943;
+
+  font-size: 12px;
+  font-weight: 900;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 4px 12px rgba(8, 121, 67, 0.05);
+}
+
+/* =========================================================
+   COMMENT FORM
+========================================================= */
+
+.comment-form {
+  padding: 28px;
+
+  border-bottom: 1px solid #e1ece6;
+
+  background: #ffffff;
+}
+
+.comment-form-title {
+  margin: 0 0 5px;
+
+  color: #163127;
+
+  font-size: 17px;
+  line-height: 1.3;
+
+  font-weight: 800;
+}
+
+.comment-form-title::before {
+  content: "💬";
+
+  margin-right: 8px;
+
+  font-size: 14px;
+}
+
+.comment-form > p {
+  margin: 0 0 22px;
+
+  color: #72867c;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   FORM ROW
+========================================================= */
+
+.comment-form-row {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+/* =========================================================
+   FORM FIELD WRAPPERS
+========================================================= */
+
+.comment-form-row > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.comment-form label,
+.comment-form-row label {
+  display: block;
+
+  color: #30483c;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   INPUTS
+   Works even if your JSX doesn't use .comment-field
+========================================================= */
+
+.comment-form input,
+.comment-form-row input,
+.comment-field {
+  width: 100%;
+
+  min-height: 46px;
+
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border: 1px solid #d4e5dc;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #f8fbf9;
+
+  color: #20372b;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.comment-form input:hover,
+.comment-form-row input:hover,
+.comment-field:hover {
+  border-color: #a9d2ba;
+
+  background: #ffffff;
+}
+
+.comment-form input:focus,
+.comment-form-row input:focus,
+.comment-field:focus {
+  border-color: #168653;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 4px rgba(8, 121, 67, 0.08);
+}
+
+.comment-form input::placeholder,
+.comment-form-row input::placeholder,
+.comment-field::placeholder {
+  color: #9aa9a1;
+}
+
+/* =========================================================
+   COMMENT TEXTAREA
+========================================================= */
+
+.comment-form textarea,
+.comment-textarea {
+  width: 100%;
+
+  min-height: 120px;
+
+  box-sizing: border-box;
+
+  margin-top: 2px;
+
+  padding: 14px 15px;
+
+  resize: vertical;
+
+  border: 1px solid #d4e5dc;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #f8fbf9;
+
+  color: #20372b;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  line-height: 1.65;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.comment-form textarea:hover,
+.comment-textarea:hover {
+  border-color: #a9d2ba;
+
+  background: #ffffff;
+}
+
+.comment-form textarea:focus,
+.comment-textarea:focus {
+  border-color: #168653;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 4px rgba(8, 121, 67, 0.08);
+}
+
+.comment-form textarea::placeholder,
+.comment-textarea::placeholder {
+  color: #9aa9a1;
+}
+
+/* =========================================================
+   COMMENT TEXTAREA AREA
+========================================================= */
+
+/* If the textarea is not inside .comment-form-row */
+.comment-form > textarea {
+  display: block;
+
+  margin-top: 5px;
+}
+
+/* =========================================================
+   EMAIL PRIVACY TEXT
+========================================================= */
+
+.comment-form small,
+.comment-form .privacy-text {
+  display: block;
+
+  margin-top: 8px;
+
+  color: #7c8f86;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SUBMIT ROW
+========================================================= */
+
+.comment-submit-row {
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 14px;
+
+  margin-top: 18px;
+}
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
+
+.comment-submit-button,
+.comment-form button[type="submit"] {
+  min-height: 44px;
+
+  padding: 11px 20px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #087943,
+      #0a9251
+    );
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 7px 18px rgba(8, 121, 67, 0.20);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.comment-submit-button:hover,
+.comment-form button[type="submit"]:hover {
+  transform: translateY(-2px);
+
+  background:
+    linear-gradient(
+      135deg,
+      #066337,
+      #087943
+    );
+
+  box-shadow:
+    0 11px 25px rgba(8, 121, 67, 0.26);
+}
+
+.comment-submit-button:active,
+.comment-form button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+.comment-submit-button:disabled,
+.comment-form button[type="submit"]:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+/* =========================================================
+   COMMENTS LIST
+========================================================= */
+
+.comments-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 14px;
+
+  padding: 24px 28px 30px;
+
+  background: #fbfdfc;
+}
+
+/* =========================================================
+   INDIVIDUAL COMMENT
+========================================================= */
+
+.comment-item {
+  position: relative;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 18px 20px;
+
+  border: 1px solid #dcebe3;
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 4px 15px rgba(10, 58, 37, 0.035);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.comment-item:hover {
+  transform: translateY(-2px);
+
+  border-color: #b9d9c6;
+
+  box-shadow:
+    0 9px 25px rgba(10, 58, 37, 0.07);
+}
+
+/* =========================================================
+   COMMENT TOP
+========================================================= */
+
+.comment-top {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+.comment-user {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  min-width: 0;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+
+  flex: 0 0 40px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #dff5e8,
+      #cdeedb
+    );
+
+  color: #087943;
+
+  font-size: 13px;
+  font-weight: 900;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(8, 121, 67, 0.06);
+}
+
+.comment-user-info {
+  min-width: 0;
+}
+
+.comment-user-name {
+  display: block;
+
+  color: #183126;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  line-height: 1.3;
+}
+
+.comment-date {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #8a9b93;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   DELETE BUTTON
+========================================================= */
+
+.comment-delete-button {
+  flex: 0 0 auto;
+
+  min-height: 30px;
+
+  padding: 6px 10px;
+
+  border: 1px solid #efd1d1;
+  border-radius: 8px;
+
+  background: #fff8f8;
+
+  color: #c24c4c;
+
+  font-family: inherit;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.comment-delete-button:hover {
+  transform: translateY(-1px);
+
+  border-color: #e6aaaa;
+
+  background: #fff0f0;
+
+  color: #b53c3c;
+}
+
+/* =========================================================
+   COMMENT BODY
+========================================================= */
+
+.comment-body {
+  margin: 14px 0 14px;
+
+  padding-left: 51px;
+}
+
+.comment-body p {
+  margin: 0;
+
+  color: #3c5147;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+  word-break: break-word;
+}
+
+/* =========================================================
+   FALLBACK COMMENT TEXT
+   Handles JSX where comment text isn't wrapped in .comment-body
+========================================================= */
+
+.comment-item > p {
+  margin: 14px 0 14px;
+
+  padding-left: 51px;
+
+  color: #3c5147;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+  word-break: break-word;
+}
+
+/* =========================================================
+   COMMENT ACTIONS
+========================================================= */
+
+.comment-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding-left: 51px;
+}
+
+.comment-action-button {
+  min-height: 32px;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 6px 11px;
+
+  border: 1px solid #d8e8df;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #647970;
+
+  font-family: inherit;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.comment-action-button:hover {
+  transform: translateY(-1px);
+
+  border-color: #a8d1b8;
+
+  background: #f0faf4;
+
+  color: #087943;
+}
+
+.comment-like-button:hover {
+  color: #087943;
+}
+
+.comment-dislike-button:hover {
+  color: #b44f4f;
+
+  border-color: #e3c4c4;
+
+  background: #fff7f7;
+}
+
+.comment-action-count {
+  font-weight: 900;
+}
+
+/* =========================================================
+   EMPTY COMMENTS
+========================================================= */
+
+.comments-empty {
+  padding: 45px 25px;
+
+  text-align: center;
+
+  border: 1px dashed #cde2d5;
+  border-radius: 14px;
+
+  background: #f8fcf9;
+}
+
+.comments-empty-icon {
+  margin-bottom: 10px;
+
+  color: #6fa989;
+
+  font-size: 32px;
+}
+
+.comments-empty p {
+  margin: 0;
+
+  color: #758980;
+
+  font-size: 13px;
+}
+
+/* =========================================================
+   ERROR / SUCCESS
+========================================================= */
+
+.comment-error {
+  margin: 12px 0 0;
+
+  padding: 10px 13px;
+
+  border: 1px solid #efcccc;
+  border-radius: 9px;
+
+  background: #fff6f6;
+
+  color: #b74444;
+
+  font-size: 12px;
+}
+
+.comment-success {
+  margin: 12px 0 0;
+
+  padding: 10px 13px;
+
+  border: 1px solid #c8e5d2;
+  border-radius: 9px;
+
+  background: #f1faf4;
+
+  color: #087943;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .comments-section {
+    margin-top: 35px;
+  }
+
+  .comments-header {
+    align-items: flex-start;
+
+    padding: 20px;
+
+    gap: 12px;
+  }
+
+  .comments-heading {
+    gap: 10px;
+  }
+
+  .comments-icon {
+    width: 40px;
+    height: 40px;
+
+    flex-basis: 40px;
+
+    font-size: 18px;
+  }
+
+  .comments-heading h2 {
+    font-size: 19px;
+  }
+
+  .comments-heading p {
+    font-size: 11px;
+  }
+
+  .comments-count {
+    min-width: 42px;
+    height: 32px;
+
+    padding: 0 9px;
+
+    font-size: 10px;
+  }
+
+  .comment-form {
+    padding: 20px;
+  }
+
+  .comment-form-row {
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+  }
+
+  .comment-form input,
+  .comment-form-row input,
+  .comment-field {
+    min-height: 44px;
+
+    font-size: 12px;
+  }
+
+  .comment-form textarea,
+  .comment-textarea {
+    min-height: 105px;
+
+    font-size: 12px;
+  }
+
+  .comment-submit-row {
+    justify-content: stretch;
+  }
+
+  .comment-submit-button,
+  .comment-form button[type="submit"] {
+    width: 100%;
+  }
+
+  .comments-list {
+    padding: 18px;
+  }
+
+  .comment-item {
+    padding: 15px;
+  }
+
+  .comment-body,
+  .comment-item > p,
+  .comment-actions {
+    padding-left: 0;
+  }
+
+  .comment-top {
+    gap: 8px;
+  }
+
+  .comment-avatar {
+    width: 35px;
+    height: 35px;
+
+    flex-basis: 35px;
+
+    font-size: 12px;
+  }
+
+  .comment-user {
+    gap: 9px;
+  }
+
+  .comment-user-name {
+    font-size: 12px;
+  }
+
+  .comment-date {
+    font-size: 9px;
+  }
+
+  .comment-delete-button {
+    padding: 5px 8px;
+
+    font-size: 9px;
+  }
+
+  .comment-body p,
+  .comment-item > p {
+    font-size: 12px;
+
+    line-height: 1.6;
+  }
+
+  .comment-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 400px) {
+
+  .comments-header {
+    padding: 16px;
+  }
+
+  .comments-heading h2 {
+    font-size: 17px;
+  }
+
+  .comments-heading p {
+    display: none;
+  }
+
+  .comments-list {
+    padding: 12px;
+  }
+
+  .comment-form {
+    padding: 16px;
+  }
+
+  .comment-item {
+    padding: 13px;
+  }
+}

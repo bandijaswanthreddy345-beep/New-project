@@ -1,0 +1,125 @@
+.author-profile1-card {
+width: 100%;
+background: #ffffff;
+border: 1px solid #e1e1e1;
+border-radius: 14px;
+padding: 25px 20px;
+box-sizing: border-box;
+text-align: center;
+}
+
+/* ================================
+PROFILE IMAGE
+================================ */
+
+.author-profile1-image-wrapper {
+display: flex;
+justify-content: center;
+align-items: center;
+margin-bottom: 20px;
+}
+
+.author-profile1-image {
+width: 145px;
+height: 145px;
+object-fit: cover;
+
+border-radius: 50%;
+border: 3px solid #ffffff;
+
+box-shadow:
+0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* ================================
+CONTENT
+================================ */
+
+.author-profile1-content h2 {
+margin: 5px 0 8px;
+
+color: #343434;
+
+font-size: 22px;
+font-weight: 700;
+}
+
+.author-profile1-role {
+margin: 0 0 18px;
+
+color: #666666;
+
+font-size: 14px;
+font-weight: 500;
+}
+
+.author-profile1-description {
+margin: 0 0 22px;
+
+color: #555b66;
+
+font-size: 14px;
+line-height: 1.65;
+
+text-align: left;
+}
+
+/* ================================
+BUTTON
+================================ */
+
+.author-profile1-button {
+width: 100%;
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+gap: 10px;
+
+padding: 13px 15px;
+
+box-sizing: border-box;
+
+border-radius: 8px;
+
+background: #6200ee;
+color: #ffffff;
+
+text-decoration: none;
+
+font-size: 14px;
+font-weight: 700;
+
+transition: 0.25s ease;
+}
+
+.author-profile1-button:hover {
+background: #4b00b8;
+transform: translateY(-2px);
+}
+
+.author-profile1-button span {
+font-size: 16px;
+}
+
+/* ================================
+MOBILE
+================================ */
+
+@media (max-width: 768px) {
+
+.author-profile1-card {
+padding: 25px 18px;
+}
+
+.author-profile1-image {
+width: 125px;
+height: 125px;
+}
+
+.author-profile1-content h2 {
+font-size: 20px;
+}
+
+}

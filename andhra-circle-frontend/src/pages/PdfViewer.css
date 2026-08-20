@@ -1,0 +1,255 @@
+/* =========================================================
+   PDF VIEWER
+   PROFESSIONAL GREEN DESIGN
+========================================================= */
+
+.pdf-viewer-page {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #f4f8f5;
+  color: #10251a;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.pdf-viewer-header {
+  position: relative;
+  z-index: 10;
+
+  width: 100%;
+  min-height: 72px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 14px 28px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #dcebe3;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 4px 18px rgba(10, 58, 37, 0.06);
+}
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.pdf-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 11px 18px;
+
+  border: 1px solid #cde4d6;
+  border-radius: 9px;
+
+  background: #f3faf5;
+  color: #087943;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pdf-back-button:hover {
+  background: #087943;
+  color: #ffffff;
+
+  transform: translateX(-2px);
+
+  box-shadow:
+    0 6px 18px rgba(8, 121, 67, 0.18);
+}
+
+.pdf-back-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* =========================================================
+   DOWNLOAD BUTTON
+========================================================= */
+
+.pdf-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 42px;
+
+  padding: 10px 18px;
+
+  border: 1px solid #087943;
+  border-radius: 9px;
+
+  background: #087943;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 16px rgba(8, 121, 67, 0.15);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.pdf-download-button:hover:not(:disabled) {
+  background: #066337;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 9px 22px rgba(8, 121, 67, 0.22);
+}
+
+.pdf-download-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pdf-download-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.pdf-viewer-main {
+  flex: 1;
+
+  width: 100%;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PDF CONTAINER
+========================================================= */
+
+.pdf-viewer-container {
+  width: 100%;
+  height: calc(100vh - 112px);
+
+  overflow: hidden;
+
+  border: 1px solid #d8e8df;
+  border-radius: 12px;
+
+  background: #292929;
+
+  box-shadow:
+    0 10px 35px rgba(10, 58, 37, 0.10);
+}
+
+/* =========================================================
+   PDF FRAME
+========================================================= */
+
+.pdf-frame {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  border: 0;
+
+  background: #292929;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .pdf-viewer-header {
+    min-height: 66px;
+
+    padding: 12px 20px;
+  }
+
+  .pdf-viewer-main {
+    padding: 15px;
+  }
+
+  .pdf-viewer-container {
+    height: calc(100vh - 96px);
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .pdf-viewer-header {
+    min-height: 62px;
+
+    padding: 10px 14px;
+
+    gap: 10px;
+  }
+
+  .pdf-back-button {
+    padding: 10px 13px;
+
+    font-size: 12px;
+  }
+
+  .pdf-download-button {
+    min-height: 40px;
+
+    padding: 9px 12px;
+
+    font-size: 12px;
+  }
+
+  .pdf-viewer-main {
+    padding: 10px;
+  }
+
+  .pdf-viewer-container {
+    height: calc(100vh - 82px);
+
+    border-radius: 8px;
+  }
+}

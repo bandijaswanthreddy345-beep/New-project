@@ -1,0 +1,7 @@
+node_modules
+.env
+andhra-circle-backend/uploads/
+dist
+dist-ssr
+*.local
+.DS_Store
