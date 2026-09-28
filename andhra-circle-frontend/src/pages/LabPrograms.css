@@ -1,0 +1,929 @@
+/* =========================================================
+   LAB PROGRAMS PAGE
+========================================================= */
+
+.lab-programs-page {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  padding: 42px 58px 70px;
+  background: #f7f9fc;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.lab-programs-heading {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.lab-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 16px;
+
+  border-radius: 999px;
+
+  background: #eaf2ff;
+  color: #1f5ed8;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lab-programs-heading h1 {
+  margin: 16px 0 8px;
+
+  color: #101828;
+
+  font-size: 36px;
+  line-height: 1.15;
+
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.lab-programs-heading p {
+  margin: 0;
+
+  color: #667085;
+
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.lab-heading-line {
+  width: 42px;
+  height: 3px;
+
+  margin: 15px auto 0;
+
+  border-radius: 10px;
+
+  background: #2563eb;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.lab-programs-grid {
+  width: 100%;
+  max-width: 1380px;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 24px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.lab-program-card {
+  position: relative;
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e4e7ec;
+
+  border-radius: 17px;
+
+  box-shadow:
+    0 4px 12px rgba(16, 24, 40, 0.04);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+
+  min-width: 0;
+}
+
+.lab-program-card:hover {
+  transform: translateY(-5px);
+
+  border-color: #cbd5e1;
+
+  box-shadow:
+    0 16px 35px rgba(16, 24, 40, 0.10);
+}
+
+
+/* =========================================================
+   BANNER
+========================================================= */
+
+.lab-card-banner {
+  position: relative;
+
+  height: 160px;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 78% 22%,
+      rgba(104, 42, 255, 0.85),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 24% 84%,
+      rgba(63, 18, 190, 0.78),
+      transparent 40%
+    ),
+    linear-gradient(
+      135deg,
+      #18002e 0%,
+      #29005f 40%,
+      #4a0aa6 68%,
+      #1b003c 100%
+    );
+}
+
+
+/* =========================================================
+   BANNER ABSTRACT WAVES
+========================================================= */
+
+.lab-card-banner::before {
+  content: "";
+
+  position: absolute;
+
+  width: 150%;
+  height: 130%;
+
+  left: -38%;
+  top: 30%;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(9, 0, 21, 0.95),
+      rgba(36, 0, 80, 0.65)
+    );
+
+  transform:
+    rotate(13deg);
+
+  box-shadow:
+    90px -35px 0 rgba(86, 21, 173, 0.48),
+    190px 15px 0 rgba(126, 46, 229, 0.30);
+}
+
+
+.lab-card-banner::after {
+  content: "";
+
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      ellipse at 80% 18%,
+      rgba(120, 50, 255, 0.32),
+      transparent 40%
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   BANNER PATTERN
+========================================================= */
+
+.lab-banner-pattern {
+  position: absolute;
+
+  inset: 0;
+
+  opacity: 0.13;
+
+  background-image:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      transparent 0,
+      transparent 18px,
+      rgba(255, 255, 255, 0.18) 19px,
+      transparent 20px
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   BANNER BADGE
+========================================================= */
+
+.lab-card-badge {
+  position: absolute;
+
+  z-index: 5;
+
+  top: 13px;
+  left: 13px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 7px 12px;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  border: 1px solid rgba(255, 255, 255, 0.75);
+
+  border-radius: 999px;
+
+  color: #1d2939;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.12);
+}
+
+.lab-badge-icon {
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.lab-card-content {
+  padding: 18px 17px 17px;
+}
+
+
+/* =========================================================
+   CATEGORY
+========================================================= */
+
+.lab-card-category {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  max-width: 100%;
+
+  padding: 6px 9px;
+
+  margin-bottom: 11px;
+
+  border-radius: 6px;
+
+  background: #eef5ff;
+
+  color: #155eef;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.lab-category-icon {
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.lab-card-title {
+  margin: 0 0 7px;
+
+  color: #101828;
+
+  font-size: 17px;
+  line-height: 1.3;
+
+  font-weight: 800;
+
+  letter-spacing: -0.2px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.lab-card-description {
+  margin: 0;
+
+  color: #667085;
+
+  font-size: 12.5px;
+
+  line-height: 1.55;
+
+  min-height: 39px;
+
+  display: -webkit-box;
+
+  -webkit-line-clamp: 2;
+
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   METADATA
+========================================================= */
+
+.lab-card-meta {
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px 13px;
+
+  margin-top: 14px;
+}
+
+.lab-meta-item {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  min-width: 0;
+
+  color: #475467;
+
+  font-size: 10.5px;
+
+  line-height: 1.3;
+}
+
+.lab-meta-icon {
+  flex-shrink: 0;
+
+  color: #667085;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.lab-card-divider {
+  width: 100%;
+
+  height: 1px;
+
+  margin: 14px 0 12px;
+
+  background: #eaecf0;
+}
+
+
+/* =========================================================
+   PDF STATUS
+========================================================= */
+
+.lab-pdf-status {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color: #475467;
+
+  font-size: 10.5px;
+
+  font-weight: 600;
+
+  margin-bottom: 13px;
+}
+
+.lab-pdf-status.unavailable {
+  color: #98a2b3;
+}
+
+.lab-pdf-icon {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 26px;
+  height: 20px;
+
+  padding: 0 5px;
+
+  border-radius: 4px;
+
+  background: #fef3f2;
+
+  color: #d92d20;
+
+  font-size: 8px;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.lab-card-actions {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+
+  width: 100%;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+========================================================= */
+
+.lab-view-button {
+  min-height: 40px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 10px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #2457d6;
+
+  color: #ffffff;
+
+  text-decoration: none;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.lab-view-button:hover {
+  background: #1948c1;
+
+  transform: translateY(-1px);
+}
+
+.lab-view-button.disabled {
+  background: #d0d5dd;
+
+  color: #ffffff;
+
+  cursor: not-allowed;
+}
+
+.lab-button-arrow {
+  font-size: 15px;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   DOWNLOAD BUTTON
+========================================================= */
+
+.lab-download-button {
+  min-height: 40px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 10px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #101828;
+
+  color: #ffffff;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.lab-download-button:hover {
+  background: #1d2939;
+
+  transform: translateY(-1px);
+}
+
+.lab-download-icon {
+  font-size: 15px;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.lab-loading {
+  min-height: 300px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 13px;
+
+  color: #667085;
+}
+
+.lab-loading p {
+  margin: 0;
+
+  font-size: 14px;
+}
+
+.lab-loading-spinner {
+  width: 30px;
+  height: 30px;
+
+  border-radius: 50%;
+
+  border: 3px solid #e4e7ec;
+
+  border-top-color: #2563eb;
+
+  animation:
+    lab-spin 0.8s linear infinite;
+}
+
+@keyframes lab-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.lab-empty {
+  min-height: 320px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 30px;
+
+  background: #ffffff;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 16px;
+
+  max-width: 650px;
+
+  margin: 0 auto;
+}
+
+.lab-empty-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eef4ff;
+
+  font-size: 25px;
+
+  margin-bottom: 15px;
+}
+
+.lab-empty h2 {
+  margin: 0 0 7px;
+
+  color: #101828;
+
+  font-size: 20px;
+}
+
+.lab-empty p {
+  margin: 0;
+
+  color: #667085;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.lab-error {
+  max-width: 600px;
+
+  margin: 30px auto;
+
+  padding: 35px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 16px;
+}
+
+.lab-error-icon {
+  width: 52px;
+  height: 52px;
+
+  margin: 0 auto 15px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #fef3f2;
+
+  color: #d92d20;
+
+  font-size: 22px;
+
+  font-weight: 800;
+}
+
+.lab-error h2 {
+  margin: 0 0 7px;
+
+  color: #101828;
+
+  font-size: 20px;
+}
+
+.lab-error p {
+  margin: 0 0 20px;
+
+  color: #667085;
+
+  font-size: 13px;
+}
+
+.lab-retry-button {
+  border: none;
+
+  border-radius: 8px;
+
+  padding: 10px 20px;
+
+  background: #2457d6;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.lab-retry-button:hover {
+  background: #1948c1;
+}
+
+
+/* =========================================================
+   RESPONSIVE — LAPTOP
+========================================================= */
+
+@media (max-width: 1200px) {
+  .lab-programs-page {
+    padding-left: 35px;
+    padding-right: 35px;
+  }
+
+  .lab-programs-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .lab-programs-page {
+    padding: 35px 25px 60px;
+  }
+
+  .lab-programs-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+  }
+
+  .lab-programs-heading h1 {
+    font-size: 32px;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .lab-programs-page {
+    padding: 28px 16px 45px;
+  }
+
+  .lab-programs-heading {
+    margin-bottom: 30px;
+  }
+
+  .lab-programs-heading h1 {
+    font-size: 28px;
+  }
+
+  .lab-programs-heading p {
+    font-size: 13px;
+  }
+
+  .lab-programs-grid {
+    grid-template-columns: 1fr;
+
+    gap: 17px;
+  }
+
+  .lab-card-banner {
+    height: 165px;
+  }
+
+  .lab-card-content {
+    padding: 17px 16px 16px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 390px) {
+  .lab-card-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-programs-heading h1 {
+    font-size: 25px;
+  }
+}
+/* =========================================
+   LAB PROGRAM SUBJECT CODE
+========================================= */
+
+.lab-subject-code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 14px;
+  padding: 10px 12px;
+
+  border: 1px solid #e8ecf3;
+  border-radius: 10px;
+
+  background: #f8fafc;
+
+  font-size: 12px;
+}
+
+.lab-subject-code span {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.lab-subject-code strong {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* =========================================
+   PDF NOT AVAILABLE
+========================================= */
+
+.pdf-not-available {
+  width: 100%;
+  padding: 12px 16px;
+
+  border-radius: 9px;
+
+  background: #f1f5f9;
+  color: #64748b;
+
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}

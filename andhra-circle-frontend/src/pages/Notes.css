@@ -1,0 +1,1138 @@
+/* =========================================================
+   NOTES PAGE
+========================================================= */
+
+.notes-page {
+  position: relative;
+
+  min-height: 100vh;
+
+  padding: 40px 32px 80px;
+
+  background: #ffffff;
+
+  color: #222222;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  overflow-x: hidden;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.notes-header {
+  width: min(1350px, 100%);
+
+  margin: 0 auto 30px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+
+.notes-eyebrow {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #777777;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.15em;
+}
+
+
+.notes-header h1 {
+  margin: 0;
+
+  color: #202020;
+
+  font-size: 42px;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: -0.04em;
+}
+
+
+.notes-header p {
+  margin: 9px 0 0;
+
+  color: #777777;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   NOTES COUNT
+========================================================= */
+
+.notes-count {
+  width: 75px;
+
+  height: 65px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 1px solid #e2e2e2;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 4px 15px
+    rgba(0, 0, 0, 0.05);
+}
+
+
+.notes-count strong {
+  color: #7b25e9;
+
+  font-size: 24px;
+
+  line-height: 1;
+}
+
+
+.notes-count span {
+  margin-top: 5px;
+
+  color: #777777;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.notes-grid {
+  width: min(1350px, 100%);
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 24px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.note-card {
+  position: relative;
+
+  overflow: hidden;
+
+  border: 1px solid #dedede;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 3px 10px
+    rgba(0, 0, 0, 0.05);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.note-card:hover {
+  transform: translateY(-3px);
+
+  border-color: #d4d4d4;
+
+  box-shadow:
+    0 12px 28px
+    rgba(0, 0, 0, 0.09);
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.note-card-image {
+  position: relative;
+
+  height: 225px;
+
+  overflow: hidden;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #353535 0%,
+      #191919 48%,
+      #080808 100%
+    );
+}
+
+
+.note-card-image::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    repeating-radial-gradient(
+      circle at center,
+      transparent 0,
+      transparent 10px,
+      rgba(255, 255, 255, 0.045) 11px,
+      transparent 12px
+    );
+}
+
+
+.note-card-image::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.05),
+      rgba(0, 0, 0, 0.20)
+    );
+}
+
+
+/* =========================================================
+   READ TIME
+========================================================= */
+
+.read-time {
+  position: absolute;
+
+  z-index: 3;
+
+  top: 10px;
+
+  left: 10px;
+
+  height: 29px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 0 10px;
+
+  border: 1px solid
+    rgba(0, 0, 0, 0.08);
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  color: #202020;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.01em;
+
+  box-shadow:
+    0 3px 10px
+    rgba(0, 0, 0, 0.15);
+}
+
+
+.read-time-icon {
+  width: 14px;
+
+  height: 14px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+.read-time-icon svg {
+  width: 14px;
+
+  height: 14px;
+
+  fill: none;
+
+  stroke: #333333;
+
+  stroke-width: 1.8;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+}
+
+
+/* =========================================================
+   IMAGE TITLE
+========================================================= */
+
+.note-card-title {
+  position: relative;
+
+  z-index: 3;
+
+  padding: 15px;
+
+  color: #ffffff;
+
+  font-size: 39px;
+
+  font-weight: 850;
+
+  line-height: 1;
+
+  text-align: center;
+
+  letter-spacing: -0.035em;
+
+  text-shadow:
+    3px 3px 0 #000000,
+    -2px -2px 0 #000000,
+    2px -2px 0 #000000,
+    -2px 2px 0 #000000;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.note-card-content {
+  padding: 16px 14px 12px;
+}
+
+
+/* =========================================================
+   BRANCH
+========================================================= */
+
+.note-branch {
+  width: fit-content;
+
+  margin-bottom: 12px;
+
+  padding: 5px 9px;
+
+  border-radius: 5px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6f16e9,
+      #9c4df2
+    );
+
+  color: #ffffff;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  box-shadow:
+    0 2px 5px
+    rgba(123, 37, 233, 0.20);
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.note-card-content h2 {
+  margin: 0;
+
+  color: #333333;
+
+  font-size: 19px;
+
+  line-height: 1.2;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.note-card-content h2:hover {
+  color: #7621df;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.note-description {
+  display: -webkit-box;
+
+  margin: 9px 0 15px;
+
+  color: #666666;
+
+  font-size: 13px;
+
+  line-height: 1.45;
+
+  -webkit-line-clamp: 3;
+
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   BOTTOM STATS
+========================================================= */
+
+.note-stats {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  min-height: 34px;
+
+  padding-top: 10px;
+
+  border-top: 1px solid #eeeeee;
+
+  gap: 12px;
+}
+
+
+/* =========================================================
+   STAT
+========================================================= */
+
+.note-stat {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  color: #666666;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+
+.stat-icon {
+  width: 16px;
+
+  height: 16px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+
+.stat-icon svg {
+  width: 15px;
+
+  height: 15px;
+
+  fill: none;
+
+  stroke: #707070;
+
+  stroke-width: 1.7;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+}
+
+
+/* =========================================================
+   PROFESSIONAL LIKE BUTTON
+========================================================= */
+
+/*
+   IMPORTANT:
+   !important is intentionally used here so any global
+   button styles cannot create the blue rectangle.
+*/
+
+.note-like-button {
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  width: auto;
+
+  min-width: 0;
+
+  height: auto;
+
+  margin: 0;
+
+  padding: 3px 1px;
+
+  border: none !important;
+
+  border-width: 0 !important;
+
+  border-style: none !important;
+
+  border-color: transparent !important;
+
+  outline: none !important;
+
+  box-shadow: none !important;
+
+  background: transparent !important;
+
+  background-color: transparent !important;
+
+  color: #666666;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  user-select: none;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+
+/*
+   Remove any browser/global hover background.
+*/
+
+.note-like-button:hover,
+.note-like-button:focus,
+.note-like-button:focus-visible,
+.note-like-button:active {
+  border: none !important;
+
+  outline: none !important;
+
+  box-shadow: none !important;
+
+  background: transparent !important;
+
+  background-color: transparent !important;
+}
+
+
+.note-like-button:hover {
+  color: #c94b61;
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   HEART
+========================================================= */
+
+.heart-icon {
+  width: 18px;
+
+  height: 18px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+
+.heart-svg {
+  width: 18px;
+
+  height: 18px;
+
+  display: block;
+
+  fill: none;
+
+  stroke: #777777;
+
+  stroke-width: 1.7;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+
+  transition:
+    transform 0.18s ease,
+    stroke 0.18s ease,
+    fill 0.18s ease;
+}
+
+
+.note-like-button:hover .heart-svg {
+  stroke: #c94b61;
+
+  transform: scale(1.08);
+}
+
+
+.heart-svg.filled {
+  fill: #d85a70;
+
+  stroke: #d85a70;
+}
+
+
+/* =========================================================
+   LIKE NUMBER
+========================================================= */
+
+.like-number {
+  color: inherit;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   LIKE ANIMATION
+========================================================= */
+
+.note-like-button.liked
+.heart-icon {
+  animation:
+    likedHeart
+    0.45s
+    cubic-bezier(
+      0.175,
+      0.885,
+      0.32,
+      1.275
+    );
+}
+
+
+@keyframes likedHeart {
+
+  0% {
+    transform: scale(0.75);
+  }
+
+  45% {
+    transform: scale(1.35);
+  }
+
+  75% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+
+}
+
+
+/* =========================================================
+   HEART ANIMATION LAYER
+========================================================= */
+
+.heart-animation-layer {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 999999;
+
+  pointer-events: none;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   LARGE HEART
+========================================================= */
+
+.big-heart-animation {
+  position: fixed;
+
+  width: 85px;
+
+  height: 85px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #f0152f;
+
+  font-size: 85px;
+
+  line-height: 1;
+
+  transform:
+    translate(-50%, -50%)
+    scale(0.2);
+
+  filter:
+    drop-shadow(
+      0 8px 8px
+      rgba(210, 0, 30, 0.25)
+    );
+
+  animation:
+    bigHeart
+    1.05s
+    cubic-bezier(
+      0.175,
+      0.885,
+      0.32,
+      1.275
+    )
+    forwards;
+}
+
+
+@keyframes bigHeart {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      scale(0.15);
+  }
+
+  20% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1.25);
+  }
+
+  40% {
+    transform:
+      translate(-50%, -50%)
+      scale(0.95);
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translate(
+        calc(-50% + 10px),
+        calc(-50% - 170px)
+      )
+      scale(0.75);
+  }
+
+}
+
+
+/* =========================================================
+   SMALL HEARTS
+========================================================= */
+
+.heart-particle {
+  position: fixed;
+
+  z-index: 999999;
+
+  display: block;
+
+  color: var(--heart-color);
+
+  font-size: var(--heart-size);
+
+  line-height: 1;
+
+  opacity: 0;
+
+  transform:
+    translate(-50%, -50%)
+    scale(0.2)
+    rotate(0deg);
+
+  animation:
+    floatingHeart
+    var(--heart-duration)
+    ease-out
+    var(--heart-delay)
+    forwards;
+}
+
+
+@keyframes floatingHeart {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      scale(0.2)
+      rotate(0deg);
+  }
+
+  10% {
+    opacity: 0.95;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1)
+      rotate(var(--heart-rotation));
+  }
+
+  45% {
+    opacity: 0.9;
+  }
+
+  75% {
+    opacity: 0.65;
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translate(
+        calc(
+          -50% + var(--heart-drift)
+        ),
+        calc(-50% - 330px)
+      )
+      scale(0.7)
+      rotate(
+        calc(
+          var(--heart-rotation) * 2
+        )
+      );
+  }
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.notes-empty {
+  width: min(450px, 100%);
+
+  margin: 120px auto;
+
+  padding: 50px 30px;
+
+  text-align: center;
+
+  border: 1px solid #e2e2e2;
+
+  border-radius: 15px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.06);
+}
+
+
+.notes-empty-icon {
+  margin-bottom: 12px;
+
+  font-size: 45px;
+}
+
+
+.notes-empty h2 {
+  margin: 0;
+
+  color: #222222;
+
+  font-size: 24px;
+}
+
+
+.notes-empty p {
+  margin: 8px 0 0;
+
+  color: #777777;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .notes-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .notes-page {
+    padding: 25px 14px 60px;
+  }
+
+
+  .notes-header {
+    align-items: flex-start;
+  }
+
+
+  .notes-header h1 {
+    font-size: 34px;
+  }
+
+
+  .notes-header p {
+    font-size: 12px;
+  }
+
+
+  .notes-count {
+    width: 65px;
+
+    height: 58px;
+  }
+
+
+  .notes-count strong {
+    font-size: 21px;
+  }
+
+
+  .notes-grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+
+  .note-card-image {
+    height: 205px;
+  }
+
+
+  .note-card-title {
+    font-size: 34px;
+  }
+
+
+  .note-card-content h2 {
+    font-size: 18px;
+  }
+
+
+  .note-stats {
+    gap: 7px;
+  }
+
+
+  .note-stat {
+    font-size: 11px;
+
+    gap: 4px;
+  }
+
+
+  .stat-icon {
+    width: 15px;
+
+    height: 15px;
+  }
+
+
+  .stat-icon svg {
+    width: 14px;
+
+    height: 14px;
+  }
+
+
+  .read-time {
+    height: 28px;
+
+    padding: 0 9px;
+
+    font-size: 10px;
+  }
+
+
+  .heart-icon {
+    width: 17px;
+
+    height: 17px;
+  }
+
+
+  .heart-svg {
+    width: 17px;
+
+    height: 17px;
+  }
+
+
+  .like-number {
+    font-size: 11px;
+  }
+
+
+  .big-heart-animation {
+    font-size: 70px;
+
+    width: 70px;
+
+    height: 70px;
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL
+========================================================= */
+
+@media (max-width: 400px) {
+
+  .notes-header h1 {
+    font-size: 30px;
+  }
+
+
+  .note-card-image {
+    height: 180px;
+  }
+
+
+  .note-card-title {
+    font-size: 29px;
+  }
+
+
+  .note-stats {
+    gap: 5px;
+  }
+
+
+  .note-stat {
+    font-size: 10px;
+  }
+
+
+  .like-number {
+    font-size: 11px;
+  }
+
+}

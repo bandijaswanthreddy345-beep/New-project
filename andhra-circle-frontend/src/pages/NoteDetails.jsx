@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import AuthorProfile from "../components/AuthorProfile";
 import "./NoteDetails.css";
 
 function NoteDetails() {
@@ -20,6 +21,9 @@ function NoteDetails() {
   const [comments, setComments] = useState([]);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [commentSubmitting, setCommentSubmitting] = useState(false);
+
+  // Heart pop animation state
+  const [heartPop, setHeartPop] = useState(null);
 
   const [commentForm, setCommentForm] = useState({
     name: "",
@@ -112,9 +116,7 @@ function NoteDetails() {
     let mounted = true;
 
     const fetchComments = async () => {
-      if (!id) {
-        return;
-      }
+      if (!id) return;
 
       try {
         setCommentsLoading(true);
@@ -194,6 +196,13 @@ function NoteDetails() {
   const subjectCode = note?.subjectCode || "";
   const branch = note?.branch || "";
   const semester = note?.semester || "";
+
+  // =========================================================
+  // CREDITS
+  // =========================================================
+
+  const credits = note?.credits || "";
+
   const year = note?.year || "";
   const description = note?.description || "";
 
@@ -267,15 +276,11 @@ function NoteDetails() {
   // =========================================================
 
   const openPdf = (pdf) => {
-    if (!pdf) {
-      return;
-    }
+    if (!pdf) return;
 
     const fileName = getFileName(pdf);
 
-    if (!fileName) {
-      return;
-    }
+    if (!fileName) return;
 
     navigate(
       `/pdf/${encodeURIComponent(fileName)}?noteId=${encodeURIComponent(
@@ -289,15 +294,11 @@ function NoteDetails() {
   // =========================================================
 
   const openPdfInNewTab = (pdf) => {
-    if (!pdf) {
-      return;
-    }
+    if (!pdf) return;
 
     const fileName = getFileName(pdf);
 
-    if (!fileName) {
-      return;
-    }
+    if (!fileName) return;
 
     const viewerUrl =
       `${window.location.origin}/pdf/` +
@@ -321,9 +322,7 @@ function NoteDetails() {
   ) => {
     const url = getBackendUrl(pdf);
 
-    if (!url) {
-      return;
-    }
+    if (!url) return;
 
     try {
       const response = await fetch(url);
@@ -461,12 +460,45 @@ function NoteDetails() {
   };
 
   // =========================================================
-  // LIKE COMMENT
+  // ❤️ LIKE COMMENT - BIG POP
   // =========================================================
 
   const handleLikeComment = async (
-    commentId
+    commentId,
+    event
   ) => {
+    // -------------------------------------------------------
+    // BIG HEART POP
+    // -------------------------------------------------------
+
+    const buttonRect =
+      event.currentTarget.getBoundingClientRect();
+
+    const popId = Date.now();
+
+    setHeartPop({
+      id: popId,
+      x:
+        buttonRect.left +
+        buttonRect.width / 2,
+      y:
+        buttonRect.top +
+        buttonRect.height / 2,
+    });
+
+    // Remove animation after it finishes
+    setTimeout(() => {
+      setHeartPop((current) =>
+        current?.id === popId
+          ? null
+          : current
+      );
+    }, 1200);
+
+    // -------------------------------------------------------
+    // API LIKE
+    // -------------------------------------------------------
+
     try {
       const response = await API.put(
         `/comments/${commentId}/like`
@@ -531,9 +563,7 @@ function NoteDetails() {
       "Are you sure you want to delete this comment?"
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       await API.delete(
@@ -564,9 +594,7 @@ function NoteDetails() {
   // =========================================================
 
   const formatCommentDate = (date) => {
-    if (!date) {
-      return "";
-    }
+    if (!date) return "";
 
     try {
       return new Date(date).toLocaleDateString(
@@ -601,6 +629,7 @@ function NoteDetails() {
     return (
       <div className="note-page-loading">
         <div className="loading-card">
+
           <div className="loading-spinner"></div>
 
           <h3>
@@ -610,6 +639,7 @@ function NoteDetails() {
           <p>
             Please wait...
           </p>
+
         </div>
       </div>
     );
@@ -622,6 +652,7 @@ function NoteDetails() {
   if (error || !note) {
     return (
       <div className="note-error-page">
+
         <div className="note-error-card">
 
           <div className="error-icon">
@@ -645,6 +676,7 @@ function NoteDetails() {
           </button>
 
         </div>
+
       </div>
     );
   }
@@ -657,16 +689,96 @@ function NoteDetails() {
     <div className="note-details-page">
 
       {/* =====================================================
+          ❤️ BIG HEART POP OVERLAY
+      ====================================================== */}
+
+      {heartPop && (
+        <div
+          className="heart-pop-container"
+          style={{
+            left: `${heartPop.x}px`,
+            top: `${heartPop.y}px`,
+          }}
+        >
+
+          {/* MAIN BIG HEART */}
+
+          <div className="heart-pop-main">
+            ❤️
+          </div>
+
+          {/* BURST HEARTS */}
+
+          <span className="burst-heart burst-heart-1">
+            ❤️
+          </span>
+
+          <span className="burst-heart burst-heart-2">
+            ❤️
+          </span>
+
+          <span className="burst-heart burst-heart-3">
+            ❤️
+          </span>
+
+          <span className="burst-heart burst-heart-4">
+            ❤️
+          </span>
+
+          <span className="burst-heart burst-heart-5">
+            ❤️
+          </span>
+
+          <span className="burst-heart burst-heart-6">
+            ❤️
+          </span>
+
+          <span className="burst-heart burst-heart-7">
+            ❤️
+          </span>
+
+          <span className="burst-heart burst-heart-8">
+            ❤️
+          </span>
+
+          {/* SPARKLES */}
+
+          <span className="heart-spark heart-spark-1">
+            ✦
+          </span>
+
+          <span className="heart-spark heart-spark-2">
+            ✦
+          </span>
+
+          <span className="heart-spark heart-spark-3">
+            ✦
+          </span>
+
+          <span className="heart-spark heart-spark-4">
+            ✦
+          </span>
+
+          <span className="heart-spark heart-spark-5">
+            ✦
+          </span>
+
+        </div>
+      )}
+
+      {/* =====================================================
           HERO
       ====================================================== */}
 
       <section className="note-hero">
 
         <div className="note-hero-background">
+
           <img
             src={defaultBanner}
             alt=""
           />
+
         </div>
 
         <div className="note-hero-overlay"></div>
@@ -744,6 +856,7 @@ function NoteDetails() {
           </div>
 
         </div>
+
       </section>
 
       {/* =====================================================
@@ -826,6 +939,22 @@ function NoteDetails() {
 
                 <strong>
                   {semester || "—"}
+                </strong>
+
+              </div>
+
+              {/* =================================================
+                  CREDITS
+              ================================================== */}
+
+              <div className="detail-item">
+
+                <span className="detail-label">
+                  Credits
+                </span>
+
+                <strong>
+                  {credits || "—"}
                 </strong>
 
               </div>
@@ -1174,9 +1303,7 @@ function NoteDetails() {
 
           <div className="comments-card">
 
-            {/* =================================================
-                COMMENTS HEADER
-            ================================================== */}
+            {/* COMMENTS HEADER */}
 
             <div className="comments-header">
 
@@ -1216,9 +1343,7 @@ function NoteDetails() {
 
             </div>
 
-            {/* =================================================
-                COMMENT FORM
-            ================================================== */}
+            {/* COMMENT FORM */}
 
             <form
               onSubmit={handleSubmitComment}
@@ -1291,9 +1416,7 @@ function NoteDetails() {
 
             </form>
 
-            {/* =================================================
-                COMMENTS LIST
-            ================================================== */}
+            {/* COMMENTS LIST */}
 
             <div className="comments-list">
 
@@ -1383,19 +1506,28 @@ function NoteDetails() {
 
                     </div>
 
+                    {/* =================================================
+                        COMMENT ACTIONS
+                    ================================================== */}
+
                     <div className="comment-actions">
+
+                      {/* ❤️ LIKE */}
 
                       <button
                         type="button"
                         className="comment-action-button comment-like-button"
-                        onClick={() =>
+                        onClick={(event) =>
                           handleLikeComment(
-                            item._id
+                            item._id,
+                            event
                           )
                         }
+                        aria-label="Like comment"
                       >
-                        <span>
-                          👍
+
+                        <span className="like-heart">
+                          ❤️
                         </span>
 
                         <span className="comment-action-count">
@@ -1403,6 +1535,8 @@ function NoteDetails() {
                         </span>
 
                       </button>
+
+                      {/* 👎 DISLIKE */}
 
                       <button
                         type="button"
@@ -1412,7 +1546,9 @@ function NoteDetails() {
                             item._id
                           )
                         }
+                        aria-label="Dislike comment"
                       >
+
                         <span>
                           👎
                         </span>
@@ -1434,6 +1570,16 @@ function NoteDetails() {
             </div>
 
           </div>
+
+        </section>
+
+        {/* ===================================================
+            AUTHOR PROFILE
+        ==================================================== */}
+
+        <section className="author-profile-section">
+
+          <AuthorProfile note={note} />
 
         </section>
 

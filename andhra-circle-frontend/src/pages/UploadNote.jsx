@@ -8,6 +8,7 @@ function UploadNote() {
   const [subject, setSubject] = useState("");
   const [subjectCode, setSubjectCode] = useState("");
   const [description, setDescription] = useState("");
+  const [credits, setCredits] = useState("Bandi Bharath");
 
   const [module1, setModule1] = useState("");
   const [module2, setModule2] = useState("");
@@ -42,6 +43,12 @@ function UploadNote() {
     formData.append("subject", subject);
     formData.append("subjectCode", subjectCode);
     formData.append("description", description);
+
+    // ==========================================
+    // CREDITS
+    // ==========================================
+
+    formData.append("credits", credits);
 
     // ==========================================
     // MODULE CONTENT
@@ -110,6 +117,7 @@ function UploadNote() {
       setSubject("");
       setSubjectCode("");
       setDescription("");
+      setCredits("Bandi Bharath");
 
       setModule1("");
       setModule2("");
@@ -321,6 +329,33 @@ function UploadNote() {
             setDescription(e.target.value)
           }
         />
+
+        {/* ==========================================
+            CREDITS
+        ========================================== */}
+
+        <div className="credits-upload-field">
+
+          <label htmlFor="credits">
+            Credits
+          </label>
+
+          <input
+            id="credits"
+            type="text"
+            placeholder="Prepared by"
+            value={credits}
+            onChange={(e) =>
+              setCredits(e.target.value)
+            }
+          />
+
+          <small>
+            Enter the name of the person who prepared
+            or contributed to these notes.
+          </small>
+
+        </div>
 
         {/* ==========================================
             MODULE 1

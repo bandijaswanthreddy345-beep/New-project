@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const Note = require("../models/Note");
+const Note = require("../models/note");
 const Paper = require("../models/Paper");
 const Syllabus = require("../models/Syllabus");
 const Notification = require("../models/Notification");

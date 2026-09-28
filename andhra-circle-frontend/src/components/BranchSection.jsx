@@ -1,89 +1,47 @@
 function BranchSection() {
   const branches = [
-    {
-      name: "Computer Science Engineering",
-      code: "CSE",
-      icon: "💻",
-      description:
-        "Explore notes, syllabus, question papers, and academic resources.",
-    },
-    {
-      name: "Electronics & Communication Engineering",
-      code: "ECE",
-      icon: "📡",
-      description:
-        "Access organized study materials and examination resources.",
-    },
-    {
-      name: "AI & ML Engineering",
-      code: "AIML",
-      icon: "🤖",
-      description:
-        "Find learning materials for artificial intelligence and machine learning.",
-    },
-    {
-      name: "Mechanical Engineering",
-      code: "ME",
-      icon: "⚙️",
-      description:
-        "Browse academic notes, syllabus, and previous question papers.",
-    },
-    {
-      name: "Civil Engineering",
-      code: "CE",
-      icon: "🏗️",
-      description:
-        "Discover structured resources for civil engineering subjects.",
-    },
+    "Computer Science Engineering",
+    "Electronics & Communication Engineering",
+    "AI & ML Engineering",
+    "Mechanical Engineering",
+    "Civil Engineering",
   ];
 
   return (
-    <section className="branches">
-      {/* =========================
-          SECTION HEADER
-      ========================== */}
+    <section className="branches-modern">
+      <div className="branches-modern-container">
 
-      <div className="section-heading">
-        <span className="section-tag">
-          ACADEMIC DEPARTMENTS
-        </span>
+        {/* SECTION HEADING */}
+        <div className="branches-modern-heading">
+          <span className="branches-modern-label">
+            ACADEMIC DEPARTMENTS
+          </span>
 
-        <h2>Browse by Branch</h2>
+          <h2>Browse by Branch</h2>
 
-       
-      </div>
+          <p>
+            Explore academic resources by engineering department
+          </p>
+        </div>
 
-      {/* =========================
-          BRANCH GRID
-      ========================== */}
-
-      <div className="branch-grid">
-        {branches.map((branch) => (
-          <article
-            className="branch-card"
-            key={branch.code}
-          >
-            <div className="branch-icon">
-              {branch.icon}
-            </div>
-
-            <span className="branch-code">
-              {branch.code}
-            </span>
-
-            <h3>{branch.name}</h3>
-
-            <p>{branch.description}</p>
-
-            <button
-              type="button"
-              className="branch-button"
+        {/* BRANCH CARDS */}
+        <div className="branches-modern-grid">
+          {branches.map((branch, index) => (
+            <article
+              className="branches-modern-card"
+              key={branch}
             >
-              Explore Resources
-              <span> → </span>
-            </button>
-          </article>
-        ))}
+              <span className="branch-number">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+
+              <h3>{branch}</h3>
+
+              <span className="branch-card-line" />
+            </article>
+          ))}
+        </div>
+
       </div>
     </section>
   );
