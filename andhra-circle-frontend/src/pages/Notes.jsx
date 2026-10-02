@@ -3,7 +3,9 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
 import logo from "../assets/jntu-circle-logo.png.png";
 import profile from "../assets/jaswanth.png.png";
-import StudentProfileModal, { getStoredStudentData } from "../components/StudentProfileModal";
+import StudentProfileModal from "../components/StudentProfileModal";
+import { getStoredStudentData } from "../data/studentData";
+import { downloadFile } from "../utils/downloadFile";
 import "./Notes.css";
 
 // Branch definitions matching homepage engineering departments
@@ -97,6 +99,7 @@ function Notes() {
   const [loading, setLoading] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [studentData, setStudentData] = useState(getStoredStudentData());
+  const [downloadingId, setDownloadingId] = useState(null);
 
   useEffect(() => {
     const handleProfileSync = () => {
@@ -241,6 +244,105 @@ function Notes() {
     }
   };
 
+  // Handle downloading note file or study material package
+  const handleDownloadNote = async (e, item) => {
+    e.stopPropagation();
+    try {
+      setDownloadingId(item.id);
+
+      // 1. Identify backend note (either directly or by searching notes array)
+      let targetNote = null;
+      if (item.isBackend && item.id) {
+        targetNote = notes.find((n) => n._id === item.id);
+      } else {
+        const activeTab = BRANCH_TABS.find((t) => t.code === activeBranch);
+        const keywords = activeTab ? activeTab.keywords : ["cse"];
+        targetNote =
+          notes.find((n) => {
+            const bText = String(n.branch || "").toLowerCase();
+            const titleText = String(n.subject || n.title || "").toLowerCase();
+            return (
+              keywords.some((k) => bText.includes(k)) &&
+              (titleText.includes(item.title.toLowerCase()) ||
+                item.title.toLowerCase().includes(titleText))
+            );
+          }) ||
+          notes.find((n) => {
+            const bText = String(n.branch || "").toLowerCase();
+            return keywords.some((k) => bText.includes(k));
+          }) ||
+          (notes.length > 0 ? notes[0] : null);
+      }
+
+      // 2. Check for uploaded PDF
+      const pdfPath =
+        targetNote?.module1Pdf ||
+        targetNote?.pdfUrl ||
+        targetNote?.module2Pdf ||
+        targetNote?.module3Pdf;
+
+      if (pdfPath) {
+        const downloadUrl = pdfPath.startsWith("http")
+          ? pdfPath
+          : `http://localhost:5000${pdfPath}`;
+        const fileName = `${item.title.replace(/[^a-zA-Z0-9_-]/g, "_")}_${
+          item.branchCode || activeBranch
+        }_Notes.pdf`;
+
+        await downloadFile(downloadUrl, fileName);
+
+        // Increment download counter on backend
+        if (targetNote?._id) {
+          API.put(`/notes/${targetNote._id}/download`).catch(() => {});
+        }
+      } else {
+        // Generate an official academic study package document for this subject
+        const content = `=====================================================
+JNTU CIRCLE — ACADEMIC REPOSITORY
+Subject: ${item.title}
+Branch: ${item.branchCode || activeBranch}
+Semester: ${item.semester || "Current Semester"}
+Student Account: ${studentData.name || "Chinnu"} (${studentData.hallTicket || "22B91A4201"})
+Curriculum: ${studentData.regulation || "R20 Regulation"}
+=====================================================
+
+SYLLABUS & MODULE BLUEPRINT:
+-----------------------------------------------------
+Unit 1: Foundational Theory & Core Principles
+Unit 2: Mathematical Formulations & Architecture
+Unit 3: Design Frameworks & Analytical Methods
+Unit 4: Systems Implementation & Industry Standards
+Unit 5: Advanced Applications & Emerging Topics
+
+EXAMINATION PREPARATION CHECKLIST:
+1. Review previous year university question papers for ${item.title}.
+2. Practice module derivations and block diagrams.
+3. For additional module notes, access JNTU Circle at: http://localhost:5173/notes
+
+Generated securely by JNTU Circle Student Academic Portal.
+`;
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${item.title.replace(/[^a-zA-Z0-9_-]/g, "_")}_${
+          item.branchCode || activeBranch
+        }_Study_Notes.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error("Error downloading notes:", err);
+      alert(`Preparing ${item.title} notes download... Please try again.`);
+    } finally {
+      setTimeout(() => {
+        setDownloadingId(null);
+      }, 700);
+    }
+  };
+
   return (
     <div className="notes-dashboard-container">
       <div className="notes-dashboard-card">
@@ -337,7 +439,7 @@ function Notes() {
               <span className="profile-status-dot" />
             </div>
             <div className="profile-info">
-              <span className="profile-name">{studentData.shortName || "Jaswanth"}</span>
+              <span className="profile-name">{studentData.shortName || "Chinnu"}</span>
               <span className="profile-role">{studentData.role || "Student"}</span>
             </div>
             <svg className="profile-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -541,14 +643,40 @@ function Notes() {
                       </div>
                     </div>
 
-                    {/* View Action Button */}
-                    <button
-                      type="button"
-                      className="folder-view-btn"
-                      onClick={() => handleViewNote(item)}
-                    >
-                      View
-                    </button>
+                    {/* Action Buttons: Download + View */}
+                    <div className="folder-card-actions">
+                      <button
+                        type="button"
+                        className={`folder-download-btn ${downloadingId === item.id ? "downloading" : ""}`}
+                        onClick={(e) => handleDownloadNote(e, item)}
+                        title={`Download ${item.title} Study Material`}
+                      >
+                        {downloadingId === item.id ? (
+                          <>
+                            <span className="download-spinner" />
+                            <span>Saving...</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                              <polyline points="7 10 12 15 17 10" />
+                              <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Download</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="folder-view-btn"
+                        onClick={() => handleViewNote(item)}
+                        title={`View ${item.title}`}
+                      >
+                        View
+                      </button>
+                    </div>
                   </article>
                 ))
               )}

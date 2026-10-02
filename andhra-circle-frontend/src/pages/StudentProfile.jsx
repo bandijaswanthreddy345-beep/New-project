@@ -6,7 +6,7 @@ import {
   DEFAULT_STUDENT_DATA,
   getStoredStudentData,
   saveStoredStudentData,
-} from "../components/StudentProfileModal";
+} from "../data/studentData";
 import "./StudentProfile.css";
 
 function StudentProfile() {
@@ -32,7 +32,7 @@ function StudentProfile() {
     const updated = {
       ...student,
       ...editForm,
-      shortName: editForm.name.split(" ")[0] || "Jaswanth",
+      shortName: editForm.name.split(" ")[0] || "Chinnu",
     };
     saveStoredStudentData(updated);
     setStudent(updated);

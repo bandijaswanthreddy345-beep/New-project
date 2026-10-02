@@ -529,6 +529,72 @@
   letter-spacing: 0.3px;
 }
 
+/* Card Actions (Download + View) */
+.folder-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.folder-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #013e37;
+  border: 1.5px solid #013e37;
+  padding: 7px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 6px rgba(1, 62, 55, 0.05);
+}
+
+.folder-download-btn svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.2s ease;
+}
+
+.folder-download-btn:hover {
+  background: #eef6f3;
+  border-color: #02594f;
+  color: #002420;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(1, 62, 55, 0.12);
+}
+
+.folder-download-btn:hover svg {
+  transform: translateY(1.5px);
+}
+
+.folder-download-btn:active {
+  transform: scale(0.98);
+}
+
+.folder-download-btn.downloading {
+  background: #f0f7f4;
+  border-color: #d9a726;
+  color: #013e37;
+}
+
+.download-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(1, 62, 55, 0.2);
+  border-top-color: #013e37;
+  border-radius: 50%;
+  animation: downloadSpin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes downloadSpin {
+  to { transform: rotate(360deg); }
+}
+
 /* "View" Action Button (Homepage Flagship Emerald & Sunbeam) */
 .folder-view-btn {
   background: linear-gradient(135deg, #013e37 0%, #02594f 100%);
@@ -698,5 +764,15 @@
     height: auto;
     max-height: none;
     overflow: visible;
+  }
+
+  .notes-folder-card {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .folder-card-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }
