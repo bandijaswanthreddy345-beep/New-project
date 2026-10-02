@@ -5,7 +5,6 @@ import logo from "../assets/jntu-circle-logo.png.png";
 import profile from "../assets/jaswanth.png.png";
 import StudentProfileModal from "../components/StudentProfileModal";
 import { getStoredStudentData } from "../data/studentData";
-import { downloadFile } from "../utils/downloadFile";
 import "./Notes.css";
 
 // Branch definitions matching homepage engineering departments
@@ -281,6 +280,8 @@ function Notes() {
         targetNote?.module2Pdf ||
         targetNote?.module3Pdf;
 
+      let downloadedSuccessfully = false;
+
       if (pdfPath) {
         const downloadUrl = pdfPath.startsWith("http")
           ? pdfPath
@@ -289,13 +290,30 @@ function Notes() {
           item.branchCode || activeBranch
         }_Notes.pdf`;
 
-        await downloadFile(downloadUrl, fileName);
+        try {
+          const res = await fetch(downloadUrl);
+          if (res.ok) {
+            const blob = await res.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
 
-        // Increment download counter on backend
-        if (targetNote?._id) {
-          API.put(`/notes/${targetNote._id}/download`).catch(() => {});
+            downloadedSuccessfully = true;
+            if (targetNote?._id) {
+              API.put(`/notes/${targetNote._id}/download`).catch(() => {});
+            }
+          }
+        } catch (fetchErr) {
+          console.warn("Server file unavailable, falling back to academic study package:", fetchErr);
         }
-      } else {
+      }
+
+      if (!downloadedSuccessfully) {
         // Generate an official academic study package document for this subject
         const content = `=====================================================
 JNTU CIRCLE — ACADEMIC REPOSITORY

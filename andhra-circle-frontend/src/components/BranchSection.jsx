@@ -245,7 +245,7 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
                       }}
                     />
 
-                    {/* Top Bar: Code Badge and ID */}
+                    {/* Top Bar: Code Badge */}
                     <div className="branch-card-top">
                       <span 
                         className="branch-code-badge"
@@ -263,8 +263,6 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
                         />
                         {item.code}
                       </span>
-
-                      <span className="branch-number">#{item.id}</span>
                     </div>
 
                     {/* Bottom Bar: Tag, Title, and Accent Line */}
