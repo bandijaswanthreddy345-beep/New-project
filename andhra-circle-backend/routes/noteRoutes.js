@@ -7,6 +7,7 @@ const auth = require("../middleware/auth");
 const {
   createNote,
   getNotes,
+  getBranchStats,
   getNoteById,
   updateNote,
   deleteNote,
@@ -20,6 +21,12 @@ const {
 // ==========================================
 
 router.get("/", getNotes);
+
+// ==========================================
+// GET BRANCH STATS (FOR 3D CARDS & CATALOG)
+// ==========================================
+
+router.get("/branch-stats", getBranchStats);
 
 // ==========================================
 // GET SINGLE NOTE
