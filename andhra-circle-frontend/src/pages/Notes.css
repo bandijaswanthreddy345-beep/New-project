@@ -424,18 +424,32 @@
 }
 
 .branch-icon-box {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: rgba(1, 62, 55, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.branch-nav-pill:hover .branch-icon-box {
+  transform: scale(1.1);
+  background: rgba(1, 62, 55, 0.09);
+}
+
+.branch-nav-pill.active .branch-icon-box {
+  background: #ffffff;
+  box-shadow: 0 1.5px 5px rgba(1, 62, 55, 0.12);
+  transform: scale(1.05);
 }
 
 .branch-icon-box svg {
   width: 17px;
   height: 17px;
+  display: block;
 }
 
 /* Right Column: Subject Folder Cards */
