@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
 import logo from "../assets/jntu-circle-logo.png.png";
@@ -99,6 +99,8 @@ function Notes() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [studentData, setStudentData] = useState(getStoredStudentData());
   const [downloadingId, setDownloadingId] = useState(null);
+  const [pulsingBranch, setPulsingBranch] = useState(null);
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     const handleProfileSync = () => {
@@ -215,10 +217,40 @@ function Notes() {
     return filtered;
   }, [notes, activeBranch, searchQuery, selectedSemester]);
 
-  // Handle branch tab switch
+  // Memoized count of study resources per engineering branch
+  const branchCounts = useMemo(() => {
+    const counts = {};
+    BRANCH_TABS.forEach((tab) => {
+      const keywords = tab.keywords;
+      const backendMatching = notes.filter((n) => {
+        const bText = String(n.branch || "").toLowerCase();
+        return keywords.some((k) => bText.includes(k));
+      });
+      const curated = CURATED_SUBJECTS[tab.code] || [];
+      const titleSet = new Set(
+        backendMatching.map((n) => String(n.subject || n.title || "").toLowerCase().trim())
+      );
+      curated.forEach((c) => titleSet.add(c.title.toLowerCase().trim()));
+      counts[tab.code] = titleSet.size || curated.length || 4;
+    });
+    return counts;
+  }, [notes]);
+
+  // Handle branch tab switch with reactive search button feedback
   const handleSelectBranch = (code) => {
+    setPulsingBranch(code);
+    setTimeout(() => setPulsingBranch(null), 500);
     setActiveBranch(code);
     setSearchParams({ branch: code });
+  };
+
+  // Handle direct search execution via search button
+  const handleExecuteSearch = () => {
+    setPulsingBranch(activeBranch);
+    setTimeout(() => setPulsingBranch(null), 500);
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
   };
 
   // Handle viewing a note
@@ -482,19 +514,40 @@ Generated securely by JNTU Circle Student Academic Portal.
 
           {/* Search & Filters Controls */}
           <div className="notes-filters-row">
-            {/* Search Box */}
+            {/* Search Box with Reactive Search Button */}
             <div className="notes-search-box">
-              <svg className="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <button 
+                type="button" 
+                className="search-input-btn"
+                onClick={handleExecuteSearch}
+                title="Search notes"
+                aria-label="Search"
+              >
+                <svg className="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </button>
               <input
+                ref={searchInputRef}
                 type="text"
-                placeholder="Search notes, subjects, codes..."
+                placeholder={`Search ${activeBranch} notes, subjects, codes...`}
                 className="notes-search-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleExecuteSearch()}
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  onClick={() => setSearchQuery("")}
+                  title="Clear search"
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
             {/* Branch Dropdown */}
@@ -535,15 +588,21 @@ Generated securely by JNTU Circle Student Academic Portal.
             <div className="notes-branch-sidebar">
               {BRANCH_TABS.map((tab) => {
                 const isActive = activeBranch === tab.code;
+                const isPulsing = pulsingBranch === tab.code;
+                const count = branchCounts[tab.code] || 0;
                 return (
                   <button
                     key={tab.code}
                     type="button"
-                    className={`branch-nav-pill ${isActive ? "active" : ""}`}
+                    className={`branch-nav-pill ${isActive ? "active" : ""} ${isPulsing ? "is-pulsing" : ""}`}
                     onClick={() => handleSelectBranch(tab.code)}
+                    title={`Search ${tab.name} (${count} study materials)`}
+                    aria-label={`Search ${tab.name}`}
                   >
-                    {/* Branch Specific Icons Matching Academic Theme */}
-                    <span className="branch-icon-box">
+                    {/* Reactive Branch Specific Emoji / Icon */}
+                    <span 
+                      className={`branch-icon-box ${tab.code.toLowerCase()}-icon ${isPulsing ? "reactive-burst" : ""}`}
+                    >
                       {tab.code === "CSE" && (
                         <svg viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="16 18 22 12 16 6" />
@@ -588,14 +647,18 @@ Generated securely by JNTU Circle Student Academic Portal.
                         </svg>
                       )}
                     </span>
-                    <span>{tab.code}</span>
+                    <span className="branch-nav-code">{tab.code}</span>
+                    <span className="branch-nav-count">{count}</span>
                   </button>
                 );
               })}
             </div>
 
             {/* Right Column: Subject Folder Cards List */}
-            <div className="notes-cards-container">
+            <div 
+              key={`${activeBranch}-${selectedSemester}-${searchQuery}`}
+              className="notes-cards-container"
+            >
               {loading ? (
                 <>
                   <div className="notes-skeleton-card" />
