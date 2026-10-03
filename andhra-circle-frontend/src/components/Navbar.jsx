@@ -38,8 +38,7 @@ function Navbar() {
   const notifContainerRef = useRef(null);
 
   const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
-  const [showPopover, setShowPopover] = useState(false);
-  const [showBubble, setShowBubble] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // Hook for cursor-driven liquid metal bend interaction
   useMetalBend(searchMetalRef);
@@ -56,12 +55,12 @@ function Navbar() {
       })
       .catch(() => {});
 
-    // Automatically trigger small notification pop-up bubble after 1.4 seconds
+    // Automatically trigger notification dropdown under the tab after 1.2 seconds
     const timer = setTimeout(() => {
       if (isMounted) {
-        setShowBubble(true);
+        setShowDropdown(true);
       }
-    }, 1400);
+    }, 1200);
 
     return () => {
       isMounted = false;
@@ -69,11 +68,11 @@ function Navbar() {
     };
   }, []);
 
-  // Close popover when clicking outside
+  // Close notification dropdown when clicking outside
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (notifContainerRef.current && !notifContainerRef.current.contains(e.target)) {
-        setShowPopover(false);
+        setShowDropdown(false);
       }
     };
     document.addEventListener("mousedown", handleOutsideClick);
@@ -178,8 +177,7 @@ function Navbar() {
                           : "nav-link"
                       }
                       onClick={() => {
-                        setShowPopover(false);
-                        setShowBubble(false);
+                        setShowDropdown(false);
                       }}
                     >
                       <span>{item.name}</span>
@@ -188,10 +186,9 @@ function Navbar() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          setShowPopover((prev) => !prev);
-                          setShowBubble(false);
+                          setShowDropdown((prev) => !prev);
                         }}
-                        title="Click to view live notification alerts"
+                        title="Click to toggle notifications preview"
                         aria-label="Toggle notifications preview"
                       >
                         <span className="nav-badge-pulse" />
@@ -199,93 +196,100 @@ function Navbar() {
                       </span>
                     </NavLink>
 
-                    {/* Compact Pop-up Notification Pill in Header (stays strictly in header) */}
-                    {showBubble && latestAlert && (
-                      <div 
-                        className="nav-notif-bubble"
-                        onClick={() => {
-                          setShowBubble(false);
-                          if (latestAlert.link && latestAlert.link.startsWith("http")) {
-                            window.open(latestAlert.link, "_blank");
-                          } else {
-                            navigate("/notifications");
-                          }
-                        }}
-                        title={`Latest Alert: ${latestAlert.title} (Click to open)`}
-                      >
-                        <span className="bubble-icon">📢</span>
-                        <span className="bubble-text">{latestAlert.title}</span>
-                        <span className="bubble-cta">View →</span>
-                        <button
-                          type="button"
-                          className="bubble-close-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowBubble(false);
-                          }}
-                          aria-label="Close notification preview"
-                          title="Dismiss notification"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
+                    {/* Modern Notification Dropdown: Positioned directly UNDER the Notifications tab */}
+                    {showDropdown && latestAlert && (
+                      <div className="nav-notif-dropdown" role="dialog" aria-label="Notifications Dropdown">
+                        <div className="notif-dropdown-arrow" />
 
-                    {/* Rich Notification Pop-up Dropdown Card */}
-                    {showPopover && (
-                      <div className="nav-notif-popover">
-                        <div className="popover-arrow" />
-                        <div className="popover-header">
-                          <div className="popover-title-row">
-                            <span className="popover-title">University Notices</span>
-                            <span className="popover-count-pill">{notificationsList.length} Active</span>
+                        {/* Top Header */}
+                        <div className="notif-dropdown-header">
+                          <div className="notif-header-left">
+                            <span className="notif-live-dot" />
+                            <span className="notif-header-title">University Notice</span>
+                            {latestAlert.category && (
+                              <span className={`notif-category-chip ${getCategoryBadgeClass(latestAlert.category)}`}>
+                                {latestAlert.category}
+                              </span>
+                            )}
                           </div>
                           <button
                             type="button"
-                            className="popover-close-btn"
-                            onClick={() => setShowPopover(false)}
-                            aria-label="Close popover"
+                            className="notif-dropdown-close"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowDropdown(false);
+                            }}
+                            aria-label="Close notification dropdown"
+                            title="Close"
                           >
                             ✕
                           </button>
                         </div>
 
-                        <div className="popover-items-list">
-                          {notificationsList.slice(0, 4).map((notif) => (
-                            <div
-                              key={notif._id}
-                              className="popover-item"
-                              onClick={() => {
-                                setShowPopover(false);
-                                if (notif.link && notif.link.startsWith("http")) {
-                                  window.open(notif.link, "_blank");
-                                } else {
-                                  navigate("/notifications");
-                                }
-                              }}
-                            >
-                              <div className="popover-item-top">
-                                <span className={`popover-item-badge ${getCategoryBadgeClass(notif.category)}`}>
-                                  {notif.category || "GENERAL"}
-                                </span>
-                                <span className="popover-item-time">{formatTimeAgo(notif.publishedDate)}</span>
-                              </div>
-                              <h4 className="popover-item-title">{notif.title}</h4>
-                              <p className="popover-item-desc">{notif.description}</p>
+                        {/* Clean Notification Card Layout (Requirement 4) */}
+                        <div 
+                          className="notif-dropdown-card"
+                          onClick={() => {
+                            setShowDropdown(false);
+                            if (latestAlert.link && latestAlert.link.startsWith("http")) {
+                              window.open(latestAlert.link, "_blank");
+                            } else {
+                              navigate("/notifications");
+                            }
+                          }}
+                        >
+                          {/* Small notification icon on the left */}
+                          <div className="notif-card-icon-col">
+                            <div className="notif-icon-circle">
+                              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                              </svg>
                             </div>
-                          ))}
+                          </div>
+
+                          {/* Center notification message + subtle time */}
+                          <div className="notif-card-content-col">
+                            <h4 className="notif-card-title">{latestAlert.title}</h4>
+                            {latestAlert.description && (
+                              <p className="notif-card-desc">{latestAlert.description}</p>
+                            )}
+                            <div className="notif-card-meta">
+                              <span className="notif-card-time">{formatTimeAgo(latestAlert.publishedDate)}</span>
+                              <span className="notif-card-divider">•</span>
+                              <span className="notif-card-author">Official Circular</span>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="popover-footer">
+                        {/* Footer Action Buttons */}
+                        <div className="notif-dropdown-footer">
                           <button
                             type="button"
-                            className="popover-view-all-btn"
-                            onClick={() => {
-                              setShowPopover(false);
+                            className="notif-btn-view"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowDropdown(false);
+                              if (latestAlert.link && latestAlert.link.startsWith("http")) {
+                                window.open(latestAlert.link, "_blank");
+                              } else {
+                                navigate("/notifications");
+                              }
+                            }}
+                          >
+                            <span>View →</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            className="notif-btn-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowDropdown(false);
                               navigate("/notifications");
                             }}
                           >
-                            View All Notifications & Circulars →
+                            All Circulars ({notificationsList.length})
                           </button>
                         </div>
                       </div>
