@@ -115,6 +115,7 @@ function Navbar() {
   };
 
   const latestAlert = notificationsList[0] || FALLBACK_NOTICES[0];
+  const hasNewNotification = Boolean(notificationsList && notificationsList.length > 0);
 
   const navigationLinks = [
     {
@@ -208,6 +209,9 @@ function Navbar() {
                       }}
                     >
                       <span>{item.name}</span>
+                      {hasNewNotification && (
+                        <span className="nav-notif-new-tag">(new)</span>
+                      )}
                     </NavLink>
 
                     {/* Small Black Glass Notification Strip Tooltip */}
