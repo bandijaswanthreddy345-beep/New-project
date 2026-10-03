@@ -229,7 +229,6 @@ function Navbar() {
                         title={latestAlert.title}
                       >
                         <div className="notif-dropdown-arrow" />
-                        <span className="notif-strip-dot" />
                         <span className="notif-strip-title">
                           {latestAlert.title}
                         </span>

@@ -3982,27 +3982,26 @@ textarea:focus-visible {
 
 .nav-notif-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 7px);
   right: 0;
-  width: 280px;
-  height: 48px;
+  width: 230px;
+  height: 36px;
   box-sizing: border-box;
-  padding: 0 12px;
-  border-radius: 10px;
+  padding: 0 10px;
+  border-radius: 8px;
   z-index: 1050;
   cursor: pointer;
 
   /* Black transparent glass background */
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
 
   /* Horizontal flex row, vertically centered */
   display: flex;
   align-items: center;
-  gap: 8px;
 
   /* Opening: opacity + translateY(-3px → 0), Closing: translateY(0 → -3px) 150-180ms */
   opacity: 0;
@@ -4037,26 +4036,16 @@ textarea:focus-visible {
 /* Subtle top arrow pointing directly to the Notifications button */
 .notif-dropdown-arrow {
   position: absolute;
-  top: -5px;
-  right: 48px;
+  top: -4px;
+  right: 36px;
   transform: rotate(45deg);
-  width: 9px;
-  height: 9px;
-  background: rgba(0, 0, 0, 0.65);
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.68);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 2px 0 0 0;
+  border-radius: 1.5px 0 0 0;
   z-index: 1;
-}
-
-/* Tiny green dot indicator */
-.notif-strip-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.9);
-  flex-shrink: 0;
 }
 
 /* Single line, vertically centered, white/light-gray headline with ellipsis */
@@ -4064,7 +4053,7 @@ textarea:focus-visible {
   flex: 1;
   min-width: 0;
   color: #f1f5f9;
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 550;
   line-height: 1.2;
   white-space: nowrap;
@@ -4082,10 +4071,10 @@ textarea:focus-visible {
 @media (max-width: 768px) {
   .nav-notif-dropdown {
     right: -10px;
-    width: min(280px, calc(100vw - 20px));
+    width: min(230px, calc(100vw - 20px));
   }
 
   .notif-dropdown-arrow {
-    right: 28px;
+    right: 24px;
   }
 }
