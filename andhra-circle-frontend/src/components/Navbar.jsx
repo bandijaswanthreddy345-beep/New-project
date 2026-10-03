@@ -36,6 +36,7 @@ function Navbar() {
   const navigate = useNavigate();
   const searchMetalRef = useRef(null);
   const notifContainerRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
 
   const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -55,20 +56,32 @@ function Navbar() {
       })
       .catch(() => {});
 
-    // Automatically trigger notification dropdown under the tab after 1.2 seconds
-    const timer = setTimeout(() => {
-      if (isMounted) {
-        setShowDropdown(true);
-      }
-    }, 1200);
-
     return () => {
       isMounted = false;
-      clearTimeout(timer);
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     };
   }, []);
 
-  // Close notification dropdown when clicking outside
+  // Hover handlers for smooth hover dropdown behavior
+  const handleNotifMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setShowDropdown(true);
+  };
+
+  const handleNotifMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    // 160ms buffer so moving cursor between button and popup never flickers
+    hoverTimeoutRef.current = setTimeout(() => {
+      setShowDropdown(false);
+    }, 160);
+  };
+
+  // Close notification dropdown when tapping outside (for touch/mobile)
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (notifContainerRef.current && !notifContainerRef.current.contains(e.target)) {
@@ -76,7 +89,11 @@ function Navbar() {
       }
     };
     document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
   }, []);
 
   const formatTimeAgo = (dateStr) => {
@@ -167,7 +184,13 @@ function Navbar() {
           {navigationLinks.map((item) => {
             if (item.name === "Notifications") {
               return (
-                <li key={item.path} className="nav-item-notif" ref={notifContainerRef}>
+                <li 
+                  key={item.path} 
+                  className="nav-item-notif" 
+                  ref={notifContainerRef}
+                  onMouseEnter={handleNotifMouseEnter}
+                  onMouseLeave={handleNotifMouseLeave}
+                >
                   <div className="nav-notif-link-container">
                     <NavLink
                       to={item.path}
@@ -176,8 +199,12 @@ function Navbar() {
                           ? "nav-link active"
                           : "nav-link"
                       }
-                      onClick={() => {
-                        setShowDropdown(false);
+                      onClick={(e) => {
+                        // On touch devices without hover support, tap toggles dropdown
+                        if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
+                          e.preventDefault();
+                          setShowDropdown((prev) => !prev);
+                        }
                       }}
                     >
                       <span>{item.name}</span>
@@ -197,8 +224,14 @@ function Navbar() {
                     </NavLink>
 
                     {/* Modern Notification Dropdown: Positioned directly UNDER the Notifications tab */}
-                    {showDropdown && latestAlert && (
-                      <div className="nav-notif-dropdown" role="dialog" aria-label="Notifications Dropdown">
+                    {latestAlert && (
+                      <div 
+                        className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`} 
+                        role="dialog" 
+                        aria-label="Notifications Dropdown"
+                        onMouseEnter={handleNotifMouseEnter}
+                        onMouseLeave={handleNotifMouseLeave}
+                      >
                         <div className="notif-dropdown-arrow" />
 
                         {/* Top Header */}

@@ -4016,28 +4016,45 @@ textarea:focus-visible {
   top: calc(100% + 8px);
   right: 0;
   width: 300px;
-  max-height: 185px;
+  max-height: 180px;
   overflow: hidden;
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid rgba(15, 23, 42, 0.1);
   box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12), 0 3px 8px -2px rgba(15, 23, 42, 0.05);
   z-index: 1050;
-  padding: 11px 12px;
+  padding: 10px 12px;
   box-sizing: border-box;
   text-align: left;
-  animation: notifDropdownEnter 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  /* Default closed state: smoothly fades & slides up 5px on close (120-150ms) */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-5px);
+  transition: opacity 140ms ease, transform 140ms ease, visibility 140ms ease;
 }
 
-@keyframes notifDropdownEnter {
-  0% {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Invisible hover bridge spanning between the Notifications button and popup */
+.nav-notif-dropdown::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* Open state on hover or toggle: smoothly fades & slides down (150-200ms) */
+.nav-notif-dropdown.is-open,
+.nav-item-notif:hover .nav-notif-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 180ms ease, transform 180ms ease;
 }
 
 /* Subtle top arrow pointing directly to the Notifications button */
@@ -4284,8 +4301,8 @@ textarea:focus-visible {
 
 @media (max-width: 768px) {
   .nav-notif-dropdown {
-    width: min(300px, calc(100vw - 24px));
-    animation: notifDropdownEnter 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    right: -10px;
+    width: min(300px, calc(100vw - 20px));
   }
 
   .notif-dropdown-arrow {
