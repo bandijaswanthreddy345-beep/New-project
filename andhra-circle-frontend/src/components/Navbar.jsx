@@ -208,19 +208,6 @@ function Navbar() {
                       }}
                     >
                       <span>{item.name}</span>
-                      <span 
-                        className="nav-notif-badge-pill" 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setShowDropdown((prev) => !prev);
-                        }}
-                        title="Click to toggle notifications preview"
-                        aria-label="Toggle notifications preview"
-                      >
-                        <span className="nav-badge-pulse" />
-                        {notificationsList.length}
-                      </span>
                     </NavLink>
 
                     {/* Small Black Glass Notification Strip Tooltip */}
