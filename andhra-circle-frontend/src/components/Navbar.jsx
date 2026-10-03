@@ -199,25 +199,23 @@ function Navbar() {
                       </span>
                     </NavLink>
 
-                    {/* Small Auto-Popping Message Bubble at Notification Tab */}
+                    {/* Compact Pop-up Notification Pill in Header (stays strictly in header) */}
                     {showBubble && latestAlert && (
-                      <div className="nav-notif-bubble">
-                        <div className="bubble-arrow" />
-                        <div 
-                          className="bubble-content" 
-                          onClick={() => {
-                            setShowBubble(false);
-                            if (latestAlert.link && latestAlert.link.startsWith("http")) {
-                              window.open(latestAlert.link, "_blank");
-                            } else {
-                              navigate("/notifications");
-                            }
-                          }}
-                        >
-                          <span className="bubble-tag">📢 BULLETIN</span>
-                          <span className="bubble-text">{latestAlert.title}</span>
-                          <span className="bubble-cta">View →</span>
-                        </div>
+                      <div 
+                        className="nav-notif-bubble"
+                        onClick={() => {
+                          setShowBubble(false);
+                          if (latestAlert.link && latestAlert.link.startsWith("http")) {
+                            window.open(latestAlert.link, "_blank");
+                          } else {
+                            navigate("/notifications");
+                          }
+                        }}
+                        title={`Latest Alert: ${latestAlert.title} (Click to open)`}
+                      >
+                        <span className="bubble-icon">📢</span>
+                        <span className="bubble-text">{latestAlert.title}</span>
+                        <span className="bubble-cta">View →</span>
                         <button
                           type="button"
                           className="bubble-close-btn"
@@ -226,6 +224,7 @@ function Navbar() {
                             setShowBubble(false);
                           }}
                           aria-label="Close notification preview"
+                          title="Dismiss notification"
                         >
                           ✕
                         </button>

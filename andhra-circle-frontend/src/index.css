@@ -3971,8 +3971,9 @@ textarea:focus-visible {
 
 .nav-notif-link-container {
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: 8px;
 }
 
 .nav-notif-badge-pill {
@@ -4007,101 +4008,97 @@ textarea:focus-visible {
   animation: livePulseRadar 1.8s infinite ease-in-out;
 }
 
-/* Small Floating Notification Message Bubble */
+/* Compact Header Notification Pop-up Pill (stays in header, zero overlap with body) */
 .nav-notif-bubble {
-  position: absolute;
-  top: calc(100% + 14px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #002420;
-  color: #ffffff;
-  padding: 8px 12px;
-  border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(0, 36, 32, 0.45), 0 0 0 1px rgba(217, 167, 38, 0.4);
-  display: flex;
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  z-index: 1000;
-  min-width: 290px;
-  max-width: 360px;
-  animation: notifBubblePop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  gap: 5px;
+  background: linear-gradient(135deg, #002722 0%, #013e37 100%);
+  color: #ffffff;
+  padding: 2.5px 8px 2.5px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 167, 38, 0.45);
+  box-shadow: 0 2px 8px rgba(0, 36, 32, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  max-width: 215px;
+  height: 24px;
+  cursor: pointer;
+  z-index: 10;
+  white-space: nowrap;
+  animation: notifPillPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: all 0.18s ease;
 }
 
-@keyframes notifBubblePop {
+.nav-notif-bubble:hover {
+  background: linear-gradient(135deg, #013e37 0%, #02574d 100%);
+  border-color: #d9a726;
+  box-shadow: 0 4px 12px rgba(0, 36, 32, 0.25);
+  transform: translateY(-1px);
+}
+
+@keyframes notifPillPop {
   0% {
     opacity: 0;
-    transform: translateX(-50%) translateY(-8px) scale(0.92);
+    transform: scale(0.92);
   }
   100% {
     opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
+    transform: scale(1);
   }
 }
 
-.nav-notif-bubble .bubble-arrow {
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 12px;
-  height: 12px;
-  background: #002420;
-  border-top: 1px solid rgba(217, 167, 38, 0.4);
-  border-left: 1px solid rgba(217, 167, 38, 0.4);
-}
-
-.nav-notif-bubble .bubble-content {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  flex: 1;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.nav-notif-bubble .bubble-tag {
-  background: #d9a726;
-  color: #002420;
-  font-size: 10px;
-  font-weight: 850;
-  padding: 2px 6px;
-  border-radius: 4px;
+.nav-notif-bubble .bubble-icon {
+  font-size: 11px;
+  line-height: 1;
   flex-shrink: 0;
-  letter-spacing: 0.3px;
 }
 
 .nav-notif-bubble .bubble-text {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: #ffffff;
+  color: #f8fafc;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 120px;
+  line-height: 1;
 }
 
 .nav-notif-bubble .bubble-cta {
   color: #ffefb3;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 750;
   white-space: nowrap;
+  line-height: 1;
   text-decoration: underline;
+  text-underline-offset: 2px;
+  flex-shrink: 0;
+}
+
+.nav-notif-bubble .bubble-cta:hover {
+  color: #ffffff;
 }
 
 .nav-notif-bubble .bubble-close-btn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
   cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 4px;
-  transition: color 0.15s ease;
+  padding: 0 2px;
+  margin-left: 1px;
+  border-radius: 3px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .nav-notif-bubble .bubble-close-btn:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Rich Notification Popover Modal */
@@ -4297,16 +4294,17 @@ textarea:focus-visible {
 
 @media (max-width: 768px) {
   .nav-notif-bubble {
-    left: auto;
-    right: 0;
-    transform: none;
-    max-width: 280px;
-    min-width: 240px;
+    max-width: 175px;
+    height: 22px;
+    font-size: 10px;
+    padding: 2px 6px;
   }
-  .nav-notif-bubble .bubble-arrow {
-    left: auto;
-    right: 25px;
-    transform: rotate(45deg);
+  .nav-notif-bubble .bubble-text {
+    max-width: 85px;
+    font-size: 10px;
+  }
+  .nav-notif-bubble .bubble-cta {
+    font-size: 9px;
   }
   .nav-notif-popover {
     right: 0;
