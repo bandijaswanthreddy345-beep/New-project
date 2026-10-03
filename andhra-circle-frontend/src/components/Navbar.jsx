@@ -1,5 +1,12 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useReducedMotion,
+} from "framer-motion";
 import { MetalFx, useMetalBend } from "metal-fx";
 import API from "../api/api";
 import logo from "../assets/jntu-circle-logo.png.png";
@@ -32,11 +39,102 @@ const FALLBACK_NOTICES = [
   },
 ];
 
+/**
+ * MagneticNavItem
+ * Subtle horizontal magnetic dock interaction for individual navbar text items.
+ * Inspires directly from <MagneticDock />: scales up to 1.10 and leans toward cursor within 130px.
+ */
+function MagneticNavItem({ children, mouseX, reducedMotion }) {
+  const itemRef = useRef(null);
+
+  // Distance from cursor to item center X
+  const distance = useTransform(mouseX, (val) => {
+    if (!itemRef.current || val === Infinity || typeof val !== "number") {
+      return 1000;
+    }
+    const rect = itemRef.current.getBoundingClientRect();
+    const center = rect.left + rect.width / 2;
+    return val - center;
+  });
+
+  // Scale: 1.0 when far (>130px), up to 1.10 when directly under cursor
+  const scale = useTransform(
+    distance,
+    [-130, -65, 0, 65, 130],
+    [1, 1.04, 1.10, 1.04, 1],
+    { clamp: true }
+  );
+
+  // Subtle magnetic horizontal pull toward cursor (max 3.5px)
+  const x = useTransform(
+    distance,
+    [-130, -65, 0, 65, 130],
+    [0, -3.5, 0, 3.5, 0],
+    { clamp: true }
+  );
+
+  // Subtle floating upward when hovered (max -2.5px)
+  const y = useTransform(
+    scale,
+    [1, 1.10],
+    [0, -2.5],
+    { clamp: true }
+  );
+
+  // Smooth, critically damped spring physics for an organic, non-bouncy feel
+  const springConfig = { damping: 20, stiffness: 260, mass: 0.45 };
+  const smoothScale = useSpring(scale, springConfig);
+  const smoothX = useSpring(x, springConfig);
+  const smoothY = useSpring(y, springConfig);
+
+  return (
+    <motion.span
+      ref={itemRef}
+      className="nav-magnetic-target"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        transformOrigin: "center center",
+        scale: reducedMotion ? 1 : smoothScale,
+        x: reducedMotion ? 0 : smoothX,
+        y: reducedMotion ? 0 : smoothY,
+        willChange: "transform",
+      }}
+    >
+      {children}
+    </motion.span>
+  );
+}
+
 function Navbar() {
   const navigate = useNavigate();
   const searchMetalRef = useRef(null);
   const notifContainerRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
+
+  // Magnetic dock motion tracking across the navbar items
+  const mouseX = useMotionValue(Infinity);
+  const navLinksRef = useRef(null);
+  const reducedMotion = useReducedMotion() ?? false;
+
+  const handleNavMouseMove = useCallback(
+    (e) => {
+      if (reducedMotion) return;
+      if (navLinksRef.current) {
+        const rect = navLinksRef.current.getBoundingClientRect();
+        if (e.clientY >= rect.top - 15 && e.clientY <= rect.bottom + 25) {
+          mouseX.set(e.clientX);
+          return;
+        }
+      }
+      mouseX.set(Infinity);
+    },
+    [mouseX, reducedMotion]
+  );
+
+  const handleNavMouseLeave = useCallback(() => {
+    mouseX.set(Infinity);
+  }, [mouseX]);
 
   const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -180,7 +278,12 @@ function Navbar() {
       ========================================== */}
 
       <nav>
-        <ul className="nav-links">
+        <ul 
+          className="nav-links"
+          ref={navLinksRef}
+          onMouseMove={handleNavMouseMove}
+          onMouseLeave={handleNavMouseLeave}
+        >
 
           {navigationLinks.map((item) => {
             if (item.name === "Notifications") {
@@ -208,10 +311,12 @@ function Navbar() {
                         }
                       }}
                     >
-                      <span>{item.name}</span>
-                      {hasNewNotification && (
-                        <span className="nav-notif-new-tag">new</span>
-                      )}
+                      <MagneticNavItem mouseX={mouseX} reducedMotion={reducedMotion}>
+                        <span>{item.name}</span>
+                        {hasNewNotification && (
+                          <span className="nav-notif-new-tag">new</span>
+                        )}
+                      </MagneticNavItem>
                     </NavLink>
 
                     {/* Small Black Glass Notification Strip Tooltip */}
@@ -253,7 +358,9 @@ function Navbar() {
                       : "nav-link"
                   }
                 >
-                  {item.name}
+                  <MagneticNavItem mouseX={mouseX} reducedMotion={reducedMotion}>
+                    <span>{item.name}</span>
+                  </MagneticNavItem>
                 </NavLink>
               </li>
             );
