@@ -2559,7 +2559,7 @@ textarea:focus-visible {
 */
 
 .notification-section {
-  display: none !important;
+  display: block;
 }
 
 .syllabus-section {
@@ -2579,19 +2579,22 @@ textarea:focus-visible {
 
 /* =========================================================
    FINAL CARD CONSISTENCY OVERRIDES
-   Question Papers + Lab Programs -> match Latest Notes
+   Question Papers + Lab Programs + Notifications -> match Latest Notes
    Keep this section at the VERY END of index.css
    ========================================================= */
 
 .papers-section,
-.lab-programs-section {
+.lab-programs-section,
+.notification-section {
   width: 100%;
   padding: 48px 56px 64px;
   background: var(--background);
+  box-sizing: border-box;
 }
 
 .papers-section .section-heading,
-.lab-programs-section .section-heading {
+.lab-programs-section .section-heading,
+.notification-section .section-heading {
   position: relative;
   width: 100%;
   max-width: 1400px;
@@ -2600,7 +2603,8 @@ textarea:focus-visible {
 }
 
 .papers-section .section-heading .section-tag,
-.lab-programs-section .section-heading .section-tag {
+.lab-programs-section .section-heading .section-tag,
+.notification-section .section-heading .section-tag {
   position: absolute;
   left: 0;
   top: 0;
@@ -2619,7 +2623,8 @@ textarea:focus-visible {
 }
 
 .papers-section .section-heading h2,
-.lab-programs-section .section-heading h2 {
+.lab-programs-section .section-heading h2,
+.notification-section .section-heading h2 {
   margin: 0;
   color: var(--text-primary);
   font-size: clamp(28px, 3vw, 34px);
@@ -2629,7 +2634,8 @@ textarea:focus-visible {
 }
 
 .papers-section .section-heading h2::after,
-.lab-programs-section .section-heading h2::after {
+.lab-programs-section .section-heading h2::after,
+.notification-section .section-heading h2::after {
   content: "";
   display: block;
   width: 42px;
@@ -2637,6 +2643,355 @@ textarea:focus-visible {
   margin: 12px auto 0;
   border-radius: 10px;
   background: var(--primary);
+}
+
+/* =========================================================
+   QUICK NOTICE SUMMARY & LIVE UPDATES COUNTER HUB
+   ========================================================= */
+
+.notifications-summary-hub {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 36px;
+  padding: 24px 28px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 250, 248, 0.98) 100%);
+  border: 1.5px solid rgba(1, 62, 55, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(1, 62, 55, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.summary-hub-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.summary-hub-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.live-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  animation: livePulseRadar 1.8s infinite ease-in-out;
+}
+
+@keyframes livePulseRadar {
+  0% { transform: scale(0.9); opacity: 0.8; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.9); opacity: 0.8; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.summary-hub-heading {
+  margin: 0;
+  color: #012622;
+  font-size: clamp(19px, 2.2vw, 24px);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.summary-hub-sub {
+  margin: 0;
+  color: #597b76;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.summary-hub-refresh {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.summary-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 9px;
+  background: #013e37;
+  color: #ffefb3;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 239, 179, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(1, 62, 55, 0.15);
+}
+
+.summary-refresh-btn:hover {
+  background: #02594f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(1, 62, 55, 0.25);
+}
+
+.summary-refresh-btn:active {
+  transform: scale(0.97);
+}
+
+.refresh-icon {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.3s ease;
+}
+
+.summary-refresh-btn.refreshing .refresh-icon {
+  animation: spinRefresh 0.7s linear infinite;
+}
+
+@keyframes spinRefresh {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.live-timestamp {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #7b9e97;
+}
+
+/* Metrics Grid */
+.summary-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .summary-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .summary-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(1, 62, 55, 0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.summary-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(1, 62, 55, 0.25);
+  box-shadow: 0 8px 20px rgba(1, 62, 55, 0.06);
+}
+
+.stat-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.stat-icon-emerald {
+  background: rgba(1, 62, 55, 0.08);
+  color: #013e37;
+}
+
+.stat-icon-amber {
+  background: rgba(217, 119, 6, 0.1);
+  color: #d97706;
+}
+
+.stat-icon-cyan {
+  background: rgba(8, 145, 178, 0.1);
+  color: #0891b2;
+}
+
+.stat-icon-gold {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+.stat-card-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-card-number {
+  font-size: 26px;
+  font-weight: 850;
+  color: #012622;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.stat-card-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #597b76;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* Latest Bulletin Ticker */
+.summary-latest-ticker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #fff9eb 0%, #ffffff 100%);
+  border: 1px solid rgba(217, 167, 38, 0.35);
+  box-shadow: 0 2px 8px rgba(217, 167, 38, 0.08);
+}
+
+.ticker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: #d9a726;
+  color: #002420;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+.ticker-badge-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #002420;
+  animation: pulseDot 1.5s infinite;
+}
+
+.ticker-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.ticker-title {
+  color: #012622;
+  font-size: 13.5px;
+  font-weight: 750;
+}
+
+.ticker-date {
+  color: #7b9e97;
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.ticker-action-link {
+  color: #013e37;
+  font-size: 12.5px;
+  font-weight: 750;
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(1, 62, 55, 0.07);
+  transition: all 0.18s ease;
+}
+
+.ticker-action-link:hover {
+  background: #013e37;
+  color: #ffffff;
+}
+
+/* Category Filter Pills */
+.summary-filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.summary-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(1, 62, 55, 0.12);
+  background: #ffffff;
+  color: #2d544f;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.summary-pill-btn:hover {
+  background: #eef6f3;
+  color: #012622;
+  transform: translateY(-1px);
+}
+
+.summary-pill-btn.active {
+  background: #013e37 !important;
+  color: #ffefb3 !important;
+  border-color: #013e37 !important;
+  box-shadow: 0 2px 8px rgba(1, 62, 55, 0.18);
+}
+
+.pill-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(1, 62, 55, 0.08);
+  color: #013e37;
+}
+
+.summary-pill-btn.active .pill-badge {
+  background: #ffefb3;
+  color: #013e37;
 }
 
 .papers-section .papers-grid,
