@@ -223,7 +223,7 @@ function Navbar() {
                       </span>
                     </NavLink>
 
-                    {/* Modern Notification Dropdown: Positioned directly UNDER the Notifications tab */}
+                    {/* Clean Glassmorphic Notification Preview Dropdown */}
                     {latestAlert && (
                       <div 
                         className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`} 
@@ -234,10 +234,14 @@ function Navbar() {
                       >
                         <div className="notif-dropdown-arrow" />
 
-                        {/* Top Header */}
-                        <div className="notif-dropdown-header">
-                          <div className="notif-header-left">
+                        {/* Top Header: ● University Notice     EXAM        × */}
+                        <div className="notif-glass-header">
+                          <div className="notif-glass-header-left">
                             <span className="notif-live-dot" />
+                            <svg className="notif-bell-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            </svg>
                             <span className="notif-header-title">University Notice</span>
                             <span className={`notif-category-chip ${getCategoryBadgeClass(latestAlert.category || "EXAM")}`}>
                               {latestAlert.category || "EXAM"}
@@ -257,9 +261,9 @@ function Navbar() {
                           </button>
                         </div>
 
-                        {/* Clean Notification Card Layout (Compact 1-line layout) */}
-                        <div 
-                          className="notif-dropdown-card"
+                        {/* Entire preview body is clickable: Title, Description, Timestamp */}
+                        <div
+                          className="notif-glass-body"
                           onClick={() => {
                             setShowDropdown(false);
                             if (latestAlert.link && latestAlert.link.startsWith("http")) {
@@ -268,57 +272,25 @@ function Navbar() {
                               navigate("/notifications");
                             }
                           }}
-                        >
-                          {/* Small notification icon on the left */}
-                          <div className="notif-card-icon-col">
-                            <div className="notif-icon-circle">
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                              </svg>
-                            </div>
-                          </div>
-
-                          {/* Center notification message (1-line) + subtle time */}
-                          <div className="notif-card-content-col">
-                            <h4 className="notif-card-title">{latestAlert.title}</h4>
-                            <div className="notif-card-meta">
-                              <span className="notif-card-time">{formatTimeAgo(latestAlert.publishedDate)}</span>
-                              <span className="notif-card-divider">•</span>
-                              <span className="notif-card-author">Official</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Footer Action Buttons */}
-                        <div className="notif-dropdown-footer">
-                          <button
-                            type="button"
-                            className="notif-btn-view"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setShowDropdown(false);
-                              if (latestAlert.link && latestAlert.link.startsWith("http")) {
-                                window.open(latestAlert.link, "_blank");
-                              } else {
-                                navigate("/notifications");
-                              }
-                            }}
-                          >
-                            <span>View →</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            className="notif-btn-all"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
                               setShowDropdown(false);
                               navigate("/notifications");
-                            }}
-                          >
-                            All ({notificationsList.length})
-                          </button>
+                            }
+                          }}
+                          title="Click to view notification"
+                        >
+                          <h4 className="notif-glass-title">{latestAlert.title}</h4>
+                          {latestAlert.description && (
+                            <p className="notif-glass-desc">{latestAlert.description}</p>
+                          )}
+                          <div className="notif-glass-meta">
+                            <span className="notif-glass-time">{formatTimeAgo(latestAlert.publishedDate)}</span>
+                            <span className="notif-glass-dot">·</span>
+                            <span className="notif-glass-source">Official Circular</span>
+                          </div>
                         </div>
                       </div>
                     )}
