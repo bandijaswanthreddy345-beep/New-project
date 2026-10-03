@@ -3976,20 +3976,38 @@ textarea:focus-visible {
 }
 
 .nav-notif-new-tag {
-  font-size: 11px;
-  font-weight: 700;
-  color: #059669;
-  margin-left: 4px;
-  letter-spacing: -0.2px;
-  display: inline-block;
-  vertical-align: baseline;
-  transition: color var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 16px;
+  padding: 0 5.5px;
+  margin-left: 5px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  vertical-align: middle;
+  box-sizing: border-box;
+
+  /* Refined brand emerald tint */
+  background: rgba(1, 62, 55, 0.08);
+  color: #013e37;
+  border: 1px solid rgba(1, 62, 55, 0.18);
+  transition: all 0.18s ease;
+  user-select: none;
 }
 
+/* Elegant brand color flip on tab hover or active */
 .nav-links a:hover .nav-notif-new-tag,
 .nav-links a.active .nav-notif-new-tag {
-  color: #047857;
+  background: #013e37;
+  color: #ffefb3;
+  border-color: #013e37;
+  transform: translateY(-0.5px);
 }
+
 /* =========================================================
    COMPACT BLACK GLASS NOTIFICATION STRIP TOOLTIP
    ========================================================= */

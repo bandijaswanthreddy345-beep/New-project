@@ -210,7 +210,7 @@ function Navbar() {
                     >
                       <span>{item.name}</span>
                       {hasNewNotification && (
-                        <span className="nav-notif-new-tag">(new)</span>
+                        <span className="nav-notif-new-tag">new</span>
                       )}
                     </NavLink>
 
