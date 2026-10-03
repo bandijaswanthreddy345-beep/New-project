@@ -223,75 +223,29 @@ function Navbar() {
                       </span>
                     </NavLink>
 
-                    {/* Clean Glassmorphic Notification Preview Dropdown */}
+                    {/* Small Black Glass Notification Strip Tooltip */}
                     {latestAlert && (
                       <div 
                         className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`} 
-                        role="dialog" 
-                        aria-label="Notifications Dropdown"
+                        role="tooltip" 
+                        aria-label="Notification Preview"
                         onMouseEnter={handleNotifMouseEnter}
                         onMouseLeave={handleNotifMouseLeave}
+                        onClick={() => {
+                          setShowDropdown(false);
+                          if (latestAlert.link && latestAlert.link.startsWith("http")) {
+                            window.open(latestAlert.link, "_blank");
+                          } else {
+                            navigate("/notifications");
+                          }
+                        }}
+                        title={latestAlert.title}
                       >
                         <div className="notif-dropdown-arrow" />
-
-                        {/* Top Header: ● University Notice     EXAM        × */}
-                        <div className="notif-glass-header">
-                          <div className="notif-glass-header-left">
-                            <span className="notif-live-dot" />
-                            <svg className="notif-bell-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                            </svg>
-                            <span className="notif-header-title">University Notice</span>
-                            <span className={`notif-category-chip ${getCategoryBadgeClass(latestAlert.category || "EXAM")}`}>
-                              {latestAlert.category || "EXAM"}
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            className="notif-dropdown-close"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setShowDropdown(false);
-                            }}
-                            aria-label="Close notification dropdown"
-                            title="Close"
-                          >
-                            ✕
-                          </button>
-                        </div>
-
-                        {/* Entire preview body is clickable: Title, Description, Timestamp */}
-                        <div
-                          className="notif-glass-body"
-                          onClick={() => {
-                            setShowDropdown(false);
-                            if (latestAlert.link && latestAlert.link.startsWith("http")) {
-                              window.open(latestAlert.link, "_blank");
-                            } else {
-                              navigate("/notifications");
-                            }
-                          }}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              setShowDropdown(false);
-                              navigate("/notifications");
-                            }
-                          }}
-                          title="Click to view notification"
-                        >
-                          <h4 className="notif-glass-title">{latestAlert.title}</h4>
-                          {latestAlert.description && (
-                            <p className="notif-glass-desc">{latestAlert.description}</p>
-                          )}
-                          <div className="notif-glass-meta">
-                            <span className="notif-glass-time">{formatTimeAgo(latestAlert.publishedDate)}</span>
-                            <span className="notif-glass-dot">·</span>
-                            <span className="notif-glass-source">Official Circular</span>
-                          </div>
-                        </div>
+                        <span className="notif-strip-dot" />
+                        <span className="notif-strip-title">
+                          {latestAlert.title}
+                        </span>
                       </div>
                     )}
                   </div>
