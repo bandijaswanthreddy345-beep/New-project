@@ -41,51 +41,70 @@ const FALLBACK_NOTICES = [
 
 /**
  * MagneticNavItem
- * Subtle horizontal magnetic dock interaction for individual navbar text items.
- * Inspires directly from <MagneticDock />: scales up to 1.10 and leans toward cursor within 130px.
+ * Smooth 2D magnetic dock interaction with continuous cosine proximity gradient.
+ * Attracts text toward cursor in both X and Y with natural spring damping, zero snapping.
  */
-function MagneticNavItem({ children, mouseX, reducedMotion }) {
+function MagneticNavItem({ children, mouseX, mouseY, reducedMotion }) {
   const itemRef = useRef(null);
 
-  // Distance from cursor to item center X
-  const distance = useTransform(mouseX, (val) => {
-    if (!itemRef.current || val === Infinity || typeof val !== "number") {
-      return 1000;
+  // Continuous proximity gradient (0 = outside field, 1 = directly centered)
+  const proximity = useTransform([mouseX, mouseY], ([mx, my]) => {
+    if (
+      !itemRef.current ||
+      mx === Infinity ||
+      my === Infinity ||
+      typeof mx !== "number" ||
+      typeof my !== "number"
+    ) {
+      return 0;
     }
     const rect = itemRef.current.getBoundingClientRect();
-    const center = rect.left + rect.width / 2;
-    return val - center;
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const dx = Math.abs(mx - centerX);
+    const dy = Math.abs(my - centerY);
+
+    const radiusX = 140;
+    const radiusY = 55;
+
+    if (dx >= radiusX || dy >= radiusY) return 0;
+
+    const normX = dx / radiusX;
+    const normY = dy / radiusY;
+
+    // Smooth cosine bell curve eliminates all snapping/wobble
+    return Math.cos((normX * Math.PI) / 2) * Math.cos((normY * Math.PI) / 2);
   });
 
-  // Scale: 1.0 when far (>130px), up to 1.10 when directly under cursor
-  const scale = useTransform(
-    distance,
-    [-130, -65, 0, 65, 130],
-    [1, 1.04, 1.10, 1.04, 1],
-    { clamp: true }
-  );
+  // Scale: 1.0 resting, subtly expands up to 1.09 directly under cursor
+  const scale = useTransform(proximity, (p) => 1 + 0.09 * p);
 
-  // Subtle magnetic horizontal pull toward cursor (max 3.5px)
-  const x = useTransform(
-    distance,
-    [-130, -65, 0, 65, 130],
-    [0, -3.5, 0, 3.5, 0],
-    { clamp: true }
-  );
+  // Magnetic attraction in X: text gently glides toward cursor position
+  const targetX = useTransform([mouseX, proximity], ([mx, p]) => {
+    if (!itemRef.current || p === 0 || mx === Infinity) return 0;
+    const rect = itemRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const dx = mx - centerX;
+    return Math.max(-6, Math.min(6, dx * 0.16 * p));
+  });
 
-  // Subtle floating upward when hovered (max -2.5px)
-  const y = useTransform(
-    scale,
-    [1, 1.10],
-    [0, -2.5],
-    { clamp: true }
-  );
+  // Magnetic attraction in Y: light float (-2.5px) + subtle vertical cursor tracking
+  const targetY = useTransform([mouseY, proximity], ([my, p]) => {
+    if (!itemRef.current || p === 0 || my === Infinity) return 0;
+    const rect = itemRef.current.getBoundingClientRect();
+    const centerY = rect.top + rect.height / 2;
+    const dy = my - centerY;
+    const lift = -2.5 * p;
+    const followY = Math.max(-2, Math.min(2, dy * 0.15 * p));
+    return lift + followY;
+  });
 
-  // Smooth, critically damped spring physics for an organic, non-bouncy feel
-  const springConfig = { damping: 20, stiffness: 260, mass: 0.45 };
+  // Smooth, non-bouncy spring physics (critically damped for an organic luxury feel)
+  const springConfig = { damping: 18, stiffness: 220, mass: 0.4 };
   const smoothScale = useSpring(scale, springConfig);
-  const smoothX = useSpring(x, springConfig);
-  const smoothY = useSpring(y, springConfig);
+  const smoothX = useSpring(targetX, springConfig);
+  const smoothY = useSpring(targetY, springConfig);
 
   return (
     <motion.span
@@ -112,29 +131,25 @@ function Navbar() {
   const notifContainerRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
 
-  // Magnetic dock motion tracking across the navbar items
+  // Magnetic dock motion tracking across the navbar items in both X and Y
   const mouseX = useMotionValue(Infinity);
-  const navLinksRef = useRef(null);
+  const mouseY = useMotionValue(Infinity);
+  const navContainerRef = useRef(null);
   const reducedMotion = useReducedMotion() ?? false;
 
   const handleNavMouseMove = useCallback(
     (e) => {
       if (reducedMotion) return;
-      if (navLinksRef.current) {
-        const rect = navLinksRef.current.getBoundingClientRect();
-        if (e.clientY >= rect.top - 15 && e.clientY <= rect.bottom + 25) {
-          mouseX.set(e.clientX);
-          return;
-        }
-      }
-      mouseX.set(Infinity);
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
     },
-    [mouseX, reducedMotion]
+    [mouseX, mouseY, reducedMotion]
   );
 
   const handleNavMouseLeave = useCallback(() => {
     mouseX.set(Infinity);
-  }, [mouseX]);
+    mouseY.set(Infinity);
+  }, [mouseX, mouseY]);
 
   const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -277,13 +292,12 @@ function Navbar() {
           NAVIGATION
       ========================================== */}
 
-      <nav>
-        <ul 
-          className="nav-links"
-          ref={navLinksRef}
-          onMouseMove={handleNavMouseMove}
-          onMouseLeave={handleNavMouseLeave}
-        >
+      <nav
+        ref={navContainerRef}
+        onMouseMove={handleNavMouseMove}
+        onMouseLeave={handleNavMouseLeave}
+      >
+        <ul className="nav-links">
 
           {navigationLinks.map((item) => {
             if (item.name === "Notifications") {
@@ -311,7 +325,7 @@ function Navbar() {
                         }
                       }}
                     >
-                      <MagneticNavItem mouseX={mouseX} reducedMotion={reducedMotion}>
+                      <MagneticNavItem mouseX={mouseX} mouseY={mouseY} reducedMotion={reducedMotion}>
                         <span>{item.name}</span>
                         {hasNewNotification && (
                           <span className="nav-notif-new-tag">new</span>
@@ -358,7 +372,7 @@ function Navbar() {
                       : "nav-link"
                   }
                 >
-                  <MagneticNavItem mouseX={mouseX} reducedMotion={reducedMotion}>
+                  <MagneticNavItem mouseX={mouseX} mouseY={mouseY} reducedMotion={reducedMotion}>
                     <span>{item.name}</span>
                   </MagneticNavItem>
                 </NavLink>
