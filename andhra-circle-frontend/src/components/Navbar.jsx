@@ -65,8 +65,8 @@ function MagneticNavItem({ children, mouseX, mouseY, reducedMotion }) {
     const dx = Math.abs(mx - centerX);
     const dy = Math.abs(my - centerY);
 
-    const radiusX = 140;
-    const radiusY = 55;
+    const radiusX = 115;
+    const radiusY = 40;
 
     if (dx >= radiusX || dy >= radiusY) return 0;
 
@@ -77,31 +77,31 @@ function MagneticNavItem({ children, mouseX, mouseY, reducedMotion }) {
     return Math.cos((normX * Math.PI) / 2) * Math.cos((normY * Math.PI) / 2);
   });
 
-  // Scale: 1.0 resting, subtly expands up to 1.09 directly under cursor
-  const scale = useTransform(proximity, (p) => 1 + 0.09 * p);
+  // Scale: 1.0 resting, gently expands up to 1.055 directly under cursor
+  const scale = useTransform(proximity, (p) => 1 + 0.055 * p);
 
-  // Magnetic attraction in X: text gently glides toward cursor position
+  // Subtler magnetic attraction in X (capped at ±3.5px)
   const targetX = useTransform([mouseX, proximity], ([mx, p]) => {
     if (!itemRef.current || p === 0 || mx === Infinity) return 0;
     const rect = itemRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const dx = mx - centerX;
-    return Math.max(-6, Math.min(6, dx * 0.16 * p));
+    return Math.max(-3.5, Math.min(3.5, dx * 0.10 * p));
   });
 
-  // Magnetic attraction in Y: light float (-2.5px) + subtle vertical cursor tracking
+  // Subtler magnetic attraction in Y: gentle micro-float (-1.5px)
   const targetY = useTransform([mouseY, proximity], ([my, p]) => {
     if (!itemRef.current || p === 0 || my === Infinity) return 0;
     const rect = itemRef.current.getBoundingClientRect();
     const centerY = rect.top + rect.height / 2;
     const dy = my - centerY;
-    const lift = -2.5 * p;
-    const followY = Math.max(-2, Math.min(2, dy * 0.15 * p));
+    const lift = -1.5 * p;
+    const followY = Math.max(-1.2, Math.min(1.2, dy * 0.08 * p));
     return lift + followY;
   });
 
-  // Smooth, non-bouncy spring physics (critically damped for an organic luxury feel)
-  const springConfig = { damping: 18, stiffness: 220, mass: 0.4 };
+  // Calmer, gentler spring physics with higher damping for an understated luxury feel
+  const springConfig = { damping: 24, stiffness: 200, mass: 0.45 };
   const smoothScale = useSpring(scale, springConfig);
   const smoothX = useSpring(targetX, springConfig);
   const smoothY = useSpring(targetY, springConfig);
