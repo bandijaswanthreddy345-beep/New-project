@@ -206,11 +206,9 @@ function Navbar() {
                           <div className="notif-header-left">
                             <span className="notif-live-dot" />
                             <span className="notif-header-title">University Notice</span>
-                            {latestAlert.category && (
-                              <span className={`notif-category-chip ${getCategoryBadgeClass(latestAlert.category)}`}>
-                                {latestAlert.category}
-                              </span>
-                            )}
+                            <span className={`notif-category-chip ${getCategoryBadgeClass(latestAlert.category || "EXAM")}`}>
+                              {latestAlert.category || "EXAM"}
+                            </span>
                           </div>
                           <button
                             type="button"
