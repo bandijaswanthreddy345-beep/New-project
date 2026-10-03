@@ -13,6 +13,7 @@ import Syllabus from "./pages/Syllabus";
 import LabPrograms from "./pages/LabPrograms";
 import SearchResults from "./pages/SearchResults";
 import NoteDetails from "./pages/NoteDetails";
+import StudentProfile from "./pages/StudentProfile";
 
 // =========================
 // Public Resource Pages
@@ -112,6 +113,20 @@ function App() {
       <Route
         path="/notes/:id"
         element={<NoteDetails />}
+      />
+
+      {/* =========================
+          STUDENT PROFILE
+      ========================== */}
+
+      <Route
+        path="/profile"
+        element={<StudentProfile />}
+      />
+
+      <Route
+        path="/student-profile"
+        element={<StudentProfile />}
       />
 
       {/* =========================

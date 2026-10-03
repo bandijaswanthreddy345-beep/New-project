@@ -71,7 +71,7 @@ function Hero() {
         ================================================== */}
 
         <h1>
-          Welcome to JNTU Circle
+          Welcome to <span className="font-deltha">JNTU</span> Circle
         </h1>
 
         {/* =================================================

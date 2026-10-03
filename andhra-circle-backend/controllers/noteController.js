@@ -343,3 +343,58 @@ exports.increaseDownloads = async (req, res) => {
     });
   }
 };
+
+// ==========================================
+// GET BRANCH STATS (FOR 3D CARDS & CATALOG)
+// ==========================================
+
+exports.getBranchStats = async (req, res) => {
+  try {
+    const Paper = require("../models/Paper");
+    const Syllabus = require("../models/Syllabus");
+    const LabProgram = require("../models/LabProgram");
+
+    const [notes, papers, syllabus, labs] = await Promise.all([
+      Note.find({}, "branch title"),
+      Paper.find({}, "branch title"),
+      Syllabus.find({}, "branch title"),
+      LabProgram.find({}, "branch title"),
+    ]);
+
+    // Group stats by branch
+    const stats = {};
+
+    const addToStats = (items, type) => {
+      items.forEach((item) => {
+        const rawBranch = String(item.branch || "").trim();
+        if (!rawBranch) return;
+
+        if (!stats[rawBranch]) {
+          stats[rawBranch] = { notes: 0, papers: 0, syllabus: 0, labs: 0, total: 0 };
+        }
+        stats[rawBranch][type] = (stats[rawBranch][type] || 0) + 1;
+        stats[rawBranch].total = (stats[rawBranch].total || 0) + 1;
+      });
+    };
+
+    addToStats(notes, "notes");
+    addToStats(papers, "papers");
+    addToStats(syllabus, "syllabus");
+    addToStats(labs, "labs");
+
+    res.status(200).json({
+      success: true,
+      stats,
+      totalNotes: notes.length,
+      totalPapers: papers.length,
+      totalSyllabus: syllabus.length,
+      totalLabs: labs.length,
+    });
+  } catch (error) {
+    console.error("Get Branch Stats Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
