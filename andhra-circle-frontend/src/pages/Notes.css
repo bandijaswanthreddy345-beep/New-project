@@ -148,6 +148,18 @@
   flex-shrink: 0;
 }
 
+.sidebar-notif-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 850;
+  padding: 1.5px 7px;
+  border-radius: 999px;
+  background: #d9a726;
+  color: #002420;
+  letter-spacing: 0.4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* Bottom Profile (Clickable Interactive Pill) */
 .sidebar-profile {
   margin-top: auto;
