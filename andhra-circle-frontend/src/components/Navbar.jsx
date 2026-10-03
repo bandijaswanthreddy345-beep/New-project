@@ -1,8 +1,14 @@
+import { useRef } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { MetalFx, useMetalBend } from "metal-fx";
 import logo from "../assets/jntu-circle-logo.png.png";
 
 function Navbar() {
   const navigate = useNavigate();
+  const searchMetalRef = useRef(null);
+
+  // Hook for cursor-driven liquid metal bend interaction
+  useMetalBend(searchMetalRef);
 
   const navigationLinks = [
     {
@@ -63,7 +69,7 @@ function Navbar() {
           />
 
           <div className="logo-text">
-            <h2>JNTU Circle</h2>
+            <h2><span className="font-deltha">JNTU</span> Circle</h2>
             <span>Academic Resource Hub</span>
           </div>
         </Link>
@@ -92,41 +98,45 @@ function Navbar() {
           ))}
 
           {/* ==========================================
-              SEARCH BUTTON
+              3D METAL SEARCH BUTTON
           ========================================== */}
 
-          <li>
-            <button
-              type="button"
-              className="nav-search-button"
-              aria-label="Search"
-              title="Search"
-              onClick={handleSearchClick}
+          <li className="nav-metal-search-item">
+            <MetalFx
+              ref={searchMetalRef}
+              preset="chromatic"
+              variant="circle"
+              strength={1}
+              innerShadow
+              className="metal-search-wrapper"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+              <button
+                type="button"
+                className="metal-search-btn"
+                aria-label="Search"
+                title="Search"
+                onClick={handleSearchClick}
               >
-                <circle
-                  cx="11"
-                  cy="11"
-                  r="7"
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
-                />
-
-                <path
-                  d="M20 20L16.65 16.65"
-                  stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="2.2"
                   strokeLinecap="round"
-                />
-              </svg>
-            </button>
+                  strokeLinejoin="round"
+                  className="metal-search-icon"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
+                </svg>
+              </button>
+            </MetalFx>
           </li>
+
+
 
           {/* ==========================================
               LOGIN BUTTON
