@@ -1,14 +1,121 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { MetalFx, useMetalBend } from "metal-fx";
+import API from "../api/api";
 import logo from "../assets/jntu-circle-logo.png.png";
+
+// Standard fallback notices for the pop-up preview
+const FALLBACK_NOTICES = [
+  {
+    _id: "notif-pop-1",
+    title: "JNTU B.Tech R20/R23 Semester End Exam Timetable 2024-25",
+    description: "Official schedule for regular and supplementary examinations commencing next month.",
+    category: "EXAM",
+    publishedDate: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+    link: "/notifications",
+  },
+  {
+    _id: "notif-pop-2",
+    title: "Revised Academic Calendar & Instruction Days for 2nd, 3rd & 4th Years",
+    description: "University circular detailing working Saturdays and assessment schedules.",
+    category: "CIRCULAR",
+    publishedDate: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    link: "/notifications",
+  },
+  {
+    _id: "notif-pop-3",
+    title: "Revaluation & Recounting Results for 2-1 and 3-1 Regular Examinations",
+    description: "Results portal is now active for online verification.",
+    category: "RESULTS",
+    publishedDate: new Date(Date.now() - 3 * 86400 * 1000).toISOString(),
+    link: "/notifications",
+  },
+];
 
 function Navbar() {
   const navigate = useNavigate();
   const searchMetalRef = useRef(null);
+  const notifContainerRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
+
+  const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // Hook for cursor-driven liquid metal bend interaction
   useMetalBend(searchMetalRef);
+
+  // Fetch real notifications from backend on mount
+  useEffect(() => {
+    let isMounted = true;
+    API.get("/notifications")
+      .then((res) => {
+        if (!isMounted) return;
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setNotificationsList(res.data);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    };
+  }, []);
+
+  // Hover handlers for smooth hover dropdown behavior
+  const handleNotifMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setShowDropdown(true);
+  };
+
+  const handleNotifMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    // 160ms buffer so moving cursor between button and popup never flickers
+    hoverTimeoutRef.current = setTimeout(() => {
+      setShowDropdown(false);
+    }, 160);
+  };
+
+  // Close notification dropdown when tapping outside (for touch/mobile)
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (notifContainerRef.current && !notifContainerRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, []);
+
+  const formatTimeAgo = (dateStr) => {
+    if (!dateStr) return "Recent";
+    const diffMin = Math.floor((new Date() - new Date(dateStr)) / 60000);
+    if (diffMin < 1) return "Just now";
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHours = Math.floor(diffMin / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${Math.floor(diffHours / 24)}d ago`;
+  };
+
+  const getCategoryBadgeClass = (category) => {
+    const c = String(category || "").toUpperCase();
+    if (c.includes("EXAM")) return "badge-exam";
+    if (c.includes("CIRCULAR")) return "badge-circular";
+    if (c.includes("RESULT")) return "badge-results";
+    return "badge-general";
+  };
+
+  const latestAlert = notificationsList[0] || FALLBACK_NOTICES[0];
+  const hasNewNotification = Boolean(notificationsList && notificationsList.length > 0);
 
   const navigationLinks = [
     {
@@ -43,13 +150,6 @@ function Navbar() {
 
   const handleSearchClick = (e) => {
     e.preventDefault();
-
-    /*
-      Add a timestamp so that clicking Search
-      again while already on /search still
-      creates a new navigation event.
-    */
-
     navigate(`/search?open=${Date.now()}`);
   };
 
@@ -82,20 +182,82 @@ function Navbar() {
       <nav>
         <ul className="nav-links">
 
-          {navigationLinks.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  isActive
-                    ? "nav-link active"
-                    : "nav-link"
-                }
-              >
-                {item.name}
-              </NavLink>
-            </li>
-          ))}
+          {navigationLinks.map((item) => {
+            if (item.name === "Notifications") {
+              return (
+                <li 
+                  key={item.path} 
+                  className="nav-item-notif" 
+                  ref={notifContainerRef}
+                  onMouseEnter={handleNotifMouseEnter}
+                  onMouseLeave={handleNotifMouseLeave}
+                >
+                  <div className="nav-notif-link-container">
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        isActive
+                          ? "nav-link active"
+                          : "nav-link"
+                      }
+                      onClick={(e) => {
+                        // On touch devices without hover support, tap toggles dropdown
+                        if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
+                          e.preventDefault();
+                          setShowDropdown((prev) => !prev);
+                        }
+                      }}
+                    >
+                      <span>{item.name}</span>
+                      {hasNewNotification && (
+                        <span className="nav-notif-new-tag">new</span>
+                      )}
+                    </NavLink>
+
+                    {/* Small Black Glass Notification Strip Tooltip */}
+                    {latestAlert && (
+                      <div 
+                        className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`} 
+                        role="tooltip" 
+                        aria-label="Notification Preview"
+                        onMouseEnter={handleNotifMouseEnter}
+                        onMouseLeave={handleNotifMouseLeave}
+                        onClick={() => {
+                          setShowDropdown(false);
+                          if (latestAlert.link && latestAlert.link.startsWith("http")) {
+                            window.open(latestAlert.link, "_blank");
+                          } else {
+                            navigate("/notifications");
+                          }
+                        }}
+                        title={latestAlert.title}
+                      >
+                        <div className="notif-dropdown-arrow" />
+                        <span className="notif-strip-title">
+                          {latestAlert.title}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </li>
+              );
+            }
+
+            return (
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "nav-link active"
+                      : "nav-link"
+                  }
+                >
+                  <span>{item.name}</span>
+                </NavLink>
+              </li>
+            );
+          })}
 
           {/* ==========================================
               3D METAL SEARCH BUTTON
