@@ -1,12 +1,5 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
 import { MetalFx, useMetalBend } from "metal-fx";
 import API from "../api/api";
 import logo from "../assets/jntu-circle-logo.png.png";
@@ -39,117 +32,11 @@ const FALLBACK_NOTICES = [
   },
 ];
 
-/**
- * MagneticNavItem
- * Smooth 2D magnetic dock interaction with continuous cosine proximity gradient.
- * Attracts text toward cursor in both X and Y with natural spring damping, zero snapping.
- */
-function MagneticNavItem({ children, mouseX, mouseY, reducedMotion }) {
-  const itemRef = useRef(null);
-
-  // Continuous proximity gradient (0 = outside field, 1 = directly centered)
-  const proximity = useTransform([mouseX, mouseY], ([mx, my]) => {
-    if (
-      !itemRef.current ||
-      mx === Infinity ||
-      my === Infinity ||
-      typeof mx !== "number" ||
-      typeof my !== "number"
-    ) {
-      return 0;
-    }
-    const rect = itemRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const dx = Math.abs(mx - centerX);
-    const dy = Math.abs(my - centerY);
-
-    const radiusX = 115;
-    const radiusY = 40;
-
-    if (dx >= radiusX || dy >= radiusY) return 0;
-
-    const normX = dx / radiusX;
-    const normY = dy / radiusY;
-
-    // Smooth cosine bell curve eliminates all snapping/wobble
-    return Math.cos((normX * Math.PI) / 2) * Math.cos((normY * Math.PI) / 2);
-  });
-
-  // Scale: 1.0 resting, gently expands up to 1.055 directly under cursor
-  const scale = useTransform(proximity, (p) => 1 + 0.055 * p);
-
-  // Subtler magnetic attraction in X (capped at ±3.5px)
-  const targetX = useTransform([mouseX, proximity], ([mx, p]) => {
-    if (!itemRef.current || p === 0 || mx === Infinity) return 0;
-    const rect = itemRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const dx = mx - centerX;
-    return Math.max(-3.5, Math.min(3.5, dx * 0.10 * p));
-  });
-
-  // Subtler magnetic attraction in Y: gentle micro-float (-1.5px)
-  const targetY = useTransform([mouseY, proximity], ([my, p]) => {
-    if (!itemRef.current || p === 0 || my === Infinity) return 0;
-    const rect = itemRef.current.getBoundingClientRect();
-    const centerY = rect.top + rect.height / 2;
-    const dy = my - centerY;
-    const lift = -1.5 * p;
-    const followY = Math.max(-1.2, Math.min(1.2, dy * 0.08 * p));
-    return lift + followY;
-  });
-
-  // Calmer, gentler spring physics with higher damping for an understated luxury feel
-  const springConfig = { damping: 24, stiffness: 200, mass: 0.45 };
-  const smoothScale = useSpring(scale, springConfig);
-  const smoothX = useSpring(targetX, springConfig);
-  const smoothY = useSpring(targetY, springConfig);
-
-  return (
-    <motion.span
-      ref={itemRef}
-      className="nav-magnetic-target"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        transformOrigin: "center center",
-        scale: reducedMotion ? 1 : smoothScale,
-        x: reducedMotion ? 0 : smoothX,
-        y: reducedMotion ? 0 : smoothY,
-        willChange: "transform",
-      }}
-    >
-      {children}
-    </motion.span>
-  );
-}
-
 function Navbar() {
   const navigate = useNavigate();
   const searchMetalRef = useRef(null);
   const notifContainerRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
-
-  // Magnetic dock motion tracking across the navbar items in both X and Y
-  const mouseX = useMotionValue(Infinity);
-  const mouseY = useMotionValue(Infinity);
-  const navContainerRef = useRef(null);
-  const reducedMotion = useReducedMotion() ?? false;
-
-  const handleNavMouseMove = useCallback(
-    (e) => {
-      if (reducedMotion) return;
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    },
-    [mouseX, mouseY, reducedMotion]
-  );
-
-  const handleNavMouseLeave = useCallback(() => {
-    mouseX.set(Infinity);
-    mouseY.set(Infinity);
-  }, [mouseX, mouseY]);
 
   const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -292,11 +179,7 @@ function Navbar() {
           NAVIGATION
       ========================================== */}
 
-      <nav
-        ref={navContainerRef}
-        onMouseMove={handleNavMouseMove}
-        onMouseLeave={handleNavMouseLeave}
-      >
+      <nav>
         <ul className="nav-links">
 
           {navigationLinks.map((item) => {
@@ -325,12 +208,10 @@ function Navbar() {
                         }
                       }}
                     >
-                      <MagneticNavItem mouseX={mouseX} mouseY={mouseY} reducedMotion={reducedMotion}>
-                        <span>{item.name}</span>
-                        {hasNewNotification && (
-                          <span className="nav-notif-new-tag">new</span>
-                        )}
-                      </MagneticNavItem>
+                      <span>{item.name}</span>
+                      {hasNewNotification && (
+                        <span className="nav-notif-new-tag">new</span>
+                      )}
                     </NavLink>
 
                     {/* Small Black Glass Notification Strip Tooltip */}
@@ -372,9 +253,7 @@ function Navbar() {
                       : "nav-link"
                   }
                 >
-                  <MagneticNavItem mouseX={mouseX} mouseY={mouseY} reducedMotion={reducedMotion}>
-                    <span>{item.name}</span>
-                  </MagneticNavItem>
+                  <span>{item.name}</span>
                 </NavLink>
               </li>
             );
