@@ -266,17 +266,28 @@ exports.deleteNote = async (req, res) => {
 
 exports.likeNote = async (req, res) => {
   try {
-    const note = await Note.findById(req.params.id);
+    const { action } = req.body || {};
+    const change = action === "unlike" ? -1 : 1;
 
-    if (!note) {
+    const existing = await Note.findById(req.params.id);
+
+    if (!existing) {
       return res.status(404).json({
         message: "Note not found",
       });
     }
 
-    note.likes += 1;
+    const currentLikes =
+      typeof existing.likes === "number" && !isNaN(existing.likes)
+        ? existing.likes
+        : 0;
+    const targetLikes = Math.max(0, currentLikes + change);
 
-    await note.save();
+    const note = await Note.findByIdAndUpdate(
+      req.params.id,
+      { $set: { likes: targetLikes } },
+      { new: true }
+    );
 
     res.status(200).json(note);
   } catch (error) {
@@ -294,17 +305,17 @@ exports.likeNote = async (req, res) => {
 
 exports.increaseViews = async (req, res) => {
   try {
-    const note = await Note.findById(req.params.id);
+    const note = await Note.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
 
     if (!note) {
       return res.status(404).json({
         message: "Note not found",
       });
     }
-
-    note.views += 1;
-
-    await note.save();
 
     res.status(200).json(note);
   } catch (error) {
@@ -322,17 +333,17 @@ exports.increaseViews = async (req, res) => {
 
 exports.increaseDownloads = async (req, res) => {
   try {
-    const note = await Note.findById(req.params.id);
+    const note = await Note.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { downloads: 1 } },
+      { new: true }
+    );
 
     if (!note) {
       return res.status(404).json({
         message: "Note not found",
       });
     }
-
-    note.downloads += 1;
-
-    await note.save();
 
     res.status(200).json(note);
   } catch (error) {

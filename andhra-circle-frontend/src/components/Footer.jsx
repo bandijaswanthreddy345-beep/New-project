@@ -3,17 +3,19 @@ import { Link } from "react-router-dom";
 function Footer() {
   const quickLinks = [
     { name: "Home", path: "/" },
-    { name: "Notes", path: "/notes" },
-    { name: "Question Papers", path: "/papers" },
-    { name: "Syllabus", path: "/syllabus" },
+    { name: "CGPA & SGPA Calculator", path: "/calculator" },
+    { name: "Academic Reports", path: "/reports" },
+    { name: "Upload Materials", path: "/upload-materials" },
     { name: "Notifications", path: "/notifications" },
   ];
 
   const resourceLinks = [
+    { name: "Notes & Materials", path: "/notes" },
+    { name: "Question Papers", path: "/papers" },
+    { name: "Syllabus Copies", path: "/syllabus" },
     { name: "Lab Programs", path: "/lab-programs" },
     { name: "Search Resources", path: "/search" },
-    { name: "Create Account", path: "/register" },
-    { name: "Admin Login", path: "/login" },
+    { name: "Admin Dashboard", path: "/dashboard" },
   ];
 
   return (

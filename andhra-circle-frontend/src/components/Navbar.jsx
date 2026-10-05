@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { MetalFx, useMetalBend } from "metal-fx";
 import API from "../api/api";
 import logo from "../assets/jntu-circle-logo.png.png";
 
@@ -34,15 +33,12 @@ const FALLBACK_NOTICES = [
 
 function Navbar() {
   const navigate = useNavigate();
-  const searchMetalRef = useRef(null);
   const notifContainerRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
 
   const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Hook for cursor-driven liquid metal bend interaction
-  useMetalBend(searchMetalRef);
 
   // Fetch real notifications from backend on mount
   useEffect(() => {
@@ -123,20 +119,20 @@ function Navbar() {
       path: "/",
     },
     {
-      name: "Notes",
-      path: "/notes",
+      name: "CGPA & SGPA Calculator",
+      path: "/calculator",
     },
     {
-      name: "Question Papers",
-      path: "/papers",
+      name: "JNTU Reports",
+      path: "/reports",
     },
     {
-      name: "Syllabus",
-      path: "/syllabus",
+      name: "Upload Materials",
+      path: "/upload-materials",
     },
     {
-      name: "Lab Programs",
-      path: "/lab-programs",
+      name: "Student Profile",
+      path: "/profile",
     },
     {
       name: "Notifications",
@@ -144,14 +140,7 @@ function Navbar() {
     },
   ];
 
-  // ==========================================
-  // OPEN SEARCH
-  // ==========================================
 
-  const handleSearchClick = (e) => {
-    e.preventDefault();
-    navigate(`/search?open=${Date.now()}`);
-  };
 
   return (
     <header className="navbar">
@@ -259,44 +248,7 @@ function Navbar() {
             );
           })}
 
-          {/* ==========================================
-              3D METAL SEARCH BUTTON
-          ========================================== */}
 
-          <li className="nav-metal-search-item">
-            <MetalFx
-              ref={searchMetalRef}
-              preset="chromatic"
-              variant="circle"
-              strength={1}
-              innerShadow
-              className="metal-search-wrapper"
-            >
-              <button
-                type="button"
-                className="metal-search-btn"
-                aria-label="Search"
-                title="Search"
-                onClick={handleSearchClick}
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="metal-search-icon"
-                  aria-hidden="true"
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
-                </svg>
-              </button>
-            </MetalFx>
-          </li>
 
 
 

@@ -138,17 +138,28 @@ exports.deletePaper = async (req, res) => {
 
 exports.likePaper = async (req, res) => {
   try {
-    const paper = await Paper.findById(req.params.id);
+    const { action } = req.body || {};
+    const change = action === "unlike" ? -1 : 1;
 
-    if (!paper) {
+    const existing = await Paper.findById(req.params.id);
+
+    if (!existing) {
       return res.status(404).json({
         message: "Paper not found",
       });
     }
 
-    paper.likes += 1;
+    const currentLikes =
+      typeof existing.likes === "number" && !isNaN(existing.likes)
+        ? existing.likes
+        : 0;
+    const targetLikes = Math.max(0, currentLikes + change);
 
-    await paper.save();
+    const paper = await Paper.findByIdAndUpdate(
+      req.params.id,
+      { $set: { likes: targetLikes } },
+      { new: true }
+    );
 
     res.status(200).json(paper);
   } catch (error) {
@@ -166,17 +177,17 @@ exports.likePaper = async (req, res) => {
 
 exports.increaseViews = async (req, res) => {
   try {
-    const paper = await Paper.findById(req.params.id);
+    const paper = await Paper.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
 
     if (!paper) {
       return res.status(404).json({
         message: "Paper not found",
       });
     }
-
-    paper.views += 1;
-
-    await paper.save();
 
     res.status(200).json(paper);
   } catch (error) {
@@ -194,17 +205,17 @@ exports.increaseViews = async (req, res) => {
 
 exports.increaseDownloads = async (req, res) => {
   try {
-    const paper = await Paper.findById(req.params.id);
+    const paper = await Paper.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { downloads: 1 } },
+      { new: true }
+    );
 
     if (!paper) {
       return res.status(404).json({
         message: "Paper not found",
       });
     }
-
-    paper.downloads += 1;
-
-    await paper.save();
 
     res.status(200).json(paper);
   } catch (error) {

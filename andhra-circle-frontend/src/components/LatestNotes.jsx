@@ -3,12 +3,25 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import LikeReactionButton from "./LikeReactionButton";
+import Resource3DModal from "./Resource3DModal";
 
 function LatestNotes({ search = "" }) {
   const navigate = useNavigate();
 
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [previewNote, setPreviewNote] = useState(null);
+
+  // Liked notes tracked per client browser
+  const [likedNoteIds, setLikedNoteIds] = useState(() => {
+    try {
+      const stored = localStorage.getItem("andhra_liked_notes");
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
 
   // ==========================================
   // FETCH NOTES
@@ -34,6 +47,97 @@ function LatestNotes({ search = "" }) {
       setNotes([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ==========================================
+  // INSTANT & RESILIENT LIKE REACTION HANDLER
+  // ==========================================
+
+  const handleToggleLike = async (note, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    const noteId = note._id;
+    if (!noteId) return;
+
+    const isLiked = likedNoteIds.has(noteId);
+    const action = isLiked ? "unlike" : "like";
+
+    // 1. Optimistic Local Liked State
+    setLikedNoteIds((prev) => {
+      const next = new Set(prev);
+      if (isLiked) {
+        next.delete(noteId);
+      } else {
+        next.add(noteId);
+      }
+      try {
+        localStorage.setItem("andhra_liked_notes", JSON.stringify([...next]));
+      } catch (err) {
+        console.error("Error saving liked notes:", err);
+      }
+      return next;
+    });
+
+    // 2. Optimistic Counter Update (Instant 0ms feedback)
+    setNotes((prevNotes) =>
+      prevNotes.map((n) => {
+        if (n._id === noteId) {
+          const current =
+            typeof n.likes === "number" && !isNaN(n.likes) ? n.likes : 0;
+          return {
+            ...n,
+            likes: Math.max(0, current + (isLiked ? -1 : 1)),
+          };
+        }
+        return n;
+      })
+    );
+
+    // 3. Persist to Backend API
+    try {
+      const res = await API.put(`/notes/${noteId}/like`, { action });
+      if (res.data && typeof res.data.likes === "number") {
+        setNotes((prevNotes) =>
+          prevNotes.map((n) =>
+            n._id === noteId ? { ...n, likes: res.data.likes } : n
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating like reaction:", error);
+      // Revert optimistic updates on network error
+      setLikedNoteIds((prev) => {
+        const next = new Set(prev);
+        if (isLiked) {
+          next.add(noteId);
+        } else {
+          next.delete(noteId);
+        }
+        try {
+          localStorage.setItem("andhra_liked_notes", JSON.stringify([...next]));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+
+      setNotes((prevNotes) =>
+        prevNotes.map((n) => {
+          if (n._id === noteId) {
+            const current =
+              typeof n.likes === "number" && !isNaN(n.likes) ? n.likes : 0;
+            return {
+              ...n,
+              likes: Math.max(0, current + (isLiked ? 1 : -1)),
+            };
+          }
+          return n;
+        })
+      );
     }
   };
 
@@ -129,8 +233,8 @@ function LatestNotes({ search = "" }) {
       );
     }
 
-    // Open the complete note page
-    navigate(`/notes/${note._id}`);
+    // Open the premium 3D interactive popup preview modal
+    setPreviewNote(note);
   };
 
   // ==========================================
@@ -241,6 +345,24 @@ function LatestNotes({ search = "" }) {
     return raw.split(/\s+/).map(formatWord).join(" ");
   };
 
+  const getNoteContext = (note) => {
+    if (
+      note.description &&
+      note.description.trim().length > 15 &&
+      !/(.)\1{4,}/.test(note.description) &&
+      !/[;'{}]/.test(note.description)
+    ) {
+      return note.description.trim();
+    }
+    const subj = formatSubject(note.subject) || "Subject";
+    const sem = note.semester ? `${note.semester}` : "";
+    const credits = note.credits ? ` • ${note.credits} Credits` : "";
+    if (sem) {
+      return `Comprehensive lecture notes, unit syllabus & key revision materials for ${subj} (${sem}${credits}).`;
+    }
+    return `Structured lecture modules, syllabus concepts, and exam preparation notes for ${subj}.`;
+  };
+
   // ==========================================
   // LOADING UI
   // ==========================================
@@ -258,7 +380,7 @@ function LatestNotes({ search = "" }) {
         <div className="notes-loading">
           Loading Notes...
         </div>
-      </section>
+    </section>
     );
   }
 
@@ -305,18 +427,6 @@ function LatestNotes({ search = "" }) {
                   }}
                 />
                 <div className="resource-image-overlay" />
-
-                <span className="read-time">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                  </svg>
-                  Verified Notes
-                </span>
-
-                <span className="resource-format-pill">
-                  R20 / R23
-                </span>
               </div>
 
               {/* ==========================================
@@ -335,7 +445,7 @@ function LatestNotes({ search = "" }) {
                 </h3>
 
                 <p className="resource-desc">
-                  {note.description || "Official JNTU academic study notes, syllabus units, and curated exam preparation material."}
+                  {getNoteContext(note)}
                 </p>
 
                 {/* ==========================================
@@ -353,12 +463,22 @@ function LatestNotes({ search = "" }) {
                   )}
 
                   {note.semester && (
-                    <span className="meta-chip" title="Academic Semester">
+                    <span className="meta-chip meta-chip-semester" title="Academic Semester">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
                         <path d="M6 12v5c3 3 9 3 12 0v-5" />
                       </svg>
                       {note.semester}
+                    </span>
+                  )}
+
+                  {note.subjectCode && (
+                    <span className="meta-chip meta-chip-code" title={`Subject Code: ${note.subjectCode}`}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                        <line x1="7" y1="7" x2="7.01" y2="7" />
+                      </svg>
+                      {note.subjectCode}
                     </span>
                   )}
 
@@ -374,60 +494,40 @@ function LatestNotes({ search = "" }) {
                 </div>
 
                 {/* ==========================================
-                    STATS
+                    PROFESSIONAL METRICS & LIKE STATS BAR
                 ========================================== */}
                 <div className="resource-stats">
                   <div className="resource-stats-left">
-                    <span className="stat-item" title="Views">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <span className="stat-chip stat-chip-views" title={`${note.views || 0} Total Views`}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
-                      {note.views || 0}
+                      <span className="stat-count">{note.views || 0}</span>
+                      <span className="stat-unit">views</span>
                     </span>
 
-                    <span className="stat-item" title="Downloads">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <span className="stat-chip stat-chip-downloads" title={`${note.downloads || 0} Total Downloads`}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="7 10 12 15 17 10" />
                         <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
-                      {note.downloads || 0}
+                      <span className="stat-count">{note.downloads || 0}</span>
+                      <span className="stat-unit">dls</span>
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    className="like-button"
-                    title="Like note"
-                    aria-label="Like note"
-                    onClick={async () => {
-                      try {
-                        await API.put(`/notes/${note._id}/like`);
-                        setNotes((prev) =>
-                          prev.map((item) =>
-                            item._id === note._id
-                              ? {
-                                  ...item,
-                                  likes: (item.likes || 0) + 1,
-                                }
-                              : item
-                          )
-                        );
-                      } catch (error) {
-                        console.error("Error liking note:", error);
-                      }
-                    }}
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                    <span>{note.likes || 0}</span>
-                  </button>
+                  <LikeReactionButton
+                    isLiked={likedNoteIds.has(note._id)}
+                    count={note.likes || 0}
+                    onToggle={(e) => handleToggleLike(note, e)}
+                    title={likedNoteIds.has(note._id) ? "Liked" : "Like note"}
+                  />
                 </div>
 
                 {/* ==========================================
-                    BUTTONS
+                    ACTION BUTTONS
                 ========================================== */}
                 <div className="resource-buttons">
                   <button
@@ -435,8 +535,8 @@ function LatestNotes({ search = "" }) {
                     className="view-pdf-button"
                     onClick={() => handleView(note)}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                     View Notes
@@ -447,7 +547,7 @@ function LatestNotes({ search = "" }) {
                     className="download-pdf-button"
                     onClick={() => handleModuleDownload(note, 1)}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                       <polyline points="7 10 12 15 17 10" />
                       <line x1="12" y1="15" x2="12" y2="3" />
@@ -461,6 +561,19 @@ function LatestNotes({ search = "" }) {
         </div>
       )}
 
+      {/* Premium 3D Interactive Floating Resource Preview Modal */}
+      <Resource3DModal
+        note={previewNote}
+        isOpen={Boolean(previewNote)}
+        onClose={() => setPreviewNote(null)}
+        onViewFull={(n) => navigate(`/notes/${n._id}`)}
+        onDownload={(n) => handleModuleDownload(n, 1)}
+        formatDate={formatDate}
+        formatSubject={formatSubject}
+        getDisplayTitle={getDisplayTitle}
+        getNoteContext={getNoteContext}
+        getImageUrl={getImageUrl}
+      />
     </section>
   );
 }

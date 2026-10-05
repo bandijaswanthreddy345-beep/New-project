@@ -1,0 +1,432 @@
+/* =========================================================
+   STUDENT ACADEMIC REPORTS STYLES
+   Pure Hex Colors, Crisp Typography & Official Transcript Print
+   ========================================================= */
+
+.rep-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.rep-main-container {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 64px 24px;
+}
+
+/* Header Section */
+.rep-header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.rep-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 12px;
+}
+
+.rep-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #16a34a;
+}
+
+.rep-page-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.rep-page-desc {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0;
+  max-width: 680px;
+}
+
+.rep-btn-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  background-color: #0f766e;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px #0f766e33;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rep-btn-print:hover {
+  background-color: #0d9488;
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   STATS GRID
+   ========================================================= */
+
+.rep-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 36px;
+}
+
+.rep-stat-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  gap: 16px;
+  box-shadow: 0 4px 16px #0f172a08;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rep-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px #0f172a0f;
+}
+
+.rep-stat-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-green {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.stat-blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.stat-purple {
+  background-color: #faf5ff;
+  color: #9333ea;
+}
+
+.stat-teal {
+  background-color: #f0fdfa;
+  color: #0d9488;
+}
+
+.rep-stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.rep-stat-label {
+  font-size: 11.5px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.rep-stat-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.rep-stat-value {
+  font-size: 24px;
+  font-weight: 850;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.rep-stat-sub {
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.rep-stat-foot {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.text-green { color: #059669; }
+.text-blue { color: #2563eb; }
+.text-purple { color: #9333ea; }
+.text-teal { color: #0d9488; }
+
+/* =========================================================
+   TRANSCRIPT CARD (PRINTABLE)
+   ========================================================= */
+
+.rep-transcript-card {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 18px;
+  padding: 36px;
+  box-shadow: 0 8px 30px #0f172a0a;
+}
+
+.rep-transcript-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+}
+
+.rep-official-logo {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+}
+
+.rep-official-titles h2 {
+  font-size: 20px;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
+}
+
+.rep-official-titles h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f766e;
+  margin: 0 0 4px 0;
+}
+
+.rep-official-titles p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Student Metadata Grid */
+.rep-student-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+}
+
+.rep-meta-item {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.rep-meta-label {
+  color: #64748b;
+  font-weight: 600;
+  min-width: 140px;
+}
+
+.rep-meta-val {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.text-primary {
+  color: #0f766e !important;
+}
+
+/* Table Filter Bar */
+.rep-table-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rep-filter-title {
+  font-size: 15px;
+  font-weight: 750;
+  color: #0f172a;
+}
+
+.rep-filter-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.rep-filter-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #475569;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rep-filter-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.rep-filter-btn.active {
+  background-color: #0f766e;
+  border-color: #0f766e;
+  color: #ffffff;
+}
+
+/* Data Table */
+.rep-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 28px;
+  font-size: 14px;
+}
+
+.rep-data-table th {
+  background-color: #f1f5f9;
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 750;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid #cbd5e1;
+  text-align: left;
+}
+
+.rep-data-table td {
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+
+.rep-sgpa-badge {
+  display: inline-block;
+  font-weight: 800;
+  color: #0f766e;
+  background-color: #ccfbf1;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.rep-status-tag {
+  font-size: 11px;
+  font-weight: 750;
+  color: #059669;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* Transcript Footer & Signature */
+.rep-transcript-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  gap: 20px;
+}
+
+.rep-calc-notes {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.6;
+  max-width: 580px;
+}
+
+.rep-calc-notes p {
+  margin: 0 0 4px 0;
+}
+
+.rep-signature-block {
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.rep-sig-line {
+  width: 200px;
+  height: 1px;
+  background-color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+/* =========================================================
+   PRINT STYLES
+   ========================================================= */
+@media print {
+  .rep-no-print {
+    display: none !important;
+  }
+
+  body, .rep-page-wrapper {
+    background-color: #ffffff !important;
+  }
+
+  .rep-main-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .rep-transcript-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .rep-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rep-student-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .rep-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

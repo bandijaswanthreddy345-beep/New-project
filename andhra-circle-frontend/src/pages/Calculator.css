@@ -1,0 +1,706 @@
+/* =========================================================
+   JNTU CGPA & SGPA CALCULATOR STYLES
+   Pure Hex Colors, Clean Typography & Modern Glassmorphism
+   ========================================================= */
+
+.calc-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.calc-main-container {
+  flex: 1;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 64px 24px;
+}
+
+/* =========================================================
+   HEADER HERO
+   ========================================================= */
+
+.calc-header-hero {
+  text-align: center;
+  max-width: 780px;
+  margin: 0 auto 36px auto;
+}
+
+.calc-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.calc-badge-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 0 3px #6ee7b7;
+}
+
+.calc-hero-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+}
+
+.calc-hero-subtitle {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #64748b;
+  margin: 0 0 28px 0;
+}
+
+/* =========================================================
+   TAB SWITCHER
+   ========================================================= */
+
+.calc-tab-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px #0f172a0a;
+}
+
+.calc-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.calc-tab-btn:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+}
+
+.calc-tab-btn.active {
+  background-color: #0f766e;
+  color: #ffffff;
+  box-shadow: 0 4px 12px #0f766e33;
+}
+
+.tab-icon {
+  font-size: 16px;
+}
+
+/* Toast Alert */
+.calc-toast-alert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background-color: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  color: #065f46;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto 24px auto;
+  box-shadow: 0 4px 12px #10b9811a;
+}
+
+/* =========================================================
+   SECTION LAYOUT (MAIN + SIDEBAR)
+   ========================================================= */
+
+.calc-section-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 28px;
+  align-items: start;
+}
+
+.calc-section-layout-single {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Primary Card */
+.calc-card-primary {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 6px 20px #0f172a08;
+}
+
+.calc-card-header {
+  margin-bottom: 24px;
+}
+
+.calc-card-title {
+  font-size: 20px;
+  font-weight: 750;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.calc-card-desc {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 20px 0;
+}
+
+/* Presets Bar */
+.calc-presets-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.calc-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calc-input-group label {
+  font-size: 13px;
+  font-weight: 650;
+  color: #475569;
+}
+
+.calc-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  outline: none;
+}
+
+.calc-select:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px #0f766e20;
+}
+
+/* =========================================================
+   TABLE STYLES
+   ========================================================= */
+
+.calc-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.calc-table th {
+  background-color: #f8fafc;
+  padding: 12px 14px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.calc-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.calc-table tr:last-child td {
+  border-bottom: none;
+}
+
+.text-center-cell {
+  text-align: center;
+}
+
+.calc-input-text {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #0f172a;
+  font-weight: 500;
+  outline: none;
+}
+
+.calc-input-text:focus {
+  border-color: #0f766e;
+  background-color: #f0fdfa;
+}
+
+.calc-select-cell {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.calc-btn-del {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.calc-btn-del:hover {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+/* Action Bar */
+.calc-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calc-btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 650;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calc-btn-add:hover {
+  background-color: #dcfce7;
+  border-color: #86efac;
+}
+
+.calc-btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calc-btn-reset:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+/* =========================================================
+   SIDEBAR RESULTS SCORE CARD
+   ========================================================= */
+
+.calc-score-card {
+  position: sticky;
+  top: 96px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 8px 30px #0f172a0d;
+}
+
+.calc-score-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.calc-pill-tag {
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  color: #0f766e;
+  background-color: #ccfbf1;
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+
+.calc-sem-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.calc-score-visual {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.calc-score-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f766e, #0d9488);
+  box-shadow: 0 10px 25px #0f766e3d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.cgpa-circle-glow {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  box-shadow: 0 10px 25px #2563eb3d;
+}
+
+.target-circle-good {
+  background: linear-gradient(135deg, #059669, #10b981);
+  box-shadow: 0 10px 25px #10b9813d;
+}
+
+.target-circle-warn {
+  background: linear-gradient(135deg, #dc2626, #f97316);
+  box-shadow: 0 10px 25px #ea580c3d;
+}
+
+.calc-score-val {
+  font-size: 34px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.calc-score-sub {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+
+.calc-standing-badge {
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.standing-distinction {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.standing-fail {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.calc-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+  margin-bottom: 20px;
+}
+
+.calc-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #475569;
+}
+
+.calc-breakdown-row strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.text-accent {
+  color: #0f766e !important;
+}
+
+.calc-formula-note {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.calc-formula-note p {
+  margin: 0 0 4px 0;
+}
+
+.calc-formula-note p:last-child {
+  margin: 0;
+}
+
+.calc-btn-save-profile {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #0f766e;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px #0f766e33;
+}
+
+.calc-btn-save-profile:hover {
+  background-color: #0d9488;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   CGPA GRID
+   ========================================================= */
+
+.calc-cgpa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.calc-cgpa-sem-box {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.calc-cgpa-sem-box.is-active {
+  border-color: #93c5fd;
+  background-color: #f0f9ff;
+}
+
+.calc-cgpa-sem-box.is-inactive {
+  opacity: 0.6;
+}
+
+.calc-sem-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.calc-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.calc-checkbox-container input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #0284c7;
+}
+
+.calc-sem-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.calc-sem-cred-pill {
+  font-size: 11px;
+  font-weight: 650;
+  padding: 3px 8px;
+  background-color: #e2e8f0;
+  color: #475569;
+  border-radius: 6px;
+}
+
+.calc-cgpa-inputs-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.calc-input-subgroup label {
+  display: block;
+  font-size: 11px;
+  font-weight: 650;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.calc-input-sgpa,
+.calc-input-cred {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #0f172a;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.calc-input-sgpa:focus,
+.calc-input-cred:focus {
+  border-color: #0284c7;
+}
+
+/* =========================================================
+   TARGET PLANNER FORM
+   ========================================================= */
+
+.calc-target-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.calc-target-input-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.calc-target-input-box label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.calc-target-input {
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.calc-target-input:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px #0f766e1a;
+}
+
+.target-highlight {
+  border-color: #0f766e;
+  background-color: #f0fdfa;
+}
+
+.calc-input-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+/* =========================================================
+   GRADE SCALE REFERENCE
+   ========================================================= */
+
+.grade-pill-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 13px;
+  border: 1px solid transparent;
+}
+
+.status-pass-tag {
+  font-size: 12px;
+  font-weight: 750;
+  color: #059669;
+}
+
+.status-fail-tag {
+  font-size: 12px;
+  font-weight: 750;
+  color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .calc-section-layout {
+    grid-template-columns: 1fr;
+  }
+  .calc-cgpa-grid {
+    grid-template-columns: 1fr;
+  }
+  .calc-target-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

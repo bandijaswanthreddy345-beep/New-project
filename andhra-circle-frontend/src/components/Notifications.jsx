@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import LikeReactionButton from "./LikeReactionButton";
 
 // Curated official JNTU academic notices as standard fallback
 const CURATED_NOTICES = [
@@ -56,6 +57,14 @@ function Notifications({ search = "" }) {
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [likedNotifIds, setLikedNotifIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem("andhra_liked_notifications");
+      return new Set(saved ? JSON.parse(saved) : []);
+    } catch {
+      return new Set();
+    }
+  });
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   useEffect(() => {
@@ -199,21 +208,88 @@ function Notifications({ search = "" }) {
     }
   };
 
-  const handleLike = async (notification) => {
-    try {
-      if (notification._id && !notification._id.startsWith("notice-")) {
-        await API.put(`/notifications/${notification._id}/like`);
-      }
+    const handleToggleLike = async (notification, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
-      setNotifications((prev) =>
-        prev.map((item) =>
-          item._id === notification._id
-            ? { ...item, likes: (item.likes || 0) + 1 }
-            : item
-        )
-      );
+    const notifId = notification._id;
+    if (!notifId) return;
+
+    const isLiked = likedNotifIds.has(notifId);
+    const action = isLiked ? "unlike" : "like";
+
+    // 1. Optimistic Local Set
+    setLikedNotifIds((prev) => {
+      const next = new Set(prev);
+      if (isLiked) {
+        next.delete(notifId);
+      } else {
+        next.add(notifId);
+      }
+      try {
+        localStorage.setItem("andhra_liked_notifications", JSON.stringify([...next]));
+      } catch (err) {
+        console.error("Error saving liked notifications:", err);
+      }
+      return next;
+    });
+
+    // 2. Optimistic Counter
+    setNotifications((prevNotifs) =>
+      prevNotifs.map((n) => {
+        if (n._id === notifId) {
+          const cur = typeof n.likes === "number" && !isNaN(n.likes) ? n.likes : 0;
+          return {
+            ...n,
+            likes: Math.max(0, cur + (isLiked ? -1 : 1)),
+          };
+        }
+        return n;
+      })
+    );
+
+    // 3. Persist to API
+    try {
+      if (!notifId.startsWith("notice-")) {
+        const res = await API.put(`/notifications/${notifId}/like`, { action });
+        if (res.data && typeof res.data.likes === "number") {
+          setNotifications((prevNotifs) =>
+            prevNotifs.map((n) =>
+              n._id === notifId ? { ...n, likes: res.data.likes } : n
+            )
+          );
+        }
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Error updating notification like:", error);
+      // Revert on error
+      setLikedNotifIds((prev) => {
+        const next = new Set(prev);
+        if (isLiked) {
+          next.add(notifId);
+        } else {
+          next.delete(notifId);
+        }
+        try {
+          localStorage.setItem("andhra_liked_notifications", JSON.stringify([...next]));
+        } catch {}
+        return next;
+      });
+
+      setNotifications((prevNotifs) =>
+        prevNotifs.map((n) => {
+          if (n._id === notifId) {
+            const cur = typeof n.likes === "number" && !isNaN(n.likes) ? n.likes : 0;
+            return {
+              ...n,
+              likes: Math.max(0, cur + (isLiked ? 1 : -1)),
+            };
+          }
+          return n;
+        })
+      );
     }
   };
 
@@ -411,31 +487,75 @@ function Notifications({ search = "" }) {
             <article className="resource-card" key={notification._id}>
               <div className="resource-image">
                 <img src={defaultBanner} alt={notification.title} />
-                <span className="read-time">Notification</span>
+                <span className="read-time">
+                  {notification.category || "Notification"}
+                </span>
               </div>
 
               <div className="resource-content">
-                <span className="resource-badge">
-                  {notification.category || "GENERAL"}
-                </span>
+                <div className="resource-badge-row">
+                  <span className="resource-badge">
+                    <span className="resource-badge-dot" />
+                    {notification.category || "GENERAL"}
+                  </span>
+                </div>
 
-                <h3>{notification.title}</h3>
-                <p>{notification.description}</p>
+                <h3 className="resource-title" title={notification.title}>
+                  {notification.title}
+                </h3>
 
-                <div className="resource-footer">
-                  <span>📅 {formatDate(notification.publishedDate)}</span>
+                <p className="resource-desc">
+                  {notification.description || "Official circular published by JNTU administrative board."}
+                </p>
+
+                <div className="resource-meta-chips">
+                  <span className="meta-chip meta-chip-date" title="Publish Date">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    {formatDate(notification.publishedDate)}
+                  </span>
+
+                  <span className="meta-chip meta-chip-category" title="Circular Category">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                      <line x1="7" y1="7" x2="7.01" y2="7" />
+                    </svg>
+                    {notification.category || "General"}
+                  </span>
                 </div>
 
                 <div className="resource-stats">
-                  <span>👁 {notification.views || 0}</span>
-                  <span>⬇ {notification.downloads || 0}</span>
+                  <div className="resource-stats-left">
+                    <span className="stat-chip stat-chip-views" title={`${notification.views || 0} Total Views`}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span className="stat-count">{notification.views || 0}</span>
+                      <span className="stat-unit">views</span>
+                    </span>
 
-                  <button
-                    className="like-button"
-                    onClick={() => handleLike(notification)}
-                  >
-                    ❤️ {notification.likes || 0}
-                  </button>
+                    <span className="stat-chip stat-chip-downloads" title={`${notification.downloads || 0} Total Downloads`}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                      </svg>
+                      <span className="stat-count">{notification.downloads || 0}</span>
+                      <span className="stat-unit">dls</span>
+                    </span>
+                  </div>
+
+                  <LikeReactionButton
+                    isLiked={likedNotifIds.has(notification._id)}
+                    count={notification.likes || 0}
+                    onToggle={(e) => handleToggleLike(notification, e)}
+                    title={likedNotifIds.has(notification._id) ? "Liked" : "Like notification"}
+                  />
                 </div>
 
                 <div className="resource-buttons">
@@ -446,13 +566,23 @@ function Notifications({ search = "" }) {
                     className="view-pdf-button"
                     onClick={() => handleView(notification)}
                   >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
                     View Details
                   </a>
 
                   <button
+                    type="button"
                     className="download-pdf-button"
                     onClick={() => handleDownload(notification)}
                   >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
                     Download
                   </button>
                 </div>
