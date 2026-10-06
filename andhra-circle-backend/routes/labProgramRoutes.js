@@ -10,6 +10,9 @@ const {
   getLabProgramById,
   updateLabProgram,
   deleteLabProgram,
+  likeLabProgram,
+  increaseViews,
+  increaseDownloads,
 } = require("../controllers/labProgramController");
 
 // ==========================================
@@ -59,5 +62,20 @@ router.delete(
   auth,
   deleteLabProgram
 );
+
+// ==========================================
+// LIKE LAB PROGRAM
+// ==========================================
+router.put("/:id/like", likeLabProgram);
+
+// ==========================================
+// INCREASE VIEWS
+// ==========================================
+router.put("/:id/view", increaseViews);
+
+// ==========================================
+// INCREASE DOWNLOADS
+// ==========================================
+router.put("/:id/download", increaseDownloads);
 
 module.exports = router;

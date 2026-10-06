@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
+import { MetalFx, useMetalBend } from "metal-fx";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
 import logo from "../assets/jntu-circle-logo.png.png";
@@ -101,6 +102,10 @@ function Notes() {
   const [downloadingId, setDownloadingId] = useState(null);
   const [pulsingBranch, setPulsingBranch] = useState(null);
   const searchInputRef = useRef(null);
+  const searchMetalRef = useRef(null);
+
+  // Hook for cursor-driven liquid metal bend interaction
+  useMetalBend(searchMetalRef);
 
   useEffect(() => {
     const handleProfileSync = () => {
@@ -506,10 +511,6 @@ Generated securely by JNTU Circle Student Academic Portal.
         <main className="notes-main-panel">
           {/* Header */}
           <header className="notes-page-header">
-            <div className="notes-eyebrow">
-              <span className="notes-eyebrow-dot" />
-              ACADEMIC REPOSITORY
-            </div>
             <h1 className="notes-page-title">Notes & Study Materials</h1>
             <p className="notes-page-subtitle">Access high-quality lecture notes, module guides, and syllabus resources across all engineering departments.</p>
           </header>
@@ -518,18 +519,40 @@ Generated securely by JNTU Circle Student Academic Portal.
           <div className="notes-filters-row">
             {/* Search Box with Reactive Search Button */}
             <div className="notes-search-box">
-              <button 
-                type="button" 
-                className="search-input-btn"
-                onClick={handleExecuteSearch}
-                title="Search notes"
-                aria-label="Search"
-              >
-                <svg className="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-              </button>
+              <div className="notes-search-metal-wrap">
+                <MetalFx
+                  ref={searchMetalRef}
+                  preset="chromatic"
+                  variant="circle"
+                  strength={1}
+                  innerShadow
+                  className="metal-search-wrapper"
+                >
+                  <button 
+                    type="button" 
+                    className="metal-search-btn notes-metal-search-btn"
+                    onClick={handleExecuteSearch}
+                    title="Search notes"
+                    aria-label="Search"
+                  >
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="metal-search-icon"
+                      aria-hidden="true"
+                    >
+                      <circle cx="11" cy="11" r="7" />
+                      <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
+                    </svg>
+                  </button>
+                </MetalFx>
+              </div>
               <input
                 ref={searchInputRef}
                 type="text"
@@ -598,7 +621,7 @@ Generated securely by JNTU Circle Student Academic Portal.
                     type="button"
                     className={`branch-nav-pill ${isActive ? "active" : ""} ${isPulsing ? "is-pulsing" : ""}`}
                     onClick={() => handleSelectBranch(tab.code)}
-                    title={`Search ${tab.name} (${count} study materials)`}
+                    title={`Search ${tab.name}`}
                     aria-label={`Search ${tab.name}`}
                   >
                     {/* Reactive Branch Specific Emoji / Icon */}
@@ -650,7 +673,6 @@ Generated securely by JNTU Circle Student Academic Portal.
                       )}
                     </span>
                     <span className="branch-nav-code">{tab.code}</span>
-                    <span className="branch-nav-count">{count}</span>
                   </button>
                 );
               })}
@@ -724,31 +746,8 @@ Generated securely by JNTU Circle Student Academic Portal.
                       </div>
                     </div>
 
-                    {/* Action Buttons: Download + View */}
+                    {/* Action Button: View */}
                     <div className="folder-card-actions">
-                      <button
-                        type="button"
-                        className={`folder-download-btn ${downloadingId === item.id ? "downloading" : ""}`}
-                        onClick={(e) => handleDownloadNote(e, item)}
-                        title={`Download ${item.title} Study Material`}
-                      >
-                        {downloadingId === item.id ? (
-                          <>
-                            <span className="download-spinner" />
-                            <span>Saving...</span>
-                          </>
-                        ) : (
-                          <>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                              <polyline points="7 10 12 15 17 10" />
-                              <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
-                            <span>Download</span>
-                          </>
-                        )}
-                      </button>
-
                       <button
                         type="button"
                         className="folder-view-btn"

@@ -163,35 +163,38 @@ res.status(500).json({
 // ==========================================
 
 exports.likeNotification = async (req, res) => {
-try {
-const notification = await Notification.findById(
-req.params.id
-);
+  try {
+    const { action } = req.body || {};
+    const change = action === "unlike" ? -1 : 1;
 
+    const existing = await Notification.findById(req.params.id);
 
-if (!notification) {
-  return res.status(404).json({
-    message: "Notification not found",
-  });
-}
+    if (!existing) {
+      return res.status(404).json({
+        message: "Notification not found",
+      });
+    }
 
-notification.likes += 1;
+    const currentLikes =
+      typeof existing.likes === "number" && !isNaN(existing.likes)
+        ? existing.likes
+        : 0;
+    const targetLikes = Math.max(0, currentLikes + change);
 
-await notification.save();
+    const notification = await Notification.findByIdAndUpdate(
+      req.params.id,
+      { $set: { likes: targetLikes } },
+      { new: true }
+    );
 
-res.status(200).json(notification);
+    res.status(200).json(notification);
+  } catch (error) {
+    console.error("Like Notification Error:", error);
 
-
-} catch (error) {
-console.error("Like Notification Error:", error);
-
-
-res.status(500).json({
-  message: error.message,
-});
-
-
-}
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
@@ -199,35 +202,27 @@ res.status(500).json({
 // ==========================================
 
 exports.increaseViews = async (req, res) => {
-try {
-const notification = await Notification.findById(
-req.params.id
-);
+  try {
+    const notification = await Notification.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
 
+    if (!notification) {
+      return res.status(404).json({
+        message: "Notification not found",
+      });
+    }
 
-if (!notification) {
-  return res.status(404).json({
-    message: "Notification not found",
-  });
-}
+    res.status(200).json(notification);
+  } catch (error) {
+    console.error("View Error:", error);
 
-notification.views += 1;
-
-await notification.save();
-
-res.status(200).json(notification);
-
-
-} catch (error) {
-console.error("View Error:", error);
-
-
-res.status(500).json({
-  message: error.message,
-});
-
-
-}
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
@@ -235,33 +230,25 @@ res.status(500).json({
 // ==========================================
 
 exports.increaseDownloads = async (req, res) => {
-try {
-const notification = await Notification.findById(
-req.params.id
-);
+  try {
+    const notification = await Notification.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { downloads: 1 } },
+      { new: true }
+    );
 
+    if (!notification) {
+      return res.status(404).json({
+        message: "Notification not found",
+      });
+    }
 
-if (!notification) {
-  return res.status(404).json({
-    message: "Notification not found",
-  });
-}
+    res.status(200).json(notification);
+  } catch (error) {
+    console.error("Download Error:", error);
 
-notification.downloads += 1;
-
-await notification.save();
-
-res.status(200).json(notification);
-
-
-} catch (error) {
-console.error("Download Error:", error);
-
-
-res.status(500).json({
-  message: error.message,
-});
-
-
-}
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };

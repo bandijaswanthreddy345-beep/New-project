@@ -152,3 +152,92 @@ exports.deleteLabProgram = async (req, res) => {
     });
   }
 };
+
+// ==========================================
+// LIKE LAB PROGRAM
+// ==========================================
+exports.likeLabProgram = async (req, res) => {
+  try {
+    const { action } = req.body || {};
+    const change = action === "unlike" ? -1 : 1;
+
+    const existing = await LabProgram.findById(req.params.id);
+
+    if (!existing) {
+      return res.status(404).json({
+        message: "Lab program not found",
+      });
+    }
+
+    const currentLikes =
+      typeof existing.likes === "number" && !isNaN(existing.likes)
+        ? existing.likes
+        : 0;
+    const targetLikes = Math.max(0, currentLikes + change);
+
+    const labProgram = await LabProgram.findByIdAndUpdate(
+      req.params.id,
+      { $set: { likes: targetLikes } },
+      { new: true }
+    );
+
+    res.status(200).json(labProgram);
+  } catch (error) {
+    console.error("Like Lab Program Error:", error);
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// ==========================================
+// INCREASE VIEWS
+// ==========================================
+exports.increaseViews = async (req, res) => {
+  try {
+    const labProgram = await LabProgram.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+
+    if (!labProgram) {
+      return res.status(404).json({
+        message: "Lab program not found",
+      });
+    }
+
+    res.status(200).json(labProgram);
+  } catch (error) {
+    console.error("View Lab Program Error:", error);
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// ==========================================
+// INCREASE DOWNLOADS
+// ==========================================
+exports.increaseDownloads = async (req, res) => {
+  try {
+    const labProgram = await LabProgram.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { downloads: 1 } },
+      { new: true }
+    );
+
+    if (!labProgram) {
+      return res.status(404).json({
+        message: "Lab program not found",
+      });
+    }
+
+    res.status(200).json(labProgram);
+  } catch (error) {
+    console.error("Download Lab Program Error:", error);
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
