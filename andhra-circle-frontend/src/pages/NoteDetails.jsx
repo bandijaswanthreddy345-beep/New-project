@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import AuthorProfile from "../components/AuthorProfile";
 import "./NoteDetails.css";
 
@@ -204,7 +203,6 @@ function NoteDetails() {
   const credits = note?.credits || "";
 
   const year = note?.year || "";
-  const description = note?.description || "";
 
   // =========================================================
   // UNITS
@@ -678,6 +676,12 @@ function NoteDetails() {
 
   return (
     <div className="note-details-page">
+      <div className="note-ambient-backdrop" aria-hidden="true">
+        <div className="note-ambient-glow note-ambient-glow-blue"></div>
+        <div className="note-ambient-glow note-ambient-glow-violet"></div>
+        <div className="note-ambient-glow note-ambient-glow-cyan"></div>
+        <div className="note-ambient-glow note-ambient-glow-pink"></div>
+      </div>
 
       {/* =====================================================
           ❤️ BIG HEART POP OVERLAY
@@ -754,88 +758,74 @@ function NoteDetails() {
       ====================================================== */}
 
       <section className="note-hero">
-
-        <div className="note-hero-background">
-          <img
-            src={defaultBanner}
-            alt=""
-          />
-        </div>
-
-        <div className="note-hero-overlay"></div>
-
         <div className="note-hero-content">
-
-          <button
-            type="button"
-            className="hero-back-button"
-            onClick={() => navigate(-1)}
-          >
-            <span>←</span>
-            Back to Notes
-          </button>
+          <div className="note-hero-topbar">
+            <button
+              type="button"
+              className="hero-back-button"
+              onClick={() => navigate(-1)}
+            >
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H16" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <span className="hero-topbar-label">
+              <span aria-hidden="true"></span>
+              JNTU CIRCLE · STUDY RESOURCE
+            </span>
+          </div>
 
           <div className="hero-main">
+            <div className="hero-heading-layout">
+              <div className="hero-title-block">
+                <div className="study-badge">
+                  <span aria-hidden="true"></span>
+                  STUDY MATERIAL
+                </div>
 
-            <div className="study-badge">
-              <span>▣</span>
-              STUDY MATERIAL
-            </div>
+                <h1>{title}</h1>
+              </div>
 
-            <h1>
-              {title}
-            </h1>
-
-            <div className="hero-subtitle">
-
-              {subject && (
-                <span>
-                  {subject}
-                </span>
+              {(subject || subjectCode) && (
+                <div className="hero-subject-details">
+                  {subject && (
+                    <div className="hero-subject-item">
+                      <span>SUBJECT</span>
+                      <strong>{subject}</strong>
+                    </div>
+                  )}
+                  {subjectCode && (
+                    <div className="hero-subject-item hero-subject-code">
+                      <span>SUBJECT CODE</span>
+                      <strong>{subjectCode}</strong>
+                    </div>
+                  )}
+                </div>
               )}
-
-              {subject &&
-                subjectCode && (
-                  <span className="hero-dot">
-                    •
-                  </span>
-                )}
-
-              {subjectCode && (
-                <span>
-                  {subjectCode}
-                </span>
-              )}
-
             </div>
 
             <div className="hero-tags">
-
               {branch && (
                 <div className="hero-tag">
-                  <span>🎓</span>
-                  {branch}
+                  <span className="hero-tag-label">BRANCH</span>
+                  <strong>{branch}</strong>
                 </div>
               )}
-
               {semester && (
                 <div className="hero-tag">
-                  <span>📚</span>
-                  {semester}
+                  <span className="hero-tag-label">SEMESTER</span>
+                  <strong>{semester}</strong>
                 </div>
               )}
-
               {year && (
                 <div className="hero-tag">
-                  <span>📅</span>
-                  {year}
+                  <span className="hero-tag-label">ACADEMIC YEAR</span>
+                  <strong>{year}</strong>
                 </div>
               )}
-
             </div>
-
           </div>
-
         </div>
 
       </section>
@@ -846,129 +836,18 @@ function NoteDetails() {
 
       <main className="note-main">
 
-        {/* ===================================================
-            COURSE + ABOUT
-        ==================================================== */}
-
-        <section className="info-grid">
-
-          <div className="course-card">
-
-            <div className="card-heading">
-
-              <div className="heading-icon">
-                📚
-              </div>
-
-              <div>
-                <span className="eyebrow">
-                  COURSE DETAILS
-                </span>
-
-                <h2>
-                  {title}
-                </h2>
-              </div>
-
-            </div>
-
-            <div className="course-details-grid">
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Subject
-                </span>
-
-                <strong>
-                  {subject || "—"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Subject Code
-                </span>
-
-                <strong>
-                  {subjectCode || "—"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Branch
-                </span>
-
-                <strong>
-                  {branch || "—"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Semester
-                </span>
-
-                <strong>
-                  {semester || "—"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Credits
-                </span>
-
-                <strong>
-                  {credits || "—"}
-                </strong>
-              </div>
-
-            </div>
-
+        <section className="credits-summary" aria-label="Course credits">
+          <div className="credits-summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 3.5 14.4 8.4l5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8L12 3.5Z" />
+              <path d="M8.2 19.4v2.1l3.8-1.8 3.8 1.8v-2.1" />
+            </svg>
           </div>
-
-          {/* ABOUT */}
-
-          <div className="about-card">
-
-            <div className="about-heading">
-
-              <div className="about-icon">
-                ℹ
-              </div>
-
-              <div>
-                <span className="eyebrow">
-                  ABOUT THIS RESOURCE
-                </span>
-
-                <h2>
-                  About these notes
-                </h2>
-              </div>
-
-            </div>
-
-            <div className="about-content">
-
-              <span className="quote-mark">
-                “
-              </span>
-
-              <p>
-                {description ||
-                  "Study material for this course."}
-              </p>
-
-              <span className="book-decoration">
-                📖
-              </span>
-
-            </div>
-
+          <div className="credits-summary-copy">
+            <span className="credits-summary-label">COURSE CREDITS</span>
+            <p>Credit value for this subject</p>
           </div>
-
+          <strong className="credits-summary-value">{credits || "—"}</strong>
         </section>
 
         {/* ===================================================
