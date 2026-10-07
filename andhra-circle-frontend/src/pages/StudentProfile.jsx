@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import logo from "../assets/jntu-circle-logo.png.png";
 import profileImg from "../assets/jaswanth.png.png";
 import {
   DEFAULT_STUDENT_DATA,
@@ -49,7 +48,7 @@ function StudentProfile() {
       <header className="sp-page-header">
         <div className="sp-page-header-inner">
           <div className="sp-header-left" onClick={() => navigate("/")}>
-            <img src={logo} alt="JNTU Circle" className="sp-page-logo" />
+            <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sp-page-logo" />
             <div>
               <h2 className="sp-brand-title"><span className="font-deltha">JNTU</span> Circle</h2>
               <span className="sp-brand-subtitle">Student Academic Portal</span>

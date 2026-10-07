@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { getStoredStudentData } from "../data/studentData";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import logo from "../assets/jntu-circle-logo.png.png";
 import "./Reports.css";
 
 export default function Reports() {
@@ -138,7 +137,7 @@ export default function Reports() {
         <section className="rep-transcript-card">
           {/* Official JNTU Header */}
           <div className="rep-transcript-header">
-            <img src={logo} alt="JNTU Logo" className="rep-official-logo" />
+            <img src="/jntu-circle-logo.png" alt="JNTU Logo" className="rep-official-logo" />
             <div className="rep-official-titles">
               <h2>JAWAHARLAL NEHRU TECHNOLOGICAL UNIVERSITY</h2>
               <h3>OFFICIAL ACADEMIC PROGRESS & TRANSCRIPT REPORT</h3>

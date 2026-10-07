@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { MetalFx, useMetalBend } from "metal-fx";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
-import logo from "../assets/jntu-circle-logo.png.png";
 import profile from "../assets/jaswanth.png.png";
 import StudentProfileModal from "../components/StudentProfileModal";
 import { getStoredStudentData } from "../data/studentData";
@@ -408,7 +407,7 @@ Generated securely by JNTU Circle Student Academic Portal.
         <aside className="notes-sidebar">
           {/* Brand Header */}
           <div className="sidebar-brand" onClick={() => navigate("/")} title="Return to Homepage">
-            <img src={logo} alt="JNTU Circle" className="sidebar-logo-img" />
+            <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sidebar-logo-img" />
             <div className="sidebar-brand-text">
               <h2><span className="font-deltha">JNTU</span> Circle</h2>
               <span>Academic Hub</span>
@@ -509,103 +508,107 @@ Generated securely by JNTU Circle Student Academic Portal.
             MAIN CONTENT AREA (WARM CANVAS & CRISP CARDS)
             ========================================================= */}
         <main className="notes-main-panel">
-          {/* Header */}
-          <header className="notes-page-header">
-            <h1 className="notes-page-title">Notes & Study Materials</h1>
-            <p className="notes-page-subtitle">Access high-quality lecture notes, module guides, and syllabus resources across all engineering departments.</p>
-          </header>
+          <section className="notes-opening-panel" aria-labelledby="notes-page-title">
+            <header className="notes-page-header">
+              <span className="notes-eyebrow">
+                <span className="notes-eyebrow-dot" aria-hidden="true" />
+                JNTU Circle · Study Library
+              </span>
+              <h1 className="notes-page-title" id="notes-page-title">Notes & Study Materials</h1>
+              <p className="notes-page-subtitle">Find lecture notes, module guides, and study resources for your engineering branch.</p>
+            </header>
 
-          {/* Search & Filters Controls */}
-          <div className="notes-filters-row">
-            {/* Search Box with Reactive Search Button */}
-            <div className="notes-search-box">
-              <div className="notes-search-metal-wrap">
-                <MetalFx
-                  ref={searchMetalRef}
-                  preset="chromatic"
-                  variant="circle"
-                  strength={1}
-                  innerShadow
-                  className="metal-search-wrapper"
-                >
-                  <button 
-                    type="button" 
-                    className="metal-search-btn notes-metal-search-btn"
-                    onClick={handleExecuteSearch}
-                    title="Search notes"
-                    aria-label="Search"
+            <div className="notes-filters-row">
+              {/* Search Box with Reactive Search Button */}
+              <div className="notes-search-box">
+                <div className="notes-search-metal-wrap">
+                  <MetalFx
+                    ref={searchMetalRef}
+                    preset="chromatic"
+                    variant="circle"
+                    strength={1}
+                    innerShadow
+                    className="metal-search-wrapper"
                   >
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="metal-search-icon"
-                      aria-hidden="true"
+                    <button
+                      type="button"
+                      className="metal-search-btn notes-metal-search-btn"
+                      onClick={handleExecuteSearch}
+                      title="Search notes"
+                      aria-label="Search"
                     >
-                      <circle cx="11" cy="11" r="7" />
-                      <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
-                    </svg>
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="metal-search-icon"
+                        aria-hidden="true"
+                      >
+                        <circle cx="11" cy="11" r="7" />
+                        <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
+                      </svg>
+                    </button>
+                  </MetalFx>
+                </div>
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder={`Search ${activeBranch} notes, subjects, codes...`}
+                  className="notes-search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleExecuteSearch()}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className="search-clear-btn"
+                    onClick={() => setSearchQuery("")}
+                    title="Clear search"
+                    aria-label="Clear search"
+                  >
+                    ✕
                   </button>
-                </MetalFx>
+                )}
               </div>
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder={`Search ${activeBranch} notes, subjects, codes...`}
-                className="notes-search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleExecuteSearch()}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  className="search-clear-btn"
-                  onClick={() => setSearchQuery("")}
-                  title="Clear search"
-                  aria-label="Clear search"
-                >
-                  ✕
-                </button>
-              )}
+
+              {/* Branch Dropdown */}
+              <select
+                className="notes-select-dropdown"
+                value={activeBranch}
+                onChange={(e) => handleSelectBranch(e.target.value)}
+              >
+                <option value="CSE">CSE — Computer Science</option>
+                <option value="ECE">ECE — Electronics & Comm.</option>
+                <option value="EEE">EEE — Electrical Eng.</option>
+                <option value="ME">ME — Mechanical Eng.</option>
+                <option value="CE">CE — Civil Eng.</option>
+                <option value="AIML">AIML — AI & Data Science</option>
+              </select>
+
+              {/* Semester Dropdown */}
+              <select
+                className="notes-select-dropdown"
+                value={selectedSemester}
+                onChange={(e) => setSelectedSemester(e.target.value)}
+              >
+                <option value="ALL">All Semesters</option>
+                <option value="1st">1st Semester</option>
+                <option value="2nd">2nd Semester</option>
+                <option value="3rd">3rd Semester</option>
+                <option value="4th">4th Semester</option>
+                <option value="5th">5th Semester</option>
+                <option value="6th">6th Semester</option>
+                <option value="7th">7th Semester</option>
+                <option value="8th">8th Semester</option>
+              </select>
             </div>
-
-            {/* Branch Dropdown */}
-            <select
-              className="notes-select-dropdown"
-              value={activeBranch}
-              onChange={(e) => handleSelectBranch(e.target.value)}
-            >
-              <option value="CSE">CSE — Computer Science</option>
-              <option value="ECE">ECE — Electronics & Comm.</option>
-              <option value="EEE">EEE — Electrical Eng.</option>
-              <option value="ME">ME — Mechanical Eng.</option>
-              <option value="CE">CE — Civil Eng.</option>
-              <option value="AIML">AIML — AI & Data Science</option>
-            </select>
-
-            {/* Semester Dropdown */}
-            <select
-              className="notes-select-dropdown"
-              value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
-            >
-              <option value="ALL">All Semesters</option>
-              <option value="1st">1st Semester</option>
-              <option value="2nd">2nd Semester</option>
-              <option value="3rd">3rd Semester</option>
-              <option value="4th">4th Semester</option>
-              <option value="5th">5th Semester</option>
-              <option value="6th">6th Semester</option>
-              <option value="7th">7th Semester</option>
-              <option value="8th">8th Semester</option>
-            </select>
-          </div>
+          </section>
 
           {/* Two-Column Body: Branch Tabs + Notes Folder Cards */}
           <div className="notes-split-view">
@@ -748,14 +751,24 @@ Generated securely by JNTU Circle Student Academic Portal.
 
                     {/* Action Button: View */}
                     <div className="folder-card-actions">
-                      <button
-                        type="button"
-                        className="folder-view-btn"
-                        onClick={() => handleViewNote(item)}
-                        title={`View ${item.title}`}
+                      <MetalFx
+                        preset="gold"
+                        variant="button"
+                        theme="dark"
+                        strength={1}
+                        innerShadow
+                        normalizeHostStyles={false}
+                        className="folder-view-metal-wrap"
                       >
-                        View
-                      </button>
+                        <button
+                          type="button"
+                          className="folder-view-btn"
+                          onClick={() => handleViewNote(item)}
+                          title={`View ${item.title}`}
+                        >
+                          View
+                        </button>
+                      </MetalFx>
                     </div>
                   </article>
                 ))

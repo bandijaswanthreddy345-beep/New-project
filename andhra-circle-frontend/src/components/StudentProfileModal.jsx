@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import profileImg from "../assets/jaswanth.png.png";
-import logoImg from "../assets/jntu-circle-logo.png.png";
 import "./StudentProfileModal.css";
 
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
@@ -71,7 +70,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
           <div className="sp-banner-glow" />
           <div className="sp-banner-content">
             <div className="sp-banner-brand">
-              <img src={logoImg} alt="JNTU Circle" className="sp-banner-logo" />
+              <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sp-banner-logo" />
               <div>
                 <span className="sp-banner-title">JNTU CIRCLE</span>
                 <span className="sp-banner-tag">OFFICIAL STUDENT PORTAL</span>

@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "../components/LikeReactionButton";
 
 function LabPrograms({ search = "" }) {
+  const navigate = useNavigate();
+
   const [labPrograms, setLabPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -138,6 +141,18 @@ function LabPrograms({ search = "" }) {
     return `${backendBaseUrl}${value}`;
   };
 
+  const getPdfFileName = (pdfUrl) => {
+    if (!pdfUrl) return "";
+
+    try {
+      const pathname = new URL(getPdfUrl(pdfUrl)).pathname;
+      return decodeURIComponent(pathname.split("/").pop() || "");
+    } catch (error) {
+      console.error("Unable to determine lab program file name:", error);
+      return "";
+    }
+  };
+
   // =========================================================
   // LIKE REACTION TOGGLE
   // =========================================================
@@ -255,13 +270,21 @@ function LabPrograms({ search = "" }) {
         throw new Error("Invalid PDF URL");
       }
 
-      const pdfWindow = window.open(finalUrl, "_blank", "noopener,noreferrer");
-      if (!pdfWindow) {
-        alert("Popup was blocked. Please allow popups for this website.");
+      const fileName = getPdfFileName(program.pdfUrl);
+      if (!fileName) {
+        throw new Error("Unable to determine PDF file name.");
       }
+
+      navigate(`/pdf/${encodeURIComponent(fileName)}`);
     } catch (err) {
       console.error("View PDF Error:", err);
-      alert("Unable to open the PDF. Please check that the PDF file exists.");
+
+      const fallbackUrl = getPdfUrl(program.pdfUrl);
+      if (!fallbackUrl) {
+        alert("Unable to open the PDF. Please check that the PDF file exists.");
+      } else if (!window.open(fallbackUrl, "_blank", "noopener,noreferrer")) {
+        alert("Popup was blocked. Please allow popups for this website.");
+      }
     } finally {
       setOpeningPdf(null);
     }

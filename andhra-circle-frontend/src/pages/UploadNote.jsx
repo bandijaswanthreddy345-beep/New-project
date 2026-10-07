@@ -10,11 +10,25 @@ function UploadNote() {
   const [description, setDescription] = useState("");
   const [credits, setCredits] = useState("Bandi Bharath");
 
+  // =========================================================
+  // UNIT CONTENT
+  //
+  // IMPORTANT:
+  // The internal state names remain module1, module2, etc.
+  // so the existing backend/database continues working.
+  //
+  // The UI displays them as Unit 1, Unit 2, etc.
+  // =========================================================
+
   const [module1, setModule1] = useState("");
   const [module2, setModule2] = useState("");
   const [module3, setModule3] = useState("");
   const [module4, setModule4] = useState("");
   const [module5, setModule5] = useState("");
+
+  // =========================================================
+  // UNIT PDFs
+  // =========================================================
 
   const [module1Pdf, setModule1Pdf] = useState(null);
   const [module2Pdf, setModule2Pdf] = useState(null);
@@ -24,18 +38,18 @@ function UploadNote() {
 
   const [loading, setLoading] = useState(false);
 
-  // ==========================================
+  // =========================================================
   // SUBMIT NOTE
-  // ==========================================
+  // =========================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
 
-    // ==========================================
+    // =======================================================
     // BASIC DETAILS
-    // ==========================================
+    // =======================================================
 
     formData.append("title", title);
     formData.append("branch", branch);
@@ -44,15 +58,17 @@ function UploadNote() {
     formData.append("subjectCode", subjectCode);
     formData.append("description", description);
 
-    // ==========================================
+    // =======================================================
     // CREDITS
-    // ==========================================
+    // =======================================================
 
     formData.append("credits", credits);
 
-    // ==========================================
-    // MODULE CONTENT
-    // ==========================================
+    // =======================================================
+    // UNIT CONTENT
+    //
+    // Keep the backend field names unchanged.
+    // =======================================================
 
     formData.append("module1", module1);
     formData.append("module2", module2);
@@ -60,9 +76,9 @@ function UploadNote() {
     formData.append("module4", module4);
     formData.append("module5", module5);
 
-    // ==========================================
-    // MODULE PDFs
-    // ==========================================
+    // =======================================================
+    // UNIT PDFs
+    // =======================================================
 
     if (module1Pdf) {
       formData.append("module1Pdf", module1Pdf);
@@ -84,9 +100,9 @@ function UploadNote() {
       formData.append("module5Pdf", module5Pdf);
     }
 
-    // ==========================================
+    // =======================================================
     // UPLOAD
-    // ==========================================
+    // =======================================================
 
     try {
       setLoading(true);
@@ -107,9 +123,9 @@ function UploadNote() {
 
       alert("Note uploaded successfully!");
 
-      // ==========================================
+      // =====================================================
       // RESET
-      // ==========================================
+      // =====================================================
 
       setTitle("");
       setBranch("");
@@ -132,7 +148,6 @@ function UploadNote() {
       setModule5Pdf(null);
 
       e.target.reset();
-
     } catch (error) {
       console.error("Upload Note Error:", error);
 
@@ -145,24 +160,23 @@ function UploadNote() {
     }
   };
 
-  // ==========================================
-  // MODULE COMPONENT
-  // ==========================================
+  // =========================================================
+  // UNIT COMPONENT
+  // =========================================================
 
-  const renderModule = (
-    moduleTitle,
+  const renderUnit = (
+    unitTitle,
     value,
     setter,
     pdfSetter
   ) => (
     <div className="module-upload">
-
-      <label>{moduleTitle}</label>
+      <label>{unitTitle}</label>
 
       <textarea
         rows="5"
         value={value}
-        placeholder={`Enter ${moduleTitle}`}
+        placeholder={`Enter ${unitTitle}`}
         onChange={(e) =>
           setter(e.target.value)
         }
@@ -177,20 +191,17 @@ function UploadNote() {
           )
         }
       />
-
     </div>
   );
 
   return (
     <div className="upload-container">
-
       <h1>Upload Note</h1>
 
       <form onSubmit={handleSubmit}>
-
-        {/* ==========================================
+        {/* ==================================================
             NOTE TITLE
-        ========================================== */}
+        ================================================== */}
 
         <input
           type="text"
@@ -202,9 +213,9 @@ function UploadNote() {
           required
         />
 
-        {/* ==========================================
+        {/* ==================================================
             BRANCH
-        ========================================== */}
+        ================================================== */}
 
         <select
           value={branch}
@@ -242,9 +253,9 @@ function UploadNote() {
           </option>
         </select>
 
-        {/* ==========================================
+        {/* ==================================================
             SEMESTER
-        ========================================== */}
+        ================================================== */}
 
         <select
           value={semester}
@@ -290,9 +301,9 @@ function UploadNote() {
           </option>
         </select>
 
-        {/* ==========================================
+        {/* ==================================================
             SUBJECT
-        ========================================== */}
+        ================================================== */}
 
         <input
           type="text"
@@ -304,9 +315,9 @@ function UploadNote() {
           required
         />
 
-        {/* ==========================================
+        {/* ==================================================
             SUBJECT CODE
-        ========================================== */}
+        ================================================== */}
 
         <input
           type="text"
@@ -317,9 +328,9 @@ function UploadNote() {
           }
         />
 
-        {/* ==========================================
+        {/* ==================================================
             DESCRIPTION
-        ========================================== */}
+        ================================================== */}
 
         <textarea
           rows="4"
@@ -330,12 +341,11 @@ function UploadNote() {
           }
         />
 
-        {/* ==========================================
+        {/* ==================================================
             CREDITS
-        ========================================== */}
+        ================================================== */}
 
         <div className="credits-upload-field">
-
           <label htmlFor="credits">
             Credits
           </label>
@@ -354,67 +364,66 @@ function UploadNote() {
             Enter the name of the person who prepared
             or contributed to these notes.
           </small>
-
         </div>
 
-        {/* ==========================================
-            MODULE 1
-        ========================================== */}
+        {/* ==================================================
+            UNIT 1
+        ================================================== */}
 
-        {renderModule(
-          "Module 1",
+        {renderUnit(
+          "Unit 1",
           module1,
           setModule1,
           setModule1Pdf
         )}
 
-        {/* ==========================================
-            MODULE 2
-        ========================================== */}
+        {/* ==================================================
+            UNIT 2
+        ================================================== */}
 
-        {renderModule(
-          "Module 2",
+        {renderUnit(
+          "Unit 2",
           module2,
           setModule2,
           setModule2Pdf
         )}
 
-        {/* ==========================================
-            MODULE 3
-        ========================================== */}
+        {/* ==================================================
+            UNIT 3
+        ================================================== */}
 
-        {renderModule(
-          "Module 3",
+        {renderUnit(
+          "Unit 3",
           module3,
           setModule3,
           setModule3Pdf
         )}
 
-        {/* ==========================================
-            MODULE 4
-        ========================================== */}
+        {/* ==================================================
+            UNIT 4
+        ================================================== */}
 
-        {renderModule(
-          "Module 4",
+        {renderUnit(
+          "Unit 4",
           module4,
           setModule4,
           setModule4Pdf
         )}
 
-        {/* ==========================================
-            MODULE 5
-        ========================================== */}
+        {/* ==================================================
+            UNIT 5
+        ================================================== */}
 
-        {renderModule(
-          "Module 5",
+        {renderUnit(
+          "Unit 5",
           module5,
           setModule5,
           setModule5Pdf
         )}
 
-        {/* ==========================================
+        {/* ==================================================
             SUBMIT
-        ========================================== */}
+        ================================================== */}
 
         <button
           type="submit"
@@ -424,9 +433,7 @@ function UploadNote() {
             ? "Uploading..."
             : "Upload Note"}
         </button>
-
       </form>
-
     </div>
   );
 }

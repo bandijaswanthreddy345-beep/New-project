@@ -345,24 +345,6 @@ function LatestNotes({ search = "" }) {
     return raw.split(/\s+/).map(formatWord).join(" ");
   };
 
-  const getNoteContext = (note) => {
-    if (
-      note.description &&
-      note.description.trim().length > 15 &&
-      !/(.)\1{4,}/.test(note.description) &&
-      !/[;'{}]/.test(note.description)
-    ) {
-      return note.description.trim();
-    }
-    const subj = formatSubject(note.subject) || "Subject";
-    const sem = note.semester ? `${note.semester}` : "";
-    const credits = note.credits ? ` • ${note.credits} Credits` : "";
-    if (sem) {
-      return `Comprehensive lecture notes, unit syllabus & key revision materials for ${subj} (${sem}${credits}).`;
-    }
-    return `Structured lecture modules, syllabus concepts, and exam preparation notes for ${subj}.`;
-  };
-
   // ==========================================
   // LOADING UI
   // ==========================================
@@ -443,10 +425,6 @@ function LatestNotes({ search = "" }) {
                 <h3 className="resource-title" title={getDisplayTitle(note)}>
                   {getDisplayTitle(note)}
                 </h3>
-
-                <p className="resource-desc">
-                  {getNoteContext(note)}
-                </p>
 
                 {/* ==========================================
                     METADATA CHIPS
@@ -571,7 +549,6 @@ function LatestNotes({ search = "" }) {
         formatDate={formatDate}
         formatSubject={formatSubject}
         getDisplayTitle={getDisplayTitle}
-        getNoteContext={getNoteContext}
         getImageUrl={getImageUrl}
       />
     </section>

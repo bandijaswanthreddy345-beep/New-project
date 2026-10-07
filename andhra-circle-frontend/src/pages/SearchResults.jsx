@@ -464,6 +464,29 @@ function SearchResults() {
     <main className="search-page">
 
       {/* =====================================================
+          ANIMATED BACKGROUND
+      ====================================================== */}
+
+      <div
+        className="search-animated-background"
+        aria-hidden="true"
+      >
+        <div className="search-gradient-orb search-orb-one"></div>
+
+        <div className="search-gradient-orb search-orb-two"></div>
+
+        <div className="search-gradient-orb search-orb-three"></div>
+
+        <div className="search-gradient-orb search-orb-four"></div>
+
+        <div className="search-background-wave search-wave-one"></div>
+
+        <div className="search-background-wave search-wave-two"></div>
+
+        <div className="search-background-glow"></div>
+      </div>
+
+      {/* =====================================================
           FULL SCREEN SEARCH HEADER
       ====================================================== */}
 

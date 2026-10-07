@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import API from "../api/api";
-import logo from "../assets/jntu-circle-logo.png.png";
 
 // Standard fallback notices for the pop-up preview
 const FALLBACK_NOTICES = [
@@ -152,7 +151,7 @@ function Navbar() {
       <div className="logo">
         <Link to="/">
           <img
-            src={logo}
+            src="/jntu-circle-logo.png"
             alt="JNTU Circle Logo"
             className="logo-image"
           />
