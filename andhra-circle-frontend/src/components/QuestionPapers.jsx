@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "./LikeReactionButton";
 
 function QuestionPapers({ search = "" }) {
+  const navigate = useNavigate();
+
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -101,6 +104,18 @@ function QuestionPapers({ search = "" }) {
       value = `/${value}`;
     }
     return `http://localhost:5000${value}`;
+  };
+
+  const getPdfFileName = (pdfUrl) => {
+    if (!pdfUrl) return "";
+
+    try {
+      const pathname = new URL(getPdfUrl(pdfUrl)).pathname;
+      return decodeURIComponent(pathname.split("/").pop() || "");
+    } catch (error) {
+      console.error("Unable to determine question paper file name:", error);
+      return "";
+    }
   };
 
   const formatDate = (date) => {
@@ -208,6 +223,12 @@ function QuestionPapers({ search = "" }) {
   // ==========================================
 
   const handleView = async (paper) => {
+    const fileName = getPdfFileName(paper.pdfUrl);
+    if (!fileName) {
+      console.error("Question paper PDF file name is missing.");
+      return;
+    }
+
     try {
       await API.put(`/papers/${paper._id}/view`);
       setPapers((prev) =>
@@ -217,11 +238,11 @@ function QuestionPapers({ search = "" }) {
             : item
         )
       );
-      window.open(getPdfUrl(paper.pdfUrl), "_blank");
     } catch (error) {
       console.error("View error:", error);
-      window.open(getPdfUrl(paper.pdfUrl), "_blank");
     }
+
+    navigate(`/pdf/${encodeURIComponent(fileName)}`);
   };
 
   // ==========================================
@@ -240,6 +261,10 @@ function QuestionPapers({ search = "" }) {
       );
 
       const response = await fetch(getPdfUrl(paper.pdfUrl));
+      if (!response.ok) {
+        throw new Error("Unable to download PDF");
+      }
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -264,6 +289,7 @@ function QuestionPapers({ search = "" }) {
         <div className="section-heading">
           <span className="section-tag">EXAM RESOURCES</span>
           <h2>Previous Question Papers</h2>
+          <p>Practice with previous examination question papers.</p>
         </div>
         <div className="papers-loading">Loading question papers...</div>
       </section>
@@ -280,6 +306,7 @@ function QuestionPapers({ search = "" }) {
         <div className="section-heading">
           <span className="section-tag">EXAM RESOURCES</span>
           <h2>Previous Question Papers</h2>
+          <p>Practice with previous examination question papers.</p>
         </div>
         <div className="error-state">
           <span>⚠️</span>
@@ -302,6 +329,7 @@ function QuestionPapers({ search = "" }) {
       <div className="section-heading">
         <span className="section-tag">EXAM RESOURCES</span>
         <h2>Previous Question Papers</h2>
+        <p>Practice with previous examination question papers.</p>
       </div>
 
       {filteredPapers.length === 0 ? (

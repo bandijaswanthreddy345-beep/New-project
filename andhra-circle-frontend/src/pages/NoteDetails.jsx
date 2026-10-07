@@ -12,7 +12,7 @@ function NoteDetails() {
   const [note, setNote] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [openModule, setOpenModule] = useState(null);
+  const [openUnit, setOpenUnit] = useState(null);
 
   // =========================================================
   // COMMENTS STATE
@@ -207,40 +207,46 @@ function NoteDetails() {
   const description = note?.description || "";
 
   // =========================================================
-  // MODULES
+  // UNITS
+  //
+  // IMPORTANT:
+  // Backend fields remain module1/module2/... to avoid
+  // breaking the existing database and API.
+  //
+  // Only the user-facing terminology is changed to Units.
   // =========================================================
 
-  const modules = useMemo(() => {
+  const units = useMemo(() => {
     if (!note) return [];
 
     return [
       {
         number: 1,
-        title: note.module1Title || "Module 1",
+        title: note.module1Title || "Unit 1",
         notes: note.module1 || "",
         pdf: note.module1Pdf || "",
       },
       {
         number: 2,
-        title: note.module2Title || "Module 2",
+        title: note.module2Title || "Unit 2",
         notes: note.module2 || "",
         pdf: note.module2Pdf || "",
       },
       {
         number: 3,
-        title: note.module3Title || "Module 3",
+        title: note.module3Title || "Unit 3",
         notes: note.module3 || "",
         pdf: note.module3Pdf || "",
       },
       {
         number: 4,
-        title: note.module4Title || "Module 4",
+        title: note.module4Title || "Unit 4",
         notes: note.module4 || "",
         pdf: note.module4Pdf || "",
       },
       {
         number: 5,
-        title: note.module5Title || "Module 5",
+        title: note.module5Title || "Unit 5",
         notes: note.module5 || "",
         pdf: note.module5Pdf || "",
       },
@@ -248,11 +254,11 @@ function NoteDetails() {
   }, [note]);
 
   // =========================================================
-  // MODULE TOGGLE
+  // UNIT TOGGLE
   // =========================================================
 
-  const toggleModule = (number) => {
-    setOpenModule((current) =>
+  const toggleUnit = (number) => {
+    setOpenUnit((current) =>
       current === number ? null : number
     );
   };
@@ -318,7 +324,7 @@ function NoteDetails() {
 
   const downloadPdf = async (
     pdf,
-    moduleNumber
+    unitNumber
   ) => {
     const url = getBackendUrl(pdf);
 
@@ -344,7 +350,7 @@ function NoteDetails() {
       link.href = blobUrl;
 
       link.download =
-        `${title}-Module-${moduleNumber}.pdf`;
+        `${title}-Unit-${unitNumber}.pdf`;
 
       document.body.appendChild(link);
 
@@ -467,10 +473,6 @@ function NoteDetails() {
     commentId,
     event
   ) => {
-    // -------------------------------------------------------
-    // BIG HEART POP
-    // -------------------------------------------------------
-
     const buttonRect =
       event.currentTarget.getBoundingClientRect();
 
@@ -486,7 +488,6 @@ function NoteDetails() {
         buttonRect.height / 2,
     });
 
-    // Remove animation after it finishes
     setTimeout(() => {
       setHeartPop((current) =>
         current?.id === popId
@@ -494,10 +495,6 @@ function NoteDetails() {
           : current
       );
     }, 1200);
-
-    // -------------------------------------------------------
-    // API LIKE
-    // -------------------------------------------------------
 
     try {
       const response = await API.put(
@@ -629,7 +626,6 @@ function NoteDetails() {
     return (
       <div className="note-page-loading">
         <div className="loading-card">
-
           <div className="loading-spinner"></div>
 
           <h3>
@@ -639,7 +635,6 @@ function NoteDetails() {
           <p>
             Please wait...
           </p>
-
         </div>
       </div>
     );
@@ -652,9 +647,7 @@ function NoteDetails() {
   if (error || !note) {
     return (
       <div className="note-error-page">
-
         <div className="note-error-card">
-
           <div className="error-icon">
             📚
           </div>
@@ -674,9 +667,7 @@ function NoteDetails() {
           >
             ← Go Back
           </button>
-
         </div>
-
       </div>
     );
   }
@@ -700,14 +691,9 @@ function NoteDetails() {
             top: `${heartPop.y}px`,
           }}
         >
-
-          {/* MAIN BIG HEART */}
-
           <div className="heart-pop-main">
             ❤️
           </div>
-
-          {/* BURST HEARTS */}
 
           <span className="burst-heart burst-heart-1">
             ❤️
@@ -741,8 +727,6 @@ function NoteDetails() {
             ❤️
           </span>
 
-          {/* SPARKLES */}
-
           <span className="heart-spark heart-spark-1">
             ✦
           </span>
@@ -762,7 +746,6 @@ function NoteDetails() {
           <span className="heart-spark heart-spark-5">
             ✦
           </span>
-
         </div>
       )}
 
@@ -773,12 +756,10 @@ function NoteDetails() {
       <section className="note-hero">
 
         <div className="note-hero-background">
-
           <img
             src={defaultBanner}
             alt=""
           />
-
         </div>
 
         <div className="note-hero-overlay"></div>
@@ -880,7 +861,6 @@ function NoteDetails() {
               </div>
 
               <div>
-
                 <span className="eyebrow">
                   COURSE DETAILS
                 </span>
@@ -888,7 +868,6 @@ function NoteDetails() {
                 <h2>
                   {title}
                 </h2>
-
               </div>
 
             </div>
@@ -896,7 +875,6 @@ function NoteDetails() {
             <div className="course-details-grid">
 
               <div className="detail-item">
-
                 <span className="detail-label">
                   Subject
                 </span>
@@ -904,11 +882,9 @@ function NoteDetails() {
                 <strong>
                   {subject || "—"}
                 </strong>
-
               </div>
 
               <div className="detail-item">
-
                 <span className="detail-label">
                   Subject Code
                 </span>
@@ -916,11 +892,9 @@ function NoteDetails() {
                 <strong>
                   {subjectCode || "—"}
                 </strong>
-
               </div>
 
               <div className="detail-item">
-
                 <span className="detail-label">
                   Branch
                 </span>
@@ -928,11 +902,9 @@ function NoteDetails() {
                 <strong>
                   {branch || "—"}
                 </strong>
-
               </div>
 
               <div className="detail-item">
-
                 <span className="detail-label">
                   Semester
                 </span>
@@ -940,15 +912,9 @@ function NoteDetails() {
                 <strong>
                   {semester || "—"}
                 </strong>
-
               </div>
 
-              {/* =================================================
-                  CREDITS
-              ================================================== */}
-
               <div className="detail-item">
-
                 <span className="detail-label">
                   Credits
                 </span>
@@ -956,7 +922,6 @@ function NoteDetails() {
                 <strong>
                   {credits || "—"}
                 </strong>
-
               </div>
 
             </div>
@@ -974,7 +939,6 @@ function NoteDetails() {
               </div>
 
               <div>
-
                 <span className="eyebrow">
                   ABOUT THIS RESOURCE
                 </span>
@@ -982,7 +946,6 @@ function NoteDetails() {
                 <h2>
                   About these notes
                 </h2>
-
               </div>
 
             </div>
@@ -1009,7 +972,7 @@ function NoteDetails() {
         </section>
 
         {/* ===================================================
-            MODULES
+            UNITS
         ==================================================== */}
 
         <section className="modules-section">
@@ -1018,29 +981,26 @@ function NoteDetails() {
 
             <div>
 
-              <span className="eyebrow">
+              <span className="eyebrow modules-eyebrow">
                 COURSE CONTENT
               </span>
 
               <h2>
-                Modules
+                Units
               </h2>
 
-              <p>
-                Select a module to view its notes
-                and PDF document.
-              </p>
+              <p>Explore unit notes and course PDFs.</p>
 
             </div>
 
             <div className="module-count">
 
               <strong>
-                {modules.length}
+                {units.length}
               </strong>
 
               <span>
-                MODULES
+                UNITS
               </span>
 
             </div>
@@ -1049,17 +1009,17 @@ function NoteDetails() {
 
           <div className="modules-list">
 
-            {modules.map((module) => {
+            {units.map((unit) => {
 
               const isOpen =
-                openModule === module.number;
+                openUnit === unit.number;
 
               const pdfUrl =
-                getBackendUrl(module.pdf);
+                getBackendUrl(unit.pdf);
 
               return (
                 <article
-                  key={module.number}
+                  key={unit.number}
                   className={`module-card ${
                     isOpen
                       ? "module-open"
@@ -1071,8 +1031,8 @@ function NoteDetails() {
                     type="button"
                     className="module-header-button"
                     onClick={() =>
-                      toggleModule(
-                        module.number
+                      toggleUnit(
+                        unit.number
                       )
                     }
                     aria-expanded={isOpen}
@@ -1080,32 +1040,35 @@ function NoteDetails() {
 
                     <div className="module-number">
                       {String(
-                        module.number
+                        unit.number
                       ).padStart(2, "0")}
                     </div>
 
                     <div className="module-heading">
 
                       <span>
-                        MODULE{" "}
-                        {module.number}
+                        UNIT{" "}
+                        {unit.number}
                       </span>
 
                       <h3>
-                        {module.title}
+                        {unit.title}
                       </h3>
 
                     </div>
 
-                    <div
+                    <span
                       className={`module-arrow ${
                         isOpen
                           ? "arrow-open"
                           : ""
                       }`}
+                      aria-hidden="true"
                     >
-                      ↓
-                    </div>
+                      <svg viewBox="0 0 20 20" fill="none">
+                        <path d="m5 7.5 5 5 5-5" />
+                      </svg>
+                    </span>
 
                   </button>
 
@@ -1121,20 +1084,23 @@ function NoteDetails() {
 
                       <div className="module-resource-grid">
 
-                        {/* MODULE NOTES */}
+                        {/* UNIT NOTES */}
 
                         <div className="module-notes-box">
 
                           <div className="resource-title">
 
-                            <div className="resource-icon">
-                              📝
+                            <div className="resource-icon" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M7 3.75h7l4.25 4.3v12.2H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z" />
+                                <path d="M14 3.75v4.5h4.25M8.5 12h7M8.5 15.5h7" />
+                              </svg>
                             </div>
 
                             <div>
 
                               <span>
-                                MODULE NOTES
+                                UNIT NOTES
                               </span>
 
                               <small>
@@ -1147,14 +1113,14 @@ function NoteDetails() {
 
                           <div className="notes-text">
 
-                            {module.notes ? (
+                            {unit.notes ? (
                               <p>
-                                {module.notes}
+                                {unit.notes}
                               </p>
                             ) : (
                               <p className="empty-text">
                                 No notes available
-                                for this module.
+                                for this unit.
                               </p>
                             )}
 
@@ -1175,8 +1141,8 @@ function NoteDetails() {
                             <div>
 
                               <span>
-                                MODULE{" "}
-                                {module.number}{" "}
+                                UNIT{" "}
+                                {unit.number}{" "}
                                 PDF
                               </span>
 
@@ -1198,7 +1164,7 @@ function NoteDetails() {
                                 className="open-pdf-button"
                                 onClick={() =>
                                   openPdf(
-                                    module.pdf
+                                    unit.pdf
                                   )
                                 }
                               >
@@ -1210,8 +1176,8 @@ function NoteDetails() {
                                 className="download-pdf-button"
                                 onClick={() =>
                                   downloadPdf(
-                                    module.pdf,
-                                    module.number
+                                    unit.pdf,
+                                    unit.number
                                   )
                                 }
                               >
@@ -1247,8 +1213,8 @@ function NoteDetails() {
                               </span>
 
                               <strong>
-                                Module{" "}
-                                {module.number}{" "}
+                                Unit{" "}
+                                {unit.number}{" "}
                                 document
                               </strong>
 
@@ -1259,7 +1225,7 @@ function NoteDetails() {
                               className="new-tab-button"
                               onClick={() =>
                                 openPdfInNewTab(
-                                  module.pdf
+                                  unit.pdf
                                 )
                               }
                             >
@@ -1272,7 +1238,7 @@ function NoteDetails() {
 
                             <iframe
                               src={pdfUrl}
-                              title={`Module ${module.number} PDF`}
+                              title={`Unit ${unit.number} PDF`}
                               className="pdf-frame"
                               loading="lazy"
                             />
@@ -1302,8 +1268,6 @@ function NoteDetails() {
         <section className="comments-section">
 
           <div className="comments-card">
-
-            {/* COMMENTS HEADER */}
 
             <div className="comments-header">
 
@@ -1506,9 +1470,7 @@ function NoteDetails() {
 
                     </div>
 
-                    {/* =================================================
-                        COMMENT ACTIONS
-                    ================================================== */}
+                    {/* COMMENT ACTIONS */}
 
                     <div className="comment-actions">
 
@@ -1600,7 +1562,7 @@ function NoteDetails() {
             </strong>
 
             <p>
-              Explore each module at your own
+              Explore each unit at your own
               pace.
             </p>
 

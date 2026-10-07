@@ -11,7 +11,6 @@ function Resource3DModal({
   formatDate,
   formatSubject,
   getDisplayTitle,
-  getNoteContext,
   getImageUrl,
 }) {
   const [isRendered, setIsRendered] = useState(false);
@@ -122,7 +121,6 @@ function Resource3DModal({
 
   // Fallbacks
   const displayTitle = getDisplayTitle ? getDisplayTitle(note) : note.title || "Academic Notes";
-  const displayContext = getNoteContext ? getNoteContext(note) : note.description || "Comprehensive syllabus and lecture materials.";
   const displaySubject = formatSubject ? formatSubject(note.subject) : note.subject || "Academic";
   const displayDate = formatDate ? formatDate(note.createdAt) : "Recently Added";
   const displayImage = getImageUrl ? getImageUrl(note.imageUrl) : defaultBanner;
@@ -205,11 +203,6 @@ function Resource3DModal({
             <h2 id="modal-3d-title-id" className="modal-3d-title">
               {displayTitle}
             </h2>
-
-            {/* Note Description */}
-            <p className="modal-3d-desc">
-              {displayContext}
-            </p>
 
             {/* Floating Metadata Chips Row */}
             <div className="modal-3d-chips-row">

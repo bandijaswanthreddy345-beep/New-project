@@ -5044,7 +5044,6 @@ textarea:focus-visible {
     height: 200px;
   }
 }
-
 @keyframes mobile-float {
   0% {
     transform: translateY(-4px);
@@ -5202,5 +5201,146 @@ textarea:focus-visible {
 
   .notif-dropdown-arrow {
     right: 24px;
+  }
+}
+
+/* =========================================================
+   QUESTION PAPERS — BACK BUTTON INSIDE PAGE
+========================================================= */
+
+.papers-section .resource-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0;
+  position: relative;
+  text-align: left;
+}
+
+.papers-section .section-heading-content {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.papers-section .resource-section-heading .section-tag {
+  position: static;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.papers-section .resource-section-heading h2 {
+  margin: 0 0 8px;
+  text-align: left;
+}
+
+.papers-section .resource-section-heading p {
+  margin: 0;
+  text-align: left;
+}
+
+.papers-section .resource-back-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 42px;
+  padding: 10px 16px;
+
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #1d4ed8;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.papers-section .resource-back-button:hover {
+  transform: translateY(-2px);
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  box-shadow: 0 8px 20px rgba(29, 78, 216, 0.12);
+}
+
+.papers-section .resource-back-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 7px;
+
+  background: #eff6ff;
+  color: #1d4ed8;
+
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.papers-section .resource-back-button:hover .resource-back-icon {
+  background: #dbeafe;
+  transform: translateX(-2px);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .papers-section .resource-section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 30px;
+  }
+
+  .papers-section .section-heading-content {
+    width: 100%;
+  }
+
+  .papers-section .resource-back-button {
+    min-height: 40px;
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 500px) {
+  .papers-section .resource-section-heading {
+    gap: 14px;
+  }
+
+  .papers-section .resource-back-button {
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .papers-section .resource-back-icon {
+    width: 23px;
+    height: 23px;
+    font-size: 15px;
   }
 }

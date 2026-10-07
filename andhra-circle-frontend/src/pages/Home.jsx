@@ -50,7 +50,6 @@ function Home() {
       ========================== */}
       <main className="home-main">
         <section className="home-content">
-
           {/* Branches (Connected to Backend Stats & Dynamic Filtering) */}
           <BranchSection 
             selectedBranch={selectedBranch} 
