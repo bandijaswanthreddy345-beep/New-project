@@ -2,36 +2,28 @@ import JntuChatbot from "./JntuChatbot";
 
 function Hero() {
   return (
-    <section className="hero">
-      <div className="hero-content">
+    <section id="home" className="hero">
+      {/* The uploaded hero artwork from emerald-horizon-web-template */}
+      <img
+        className="hero-art"
+        src="/hero.png"
+        alt="Emerald horizon with a luminous golden arc over water"
+      />
 
-        {/* =================================================
-            TITLE
-        ================================================== */}
-        <h1 className="hero-title">
-          Welcome to <span className="font-deltha">JNTU</span> Circle
+      <div className="hero-content">
+        <p className="eyebrow">YOUR ACADEMIC COMPANION</p>
+
+        <h1>
+          Where <em>vision</em><br />
+          meets possibility.
         </h1>
 
-        {/* =================================================
-            SLOGAN
-        ================================================== */}
-        <p className="hero-slogan">
-          Built by Students, for Students.
-        </p>
-
-        {/* =================================================
-            SUBTITLE
-        ================================================== */}
-        <p className="hero-subtitle">
-          Find Notes, Question Papers, Syllabus,
-          Lab Programs and Notifications
-        </p>
-
-        {/* =================================================
-            AI SEARCH / COMMAND BAR
-        ================================================== */}
+        {/* EXISTING AI COMMAND BAR + STUDENT PROFILE CTA */}
         <JntuChatbot />
+      </div>
 
+      <div className="hero-scroll">
+        SCROLL <span></span>
       </div>
     </section>
   );

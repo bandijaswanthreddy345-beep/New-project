@@ -1,0 +1,419 @@
+/* =========================================================
+   HERO BACKGROUND MOTION SYSTEM
+   Cinematic, Organic, Ultra-Subtle Ambient Motion
+   GPU-Accelerated (transform & opacity only)
+========================================================= */
+
+.hero-motion-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  --mouse-x: 0;
+  --mouse-y: 0;
+}
+
+/* =========================================================
+   BASE PHOTOGRAPHIC LAYER
+   The uploaded emerald/gold half-sun image fills the entire hero.
+   object-position centers the golden arc visually.
+========================================================= */
+.hero-motion-base {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  z-index: 1;
+  pointer-events: none;
+  will-change: transform;
+  transform: translate3d(
+    calc(var(--mouse-x) * -0.8px),
+    calc(var(--mouse-y) * -0.6px),
+    0
+  );
+}
+
+.hero-motion-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;
+  display: block;
+}
+
+/* =========================================================
+   GOLDEN SUN GLOW
+   Gentle breathing radiance around the golden half-sun arc.
+   Positioned to match the arc center in the image (~42% from top).
+   8-second cycle, smooth, barely noticeable.
+========================================================= */
+.hero-motion-sun-glow {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform, opacity;
+  background: radial-gradient(
+    ellipse 50% 40% at 50% 32%,
+    rgba(255, 235, 170, 0.12) 0%,
+    rgba(255, 210, 95, 0.05) 35%,
+    rgba(220, 170, 50, 0.02) 55%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  transform: translate3d(
+    calc(var(--mouse-x) * -1.4px),
+    calc(var(--mouse-y) * -1px),
+    0
+  );
+  animation: heroSunBreathe 8s ease-in-out infinite;
+}
+
+@keyframes heroSunBreathe {
+  0%, 100% {
+    opacity: 0.22;
+    transform: scale(1.0) translate3d(
+      calc(var(--mouse-x) * -1.4px),
+      calc(var(--mouse-y) * -1px),
+      0
+    );
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.012) translate3d(
+      calc(var(--mouse-x) * -1.4px),
+      calc(var(--mouse-y) * -1px),
+      0
+    );
+  }
+}
+
+/* =========================================================
+   ATMOSPHERIC LIGHT
+   Extremely slow, barely noticeable emerald/gold diffusion
+   behind the sun arc. 22-second cycle.
+========================================================= */
+.hero-motion-atmosphere {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform, opacity;
+  background: radial-gradient(
+    ellipse 60% 42% at 50% 34%,
+    rgba(255, 235, 170, 0.06) 0%,
+    rgba(2, 80, 68, 0.18) 48%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  transform: translate3d(
+    calc(var(--mouse-x) * -1px),
+    calc(var(--mouse-y) * -0.8px),
+    0
+  );
+  animation: heroAtmosphereShift 22s ease-in-out infinite alternate;
+}
+
+@keyframes heroAtmosphereShift {
+  0% {
+    opacity: 0.25;
+    transform: scale(1.0) translate3d(
+      calc(var(--mouse-x) * -1px),
+      calc(var(--mouse-y) * -0.8px),
+      0
+    );
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.015) translate3d(
+      calc(var(--mouse-x) * -1px + 0.5px),
+      calc(var(--mouse-y) * -0.8px - 0.5px),
+      0
+    );
+  }
+  100% {
+    opacity: 0.28;
+    transform: scale(0.995) translate3d(
+      calc(var(--mouse-x) * -1px - 0.5px),
+      calc(var(--mouse-y) * -0.8px + 0.3px),
+      0
+    );
+  }
+}
+
+/* =========================================================
+   HORIZON LIGHT
+   Soft golden light sweep along the horizon.
+   Positioned at ~62% from top (where mountains meet water).
+   13-second left→right sweep, very faint.
+========================================================= */
+.hero-motion-horizon {
+  position: absolute;
+  top: 60%;
+  left: 0;
+  right: 0;
+  height: 16px;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate3d(
+    calc(var(--mouse-x) * -1.8px),
+    calc(var(--mouse-y) * -1.2px),
+    0
+  );
+}
+
+.hero-motion-horizon-beam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28%;
+  height: 100%;
+  border-radius: 9999px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 250, 215, 0.5) 0%,
+    rgba(255, 215, 110, 0.22) 42%,
+    rgba(255, 195, 60, 0.06) 65%,
+    transparent 82%
+  );
+  mix-blend-mode: screen;
+  filter: blur(3px);
+  will-change: transform, opacity;
+  animation: heroHorizonSweep 14s cubic-bezier(0.42, 0, 0.25, 1) infinite;
+}
+
+@keyframes heroHorizonSweep {
+  0% {
+    transform: translateX(-130%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.12;
+  }
+  45% {
+    opacity: 0.55;
+    transform: translateX(180%);
+  }
+  78% {
+    opacity: 0.1;
+  }
+  95%, 100% {
+    transform: translateX(430%);
+    opacity: 0;
+  }
+}
+
+/* =========================================================
+   WATER REFLECTION
+   Animates ONLY the lower reflective area (bottom ~38%).
+   Extremely subtle horizontal shimmer/ripple (2-3px).
+========================================================= */
+.hero-motion-water {
+  position: absolute;
+  top: 62%;
+  bottom: -6px;
+  left: -6px;
+  right: -6px;
+  width: calc(100% + 12px);
+  height: auto;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate3d(
+    calc(var(--mouse-x) * -2.4px),
+    calc(var(--mouse-y) * -1.8px),
+    0
+  );
+}
+
+.hero-water-shimmer-plate {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Subtle water ripples (very low opacity, irregular timing) */
+.hero-water-ripple-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.hero-water-ripple-1 {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 7px,
+    rgba(255, 235, 160, 0.04) 8px,
+    transparent 10px
+  );
+  animation: heroWaterRipple1 7.4s ease-in-out infinite alternate;
+}
+
+@keyframes heroWaterRipple1 {
+  0% {
+    transform: translate3d(0, 0, 0) scaleY(1.0);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate3d(2px, 0.6px, 0) scaleY(1.015);
+    opacity: 0.5;
+  }
+}
+
+.hero-water-ripple-2 {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 12px,
+    rgba(255, 215, 110, 0.03) 13px,
+    transparent 15px
+  );
+  animation: heroWaterRipple2 11s ease-in-out infinite alternate;
+}
+
+@keyframes heroWaterRipple2 {
+  0% {
+    transform: translate3d(0, 0, 0) scaleY(1.0);
+    opacity: 0.25;
+  }
+  100% {
+    transform: translate3d(-1.6px, -0.4px, 0) scaleY(0.985);
+    opacity: 0.45;
+  }
+}
+
+/* Subtle golden light column reflection */
+.hero-water-pillar-glow {
+  position: absolute;
+  top: 0;
+  left: 28%;
+  width: 44%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse 48% 85% at 50% 0%,
+    rgba(255, 225, 120, 0.16) 0%,
+    rgba(255, 195, 75, 0.05) 42%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  filter: blur(5px);
+  animation: heroWaterPillarPulse 9s ease-in-out infinite alternate;
+}
+
+@keyframes heroWaterPillarPulse {
+  0% {
+    opacity: 0.3;
+    transform: scaleX(0.97);
+  }
+  100% {
+    opacity: 0.48;
+    transform: scaleX(1.03);
+  }
+}
+
+/* =========================================================
+   OPTICAL SCRIM
+   Ultra-thin scrim that ensures text readability while
+   letting the image show through beautifully.
+   Lighter in center (over the sun) so it glows through,
+   stronger at edges for text contrast.
+========================================================= */
+.hero-motion-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  /* Multi-layer scrim:
+     1. Very light center vignette so sun arc shows through
+     2. Subtle top darkening for navbar blend & title readability
+     3. Bottom fade for clean transition to next section
+  */
+  background:
+    radial-gradient(
+      ellipse 70% 55% at 50% 38%,
+      rgba(0, 20, 16, 0.08) 0%,
+      rgba(0, 18, 14, 0.35) 55%,
+      rgba(0, 14, 11, 0.55) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 20, 16, 0.3) 0%,
+      transparent 18%,
+      transparent 75%,
+      rgba(0, 20, 16, 0.25) 100%
+    );
+}
+
+/* =========================================================
+   MOBILE RESPONSIVENESS
+========================================================= */
+@media (max-width: 768px), (pointer: coarse) {
+  .hero-motion-base,
+  .hero-motion-sun-glow,
+  .hero-motion-atmosphere {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: none !important;
+  }
+
+  .hero-motion-water {
+    left: 0;
+    right: 0;
+    width: 100%;
+    transform: none !important;
+  }
+
+  .hero-motion-horizon {
+    transform: none !important;
+  }
+
+  .hero-water-ripple-2 {
+    display: none;
+  }
+}
+
+/* =========================================================
+   PREFERS-REDUCED-MOTION
+   Respects user system preferences
+========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .hero-motion-sun-glow,
+  .hero-motion-atmosphere,
+  .hero-motion-horizon-beam,
+  .hero-water-ripple-layer,
+  .hero-water-pillar-glow {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .hero-motion-sun-glow,
+  .hero-motion-atmosphere {
+    opacity: 0.3 !important;
+  }
+
+  .hero-motion-base,
+  .hero-motion-sun-glow,
+  .hero-motion-atmosphere {
+    transform: none !important;
+  }
+
+  .hero-motion-water {
+    transform: none !important;
+  }
+
+  .hero-motion-horizon {
+    transform: none !important;
+  }
+}
