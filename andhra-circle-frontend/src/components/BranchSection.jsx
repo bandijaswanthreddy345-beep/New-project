@@ -1,24 +1,24 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const BRANCHES = [
   {
     id: "01",
-    name: "Computer Science Engineering",
+    name: "Computer Science",
     code: "CSE",
     tag: "AI & Software Systems",
     image: "/branches/cse.jpg",
-    accent: "#6366f1",
-    filterQuery: "Computer Science",
+    accent: "#f5bd3f", // Emerald Horizon Gold
+    filterQuery: "CSE",
   },
   {
     id: "02",
-    name: "Electronics & Communication",
+    name: "Electronics & Comm",
     code: "ECE",
     tag: "VLSI & Embedded Systems",
     image: "/branches/ece.jpg",
-    accent: "#06b6d4",
-    filterQuery: "Electronics",
+    accent: "#ffe29a", // Light Gold
+    filterQuery: "ECE",
   },
   {
     id: "03",
@@ -26,8 +26,8 @@ const BRANCHES = [
     code: "AIML",
     tag: "Neural Nets & Data Science",
     image: "/branches/aiml.jpg",
-    accent: "#a855f7",
-    filterQuery: "Artificial Intelligence",
+    accent: "#5eead4", // Emerald Mint / Cyan
+    filterQuery: "AIML",
   },
   {
     id: "04",
@@ -35,8 +35,8 @@ const BRANCHES = [
     code: "MECH",
     tag: "Robotics & Automation",
     image: "/branches/mech.jpg",
-    accent: "#f59e0b",
-    filterQuery: "Mechanical",
+    accent: "#fbbf24", // Warm Amber Gold
+    filterQuery: "MECH",
   },
   {
     id: "05",
@@ -44,18 +44,18 @@ const BRANCHES = [
     code: "CIVIL",
     tag: "Smart Infrastructure",
     image: "/branches/civil.jpg",
-    accent: "#10b981",
-    filterQuery: "Civil",
+    accent: "#34d399", // Deep Emerald Accent
+    filterQuery: "CIVIL",
   },
 ];
 
-// Department card data
 function BranchSection({ selectedBranch = "", onSelectBranch }) {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const containerRef = useRef(null);
+  const orbitSceneRef = useRef(null);
   const sceneRef = useRef(null);
   const cardRefs = useRef([]);
 
@@ -69,7 +69,7 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 600);
+      setIsMobile(window.innerWidth <= 768);
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -95,6 +95,16 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
     setHoveredIndex(null);
   };
 
+  const handleExploreCatalogClick = (e) => {
+    e.preventDefault();
+    if (orbitSceneRef.current) {
+      orbitSceneRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      const el = document.getElementById("branch-cards") || document.getElementById("features");
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   useEffect(() => {
     if (isMobile) return;
 
@@ -113,11 +123,9 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
       angleRef.current = (angleRef.current + speed) % (Math.PI * 2);
 
       const width = window.innerWidth;
-      // Radius calculated for 5 edge-to-edge cards of width 350px:
-      // R = 350 / (2 * sin(36 deg)) = 298px
-      let rx = 296; 
+      let rx = 300; 
       let ry = 22;
-      let rz = 155;
+      let rz = 160;
 
       if (width <= 1100) {
         rx = 245;
@@ -140,11 +148,9 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
 
         const normZ = z / rz; // -1 (back) to +1 (front center)
 
-        // Smooth 3D cylindrical yaw: cards subtly angle along the carousel arc
-        // Front center card faces completely straight (rotY = 0)
         const rotY = isHovered ? 0 : -(x / rx) * 18;
 
-        let scale = 0.88 + normZ * 0.16; // 0.72 (back) to 1.04 (front)
+        let scale = 0.88 + normZ * 0.16;
         let zIndex = Math.round(100 + normZ * 60);
 
         if (isHovered) {
@@ -154,14 +160,14 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
 
         const shadowBlur = Math.round(14 + normZ * 14);
         const shadowY = Math.round(6 + normZ * 6);
-        const shadowAlpha = (0.15 + Math.max(0, normZ) * 0.25).toFixed(3);
+        const shadowAlpha = (0.2 + Math.max(0, normZ) * 0.3).toFixed(3);
 
         cardEl.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${rotY.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
         cardEl.style.opacity = "1";
         cardEl.style.zIndex = zIndex;
 
         if (isHovered) {
-          cardEl.style.boxShadow = "0 24px 50px rgba(0, 0, 0, 0.65), 0 0 30px rgba(139, 92, 246, 0.35)";
+          cardEl.style.boxShadow = "0 24px 54px rgba(0, 0, 0, 0.85), 0 0 12px rgba(245, 189, 63, 0.12)";
         } else {
           cardEl.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha})`;
         }
@@ -176,6 +182,7 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
 
   return (
     <section 
+      id="features"
       className="branches-section" 
       ref={containerRef} 
       onMouseMove={handleMouseMove} 
@@ -183,17 +190,19 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
     >
       <div className="branches-container">
 
-        {/* Section Header */}
-        <div className="branches-header">
-          <span className="branches-badge">ACADEMIC DEPARTMENTS</span>
-          <h2 className="branches-title">Browse by Branch</h2>
+        {/* Section Header styled in Emerald Horizon design */}
+        <div className="section-heading branches-header">
+          <p className="eyebrow">ACADEMIC DEPARTMENTS</p>
+          <h2>
+            Explore engineering <em>disciplines.</em>
+          </h2>
           <p className="branches-subtitle">
-            Explore academic resources by engineering department
+            Interactive 3D navigation across university departments. Select a branch to access verified notes, question papers, and lab manuals.
           </p>
         </div>
 
         {/* 3D Orbit Layout */}
-        <div className="orbit-scene">
+        <div className="orbit-scene" id="branch-cards" ref={orbitSceneRef}>
           
           <div className="orbit-world" ref={sceneRef}>
 
@@ -208,7 +217,11 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
 
               const handleCardClick = (e) => {
                 e.preventDefault();
-                navigate(`/notes?branch=${encodeURIComponent(item.code)}`);
+                if (onSelectBranch) {
+                  onSelectBranch(item.code, item.name);
+                } else {
+                  navigate(`/notes?branch=${encodeURIComponent(item.code)}`);
+                }
               };
 
               return (
@@ -220,11 +233,11 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
                   onClick={handleCardClick}
-                  title={`Filter resources by ${item.name}`}
+                  title={`Explore ${item.name}`}
                   role="button"
                   tabIndex={0}
                 >
-                  {/* Seamless 3D Solid Card Panel - Zero lines or seams while rotating */}
+                  {/* Seamless 3D Solid Card Panel */}
                   <article className="branch-card">
                     {/* High-res Image Background */}
                     <img 
@@ -237,32 +250,33 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
                     {/* Cinematic Multi-stop Overlay */}
                     <div className="branch-card-gradient" />
 
-                    {/* Dynamic Radial Ambient Accent Glow */}
+                    {/* Subtle, soft ambient accent (significantly reduced glare) */}
                     <div 
                       className="branch-card-glow"
                       style={{
-                        background: `radial-gradient(circle at 80% 20%, ${item.accent}55 0%, transparent 65%)`
+                        background: `radial-gradient(circle at 80% 20%, ${item.accent}14 0%, transparent 60%)`
                       }}
                     />
 
-                    {/* Top Bar: Code Badge */}
+                    {/* Top Bar: Code Badge and ID */}
                     <div className="branch-card-top">
                       <span 
                         className="branch-code-badge"
                         style={{
-                          borderColor: `${item.accent}88`,
-                          boxShadow: `0 0 12px ${item.accent}33`
+                          borderColor: `${item.accent}44`,
+                          boxShadow: "none"
                         }}
                       >
                         <span 
                           className="badge-dot" 
                           style={{ 
                             backgroundColor: item.accent,
-                            boxShadow: `0 0 8px ${item.accent}`
+                            boxShadow: `0 0 3px ${item.accent}88`
                           }} 
                         />
                         {item.code}
                       </span>
+                      <span className="branch-number">{item.id}</span>
                     </div>
 
                     {/* Bottom Bar: Tag, Title, and Accent Line */}
@@ -287,12 +301,15 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
 
                       <h3 className="branch-name">{item.name}</h3>
 
-                      <span 
-                        className="branch-line"
-                        style={{
-                          background: `linear-gradient(90deg, ${item.accent}, #ffffff)`
-                        }}
-                      />
+                      <div className="branch-action-row">
+                        <span 
+                          className="branch-line"
+                          style={{
+                            background: `linear-gradient(90deg, ${item.accent}, rgba(255, 226, 154, 0.4), transparent)`
+                          }}
+                        />
+                        <span className="branch-action-text">Explore Notes →</span>
+                      </div>
                     </div>
                   </article>
                 </div>
@@ -300,6 +317,23 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
             })}
 
           </div>
+        </div>
+
+        {/* Ambition Statement aligned perfectly under 3D Cards */}
+        <div className="branches-cta-footer">
+          <p className="eyebrow">READY TO EXCEL?</p>
+          <h2>
+            Turn your ambition into<br />
+            <em>academic success.</em>
+          </h2>
+          <a
+            href="#branch-cards"
+            className="primary-btn branches-cta-btn"
+            onClick={handleExploreCatalogClick}
+            aria-label="Explore 3D department cards catalog"
+          >
+            Explore Catalog <span>→</span>
+          </a>
         </div>
 
       </div>
