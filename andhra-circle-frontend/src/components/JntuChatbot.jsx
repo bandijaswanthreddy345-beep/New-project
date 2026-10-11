@@ -166,7 +166,7 @@ function JntuChatbot() {
           text: `🎉 All set! Your Student Profile has been created and synced live across JNTU Circle.`,
           profilePreview: updated,
           action: { label: "Open Full Student Profile →", path: "/profile" },
-          suggestions: ["🎓 View JNTU Reports", "📊 CGPA Calculator", "📁 Upload Materials"],
+          suggestions: ["🎓 View JNTU Reports", "📊 CGPA Calculator", "👤 Student Profile"],
         };
       }
     }

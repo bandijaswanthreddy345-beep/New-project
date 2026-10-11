@@ -37,25 +37,115 @@ function Navbar() {
 
   const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [hasNewAlert, setHasNewAlert] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showToastAlert, setShowToastAlert] = useState(false);
+  const [activeAlertItem, setActiveAlertItem] = useState(null);
 
+  const isBTechNotice = (n) => {
+    if (!n) return false;
+    const text = `${n.title || ""} ${n.description || ""}`.toLowerCase();
+    const isBTech = text.includes("b.tech") || text.includes("btech") || text.includes("b tech");
+    const isOther =
+      text.includes("b.pharm") ||
+      text.includes("bpharm") ||
+      text.includes("m.pharm") ||
+      text.includes("mpharm") ||
+      text.includes("m.tech") ||
+      text.includes("mtech") ||
+      text.includes("mba") ||
+      text.includes("mca") ||
+      text.includes("ph.d") ||
+      text.includes("phd") ||
+      text.includes("pharm.d") ||
+      text.includes("pharmd");
+    if (isOther && !isBTech) return false;
+    return isBTech;
+  };
 
-  // Fetch real notifications from backend on mount
-  useEffect(() => {
-    let isMounted = true;
-    API.get("/notifications")
-      .then((res) => {
-        if (!isMounted) return;
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          setNotificationsList(res.data);
+  // Fetch real notifications and check for unseen B.Tech alerts
+  const checkNotifications = async () => {
+    try {
+      const res = await API.get("/notifications");
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        const btechOnly = res.data.filter(isBTechNotice);
+        setNotificationsList(btechOnly);
+
+        const latest = btechOnly[0];
+        if (!latest) return;
+
+        const lastSeenId = localStorage.getItem("jntu_last_viewed_notif_id");
+        const lastSeenTime = localStorage.getItem("jntu_last_viewed_notif_time");
+
+        // If never viewed or latest is newer than last seen
+        const isNew = !lastSeenId || latest._id !== lastSeenId;
+
+        if (isNew) {
+          let count = 1;
+          if (lastSeenTime) {
+            const newer = btechOnly.filter(
+              (n) => new Date(n.createdAt || n.publishedDate) > new Date(lastSeenTime)
+            );
+            count = Math.max(1, newer.length);
+          }
+
+          setHasNewAlert(true);
+          setUnreadCount(count);
+          setActiveAlertItem(latest);
+
+          const dismissed = sessionStorage.getItem(`dismissed_notif_${latest._id}`);
+          if (!dismissed) {
+            setShowToastAlert(true);
+          }
+        } else {
+          setHasNewAlert(false);
+          setUnreadCount(0);
+          setShowToastAlert(false);
         }
-      })
-      .catch(() => {});
+      }
+    } catch {
+      // Fallback
+    }
+  };
+
+  useEffect(() => {
+    checkNotifications();
+    const interval = setInterval(checkNotifications, 20000); // 20s polling for new notifications
 
     return () => {
-      isMounted = false;
+      clearInterval(interval);
       if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     };
   }, []);
+
+  // Auto-dismiss toast alert after 9 seconds so it is unobtrusive
+  useEffect(() => {
+    if (showToastAlert) {
+      const timer = setTimeout(() => {
+        setShowToastAlert(false);
+      }, 9000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToastAlert]);
+
+  const handleOpenNotifications = () => {
+    if (notificationsList && notificationsList.length > 0) {
+      const latest = notificationsList[0];
+      localStorage.setItem("jntu_last_viewed_notif_id", latest._id);
+      localStorage.setItem("jntu_last_viewed_notif_time", new Date().toISOString());
+    }
+    setHasNewAlert(false);
+    setUnreadCount(0);
+    setShowToastAlert(false);
+  };
+
+  const handleDismissToast = (e) => {
+    e.stopPropagation();
+    setShowToastAlert(false);
+    if (activeAlertItem) {
+      sessionStorage.setItem(`dismissed_notif_${activeAlertItem._id}`, "true");
+    }
+  };
 
   // Hover handlers for smooth hover dropdown behavior
   const handleNotifMouseEnter = () => {
@@ -70,7 +160,6 @@ function Navbar() {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
     }
-    // 160ms buffer so moving cursor between button and popup never flickers
     hoverTimeoutRef.current = setTimeout(() => {
       setShowDropdown(false);
     }, 160);
@@ -101,16 +190,7 @@ function Navbar() {
     return `${Math.floor(diffHours / 24)}d ago`;
   };
 
-  const getCategoryBadgeClass = (category) => {
-    const c = String(category || "").toUpperCase();
-    if (c.includes("EXAM")) return "badge-exam";
-    if (c.includes("CIRCULAR")) return "badge-circular";
-    if (c.includes("RESULT")) return "badge-results";
-    return "badge-general";
-  };
-
   const latestAlert = notificationsList[0] || FALLBACK_NOTICES[0];
-  const hasNewNotification = Boolean(notificationsList && notificationsList.length > 0);
 
   const navigationLinks = [
     {
@@ -126,10 +206,6 @@ function Navbar() {
       path: "/reports",
     },
     {
-      name: "Upload Materials",
-      path: "/upload-materials",
-    },
-    {
       name: "Student Profile",
       path: "/profile",
     },
@@ -138,8 +214,6 @@ function Navbar() {
       path: "/notifications",
     },
   ];
-
-
 
   return (
     <header className="navbar">
@@ -188,16 +262,32 @@ function Navbar() {
                           ? "nav-link active"
                           : "nav-link"
                       }
-                      onClick={(e) => {
-                        // On touch devices without hover support, tap toggles dropdown
+                      onClick={() => {
+                        handleOpenNotifications();
                         if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
-                          e.preventDefault();
                           setShowDropdown((prev) => !prev);
                         }
                       }}
                     >
-                      <span>{item.name}</span>
-                      {hasNewNotification && (
+                      <span className="nav-notif-text">
+                        {hasNewAlert && (
+                          <span className="nav-notif-bell" title="New Alert!">
+                            🔔
+                          </span>
+                        )}
+                        {item.name}
+                      </span>
+
+                      {hasNewAlert ? (
+                        <span 
+                          className="nav-notif-alert-badge" 
+                          title={`${unreadCount} New Notification${unreadCount > 1 ? "s" : ""} Available`}
+                        >
+                          <span className="pulse-beacon-ring" />
+                          <span className="pulse-beacon-dot" />
+                          <span>{unreadCount > 1 ? `${unreadCount} NEW` : "NEW"}</span>
+                        </span>
+                      ) : (
                         <span className="nav-notif-new-tag">new</span>
                       )}
                     </NavLink>
@@ -211,9 +301,10 @@ function Navbar() {
                         onMouseEnter={handleNotifMouseEnter}
                         onMouseLeave={handleNotifMouseLeave}
                         onClick={() => {
+                          handleOpenNotifications();
                           setShowDropdown(false);
-                          if (latestAlert.link && latestAlert.link.startsWith("http")) {
-                            window.open(latestAlert.link, "_blank");
+                          if (latestAlert._id) {
+                            navigate(`/notifications?view=${encodeURIComponent(latestAlert._id)}`);
                           } else {
                             navigate("/notifications");
                           }
@@ -247,10 +338,6 @@ function Navbar() {
             );
           })}
 
-
-
-
-
           {/* ==========================================
               LOGIN BUTTON
           ========================================== */}
@@ -267,6 +354,54 @@ function Navbar() {
 
         </ul>
       </nav>
+
+      {/* ==========================================
+          REAL-TIME NEW B.TECH NOTIFICATION TOAST ALERT
+      ========================================== */}
+      {showToastAlert && activeAlertItem && (
+        <div 
+          className="notif-toast-alert"
+          onClick={() => {
+            handleOpenNotifications();
+            if (activeAlertItem._id) {
+              navigate(`/notifications?view=${encodeURIComponent(activeAlertItem._id)}`);
+            } else {
+              navigate("/notifications");
+            }
+          }}
+          role="alert"
+          aria-live="polite"
+        >
+          <div className="notif-toast-icon">
+            🔔
+          </div>
+          <div className="notif-toast-body">
+            <div className="notif-toast-header">
+              <span className="notif-toast-tag">
+                B.TECH {activeAlertItem.category || "EXAM"}
+              </span>
+              <span className="notif-toast-time">
+                {formatTimeAgo(activeAlertItem.publishedDate || activeAlertItem.createdAt)}
+              </span>
+            </div>
+            <div className="notif-toast-title">
+              {activeAlertItem.title}
+            </div>
+            <div className="notif-toast-action">
+              View Notice Details →
+            </div>
+          </div>
+          <button 
+            type="button" 
+            className="notif-toast-close"
+            onClick={handleDismissToast}
+            title="Dismiss alert"
+            aria-label="Dismiss alert"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
     </header>
   );

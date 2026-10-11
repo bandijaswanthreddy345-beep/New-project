@@ -5,11 +5,14 @@ const upload = require("../config/multer");
 const auth = require("../middleware/auth");
 
 const {
-createSyllabus,
-getSyllabus,
-getSyllabusById,
-updateSyllabus,
-deleteSyllabus,
+  createSyllabus,
+  getSyllabus,
+  getSyllabusById,
+  updateSyllabus,
+  deleteSyllabus,
+  likeSyllabus,
+  increaseViews,
+  increaseDownloads,
 } = require("../controllers/syllabusController");
 
 // ==========================================
@@ -20,7 +23,7 @@ router.get("/", getSyllabus);
 
 // ==========================================
 // GET SINGLE SYLLABUS
-// GET /api/syllabus/
+// GET /api/syllabus/:id
 // ==========================================
 router.get("/:id", getSyllabusById);
 
@@ -29,30 +32,48 @@ router.get("/:id", getSyllabusById);
 // POST /api/syllabus
 // ==========================================
 router.post(
-"/:id",
-auth,
-upload.single("file"),
-createSyllabus
+  "/",
+  auth,
+  upload.single("file"),
+  createSyllabus
 );
 
 // ==========================================
 // UPDATE SYLLABUS
-// PUT /api/syllabus/
+// PUT /api/syllabus/:id
 // ==========================================
 router.put(
-"/:id",
-auth,
-updateSyllabus
+  "/:id",
+  auth,
+  updateSyllabus
 );
 
 // ==========================================
 // DELETE SYLLABUS
-// DELETE /api/syllabus/
+// DELETE /api/syllabus/:id
 // ==========================================
 router.delete(
-"/:id",
-auth,
-deleteSyllabus
+  "/:id",
+  auth,
+  deleteSyllabus
 );
+
+// ==========================================
+// LIKE SYLLABUS
+// PUT /api/syllabus/:id/like
+// ==========================================
+router.put("/:id/like", likeSyllabus);
+
+// ==========================================
+// INCREASE VIEW COUNT
+// PUT /api/syllabus/:id/view
+// ==========================================
+router.put("/:id/view", increaseViews);
+
+// ==========================================
+// INCREASE DOWNLOAD COUNT
+// PUT /api/syllabus/:id/download
+// ==========================================
+router.put("/:id/download", increaseDownloads);
 
 module.exports = router;

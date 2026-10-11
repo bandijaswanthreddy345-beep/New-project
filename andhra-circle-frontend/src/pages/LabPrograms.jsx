@@ -90,10 +90,13 @@ function LabPrograms({ search = "" }) {
   };
 
   const getLabContext = (program) => {
-    if (program.description && program.description.trim()) {
-      return program.description;
+    if (program && program.description && program.description.trim()) {
+      const desc = program.description.trim();
+      if (!desc.toLowerCase().startsWith("laboratory experiments")) {
+        return desc;
+      }
     }
-    return `Laboratory experiments, practical source codes, algorithms and record materials for ${program.branch || "engineering students"}.`;
+    return "";
   };
 
   const formatDate = (date) => {
@@ -434,9 +437,11 @@ function LabPrograms({ search = "" }) {
                   {getLabDisplayTitle(program)}
                 </h3>
 
-                <p className="resource-desc">
-                  {getLabContext(program)}
-                </p>
+                {getLabContext(program) ? (
+                  <p className="resource-desc">
+                    {getLabContext(program)}
+                  </p>
+                ) : null}
 
                 {/* Metadata Chips */}
                 <div className="resource-meta-chips">
@@ -486,7 +491,7 @@ function LabPrograms({ search = "" }) {
                   <div className="resource-stats-left">
                     <span className="stat-chip stat-chip-views" title={`${program.views || 0} Total Views`}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                       <span className="stat-count">{program.views || 0}</span>
@@ -523,7 +528,7 @@ function LabPrograms({ search = "" }) {
                         onClick={() => handleViewPdf(program)}
                       >
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                           <circle cx="12" cy="12" r="3" />
                         </svg>
                         {openingPdf === program._id ? "Opening..." : "View PDF"}

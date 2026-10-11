@@ -1,0 +1,265 @@
+.user-uploaded-page {
+  min-height: 100vh;
+  padding: 42px max(24px, calc((100vw - 1240px) / 2)) 72px;
+  background: #f4f7f6;
+  color: #18332e;
+}
+
+.user-uploaded-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.user-uploaded-eyebrow {
+  color: #a47c1b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.user-uploaded-header h1 {
+  margin: 8px 0;
+  color: #073e35;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.user-uploaded-header p {
+  margin: 0;
+  color: #60736e;
+}
+
+.user-uploaded-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.user-uploaded-header-actions button {
+  min-height: 42px;
+  padding: 9px 15px;
+  border: 1px solid #b9d1c9;
+  border-radius: 10px;
+  background: #fff;
+  color: #124f43;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.user-uploaded-header-actions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.user-uploaded-header-actions .user-uploaded-back {
+  background: #0d5a4d;
+  border-color: #0d5a4d;
+  color: #fff;
+}
+
+.user-uploaded-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 210px;
+  margin-bottom: 22px;
+  padding: 16px 20px;
+  border: 1px solid #d9e8e2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(16, 63, 53, 0.06);
+}
+
+.user-uploaded-summary > span {
+  font-size: 1.8rem;
+}
+
+.user-uploaded-summary div {
+  display: grid;
+  gap: 2px;
+}
+
+.user-uploaded-summary strong {
+  color: #0c594b;
+  font-size: 1.35rem;
+}
+
+.user-uploaded-summary div span {
+  color: #647570;
+  font-size: 0.85rem;
+}
+
+.user-uploaded-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #d9e8e2;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(16, 63, 53, 0.06);
+}
+
+.user-uploaded-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.user-uploaded-table th,
+.user-uploaded-table td {
+  padding: 15px 16px;
+  border-bottom: 1px solid #edf2ef;
+  vertical-align: top;
+}
+
+.user-uploaded-table th {
+  background: #eaf3ef;
+  color: #315a50;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.user-uploaded-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.user-uploaded-table tbody tr:hover {
+  background: #f9fcfa;
+}
+
+.user-uploaded-type,
+.user-uploaded-status {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #edf6f1;
+  color: #145847;
+  font-size: 0.78rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.user-uploaded-name,
+.user-uploaded-email {
+  display: block;
+}
+
+.user-uploaded-name {
+  margin-bottom: 4px;
+  color: #203a34;
+}
+
+.user-uploaded-email {
+  color: #55756d;
+  font-size: 0.86rem;
+  text-decoration: none;
+}
+
+.user-uploaded-email:hover,
+.user-uploaded-file:hover {
+  text-decoration: underline;
+}
+
+.user-uploaded-comment {
+  min-width: 190px;
+  max-width: 300px;
+  color: #52645f;
+  overflow-wrap: anywhere;
+}
+
+.user-uploaded-file {
+  color: #0c6655;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.user-uploaded-no-file {
+  color: #899791;
+  font-size: 0.85rem;
+}
+
+.user-uploaded-status.status-pending {
+  background: #fff5d8;
+  color: #805d0a;
+}
+
+.user-uploaded-status.status-approved {
+  background: #e4f7ed;
+  color: #15633e;
+}
+
+.user-uploaded-status.status-rejected {
+  background: #fff0ee;
+  color: #9b392d;
+}
+
+.user-uploaded-delete {
+  padding: 7px 11px;
+  border: 1px solid #e8bcb5;
+  border-radius: 8px;
+  background: #fff7f5;
+  color: #963b30;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.user-uploaded-delete:hover:not(:disabled) {
+  border-color: #ca7569;
+  background: #ffebe7;
+}
+
+.user-uploaded-delete:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.user-uploaded-empty,
+.user-uploaded-message {
+  padding: 36px 24px;
+  border: 1px solid #d9e8e2;
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+  color: #60736e;
+}
+
+.user-uploaded-empty > span {
+  font-size: 2rem;
+}
+
+.user-uploaded-empty h2 {
+  margin: 10px 0 6px;
+  color: #164b40;
+}
+
+.user-uploaded-empty p {
+  margin: 0;
+}
+
+.user-uploaded-error {
+  margin-bottom: 18px;
+  border-color: #f0c8c3;
+  background: #fff7f5;
+  color: #913d32;
+}
+
+@media (max-width: 700px) {
+  .user-uploaded-page {
+    padding: 28px 16px 48px;
+  }
+
+  .user-uploaded-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .user-uploaded-table {
+    min-width: 1040px;
+  }
+}

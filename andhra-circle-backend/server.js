@@ -144,6 +144,15 @@ app.use(
 );
 
 // ==========================
+// USER POSTED MATERIALS
+// ==========================
+
+app.use(
+  "/api/user-materials",
+  require("./routes/userMaterialRoutes")
+);
+
+// ==========================
 // ADMIN ONLY ROUTES
 // ==========================
 
@@ -203,5 +212,9 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌐 http://localhost:${PORT}`);
   console.log("=================================");
+
+  // Start background auto-sync for official JNTUA examination updates
+  const { startJntuaAutoSync } = require("./services/jntuaSyncService");
+  startJntuaAutoSync();
 });
 

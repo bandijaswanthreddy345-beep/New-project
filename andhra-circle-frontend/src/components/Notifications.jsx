@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "./LikeReactionButton";
@@ -52,11 +53,17 @@ const CURATED_NOTICES = [
 ];
 
 function Notifications({ search = "" }) {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlSearch = searchParams.get("search") || "";
+  const effectiveSearch = search || urlSearch;
+
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [viewingNotice, setViewingNotice] = useState(null);
   const [likedNotifIds, setLikedNotifIds] = useState(() => {
     try {
       const saved = localStorage.getItem("andhra_liked_notifications");
@@ -89,11 +96,37 @@ function Notifications({ search = "" }) {
 
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
+    try {
+      await API.get("/notifications/sync");
+    } catch (e) {
+      console.warn("Manual sync error:", e);
+    }
     await fetchNotifications();
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
-  // Combine backend notices with curated defaults
+  const isBTechNotice = (n) => {
+    if (!n) return false;
+    const text = `${n.title || ""} ${n.description || ""}`.toLowerCase();
+    const isBTech = text.includes("b.tech") || text.includes("btech") || text.includes("b tech");
+    const isOther =
+      text.includes("b.pharm") ||
+      text.includes("bpharm") ||
+      text.includes("m.pharm") ||
+      text.includes("mpharm") ||
+      text.includes("m.tech") ||
+      text.includes("mtech") ||
+      text.includes("mba") ||
+      text.includes("mca") ||
+      text.includes("ph.d") ||
+      text.includes("phd") ||
+      text.includes("pharm.d") ||
+      text.includes("pharmd");
+    if (isOther && !isBTech) return false;
+    return isBTech;
+  };
+
+  // Combine backend notices with curated defaults (strictly B.Tech only)
   const combinedNotices = useMemo(() => {
     const list = [...notifications];
     CURATED_NOTICES.forEach((c) => {
@@ -101,7 +134,7 @@ function Notifications({ search = "" }) {
         list.push(c);
       }
     });
-    return list;
+    return list.filter(isBTechNotice);
   }, [notifications]);
 
   // Compute live metrics for the counter portion
@@ -131,7 +164,53 @@ function Notifications({ search = "" }) {
   }, [combinedNotices]);
 
   // Filtered list based on search and selected category
-  const searchText = String(search).trim().toLowerCase();
+  const searchText = String(effectiveSearch).trim().toLowerCase();
+
+  // Sync viewingNotice with query parameter ?view=<id>
+  useEffect(() => {
+    const viewId = searchParams.get("view");
+    if (viewId && combinedNotices.length > 0) {
+      const target = combinedNotices.find((n) => String(n._id) === String(viewId));
+      if (target) {
+        setViewingNotice(target);
+      }
+    }
+  }, [searchParams, combinedNotices]);
+
+  // Handle escape key and lock body scroll while viewer modal is open
+  useEffect(() => {
+    if (!viewingNotice) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        handleCloseNotice();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [viewingNotice]);
+
+  const handleOpenNotice = (notification) => {
+    setViewingNotice(notification);
+    handleView(notification);
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.set("view", notification._id);
+      return p;
+    }, { replace: true });
+  };
+
+  const handleCloseNotice = () => {
+    setViewingNotice(null);
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.delete("view");
+      return p;
+    }, { replace: true });
+  };
 
   const displayedNotifications = useMemo(() => {
     return combinedNotices.filter((notification) => {
@@ -322,11 +401,48 @@ function Notifications({ search = "" }) {
 
   return (
     <section id="notifications-section" className="notification-section">
-      {/* Standard Section Heading */}
-      <div className="section-heading">
-        <span className="section-tag">UNIVERSITY ANNOUNCEMENTS</span>
-        <h2>Notifications & Circulars</h2>
-        <p>Stay updated with official JNTU university notices, examination circulars, and academic bulletins.</p>
+      {/* Top Page Navigation Bar with Back Button in the Left Corner */}
+      <div className="notif-page-topbar">
+        <button
+          type="button"
+          className="notif-back-btn"
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/");
+            }
+          }}
+          title="Go back to previous page"
+        >
+          <span className="notif-back-icon-wrap" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+          </span>
+          <span>Back</span>
+        </button>
+
+        <div className="notif-topbar-breadcrumb">
+          <button type="button" onClick={() => navigate("/")} className="notif-breadcrumb-link">
+            Home
+          </button>
+          <span className="notif-breadcrumb-slash">/</span>
+          <span className="notif-breadcrumb-current">
+            <span className="notif-breadcrumb-dot" aria-hidden="true" />
+            B.Tech Notifications
+          </span>
+        </div>
+      </div>
+
+      {/* Enhanced Section Heading */}
+      <div className="section-heading notif-section-heading">
+        <span className="section-tag">
+          <span className="notif-tag-pulse" aria-hidden="true" />
+          B.TECH UNIVERSITY ANNOUNCEMENTS
+        </span>
+        <h2>B.Tech Notifications & Circulars</h2>
       </div>
 
       {/* =========================================================
@@ -337,11 +453,11 @@ function Notifications({ search = "" }) {
           <div className="summary-hub-title-group">
             <span className="live-status-pill">
               <span className="live-pulse-dot" />
-              LIVE JNTU CIRCULARS
+              LIVE JNTU B.TECH CIRCULARS
             </span>
-            <h3 className="summary-hub-heading">Quick Notice Summary & Live Updates Counter</h3>
+            <h3 className="summary-hub-heading">B.Tech Notice Summary & Live Updates Counter</h3>
             <p className="summary-hub-sub">
-              Real-time feed of board decisions, exam timetables, academic calendars, and university circulars.
+              Real-time feed of official B.Tech examination timetables, semester circulars, and university updates.
             </p>
           </div>
 
@@ -440,16 +556,14 @@ function Notifications({ search = "" }) {
               <span className="ticker-title">{latestNotice.title}</span>
               <span className="ticker-date">• Published {formatDate(latestNotice.publishedDate)}</span>
             </div>
-            {latestNotice.link && (
-              <a
-                href={latestNotice.link}
-                target="_blank"
-                rel="noreferrer"
-                className="ticker-action-link"
-              >
-                View Circular →
-              </a>
-            )}
+            <button
+              type="button"
+              className="ticker-action-link"
+              onClick={() => handleOpenNotice(latestNotice)}
+              style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+            >
+              View Circular →
+            </button>
           </div>
         )}
 
@@ -485,7 +599,12 @@ function Notifications({ search = "" }) {
         <div className="papers-grid">
           {displayedNotifications.map((notification) => (
             <article className="resource-card" key={notification._id}>
-              <div className="resource-image">
+              <div 
+                className="resource-image"
+                style={{ cursor: "pointer" }}
+                onClick={() => handleOpenNotice(notification)}
+                title="Click to view notification details"
+              >
                 <img src={defaultBanner} alt={notification.title} />
                 <span className="read-time">
                   {notification.category || "Notification"}
@@ -500,7 +619,12 @@ function Notifications({ search = "" }) {
                   </span>
                 </div>
 
-                <h3 className="resource-title" title={notification.title}>
+                <h3 
+                  className="resource-title" 
+                  title={notification.title}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleOpenNotice(notification)}
+                >
                   {notification.title}
                 </h3>
 
@@ -532,7 +656,7 @@ function Notifications({ search = "" }) {
                   <div className="resource-stats-left">
                     <span className="stat-chip stat-chip-views" title={`${notification.views || 0} Total Views`}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                       <span className="stat-count">{notification.views || 0}</span>
@@ -559,19 +683,18 @@ function Notifications({ search = "" }) {
                 </div>
 
                 <div className="resource-buttons">
-                  <a
-                    href={notification.link || "#"}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
                     className="view-pdf-button"
-                    onClick={() => handleView(notification)}
+                    onClick={() => handleOpenNotice(notification)}
+                    title="View notification details"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                     View Details
-                  </a>
+                  </button>
 
                   <button
                     type="button"
@@ -589,6 +712,179 @@ function Notifications({ search = "" }) {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {/* =========================================================
+          IN-APP NOTIFICATION DETAIL VIEWER (WITH PROMINENT BACK OPTION)
+          ========================================================= */}
+      {viewingNotice && (
+        <div 
+          className="notif-modal-backdrop" 
+          onClick={handleCloseNotice}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Notification details"
+        >
+          <div 
+            className="notif-modal-card" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Top Header with Prominent Back Option */}
+            <div className="notif-modal-header">
+              <button
+                type="button"
+                className="notif-modal-back-btn"
+                onClick={handleCloseNotice}
+                title="Back to notifications"
+                autoFocus
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+                <span>← Back to Notifications</span>
+              </button>
+
+              <span className="notif-modal-badge">
+                JNTUA B.Tech Official
+              </span>
+
+              <button
+                type="button"
+                className="notif-modal-close-btn"
+                onClick={handleCloseNotice}
+                title="Close (Esc)"
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="notif-modal-body">
+              <div className="notif-modal-meta-row">
+                <span className="notif-modal-category-chip">
+                  <span className="category-chip-dot" />
+                  {viewingNotice.category || "GENERAL"}
+                </span>
+
+                <span className="notif-modal-date-chip">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  Published {formatDate(viewingNotice.publishedDate || viewingNotice.createdAt)} · {formatTimeAgo(viewingNotice.publishedDate || viewingNotice.createdAt)}
+                </span>
+              </div>
+
+              <h2 className="notif-modal-title">
+                {viewingNotice.title}
+              </h2>
+
+              {/* Official University Verification Alert Banner */}
+              <div className="notif-modal-verified-banner">
+                <div className="verified-seal-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <polyline points="9 12 11 14 15 10" />
+                  </svg>
+                </div>
+                <div className="verified-seal-text">
+                  <strong>Official University Examination Announcement</strong>
+                  <span>Directly synchronized from Jawaharlal Nehru Technological University Official Portal (jntua.ac.in).</span>
+                </div>
+              </div>
+
+              {/* Notice Description Details */}
+              <div className="notif-modal-description-box">
+                <h4 className="description-box-heading">Circular Details & Instructions</h4>
+                <p className="description-box-text">
+                  {viewingNotice.description || "Official circular issued for B.Tech regular & supplementary examinations. Students are advised to verify timelines and download attached schedules."}
+                </p>
+              </div>
+
+              {/* Notice Live Metrics & Like Reactions */}
+              <div className="notif-modal-stats-row">
+                <div className="modal-stats-group">
+                  <span className="modal-stat-pill" title="Total Views">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <strong>{viewingNotice.views || 0}</strong> views
+                  </span>
+
+                  <span className="modal-stat-pill" title="Total Downloads">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <strong>{viewingNotice.downloads || 0}</strong> dls
+                  </span>
+                </div>
+
+                <LikeReactionButton
+                  isLiked={likedNotifIds.has(viewingNotice._id)}
+                  count={viewingNotice.likes || 0}
+                  onToggle={(e) => handleToggleLike(viewingNotice, e)}
+                  title={likedNotifIds.has(viewingNotice._id) ? "Liked" : "Like notification"}
+                />
+              </div>
+            </div>
+
+            {/* Modal Bottom Footer with Back Action & External Link */}
+            <div className="notif-modal-footer">
+              <button
+                type="button"
+                className="notif-btn-back-action"
+                onClick={handleCloseNotice}
+                title="Return to notifications list"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+                <span>← Back</span>
+              </button>
+
+              <div className="notif-modal-footer-right">
+                {viewingNotice.link && (
+                  <a
+                    href={viewingNotice.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="notif-btn-external"
+                    title="Open on official university portal"
+                  >
+                    <span>Open Official Portal / PDF</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                  </a>
+                )}
+
+                <button
+                  type="button"
+                  className="notif-btn-download"
+                  onClick={() => handleDownload(viewingNotice)}
+                  title="Download attached circular"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span>Download</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </section>
