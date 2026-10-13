@@ -127,7 +127,7 @@ await Notification.findByIdAndUpdate(
 req.params.id,
 req.body,
 {
-new: true,
+returnDocument: "after",
 }
 );
 
@@ -214,7 +214,7 @@ exports.likeNotification = async (req, res) => {
     const notification = await Notification.findByIdAndUpdate(
       req.params.id,
       { $set: { likes: targetLikes } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     res.status(200).json(notification);
@@ -236,7 +236,7 @@ exports.increaseViews = async (req, res) => {
     const notification = await Notification.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!notification) {
@@ -264,7 +264,7 @@ exports.increaseDownloads = async (req, res) => {
     const notification = await Notification.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!notification) {

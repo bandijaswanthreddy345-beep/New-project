@@ -305,7 +305,7 @@ function AuthorProfile() {
 
             <h2 id="upload-materials-title">Upload Materials</h2>
             <p className="upload-modal-subtitle">
-              Upload notes, papers, syllabus, or reports in PDF format only.
+              Upload notes, papers, syllabus, or lab programs in PDF format only.
             </p>
 
             <form className="upload-material-form" onSubmit={handleUploadSubmit}>

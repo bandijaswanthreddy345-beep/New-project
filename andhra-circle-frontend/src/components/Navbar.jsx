@@ -202,8 +202,8 @@ function Navbar() {
       path: "/calculator",
     },
     {
-      name: "JNTU Reports",
-      path: "/reports",
+      name: "Upload Materials",
+      path: "/upload-materials",
     },
     {
       name: "Student Profile",

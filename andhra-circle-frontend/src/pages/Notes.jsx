@@ -5,6 +5,7 @@ import API from "../api/api";
 import profile from "../assets/jaswanth.png.png";
 import StudentProfileModal from "../components/StudentProfileModal";
 import { getStoredStudentData } from "../data/studentData";
+import AuthorProfile from "../components/AuthorProfile";
 import "./Notes.css";
 
 // Branch definitions matching homepage engineering departments
@@ -1030,6 +1031,14 @@ function Notes({ initialType }) {
             </div>
           </div>
         </main>
+
+        {/* =========================================================
+            RIGHT COLUMN: DEVELOPER PROFILES & JNTU UPLOAD
+            (Matches Note Details design & placement)
+            ========================================================= */}
+        <aside className="notes-right-column">
+          <AuthorProfile />
+        </aside>
 
       </div>
 

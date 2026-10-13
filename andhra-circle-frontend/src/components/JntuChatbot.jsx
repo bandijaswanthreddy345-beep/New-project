@@ -166,7 +166,7 @@ function JntuChatbot() {
           text: `🎉 All set! Your Student Profile has been created and synced live across JNTU Circle.`,
           profilePreview: updated,
           action: { label: "Open Full Student Profile →", path: "/profile" },
-          suggestions: ["🎓 View JNTU Reports", "📊 CGPA Calculator", "👤 Student Profile"],
+          suggestions: ["📊 CGPA Calculator", "👤 Student Profile", "📘 Notes"],
         };
       }
     }
@@ -200,9 +200,9 @@ function JntuChatbot() {
       const newCgpa = parseFloat(cgpaMatch[1]).toFixed(2);
       const updated = handleQuickProfileUpdate({ cgpa: newCgpa });
       return {
-        text: `✅ Updated your Cumulative CGPA to ${newCgpa}! This reflects in your JNTU Reports and Calculator.`,
+        text: `✅ Updated your Cumulative CGPA to ${newCgpa}! This reflects in your Student Profile and Calculator.`,
         profilePreview: updated,
-        action: { label: "View JNTU Reports →", path: "/reports" },
+        action: { label: "Open CGPA Calculator →", path: "/calculator" },
         suggestions: ["📊 CGPA Calculator", "🎓 View Student Profile"],
       };
     }
@@ -256,12 +256,12 @@ function JntuChatbot() {
       };
     }
 
-    // Reports Query
-    if (q.includes("report") || q.includes("transcript") || q.includes("marks") || q.includes("result card") || q.includes("progress")) {
+    // Student Academic Performance / Transcript Query
+    if (q.includes("transcript") || q.includes("marks") || q.includes("result card") || q.includes("progress")) {
       return {
-        text: "Official JNTU Academic Reports: verified semester breakdown, CGPA trajectory, credit audits, and printable transcript.",
-        action: { label: "Open JNTU Reports →", path: "/reports" },
-        suggestions: ["Print Official Transcript", "Credit Tracker", "SGPA History"],
+        text: "View your verified academic profile, semester progression, and CGPA trajectory in your Student Profile.",
+        action: { label: "View Student Profile →", path: "/profile" },
+        suggestions: ["📊 CGPA Calculator", "👤 Student Profile"],
       };
     }
 
@@ -331,8 +331,8 @@ function JntuChatbot() {
     // Greetings
     if (q.startsWith("hi") || q.startsWith("hello") || q.startsWith("hey") || q.includes("good morning") || q.includes("good evening") || q === "help") {
       return {
-        text: "Hello! I am your JNTU AI Assistant. I can help you build your student profile, calculate CGPA/SGPA, view JNTU reports, or find study notes.",
-        suggestions: ["🚀 Build Student Profile with AI", "📊 CGPA Calculator", "🎓 JNTU Reports", "Notes"],
+        text: "Hello! I am your JNTU AI Assistant. I can help you build your student profile, calculate CGPA/SGPA, or find study notes.",
+        suggestions: ["🚀 Build Student Profile with AI", "📊 CGPA Calculator", "👤 Student Profile", "Notes"],
       };
     }
 
@@ -615,9 +615,9 @@ function JntuChatbot() {
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("JNTU Reports")}
+                      onClick={() => handleSend("Student Profile")}
                     >
-                      🎓 JNTU Reports
+                      👤 Student Profile
                     </button>
                     <button
                       type="button"

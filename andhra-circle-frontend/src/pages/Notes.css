@@ -260,6 +260,7 @@
 
 .notes-main-panel {
   flex: 1;
+  min-width: 0;
   height: 100vh;
   padding: 34px 44px;
   display: flex;
@@ -267,6 +268,46 @@
   background: #fffdf8;
   overflow: hidden;
   box-sizing: border-box;
+}
+
+/* =========================================================
+   RIGHT SIDEBAR: DEVELOPER PROFILES & COMMUNITY UPLOAD
+   Matches Note Details (Image 1) Layout & Theme
+   ========================================================= */
+
+.notes-right-column {
+  width: 390px;
+  min-width: 380px;
+  max-width: 410px;
+  height: 100vh;
+  background: #002420;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 30px 20px 96px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.notes-right-column::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notes-right-column::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notes-right-column::-webkit-scrollbar-thumb {
+  background: rgba(255, 239, 179, 0.22);
+  border-radius: 10px;
+}
+
+.notes-right-column::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 239, 179, 0.42);
 }
 
 .notes-opening-panel {
@@ -955,8 +996,51 @@
 }
 
 /* =========================================================
-   RESPONSIVE LAYOUT (< 960px)
+   RESPONSIVE LAYOUT (< 1280px, < 1100px, < 960px)
    ========================================================= */
+
+@media (max-width: 1280px) {
+  .notes-right-column {
+    width: 350px;
+    min-width: 330px;
+    padding: 24px 16px 96px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .notes-dashboard-container {
+    height: auto;
+    min-height: 100vh;
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  .notes-dashboard-card {
+    flex-direction: column;
+    min-height: 100vh;
+    height: auto;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .notes-main-panel {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .notes-right-column {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 30px 20px 96px;
+    order: 3;
+    overflow: visible;
+  }
+}
 
 @media (max-width: 960px) {
   .notes-dashboard-container {

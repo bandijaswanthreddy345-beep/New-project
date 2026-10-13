@@ -1,10 +1,26 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Footer() {
+  const navigate = useNavigate();
+
+  const handleAdminDashboardClick = (e) => {
+    e.preventDefault();
+    // Clear stored admin credentials so fresh login is always required
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login", {
+      state: {
+        adminPrompt: true,
+        message: "Admin authentication required. Please sign in to access the Admin Dashboard.",
+      },
+    });
+  };
+
   const quickLinks = [
     { name: "Home", path: "/" },
     { name: "CGPA & SGPA Calculator", path: "/calculator" },
-    { name: "Academic Reports", path: "/reports" },
+    { name: "Upload Materials", path: "/upload-materials" },
     { name: "Notifications", path: "/notifications" },
   ];
 
@@ -24,8 +40,15 @@ function Footer() {
         {/* Brand */}
         <div className="footer-column footer-brand">
           <Link to="/" className="footer-brand-title">
-            <span className="footer-brand-icon">🎓</span>
-            <span>JNTU Circle</span>
+            <img
+              src="/jntu-circle-logo.png"
+              alt="JNTU Circle Logo"
+              className="footer-brand-logo"
+            />
+            <div className="footer-brand-text">
+              <h2><span className="font-deltha">JNTU</span> Circle</h2>
+              <span>Academic Resource Hub</span>
+            </div>
           </Link>
 
           <p className="footer-description">
@@ -61,7 +84,18 @@ function Footer() {
           <ul className="footer-links">
             {resourceLinks.map((link) => (
               <li key={link.path}>
-                <Link to={link.path}>{link.name}</Link>
+                {link.path === "/dashboard" ? (
+                  <a
+                    href="/login"
+                    onClick={handleAdminDashboardClick}
+                    className="footer-admin-link"
+                    title="Sign in to Admin Dashboard"
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link to={link.path}>{link.name}</Link>
+                )}
               </li>
             ))}
           </ul>

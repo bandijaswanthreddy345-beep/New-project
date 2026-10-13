@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import API from "../api/api";
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const adminPrompt = location.state?.adminPrompt;
+  const adminMessage = location.state?.message;
 
   const [form, setForm] = useState({
     email: "",
@@ -110,11 +114,39 @@ function Login() {
 
         {/* Welcome Section */}
         <div className="login-heading-section">
-          <h1 className="login-main-title">Sign In to Your Account</h1>
+          <h1 className="login-main-title">
+            {adminPrompt ? "Admin Portal Login" : "Sign In to Your Account"}
+          </h1>
           <p className="login-main-sub">
-            Access lecture notes, question papers, syllabus & academic tools
+            {adminPrompt
+              ? "Verify administrator credentials to access management tools"
+              : "Access lecture notes, question papers, syllabus & academic tools"}
           </p>
         </div>
+
+        {/* Admin Access Prompt Banner */}
+        {adminPrompt && (
+          <div className="login-alert login-alert-admin" role="status">
+            <svg
+              className="login-alert-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <div>
+              <strong style={{ display: "block" }}>Admin Authentication Required</strong>
+              <p style={{ margin: "2px 0 0 0", fontSize: "12.5px", opacity: 0.9 }}>
+                {adminMessage || "Please enter your administrator credentials to access the Dashboard."}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Error Alert Banner */}
         {error && (

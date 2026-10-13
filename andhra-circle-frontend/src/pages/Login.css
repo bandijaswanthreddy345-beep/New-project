@@ -293,6 +293,12 @@
   color: #991b1b;
 }
 
+.login-alert-admin {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
 .login-alert-icon {
   width: 17px;
   height: 17px;

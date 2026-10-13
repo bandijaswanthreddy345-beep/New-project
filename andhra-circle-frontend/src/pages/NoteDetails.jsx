@@ -1448,7 +1448,7 @@ function NoteDetails() {
         RIGHT COLUMN: DEVELOPER PROFILES & JNTU UPLOAD
     ====================================================== */}
     <aside className="note-right-column">
-      <AuthorProfile note={note} />
+      <AuthorProfile />
     </aside>
   </div>
 

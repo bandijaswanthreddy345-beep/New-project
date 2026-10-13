@@ -1,5 +1,5 @@
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // =========================
 // Public Pages
@@ -22,7 +22,6 @@ import StudentProfile from "./pages/StudentProfile";
 import QuestionPapers from "./components/QuestionPapers";
 import Notifications from "./components/Notifications";
 import Calculator from "./pages/Calculator";
-import Reports from "./pages/Reports";
 import UploadMaterials from "./pages/UploadMaterials";
 
 // =========================
@@ -189,18 +188,19 @@ function App() {
         element={<Calculator />}
       />
 
+
       {/* =========================
-          REPORTS & TRANSCRIPTS
+          REPORTS REDIRECT
       ========================== */}
 
       <Route
         path="/reports"
-        element={<Reports />}
+        element={<Navigate to="/" replace />}
       />
 
       <Route
         path="/academic-reports"
-        element={<Reports />}
+        element={<Navigate to="/" replace />}
       />
 
       {/* =========================
