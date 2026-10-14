@@ -5,6 +5,7 @@ import { BotAvatar } from "bot-avatars";
 import { MetalFx, useMetalBend } from "metal-fx";
 import { ThinkingOrb } from "thinking-orbs";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
+import { performSearch, formatResourceAction } from "../utils/searchEngine";
 
 function JntuChatbot() {
   const [messages, setMessages] = useState([]);
@@ -67,7 +68,7 @@ function JntuChatbot() {
     return updated;
   };
 
-  const generateResponse = (rawQuery, currentSession) => {
+  const generateResponse = async (rawQuery, currentSession) => {
     const q = rawQuery.toLowerCase().trim();
 
     // =========================================================
@@ -244,7 +245,7 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 4. GENERAL PLATFORM QUERIES & NAVIGATION
+    // 4. PLATFORM TOOLS & HELPERS
     // =========================================================
 
     // Calculator Query
@@ -274,77 +275,55 @@ function JntuChatbot() {
       };
     }
 
-    // Check for Notes
-    if (q.includes("note") || q.includes("material") || q.includes("lecture") || q.includes("pdf") || q.includes("textbook")) {
-      return {
-        text: "Verified B.Tech notes & materials for R20 & R23 across all departments.",
-        action: { label: "Open Notes Catalog →", path: "/notes" },
-        suggestions: ["CSE Notes", "ECE Notes", "Civil Notes"],
-      };
-    }
-
-    // Check for Question Papers
-    if (q.includes("paper") || q.includes("question") || q.includes("pyq") || q.includes("mid") || q.includes("model")) {
-      return {
-        text: "Semester-end & mid exam question papers categorized by regulation and branch.",
-        action: { label: "Browse Question Papers →", path: "/papers" },
-        suggestions: ["R20 Papers", "R23 Papers", "Mid Exam Papers"],
-      };
-    }
-
-    // Check for Syllabus
-    if (q.includes("syllabus") || q.includes("curriculum") || q.includes("credit") || q.includes("course structure")) {
-      return {
-        text: "Official JNTU academic curriculum, credits, and semester syllabus.",
-        action: { label: "View Syllabus →", path: "/syllabus" },
-        suggestions: ["R20 Syllabus", "R23 Syllabus"],
-      };
-    }
-
-    // Check for Lab Programs
-    if (q.includes("lab") || q.includes("program") || q.includes("code") || q.includes("manual") || q.includes("viva") || q.includes("practical")) {
-      return {
-        text: "Verified lab manuals, source codes, and practical viva exercises.",
-        action: { label: "Open Lab Programs →", path: "/lab-programs" },
-        suggestions: ["Java Lab", "Python Lab", "Data Structures Lab"],
-      };
-    }
-
-    // Check for Notifications / Circulars
-    if (q.includes("notification") || q.includes("circular") || q.includes("timetable") || q.includes("exam") || q.includes("result") || q.includes("alert")) {
-      return {
-        text: "Official JNTU circulars, exam timetables, fee alerts, and university circulars.",
-        action: { label: "View Notifications →", path: "/notifications" },
-        suggestions: ["Exam Timetable", "Academic Calendar"],
-      };
-    }
-
-    // Check for Departments / Branches
-    if (q.includes("department") || q.includes("branch")) {
-      return {
-        text: "Dedicated study resources for CSE, ECE, EEE, MECH, CIVIL & AIML branches.",
-        action: { label: "Explore Department Notes →", path: "/notes" },
-        suggestions: ["CSE", "ECE", "EEE", "MECH", "CIVIL", "AIML"],
-      };
-    }
-
     // Greetings
     if (q.startsWith("hi") || q.startsWith("hello") || q.startsWith("hey") || q.includes("good morning") || q.includes("good evening") || q === "help") {
       return {
-        text: "Hello! I am your JNTU AI Assistant. I can help you build your student profile, calculate CGPA/SGPA, or find study notes.",
-        suggestions: ["🚀 Build Student Profile with AI", "📊 CGPA Calculator", "👤 Student Profile", "Notes"],
+        text: "Hello! I am your JNTU AI Academic Assistant. Ask me to find notes, question papers, syllabus, or lab programs for any subject, or build your student profile.",
+        suggestions: ["🚀 Build Student Profile with AI", "Data Structures Notes", "Python Lab Programs", "R23 AIML Syllabus", "📊 CGPA Calculator"],
       };
     }
 
-    // Fallback search
+    // =========================================================
+    // 5. ACCURATE ACADEMIC SEARCH & RELATED CONTENT DISCOVERY
+    // =========================================================
+    const searchRes = await performSearch(rawQuery);
+
+    if (searchRes.results && searchRes.results.length > 0) {
+      const topItems = searchRes.results.slice(0, 3).map((item) => {
+        const action = formatResourceAction(item);
+        return {
+          ...item,
+          actionPath: action.path,
+          actionLabel: action.label,
+        };
+      });
+
+      return {
+        text: `Found ${searchRes.results.length} verified academic resource${searchRes.results.length > 1 ? "s" : ""} matching "${rawQuery}":`,
+        matchedResources: topItems,
+        relatedResources: searchRes.relatedResources,
+        relatedSubjects: searchRes.relatedSubjects,
+        action: {
+          label: `View all ${searchRes.results.length} results in Portal →`,
+          path: `/search?query=${encodeURIComponent(rawQuery)}`,
+        },
+        suggestions: searchRes.suggestedQueries.length > 0 ? searchRes.suggestedQueries : ["Notes", "Question Papers", "Syllabus"],
+      };
+    }
+
+    // Fallback if no matching item found
     return {
-      text: `Resources matching "${rawQuery}": search verified portal database records.`,
-      action: { label: `Search "${rawQuery}" in Portal →`, path: `/search?query=${encodeURIComponent(rawQuery)}` },
-      suggestions: ["🚀 Build Student Profile with AI", "Notes", "Question Papers"],
+      text: `No exact records found for "${rawQuery}". Here are related curriculum subjects and syllabus topics you can check:`,
+      relatedSubjects: searchRes.relatedSubjects,
+      action: {
+        label: `Search "${rawQuery}" in Full Catalog →`,
+        path: `/search?query=${encodeURIComponent(rawQuery)}`,
+      },
+      suggestions: searchRes.suggestedQueries.length > 0 ? searchRes.suggestedQueries : ["Data Structures Notes", "Python Programming", "Operating Systems", "R23 Syllabus"],
     };
   };
 
-  const handleSend = (textToSend) => {
+  const handleSend = async (textToSend) => {
     const query = (textToSend || "").trim();
     if (!query) return;
 
@@ -359,7 +338,7 @@ function JntuChatbot() {
 
     const q = query.toLowerCase();
     let orbState = "searching";
-    let orbLabel = "Searching verified resources...";
+    let orbLabel = `Searching academic resources for "${query}"...`;
 
     if (q.includes("profile") || profileSession.active) {
       orbState = "weaving";
@@ -369,13 +348,13 @@ function JntuChatbot() {
       orbLabel = "Computing academic grade point metrics...";
     } else if (q.includes("lab") || q.includes("program") || q.includes("code")) {
       orbState = "solving";
-      orbLabel = "Resolving lab programs & solutions...";
+      orbLabel = "Locating verified lab manuals & code...";
+    } else if (q.includes("paper") || q.includes("pyq") || q.includes("question")) {
+      orbState = "searching";
+      orbLabel = "Searching semester question papers...";
     } else if (q.includes("notification") || q.includes("circular") || q.includes("report")) {
       orbState = "connecting";
       orbLabel = "Connecting to university records...";
-    } else if (q.startsWith("hi") || q.startsWith("hello") || q.startsWith("hey")) {
-      orbState = "working";
-      orbLabel = "Initializing JNTU AI Assistant...";
     }
 
     setThinkingState(orbState);
@@ -385,8 +364,8 @@ function JntuChatbot() {
     setModalInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const responseData = generateResponse(query, profileSession);
+    try {
+      const responseData = await generateResponse(query, profileSession);
       const botMessage = {
         id: "bot-" + Date.now(),
         sender: "assistant",
@@ -394,16 +373,32 @@ function JntuChatbot() {
         action: responseData.action,
         suggestions: responseData.suggestions,
         profilePreview: responseData.profilePreview,
+        matchedResources: responseData.matchedResources,
+        relatedResources: responseData.relatedResources,
+        relatedSubjects: responseData.relatedSubjects,
       };
 
       setMessages((prev) => [...prev, botMessage]);
+    } catch (err) {
+      console.error("AI Assistant Search Error:", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: "bot-" + Date.now(),
+          sender: "assistant",
+          text: `Here are resources matching "${query}":`,
+          action: { label: `Search in Portal →`, path: `/search?query=${encodeURIComponent(query)}` },
+          suggestions: ["Data Structures Notes", "Python Programming", "Syllabus"],
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 550);
+    }
   };
 
   // Submit from the Hero home command bar
   const handleHeroSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (input.trim()) {
       handleSend(input);
     } else {
@@ -413,9 +408,25 @@ function JntuChatbot() {
 
   // Submit from the Modal Overlay input bar
   const handleModalSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (modalInput.trim()) {
       handleSend(modalInput);
+    }
+  };
+
+  // Handle Enter key on hero input (bypass disabled submit button)
+  const handleHeroKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleHeroSubmit();
+    }
+  };
+
+  // Handle Enter key on modal input (bypass disabled submit button)
+  const handleModalKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleModalSubmit();
     }
   };
 
@@ -471,6 +482,7 @@ function JntuChatbot() {
               placeholder="Ask JNTU AI or say 'Build my student profile'..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleHeroKeyDown}
               aria-label="Ask JNTU AI"
               autoComplete="off"
             />
@@ -685,6 +697,121 @@ function JntuChatbot() {
                             </div>
                           )}
 
+                          {/* Interactive Academic Resource Cards */}
+                          {msg.matchedResources && msg.matchedResources.length > 0 && (
+                            <div className="chat-result-cards">
+                              {msg.matchedResources.map((resItem, rIdx) => {
+                                const typeClass =
+                                  resItem.type === "Notes" ? "chat-tag-notes"
+                                  : resItem.type === "Question Paper" ? "chat-tag-paper"
+                                  : resItem.type === "Syllabus" ? "chat-tag-syllabus"
+                                  : resItem.type === "Lab Program" ? "chat-tag-lab"
+                                  : "chat-tag-notif";
+
+                                return (
+                                  <div
+                                    key={resItem._id || rIdx}
+                                    className="chat-result-card"
+                                    onClick={() => {
+                                      handleCloseModal();
+                                      navigate(resItem.actionPath);
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter" || e.key === " ") {
+                                        handleCloseModal();
+                                        navigate(resItem.actionPath);
+                                      }
+                                    }}
+                                  >
+                                    <div className="chat-result-top-row">
+                                      <span className={`chat-result-type-tag ${typeClass}`}>
+                                        <span>{resItem.icon || "📄"}</span>
+                                        <span>{resItem.type}</span>
+                                      </span>
+                                      {resItem.subjectCode && (
+                                        <span className="chat-result-badge">{resItem.subjectCode}</span>
+                                      )}
+                                    </div>
+
+                                    <h5 className="chat-result-title">{resItem.title}</h5>
+
+                                    {resItem.description && (
+                                      <p className="chat-result-desc">{resItem.description}</p>
+                                    )}
+
+                                    <div className="chat-result-badges">
+                                      {resItem.branch && (
+                                        <span className="chat-result-badge">Dept: {resItem.branch}</span>
+                                      )}
+                                      {resItem.semester && (
+                                        <span className="chat-result-badge">Sem: {resItem.semester}</span>
+                                      )}
+                                      {resItem.regulation && (
+                                        <span className="chat-result-badge">{resItem.regulation}</span>
+                                      )}
+                                      {resItem.credits && (
+                                        <span className="chat-result-badge">{resItem.credits} Credits</span>
+                                      )}
+                                    </div>
+
+                                    <div className="chat-result-btn-row">
+                                      <span style={{ fontSize: "10px", color: "#94a3b8" }}>
+                                        {resItem.subject || resItem.type}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        className="chat-result-btn"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleCloseModal();
+                                          navigate(resItem.actionPath);
+                                        }}
+                                      >
+                                        <span>{resItem.actionLabel}</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* Related Resources & Sibling Subjects Explorer */}
+                          {((msg.relatedResources && msg.relatedResources.length > 0) || (msg.relatedSubjects && msg.relatedSubjects.length > 0)) && (
+                            <div className="chat-related-box">
+                              <div className="chat-related-header">
+                                <span>💡</span>
+                                <span>Related Content & Sibling Subjects:</span>
+                              </div>
+                              <div className="chat-related-chips">
+                                {msg.relatedResources && msg.relatedResources.map((rel, rIdx) => (
+                                  <button
+                                    key={`rel-res-${rIdx}`}
+                                    type="button"
+                                    className="chat-related-pill"
+                                    onClick={() => handleSend(`${rel.subject || rel.title} ${rel.type}`)}
+                                    title={`Search related ${rel.type}`}
+                                  >
+                                    {rel.icon} {rel.type}: {rel.subject || rel.title}
+                                  </button>
+                                ))}
+                                {msg.relatedSubjects && msg.relatedSubjects.map((sub, sIdx) => (
+                                  <button
+                                    key={`rel-sub-${sIdx}`}
+                                    type="button"
+                                    className="chat-related-pill"
+                                    onClick={() => handleSend(`${sub.name} notes`)}
+                                    title={`Find resources for ${sub.name}`}
+                                  >
+                                    📚 {sub.name} ({sub.branch})
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
                           {msg.action && (
                             <button
                               type="button"
@@ -746,6 +873,7 @@ function JntuChatbot() {
                   }
                   value={modalInput}
                   onChange={(e) => setModalInput(e.target.value)}
+                  onKeyDown={handleModalKeyDown}
                   autoComplete="off"
                 />
 

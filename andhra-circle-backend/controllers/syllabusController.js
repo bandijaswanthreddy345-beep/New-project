@@ -28,13 +28,15 @@ exports.createSyllabus = async (req, res) => {
 // Get All Syllabus
 exports.getSyllabus = async (req, res) => {
   try {
+    if (require("mongoose").connection.readyState !== 1) {
+      return res.status(200).json([]);
+    }
     const syllabus = await Syllabus.find().sort({ createdAt: -1 });
 
-    res.json(syllabus);
+    res.status(200).json(syllabus);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    console.warn("Get Syllabus Warning:", error.message);
+    res.status(200).json([]);
   }
 };
 

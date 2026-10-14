@@ -110,17 +110,17 @@ exports.createNote = async (req, res) => {
 
 exports.getNotes = async (req, res) => {
   try {
+    if (require("mongoose").connection.readyState !== 1) {
+      return res.status(200).json([]);
+    }
     const notes = await Note.find().sort({
       createdAt: -1,
     });
 
     res.status(200).json(notes);
   } catch (error) {
-    console.error("Get Notes Error:", error);
-
-    res.status(500).json({
-      message: error.message,
-    });
+    console.warn("Get Notes Warning:", error.message);
+    res.status(200).json([]);
   }
 };
 
@@ -361,6 +361,17 @@ exports.increaseDownloads = async (req, res) => {
 
 exports.getBranchStats = async (req, res) => {
   try {
+    if (require("mongoose").connection.readyState !== 1) {
+      return res.status(200).json({
+        success: true,
+        stats: {},
+        totalNotes: 0,
+        totalPapers: 0,
+        totalSyllabus: 0,
+        totalLabs: 0,
+      });
+    }
+
     const Paper = require("../models/Paper");
     const Syllabus = require("../models/Syllabus");
     const LabProgram = require("../models/LabProgram");
@@ -402,10 +413,14 @@ exports.getBranchStats = async (req, res) => {
       totalLabs: labs.length,
     });
   } catch (error) {
-    console.error("Get Branch Stats Error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
+    console.warn("Get Branch Stats Warning:", error.message);
+    res.status(200).json({
+      success: true,
+      stats: {},
+      totalNotes: 0,
+      totalPapers: 0,
+      totalSyllabus: 0,
+      totalLabs: 0,
     });
   }
 };

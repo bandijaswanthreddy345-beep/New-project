@@ -36,17 +36,17 @@ exports.createPaper = async (req, res) => {
 
 exports.getPapers = async (req, res) => {
   try {
+    if (require("mongoose").connection.readyState !== 1) {
+      return res.status(200).json([]);
+    }
     const papers = await Paper.find().sort({
       createdAt: -1,
     });
 
     res.status(200).json(papers);
   } catch (error) {
-    console.error("Get Papers Error:", error);
-
-    res.status(500).json({
-      message: error.message,
-    });
+    console.warn("Get Papers Warning:", error.message);
+    res.status(200).json([]);
   }
 };
 

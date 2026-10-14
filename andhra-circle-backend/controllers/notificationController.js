@@ -57,30 +57,27 @@ res.status(500).json({
 
 exports.getNotifications = async (req, res) => {
 try {
-// Non-blocking background sync with official JNTUA updates
-syncJntuaNotifications(false).catch((err) => {
-  console.error("Background JNTUA sync error:", err.message);
-});
+  if (require("mongoose").connection.readyState !== 1) {
+    return res.status(200).json([]);
+  }
 
-const notifications = await Notification.find().sort({
-createdAt: -1,
-});
+  // Non-blocking background sync with official JNTUA updates
+  syncJntuaNotifications(false).catch((err) => {
+    console.warn("Background JNTUA sync warning:", err.message);
+  });
 
-const btechNotifications = notifications.filter((n) =>
-  isBTechNotification(n.title, n.description)
-);
+  const notifications = await Notification.find().sort({
+    createdAt: -1,
+  });
 
-res.status(200).json(btechNotifications);
+  const btechNotifications = notifications.filter((n) =>
+    isBTechNotification(n.title, n.description)
+  );
 
+  res.status(200).json(btechNotifications);
 } catch (error) {
-console.error("Get Notifications Error:", error);
-
-
-res.status(500).json({
-  message: error.message,
-});
-
-
+  console.warn("Get Notifications Warning:", error.message);
+  res.status(200).json([]);
 }
 };
 
