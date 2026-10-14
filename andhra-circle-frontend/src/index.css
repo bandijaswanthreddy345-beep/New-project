@@ -1,7 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* =========================================================
-   JNTU CIRCLE — PROFESSIONAL GLOBAL STYLES
+   JNTU CIRCLE — EMERALD HORIZON DESIGN SYSTEM
    Clean Academic / Modern SaaS Design
 ========================================================= */
 
@@ -10,6 +11,14 @@
 ========================================================= */
 
 :root {
+  /* Emerald Horizon Web Template Tokens */
+  --bg: #031c18;
+  --bg-2: #062a24;
+  --gold: #f5bd3f;
+  --gold-light: #ffe29a;
+  --text: #f5f4ed;
+  --muted: #aab8b2;
+  --line: rgba(245, 189, 63, .22);
   /* =========================================================
      USER SPECIFIED PALETTE:
      Cream Sunbeam: #FFEFB3 | Deep Emerald: #013E37
@@ -64,8 +73,8 @@
   --shadow-lg: 0 16px 40px rgba(0, 41, 36, 0.15);
   --shadow-ghost: 0 10px 30px -5px rgba(217, 167, 38, 0.25);
 
-  --font-family: 'Nexo Kora', 'Nexo', 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-title: 'Deltha', 'Deltha Font', 'Nexo Kora', 'Plus Jakarta Sans', sans-serif;
+  --font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-title: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   --transition: 0.25s ease;
 }
@@ -94,10 +103,9 @@ html {
 }
 
 body {
-  font-family: var(--font-family);
-
-  background: var(--background);
-  color: var(--text-primary);
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.6;
 
   -webkit-font-smoothing: antialiased;
@@ -380,87 +388,576 @@ ul {
 }
 
 /* =========================================================
-   HERO
-========================================================= */
+   EMERALD HORIZON — SITE HEADER
+   ========================================================= */
+
+.site-header {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(2, 24, 20, 0.48);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.logo > span:last-child > span {
+  display: block;
+  color: var(--gold);
+  font-size: 8px;
+  letter-spacing: 0.28em;
+  margin-top: 3px;
+}
+
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 16px rgba(245, 189, 63, 0.3);
+  flex-shrink: 0;
+}
+
+.logo-mark::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  top: 9px;
+  left: 9px;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 38px;
+  margin-left: auto;
+  margin-right: 44px;
+}
+
+.desktop-nav a {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  transition: color 0.25s;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.desktop-nav a:hover,
+.desktop-nav a.active {
+  color: var(--gold);
+}
+
+.header-btn,
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  padding: 12px 18px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: 0.25s;
+  background: transparent;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+}
+
+.header-btn:hover,
+.primary-btn:hover {
+  background: var(--gold);
+  color: #071b17;
+  box-shadow: 0 0 28px rgba(245, 189, 63, 0.22);
+}
+
+.header-btn span,
+.primary-btn span {
+  margin-left: 12px;
+}
+
+.menu-btn {
+  display: none;
+  background: none;
+  color: white;
+  border: 0;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   EMERALD HORIZON — HERO SECTION
+   ========================================================= */
 
 .hero {
   position: relative;
-
-  min-height: 570px;
-  height: auto;
-
+  min-height: 100vh;
+  height: max(760px, 100vh);
+  overflow: hidden;
+  isolation: isolate;
+  background: #031c18;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 82px 24px 60px 24px;
+}
 
-  padding: 48px 24px 44px 24px;
+.hero-art {
+  position: absolute;
+  top: clamp(24px, 3.5vh, 38px);
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: -2;
+}
 
-  color: white;
-  text-align: center;
-  overflow: hidden;
-
-  /* Rich emerald/green gradient with subtle soft radial lighting behind heading */
+/* Keeps the supplied image visually intact with a balanced, warm golden arc glow. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background:
-    radial-gradient(circle at 50% 28%, rgba(255, 239, 179, 0.18) 0%, transparent 55%),
-    radial-gradient(circle at 12% 16%, rgba(255, 239, 179, 0.22) 0%, transparent 45%),
-    radial-gradient(circle at 88% 84%, rgba(1, 62, 55, 0.5) 0%, transparent 45%),
-    linear-gradient(135deg,
-      #00241f 0%,
-      #01352f 48%,
-      #02493f 100%);
+    /* Delicate touch to tone down only peak glare while keeping the vibrant golden glow */
+    radial-gradient(
+      ellipse 58% 20% at 50% 23%,
+      rgba(2, 24, 20, 0.20) 0%,
+      rgba(2, 24, 20, 0.06) 45%,
+      transparent 75%
+    ),
+    /* Balanced central contrast scrim for centered typography & AI chatbot */
+    radial-gradient(
+      ellipse 72% 52% at 50% 40%,
+      rgba(0, 12, 10, 0.46) 0%,
+      rgba(0, 12, 10, 0.18) 55%,
+      transparent 85%
+    ),
+    /* Bottom blend into the next section */
+    linear-gradient(0deg, rgba(0, 10, 8, 0.45), transparent 35%);
+  pointer-events: none;
 }
 
 .hero-content {
   position: relative;
-  overflow: visible;
-
   width: 100%;
-  max-width: 820px;
-
+  max-width: 780px;
   margin: 0 auto;
-
+  z-index: 2;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.eyebrow {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-indent: 0.35em;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
   text-align: center;
+  width: 100%;
 }
 
-.hero h1,
-.hero-title {
-  margin: 0 0 12px 0;
-
-  font-size: clamp(38px, 4.8vw, 56px);
-  line-height: 1.1;
-
-  font-weight: 800;
-  letter-spacing: -1.4px;
-  color: #ffffff;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+h1,
+h2 {
+  font-family: "Playfair Display", serif;
+  font-weight: 500;
+  line-height: 1.04;
+  margin: 0;
+  color: var(--text);
 }
 
-.hero-slogan {
-  margin: 0 0 10px 0;
+h1 {
+  font-size: clamp(42px, 5.5vw, 84px);
+  text-align: center;
+  width: 100%;
+  margin: 0 0 32px 0;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.65);
+}
 
-  font-size: clamp(19px, 2.2vw, 22px);
+h2 {
+  font-size: clamp(40px, 5vw, 72px);
+}
+
+em {
+  color: var(--gold-light);
+  font-style: italic;
+}
+
+.hero-title-sub {
+  color: var(--gold-light);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin: 18px 0 6px 0;
+}
+
+.hero-brand-gold {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.hero-copy {
+  max-width: 520px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin: 16px 0 24px 0;
+  font-size: 15px;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.55);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-scroll span {
+  width: 50px;
+  height: 1px;
+  background: var(--gold);
+}
+
+/* =========================================================
+   EMERALD HORIZON — CONTENT SECTIONS
+   ========================================================= */
+
+.section {
+  padding: 130px max(28px, 8vw);
+}
+
+.intro {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 10vw;
+  align-items: end;
+  background: var(--bg);
+}
+
+.intro > p {
+  color: var(--muted);
+  line-height: 1.9;
+  max-width: 520px;
+  font-size: 15px;
+}
+
+.features {
+  background: linear-gradient(180deg, var(--bg), var(--bg-2));
+}
+
+.section-heading {
+  margin-bottom: 55px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  min-height: 260px;
+  padding: 32px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+  transition: transform 0.3s, border-color 0.3s, background 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(245, 189, 63, 0.55);
+  background: rgba(245, 189, 63, 0.04);
+}
+
+.card > span {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.15em;
   font-weight: 600;
-  line-height: 1.35;
-
-  color: #f1f5f9;
-  letter-spacing: -0.01em;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.28);
 }
 
-.hero-subtitle,
-.hero-content > p:not(.hero-slogan) {
-  max-width: 640px;
-  margin: 0 auto 28px auto;
+.card h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: 500;
+  margin: 50px 0 14px;
+  color: var(--text);
+}
 
-  font-size: clamp(14px, 1.4vw, 16px);
-  line-height: 1.55;
+.card p {
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 14px;
+  margin-top: auto;
+}
 
-  color: rgba(255, 255, 255, 0.82);
-  font-weight: 450;
-  letter-spacing: -0.01em;
+.cta {
+  padding: 110px max(28px, 8vw);
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 40px;
+  border-top: 1px solid var(--line);
+  background: #021713;
+}
+
+/* =========================================================
+   EMERALD HORIZON — FOOTER
+   ========================================================= */
+
+.site-footer {
+  padding: 100px max(28px, 8vw) 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 70px;
+  border-top: 1px solid var(--line);
+  background: #01110e;
+}
+
+.footer-platform-intro {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 10vw;
+  align-items: end;
+  padding-bottom: 70px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-platform-heading h2 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(34px, 4.5vw, 56px);
+  font-weight: 500;
+  line-height: 1.08;
+  margin: 0;
+  color: var(--text);
+}
+
+.footer-platform-heading .eyebrow {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.footer-platform-desc {
+  color: var(--muted) !important;
+  line-height: 1.9 !important;
+  max-width: 520px;
+  font-size: 15px !important;
+  margin: 0 !important;
+}
+
+.footer-bottom-bar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 60px;
+  align-items: end;
+}
+
+.footer-bottom-bar p {
+  color: #71827d;
+  font-size: 12px;
+  margin: 14px 0 0;
+}
+
+.footer-links {
+  display: flex;
+  gap: 25px;
+  font-size: 12px;
+  color: #9aa8a4;
+}
+
+.footer-links a {
+  color: #9aa8a4;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--gold);
+}
+
+.copyright {
+  margin: 0 !important;
+  white-space: nowrap;
+  color: #71827d;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .site-header {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    left: 0;
+    right: 0;
+    padding: 0 20px;
+    transform: none;
+  }
+
+  .desktop-nav,
+  .header-btn {
+    display: none;
+  }
+
+  .menu-btn {
+    display: block;
+  }
+
+  .desktop-nav.mobile-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 82px;
+    left: 0;
+    right: 0;
+    background: rgba(3, 28, 24, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--line);
+    gap: 20px;
+    z-index: 1000;
+  }
+
+  .hero {
+    min-height: 100svh;
+    height: auto;
+    padding: 85px 16px 60px 16px;
+  }
+
+  .hero-content {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-art {
+    top: 20px;
+    object-position: center top;
+  }
+
+  .intro,
+  .cards,
+  .footer-platform-intro,
+  .footer-bottom-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .intro,
+  .footer-platform-intro {
+    gap: 35px;
+  }
+
+  .footer-platform-intro {
+    padding-bottom: 45px;
+  }
+
+  .cards {
+    gap: 12px;
+  }
+
+  .card {
+    min-height: 220px;
+  }
+
+  .card h3 {
+    margin-top: 36px;
+  }
+
+  .cta {
+    display: block;
+  }
+
+  .cta .primary-btn {
+    display: inline-block;
+    margin-top: 35px;
+  }
+
+  .site-footer {
+    padding: 70px 20px 40px;
+    gap: 45px;
+  }
+
+  .footer-bottom-bar {
+    gap: 25px;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 500px) {
+  .hero-copy {
+    font-size: 13px;
+  }
+
+  .section {
+    padding-top: 90px;
+    padding-bottom: 90px;
+  }
 }
 
 /* =========================================================
@@ -484,6 +981,7 @@ ul {
   position: relative;
   width: 100%;
   max-width: 600px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -494,6 +992,7 @@ ul {
 .hero-ai-beam {
   width: 100% !important;
   max-width: 600px !important;
+  margin: 0 auto !important;
   border-radius: 18px !important;
   box-shadow: 0 16px 36px #00000050, 0 0 16px #ffefb322;
   transition: box-shadow 0.3s ease;
@@ -760,7 +1259,7 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 16px;
+  margin: 16px auto 0 auto;
   width: 100%;
   animation: heroAiFadeIn 0.3s ease;
 }
@@ -3387,31 +3886,49 @@ textarea:focus-visible {
     font-size: 12px;
   }
 
-  .hero {
-    min-height: 520px;
-    height: auto;
-    padding: 48px 20px;
+  .hero-background {
+    background-position: center 28%;
+    background-size: cover;
   }
 
-  .hero-content {
-    max-width: 750px;
+  .hero-eyebrow {
+    margin-bottom: 12px;
+    padding: 4px 13px;
+  }
+
+  .hero-eyebrow-text {
+    font-size: 11px;
+    letter-spacing: 0.16em;
   }
 
   .hero h1,
   .hero-title {
-    font-size: 40px;
+    font-size: clamp(40px, 4.8vw, 48px);
+    line-height: 1.08;
     margin-bottom: 10px;
   }
 
   .hero-slogan {
-    font-size: 19px;
-    margin-bottom: 8px;
+    font-size: clamp(20px, 2.4vw, 22px);
+    margin-bottom: 10px;
   }
 
   .hero-subtitle,
   .hero-content > p:not(.hero-slogan) {
     font-size: 15px;
-    margin-bottom: 26px;
+    margin-bottom: 24px;
+    max-width: 620px;
+  }
+
+  .hero-ai-container,
+  .hero-ai-bar-anchor,
+  .hero-ai-bar,
+  .hero-ai-beam {
+    max-width: 520px !important;
+  }
+
+  .hero-ai-starter-chips {
+    margin-top: 16px;
   }
 
   .branches,
@@ -3484,34 +4001,64 @@ textarea:focus-visible {
     padding: 7px 12px !important;
   }
 
-  .hero {
-    min-height: 490px;
-    height: auto;
-    padding: 42px 16px;
+
+  .hero-background {
+    background-position: center 22%;
+    background-size: cover;
+  }
+
+  .hero-overlay {
+    background:
+      radial-gradient(
+        ellipse 90% 60% at 50% 25%,
+        rgba(0, 26, 22, 0.05) 0%,
+        rgba(0, 22, 18, 0.28) 65%,
+        rgba(0, 18, 14, 0.5) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(0, 26, 22, 0.28) 0%,
+        transparent 20%,
+        transparent 80%,
+        rgba(0, 26, 22, 0.35) 100%
+      );
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 10px;
+    padding: 4px 12px;
+  }
+
+  .hero-eyebrow-text {
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
   }
 
   .hero h1,
   .hero-title {
-    font-size: 32px;
-    letter-spacing: -0.8px;
-    margin-bottom: 9px;
+    font-size: clamp(36px, 8.5vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    margin-bottom: 8px;
   }
 
   .hero-slogan {
-    font-size: 18px;
+    font-size: clamp(20px, 4.8vw, 22px);
     margin-bottom: 8px;
   }
 
   .hero-subtitle,
   .hero-content > p:not(.hero-slogan) {
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: clamp(15px, 3.8vw, 16px);
+    line-height: 1.48;
     margin-bottom: 22px;
   }
 
   .hero-ai-container {
     width: 100%;
     max-width: calc(100vw - 32px);
+    margin: 22px auto 0 auto;
+    align-items: center;
   }
 
   .hero-ai-bar {
@@ -3687,11 +4234,6 @@ textarea:focus-visible {
     padding: 6px 10px !important;
   }
 
-  .hero {
-    min-height: 430px;
-
-    padding: 55px 15px;
-  }
 
   .hero h1 {
     font-size: 30px;
@@ -4510,25 +5052,36 @@ textarea:focus-visible {
 
 .branches-section {
   width: 100%;
-  padding: 50px 32px;
-  background: #fcfdfe;
+  padding: 105px max(28px, 8vw) 80px;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
   overflow: hidden;
+  position: relative;
+  border-top: 1px solid var(--line);
 }
 
 .branches-header {
-  text-align: center;
-  margin-bottom: 10px;
+  text-align: left;
+  margin-bottom: 55px;
+}
+
+.branches-subtitle {
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 620px;
+  font-size: 15px;
+  margin: 16px 0 0 0;
 }
 
 .orbit-scene {
   position: relative;
   width: 100%;
-  height: 520px;
+  height: 480px;
   perspective: 1200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0px;
+  margin-top: 20px;
+  scroll-margin-top: 100px;
 }
 
 .orbit-world {
@@ -4543,53 +5096,53 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   ORBITING IMAGE CARDS - 350px x 220px CINEMATIC PANELS
+   ORBITING IMAGE CARDS - 350px x 230px CINEMATIC PANELS
    ========================================================= */
 
 .orbit-item {
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: -110px;
+  margin-top: -115px;
   margin-left: -175px;
   width: 350px;
-  height: 220px;
+  height: 230px;
   flex-shrink: 0;
   transform-style: preserve-3d;
   will-change: transform, opacity, box-shadow;
   transition: box-shadow 0.3s ease;
-  border-radius: 20px;
+  border-radius: 18px;
   cursor: pointer;
   outline: none;
 }
 
 .orbit-item:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid var(--gold);
   outline-offset: 4px;
 }
 
 /* =========================================================
-   CRISP SEAMLESS 3D CARD SURFACE (ZERO SEAMS, ZERO LINES)
+   CRISP SEAMLESS 3D CARD SURFACE (EMERALD HORIZON THEME)
    ========================================================= */
 
 .branch-card {
   position: relative;
   width: 350px;
-  height: 220px;
+  height: 230px;
   box-sizing: border-box;
-  padding: 22px 24px;
+  padding: 24px 26px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
   overflow: hidden;
 
-  background: #090d16 !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 20px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45) !important;
+  background: #021a16 !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
 
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
@@ -4601,10 +5154,10 @@ textarea:focus-visible {
   top: 0;
   left: 0;
   width: 350px;
-  height: 220px;
+  height: 230px;
   object-fit: cover;
   z-index: 0;
-  filter: brightness(0.82) contrast(1.1);
+  filter: brightness(0.68) contrast(1.15) saturate(1.1);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
   pointer-events: none;
   user-select: none;
@@ -4615,10 +5168,12 @@ textarea:focus-visible {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg,
-      rgba(10, 15, 29, 0.32) 0%,
-      rgba(10, 15, 29, 0.62) 45%,
-      rgba(10, 15, 29, 0.94) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(2, 24, 20, 0.32) 0%,
+    rgba(2, 24, 20, 0.68) 45%,
+    rgba(1, 17, 14, 0.98) 100%
+  );
   pointer-events: none;
 }
 
@@ -4628,7 +5183,7 @@ textarea:focus-visible {
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  opacity: 0.65;
+  opacity: 0.18;
   transition: opacity 0.35s ease;
 }
 
@@ -4646,16 +5201,18 @@ textarea:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 4px 12px;
+  padding: 5px 12px;
   border-radius: 9999px;
-  background: rgba(10, 15, 30, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(2, 24, 20, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--gold-light);
+  border: 1px solid rgba(245, 189, 63, 0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  font-family: "DM Sans", sans-serif;
 }
 
 .badge-dot {
@@ -4663,66 +5220,18 @@ textarea:focus-visible {
   height: 7px;
   border-radius: 50%;
   display: inline-block;
-}
-
-.branch-top-meta {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.branch-live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 9px;
-  border-radius: 9999px;
-  background: rgba(10, 15, 30, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  color: #cbd5e1;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  transition: all 0.25s ease;
-}
-
-.branch-live-pill.has-data {
-  border-color: rgba(16, 185, 129, 0.38);
-  color: #6ee7b7;
-  background: rgba(6, 78, 59, 0.45);
-}
-
-.pulse-indicator {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-  animation: pulseDot 2s infinite ease-in-out;
-}
-
-@keyframes pulseDot {
-
-  0%,
-  100% {
-    opacity: 0.7;
-    transform: scale(0.9);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.25);
-  }
+  background: var(--gold);
+  box-shadow: 0 0 3px rgba(245, 189, 63, 0.5);
 }
 
 .branch-number {
   position: relative;
   z-index: 3;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  font-family: "DM Sans", sans-serif;
 }
 
 /* Bottom Bar: Tag and Title */
@@ -4738,15 +5247,17 @@ textarea:focus-visible {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
 .branch-tag {
   display: block;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  color: var(--gold);
+  font-family: "DM Sans", sans-serif;
 }
 
 .branch-active-pill {
@@ -4758,58 +5269,22 @@ textarea:focus-visible {
   letter-spacing: 0.8px;
   padding: 2px 7px;
   border-radius: 4px;
-  border: 1px solid;
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  background: rgba(245, 189, 63, 0.2);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
 
 .branch-name {
-  margin: 0 0 6px 0;
-  color: #ffffff !important;
-  font-size: 17px;
-  font-weight: 800;
-  line-height: 1.3;
-  letter-spacing: -0.2px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
-}
-
-/* Live Database Breakdown Strip */
-.branch-stats-strip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 2px 0 7px 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  padding: 3.5px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.branch-stat-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.branch-stat-item .stat-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.branch-stat-item .stat-count {
-  font-size: 11.5px;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-.branch-stat-item .stat-divider {
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 9px;
+  margin: 0 0 8px 0;
+  color: var(--text) !important;
+  font-family: "Playfair Display", serif !important;
+  font-size: 21px !important;
+  font-weight: 500 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
 }
 
 .branch-action-row {
@@ -4822,41 +5297,40 @@ textarea:focus-visible {
 .branch-line {
   display: block;
   width: 36px;
-  height: 3.5px;
+  height: 3px;
   border-radius: 20px;
+  background: linear-gradient(90deg, var(--gold), rgba(255, 226, 154, 0.4), transparent);
   transition: width 0.3s ease;
 }
 
 .branch-action-text {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.65);
-  letter-spacing: 0.2px;
+  color: var(--gold-light);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-family: "DM Sans", sans-serif;
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
 /* Hover & Selected States */
+.orbit-item.is-hovered .branch-card,
+.orbit-item:hover .branch-card {
+  border-color: rgba(245, 189, 63, 0.45) !important;
+  background: rgba(2, 24, 20, 0.98) !important;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.85), 0 0 12px rgba(245, 189, 63, 0.12) !important;
+}
+
 .orbit-item.is-hovered .branch-card-bg-img,
 .orbit-item:hover .branch-card-bg-img {
   transform: scale(1.08);
-  filter: brightness(0.96) contrast(1.15);
-}
-
-.orbit-item.is-hovered .branch-card-content,
-.orbit-item:hover .branch-card-content {
-  border-color: rgba(255, 255, 255, 0.48) !important;
-  box-shadow: 0 26px 55px rgba(0, 0, 0, 0.7), 0 0 28px rgba(139, 92, 246, 0.28) !important;
-}
-
-.orbit-item.is-selected .branch-card-content {
-  border-color: var(--accent, #a855f7) !important;
-  box-shadow: 0 0 0 2.5px var(--accent, #a855f7), 0 26px 55px rgba(0, 0, 0, 0.75) !important;
+  filter: brightness(0.85) contrast(1.18);
 }
 
 .orbit-item.is-hovered .branch-card-glow,
 .orbit-item:hover .branch-card-glow,
 .orbit-item.is-selected .branch-card-glow {
-  opacity: 1;
+  opacity: 0.35;
 }
 
 .orbit-item.is-hovered .branch-line,
@@ -4869,6 +5343,75 @@ textarea:focus-visible {
 .orbit-item:hover .branch-action-text {
   color: #ffffff;
   transform: translateX(2px);
+}
+
+/* =========================================================
+   BRANCHES SECTION - AMBITION CTA UNDER 3D CARDS
+   ========================================================= */
+
+.branches-cta-footer {
+  margin: 25px auto 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 680px;
+  position: relative;
+  z-index: 10;
+}
+
+.branches-cta-footer .eyebrow {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-indent: 0.35em;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+}
+
+.branches-cta-footer h2 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(34px, 4.5vw, 56px);
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0 0 24px 0;
+  color: var(--text);
+  text-align: center;
+  width: 100%;
+}
+
+.branches-cta-footer h2 em {
+  color: var(--gold-light);
+  font-style: italic;
+}
+
+.branches-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 30px;
+  background: var(--gold);
+  color: #000000;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  border-radius: 999px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 18px rgba(245, 189, 63, 0.25);
+}
+
+.branches-cta-btn:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(245, 189, 63, 0.4);
+  color: #000000;
 }
 
 /* =========================================================
@@ -4999,9 +5542,9 @@ textarea:focus-visible {
    RESPONSIVE MOBILE LAYOUT (< 868px)
    ========================================================= */
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .branches-section {
-    padding: 40px 16px;
+    padding: 80px 20px;
   }
 
   .orbit-scene {
@@ -5084,20 +5627,22 @@ textarea:focus-visible {
   vertical-align: middle;
   box-sizing: border-box;
 
-  /* Refined brand emerald tint */
-  background: rgba(1, 62, 55, 0.08);
-  color: #013e37;
-  border: 1px solid rgba(1, 62, 55, 0.18);
+  /* Refined emerald horizon gold tag */
+  background: rgba(245, 189, 63, 0.15);
+  color: var(--gold);
+  border: 1px solid rgba(245, 189, 63, 0.4);
   transition: all 0.18s ease;
   user-select: none;
 }
 
 /* Elegant brand color flip on tab hover or active */
 .nav-links a:hover .nav-notif-new-tag,
-.nav-links a.active .nav-notif-new-tag {
-  background: #013e37;
-  color: #ffefb3;
-  border-color: #013e37;
+.nav-links a.active .nav-notif-new-tag,
+.desktop-nav a:hover .nav-notif-new-tag,
+.desktop-nav a.active .nav-notif-new-tag {
+  background: var(--gold);
+  color: #071b17;
+  border-color: var(--gold);
   transform: translateY(-0.5px);
 }
 

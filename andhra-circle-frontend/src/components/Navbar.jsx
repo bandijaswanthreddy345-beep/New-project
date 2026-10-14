@@ -37,7 +37,7 @@ function Navbar() {
 
   const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
   const [showDropdown, setShowDropdown] = useState(false);
-
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Fetch real notifications from backend on mount
   useEffect(() => {
@@ -70,13 +70,12 @@ function Navbar() {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
     }
-    // 160ms buffer so moving cursor between button and popup never flickers
     hoverTimeoutRef.current = setTimeout(() => {
       setShowDropdown(false);
     }, 160);
   };
 
-  // Close notification dropdown when tapping outside (for touch/mobile)
+  // Close notification dropdown when tapping outside
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (notifContainerRef.current && !notifContainerRef.current.contains(e.target)) {
@@ -91,183 +90,105 @@ function Navbar() {
     };
   }, []);
 
-  const formatTimeAgo = (dateStr) => {
-    if (!dateStr) return "Recent";
-    const diffMin = Math.floor((new Date() - new Date(dateStr)) / 60000);
-    if (diffMin < 1) return "Just now";
-    if (diffMin < 60) return `${diffMin}m ago`;
-    const diffHours = Math.floor(diffMin / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${Math.floor(diffHours / 24)}d ago`;
-  };
-
-  const getCategoryBadgeClass = (category) => {
-    const c = String(category || "").toUpperCase();
-    if (c.includes("EXAM")) return "badge-exam";
-    if (c.includes("CIRCULAR")) return "badge-circular";
-    if (c.includes("RESULT")) return "badge-results";
-    return "badge-general";
-  };
-
   const latestAlert = notificationsList[0] || FALLBACK_NOTICES[0];
   const hasNewNotification = Boolean(notificationsList && notificationsList.length > 0);
 
   const navigationLinks = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "CGPA & SGPA Calculator",
-      path: "/calculator",
-    },
-    {
-      name: "JNTU Reports",
-      path: "/reports",
-    },
-    {
-      name: "Upload Materials",
-      path: "/upload-materials",
-    },
-    {
-      name: "Student Profile",
-      path: "/profile",
-    },
-    {
-      name: "Notifications",
-      path: "/notifications",
-    },
+    { name: "Home", path: "/" },
+    { name: "CGPA Calculator", path: "/calculator" },
+    { name: "JNTU Reports", path: "/reports" },
+    { name: "Upload", path: "/upload-materials" },
+    { name: "Student Profile", path: "/profile" },
+    { name: "Notifications", path: "/notifications" },
   ];
 
-
-
   return (
-    <header className="navbar">
+    <header className="site-header">
+      {/* LOGO WITH EMERALD HORIZON CIRCLE MARK */}
+      <Link className="logo" to="/" aria-label="JNTU Circle home">
+        <span className="logo-mark"></span>
+        <span>JNTU<span>CIRCLE</span></span>
+      </Link>
 
-      {/* ==========================================
-          LOGO
-      ========================================== */}
-
-      <div className="logo">
-        <Link to="/">
-          <img
-            src="/jntu-circle-logo.png"
-            alt="JNTU Circle Logo"
-            className="logo-image"
-          />
-
-          <div className="logo-text">
-            <h2><span className="font-deltha">JNTU</span> Circle</h2>
-            <span>Academic Resource Hub</span>
-          </div>
-        </Link>
-      </div>
-
-      {/* ==========================================
-          NAVIGATION
-      ========================================== */}
-
-      <nav>
-        <ul className="nav-links">
-
-          {navigationLinks.map((item) => {
-            if (item.name === "Notifications") {
-              return (
-                <li 
-                  key={item.path} 
-                  className="nav-item-notif" 
-                  ref={notifContainerRef}
-                  onMouseEnter={handleNotifMouseEnter}
-                  onMouseLeave={handleNotifMouseLeave}
-                >
-                  <div className="nav-notif-link-container">
-                    <NavLink
-                      to={item.path}
-                      className={({ isActive }) =>
-                        isActive
-                          ? "nav-link active"
-                          : "nav-link"
-                      }
-                      onClick={(e) => {
-                        // On touch devices without hover support, tap toggles dropdown
-                        if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
-                          e.preventDefault();
-                          setShowDropdown((prev) => !prev);
-                        }
-                      }}
-                    >
-                      <span>{item.name}</span>
-                      {hasNewNotification && (
-                        <span className="nav-notif-new-tag">new</span>
-                      )}
-                    </NavLink>
-
-                    {/* Small Black Glass Notification Strip Tooltip */}
-                    {latestAlert && (
-                      <div 
-                        className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`} 
-                        role="tooltip" 
-                        aria-label="Notification Preview"
-                        onMouseEnter={handleNotifMouseEnter}
-                        onMouseLeave={handleNotifMouseLeave}
-                        onClick={() => {
-                          setShowDropdown(false);
-                          if (latestAlert.link && latestAlert.link.startsWith("http")) {
-                            window.open(latestAlert.link, "_blank");
-                          } else {
-                            navigate("/notifications");
-                          }
-                        }}
-                        title={latestAlert.title}
-                      >
-                        <div className="notif-dropdown-arrow" />
-                        <span className="notif-strip-title">
-                          {latestAlert.title}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </li>
-              );
-            }
-
+      {/* DESKTOP & MOBILE NAVIGATION */}
+      <nav
+        className={`desktop-nav ${mobileMenuOpen ? "mobile-open" : ""}`}
+        aria-label="Main navigation"
+      >
+        {navigationLinks.map((item) => {
+          if (item.name === "Notifications") {
             return (
-              <li key={item.path}>
+              <div
+                key={item.path}
+                className="nav-item-notif"
+                ref={notifContainerRef}
+                onMouseEnter={handleNotifMouseEnter}
+                onMouseLeave={handleNotifMouseLeave}
+              >
                 <NavLink
                   to={item.path}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "nav-link active"
-                      : "nav-link"
-                  }
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   <span>{item.name}</span>
+                  {hasNewNotification && (
+                    <span className="nav-notif-new-tag">new</span>
+                  )}
                 </NavLink>
-              </li>
+
+                {/* Notification Strip Tooltip */}
+                {latestAlert && (
+                  <div
+                    className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`}
+                    role="tooltip"
+                    aria-label="Notification Preview"
+                    onMouseEnter={handleNotifMouseEnter}
+                    onMouseLeave={handleNotifMouseLeave}
+                    onClick={() => {
+                      setShowDropdown(false);
+                      setMobileMenuOpen(false);
+                      if (latestAlert.link && latestAlert.link.startsWith("http")) {
+                        window.open(latestAlert.link, "_blank");
+                      } else {
+                        navigate("/notifications");
+                      }
+                    }}
+                    title={latestAlert.title}
+                  >
+                    <div className="notif-dropdown-arrow" />
+                    <span className="notif-strip-title">{latestAlert.title}</span>
+                  </div>
+                )}
+              </div>
             );
-          })}
+          }
 
-
-
-
-
-          {/* ==========================================
-              LOGIN BUTTON
-          ========================================== */}
-
-          <li>
-            <Link
-              to="/login"
-              className="nav-login-button"
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) => (isActive ? "active" : "")}
+              onClick={() => setMobileMenuOpen(false)}
             >
-              <span>Login</span>
-              <span className="login-arrow">→</span>
-            </Link>
-          </li>
-
-        </ul>
+              {item.name}
+            </NavLink>
+          );
+        })}
       </nav>
 
+      {/* GET STARTED / LOGIN BUTTON */}
+      <Link className="header-btn" to="/login">
+        Get Started <span>→</span>
+      </Link>
+
+      {/* MOBILE MENU TOGGLE */}
+      <button
+        className="menu-btn"
+        aria-label="Open menu"
+        onClick={() => setMobileMenuOpen((prev) => !prev)}
+      >
+        {mobileMenuOpen ? "✕" : "☰"}
+      </button>
     </header>
   );
 }

@@ -5,3 +5,7 @@ dist
 dist-ssr
 *.local
 .DS_Store
+FreeVideo/
+*.original_backup.*
+*hero-bg-4k*
+gpu-restart.ps1
