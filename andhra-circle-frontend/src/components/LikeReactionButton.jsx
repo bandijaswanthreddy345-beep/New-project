@@ -1,6 +1,7 @@
 import { useState } from "react";
+import trigger100Hearts from "../utils/heartBurst";
 
-function LikeReactionButton({ isLiked, onToggle, title = "Like" }) {
+function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
   const [particles, setParticles] = useState([]);
   const [isHaptic, setIsHaptic] = useState(false);
 
@@ -67,13 +68,27 @@ function LikeReactionButton({ isLiked, onToggle, title = "Like" }) {
     e.preventDefault();
     e.stopPropagation();
 
-    // The animation strictly works ONLY when user is liking (not when unliking)
+    // The 100-heart pop burst strictly works ONLY when user is liking (not when unliking)
     if (!isLiked) {
       triggerAnimation();
+
+      try {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const originX = rect.left + rect.width / 2;
+        const originY = rect.top + rect.height / 2;
+        trigger100Hearts(originX, originY);
+      } catch (err) {
+        console.error("Heart burst coordinate error:", err);
+      }
     }
 
-    onToggle(e);
+    if (onToggle) {
+      onToggle(e);
+    }
   };
+
+  const displayCount =
+    typeof count === "number" && !isNaN(count) ? Math.max(0, count) : 0;
 
   return (
     <div className="like-symbol-wrapper">
@@ -171,13 +186,13 @@ function LikeReactionButton({ isLiked, onToggle, title = "Like" }) {
         return null;
       })}
 
-      {/* Main Like Reaction Button with Just Heart Symbol (No Background) */}
+      {/* Main Like Reaction Button with Heart Symbol & Live Counter */}
       <button
         type="button"
         className={`like-symbol-btn ${isLiked ? "is-liked" : ""} ${isHaptic ? "animate-haptic" : ""}`}
         onClick={handleClick}
         title={title}
-        aria-label={title}
+        aria-label={`${title} (${displayCount})`}
       >
         <svg
           className="like-heart-icon"
@@ -192,6 +207,10 @@ function LikeReactionButton({ isLiked, onToggle, title = "Like" }) {
         >
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
+
+        <span className="like-count-value" key={displayCount}>
+          {displayCount}
+        </span>
       </button>
     </div>
   );

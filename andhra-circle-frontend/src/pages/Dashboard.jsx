@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../api/api";
@@ -268,6 +269,17 @@ function Dashboard() {
             </div>
           </Link>
 
+          <Link
+            to="/user-uploaded-data"
+            className="dashboard-option-card"
+          >
+            <span>📥</span>
+            <div>
+              <h3>User Uploaded Data</h3>
+              <p>Review materials submitted by students.</p>
+            </div>
+          </Link>
+
         </div>
 
       </section>
@@ -291,4 +303,3 @@ function Dashboard() {
 }
 
 export default Dashboard;
-

@@ -1,0 +1,487 @@
+/* =========================================================
+   SYLLABUS PAGE STYLING (Executive Split-View Dashboard)
+========================================================= */
+
+.syllabus-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #faf9f6;
+  color: #012622;
+}
+
+.syllabus-page-main {
+  flex: 1;
+  width: 100%;
+}
+
+.syllabus-section-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px 72px;
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------
+   WORKSPACE 2-COLUMN SPLIT LAYOUT
+   (Branches on Left + Main Feed on Right)
+--------------------------------------------------------- */
+.syllabus-workspace-layout {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+/* ---------------------------------------------------------
+   LEFT COLUMN: BRANCHES SIDEBAR PANEL
+--------------------------------------------------------- */
+.syllabus-branch-sidebar {
+  position: sticky;
+  top: 24px;
+  z-index: 5;
+}
+
+.branch-sidebar-card {
+  background: #ffffff;
+  border: 1px solid rgba(1, 62, 55, 0.12);
+  border-radius: 18px;
+  padding: 22px 18px;
+  box-shadow: 0 4px 22px rgba(1, 62, 55, 0.05);
+  box-sizing: border-box;
+}
+
+.branch-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.branch-sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #013e37;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.branch-sidebar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #013e37;
+}
+
+.branch-sidebar-badge {
+  font-size: 11px;
+  font-weight: 750;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(1, 62, 55, 0.07);
+  color: #013e37;
+  white-space: nowrap;
+}
+
+.branch-sidebar-caption {
+  font-size: 12px;
+  color: #62827e;
+  line-height: 1.45;
+  margin: 0 0 16px;
+}
+
+.branch-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.branch-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  box-sizing: border-box;
+  user-select: none;
+  font-family: inherit;
+}
+
+.branch-nav-item:hover {
+  background: #f0f7f5;
+  color: #012622;
+  transform: translateX(3px);
+}
+
+.branch-nav-item:active {
+  transform: scale(0.98) translateX(2px);
+}
+
+.branch-nav-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.branch-nav-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-width: 44px;
+  height: 27px;
+  border-radius: 8px;
+  background: rgba(1, 62, 55, 0.08);
+  color: #013e37;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  transition: all 0.2s ease;
+}
+
+.branch-nav-label {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: #1e4540;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s ease;
+}
+
+.branch-nav-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #eef5f3;
+  color: #496c67;
+  font-size: 11px;
+  font-weight: 750;
+  transition: all 0.2s ease;
+}
+
+.branch-nav-count.has-count {
+  background: rgba(1, 62, 55, 0.12);
+  color: #013e37;
+  font-weight: 800;
+}
+
+/* Active State for Selected Branch */
+.branch-nav-item.active {
+  background: linear-gradient(135deg, #013e37 0%, #014d44 100%) !important;
+  border-color: #013e37 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.18);
+  transform: translateX(3px);
+}
+
+.branch-nav-item.active .branch-nav-code {
+  background: rgba(255, 239, 179, 0.22);
+  color: #ffefb3;
+}
+
+.branch-nav-item.active .branch-nav-label {
+  color: #ffffff;
+  font-weight: 750;
+}
+
+.branch-nav-item.active .branch-nav-count {
+  background: #ffefb3;
+  color: #013e37;
+  font-weight: 800;
+}
+
+/* ---------------------------------------------------------
+   RIGHT COLUMN: SEARCH & CONTENT AREA
+--------------------------------------------------------- */
+.syllabus-content-area {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Search Toolbar Row */
+.syllabus-controls-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.syllabus-search-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.syllabus-search-box {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+
+.syllabus-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #55726e;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.syllabus-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 38px 0 42px;
+  border-radius: 12px;
+  border: 1.5px solid #dce8e5;
+  background: #ffffff;
+  color: #012622;
+  font-size: 14px;
+  font-weight: 550;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(1, 62, 55, 0.04);
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.syllabus-search-input:focus {
+  border-color: #013e37;
+  box-shadow: 0 0 0 3px rgba(1, 62, 55, 0.12), 0 2px 8px rgba(1, 62, 55, 0.06);
+}
+
+.syllabus-search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #eef4f2;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #55726e;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.syllabus-search-clear:hover {
+  background: #013e37;
+  color: #ffffff;
+}
+
+.syllabus-sem-filter-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.syllabus-sem-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #55726e;
+  white-space: nowrap;
+}
+
+.syllabus-sem-select {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1.5px solid #dce8e5;
+  background: #ffffff;
+  color: #013e37;
+  font-size: 13.5px;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 2px 6px rgba(1, 62, 55, 0.04);
+}
+
+.syllabus-sem-select:focus {
+  border-color: #013e37;
+}
+
+/* Feed Header with Active Filter Tags */
+.syllabus-feed-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+
+.feed-title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.feed-current-branch {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #012622;
+  letter-spacing: -0.3px;
+}
+
+.feed-results-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(1, 62, 55, 0.07);
+  color: #013e37;
+  font-size: 12.5px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.syllabus-active-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.active-tags-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #55726e;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.active-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e9f3f0;
+  border: 1px solid rgba(1, 62, 55, 0.15);
+  color: #013e37;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.active-filter-tag:hover {
+  background: #013e37;
+  color: #ffffff;
+  border-color: #013e37;
+}
+
+.tag-remove-x {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.clear-all-filters-btn {
+  background: none;
+  border: none;
+  color: #883a3a;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-family: inherit;
+}
+
+.clear-all-filters-btn:hover {
+  background: rgba(136, 58, 58, 0.08);
+  color: #a82424;
+}
+
+/* Override cards grid layout in split view */
+.syllabus-content-area .papers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 22px;
+  max-width: 100%;
+  margin: 0;
+  align-items: stretch;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE DESIGN
+--------------------------------------------------------- */
+@media (max-width: 980px) {
+  .syllabus-workspace-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .syllabus-branch-sidebar {
+    position: static;
+  }
+
+  .branch-nav-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+  }
+
+  .branch-nav-item:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .syllabus-section-container {
+    padding: 16px 14px 48px;
+  }
+
+  .branch-nav-list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .syllabus-search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .syllabus-sem-filter-wrap {
+    justify-content: space-between;
+  }
+
+  .syllabus-sem-select {
+    flex: 1;
+  }
+}

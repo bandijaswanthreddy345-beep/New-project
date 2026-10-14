@@ -10,7 +10,11 @@ const {
   likeNotification,
   increaseViews,
   increaseDownloads,
+  syncJntua,
 } = require("../controllers/notificationController");
+
+router.get("/sync", syncJntua);
+router.post("/sync", syncJntua);
 
 router.get("/", getNotifications);
 router.get("/:id", getNotificationById);

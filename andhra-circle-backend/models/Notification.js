@@ -35,6 +35,11 @@ const notificationSchema = new mongoose.Schema(
       default: Date.now,
     },
 
+    externalId: {
+      type: String,
+      default: "",
+    },
+
     // ==========================================
     // STATISTICS
     // ==========================================

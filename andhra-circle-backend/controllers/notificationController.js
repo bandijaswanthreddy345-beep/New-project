@@ -1,4 +1,26 @@
 const Notification = require("../models/Notification");
+const { syncJntuaNotifications, isBTechNotification } = require("../services/jntuaSyncService");
+
+// ==========================================
+// SYNC NOTIFICATIONS FROM JNTUA OFFICIAL
+// ==========================================
+
+exports.syncJntua = async (req, res) => {
+  try {
+    const result = await syncJntuaNotifications(true);
+    res.status(200).json({
+      success: true,
+      message: "Synced with official JNTUA examinations portal",
+      ...result,
+    });
+  } catch (error) {
+    console.error("Manual JNTUA Sync Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // ==========================================
 // CREATE NOTIFICATION
@@ -35,12 +57,20 @@ res.status(500).json({
 
 exports.getNotifications = async (req, res) => {
 try {
+// Non-blocking background sync with official JNTUA updates
+syncJntuaNotifications(false).catch((err) => {
+  console.error("Background JNTUA sync error:", err.message);
+});
+
 const notifications = await Notification.find().sort({
 createdAt: -1,
 });
 
+const btechNotifications = notifications.filter((n) =>
+  isBTechNotification(n.title, n.description)
+);
 
-res.status(200).json(notifications);
+res.status(200).json(btechNotifications);
 
 } catch (error) {
 console.error("Get Notifications Error:", error);
@@ -97,7 +127,7 @@ await Notification.findByIdAndUpdate(
 req.params.id,
 req.body,
 {
-new: true,
+returnDocument: "after",
 }
 );
 
@@ -184,7 +214,7 @@ exports.likeNotification = async (req, res) => {
     const notification = await Notification.findByIdAndUpdate(
       req.params.id,
       { $set: { likes: targetLikes } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     res.status(200).json(notification);
@@ -206,7 +236,7 @@ exports.increaseViews = async (req, res) => {
     const notification = await Notification.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!notification) {
@@ -234,7 +264,7 @@ exports.increaseDownloads = async (req, res) => {
     const notification = await Notification.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!notification) {

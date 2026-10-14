@@ -379,7 +379,9 @@ function SearchResults() {
     // NOTIFICATIONS
     if (item.type === "Notification") {
       navigate(
-        `/notifications?search=${encodeURIComponent(title)}`
+        item._id
+          ? `/notifications?view=${encodeURIComponent(item._id)}`
+          : `/notifications?search=${encodeURIComponent(title)}`
       );
       return;
     }

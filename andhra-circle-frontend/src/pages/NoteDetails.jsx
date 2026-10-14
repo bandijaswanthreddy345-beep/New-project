@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import AuthorProfile from "../components/AuthorProfile";
 import "./NoteDetails.css";
 
@@ -204,7 +203,6 @@ function NoteDetails() {
   const credits = note?.credits || "";
 
   const year = note?.year || "";
-  const description = note?.description || "";
 
   // =========================================================
   // UNITS
@@ -678,6 +676,19 @@ function NoteDetails() {
 
   return (
     <div className="note-details-page">
+      {/* =====================================================
+          FLOATING BUBBLES ANIMATION BACKDROP (MATCHING REFERENCE)
+      ====================================================== */}
+      <div className="note-bubbles-container" aria-hidden="true">
+        <span className="note-bubble note-bubble-1"></span>
+        <span className="note-bubble note-bubble-2"></span>
+        <span className="note-bubble note-bubble-3"></span>
+        <span className="note-bubble note-bubble-4"></span>
+        <span className="note-bubble note-bubble-5"></span>
+        <span className="note-bubble note-bubble-6"></span>
+        <span className="note-bubble note-bubble-7"></span>
+        <span className="note-bubble note-bubble-8"></span>
+      </div>
 
       {/* =====================================================
           ❤️ BIG HEART POP OVERLAY
@@ -750,92 +761,99 @@ function NoteDetails() {
       )}
 
       {/* =====================================================
-          HERO
+          TWO-COLUMN PAGE LAYOUT (DESKTOP) / STACKED (MOBILE)
       ====================================================== */}
-
-      <section className="note-hero">
-
-        <div className="note-hero-background">
-          <img
-            src={defaultBanner}
-            alt=""
-          />
-        </div>
-
-        <div className="note-hero-overlay"></div>
-
+      <div className="note-page-layout">
+        <div className="note-left-column">
+          {/* =====================================================
+              HERO
+          ====================================================== */}
+          <section className="note-hero">
         <div className="note-hero-content">
+          <div className="note-hero-topbar">
+            <button
+              type="button"
+              className="hero-back-button"
+              onClick={() => navigate(-1)}
+            >
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H16" />
+              </svg>
+              <span>Back</span>
+            </button>
 
-          <button
-            type="button"
-            className="hero-back-button"
-            onClick={() => navigate(-1)}
-          >
-            <span>←</span>
-            Back to Notes
-          </button>
-
-          <div className="hero-main">
-
-            <div className="study-badge">
-              <span>▣</span>
-              STUDY MATERIAL
-            </div>
-
-            <h1>
-              {title}
-            </h1>
-
-            <div className="hero-subtitle">
-
-              {subject && (
-                <span>
-                  {subject}
-                </span>
-              )}
-
-              {subject &&
-                subjectCode && (
-                  <span className="hero-dot">
-                    •
-                  </span>
-                )}
-
-              {subjectCode && (
-                <span>
-                  {subjectCode}
-                </span>
-              )}
-
-            </div>
-
-            <div className="hero-tags">
-
-              {branch && (
-                <div className="hero-tag">
-                  <span>🎓</span>
-                  {branch}
-                </div>
-              )}
-
-              {semester && (
-                <div className="hero-tag">
-                  <span>📚</span>
-                  {semester}
-                </div>
-              )}
-
-              {year && (
-                <div className="hero-tag">
-                  <span>📅</span>
-                  {year}
-                </div>
-              )}
-
-            </div>
-
+            <span className="hero-topbar-label">
+              <span aria-hidden="true"></span>
+              JNTU CIRCLE · STUDY RESOURCE
+            </span>
           </div>
 
+          <div className="hero-main">
+            <div className="hero-heading-layout">
+              <div className="hero-title-block">
+                <div className="study-badge">
+                  <span aria-hidden="true"></span>
+                  STUDY MATERIAL
+                </div>
+
+                <h1>{title}</h1>
+              </div>
+
+              {(subject || subjectCode) && (
+                <div className="hero-subject-details">
+                  {subject && (
+                    <div className="hero-subject-item">
+                      <span>SUBJECT</span>
+                      <strong>{subject}</strong>
+                    </div>
+                  )}
+                  {subjectCode && (
+                    <div className="hero-subject-item hero-subject-code">
+                      <span>SUBJECT CODE</span>
+                      <strong>{subjectCode}</strong>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="hero-unified-footer">
+              <div className="hero-tags">
+                {branch && (
+                  <div className="hero-tag">
+                    <span className="hero-tag-label">BRANCH</span>
+                    <strong>{branch}</strong>
+                  </div>
+                )}
+                {semester && (
+                  <div className="hero-tag">
+                    <span className="hero-tag-label">SEMESTER</span>
+                    <strong>{semester}</strong>
+                  </div>
+                )}
+                {year && (
+                  <div className="hero-tag">
+                    <span className="hero-tag-label">ACADEMIC YEAR</span>
+                    <strong>{year}</strong>
+                  </div>
+                )}
+              </div>
+
+              <div className="hero-credits-integrated" aria-label="Course credits">
+                <div className="hero-credits-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3.5 14.4 8.4l5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8L12 3.5Z" />
+                    <path d="M8.2 19.4v2.1l3.8-1.8 3.8 1.8v-2.1" />
+                  </svg>
+                </div>
+                <div className="hero-credits-copy">
+                  <span className="hero-credits-label">COURSE CREDITS</span>
+                  <span className="hero-credits-desc">Credit value for this subject</span>
+                </div>
+                <strong className="hero-credits-value">{credits || "4"}</strong>
+              </div>
+            </div>
+          </div>
         </div>
 
       </section>
@@ -845,131 +863,6 @@ function NoteDetails() {
       ====================================================== */}
 
       <main className="note-main">
-
-        {/* ===================================================
-            COURSE + ABOUT
-        ==================================================== */}
-
-        <section className="info-grid">
-
-          <div className="course-card">
-
-            <div className="card-heading">
-
-              <div className="heading-icon">
-                📚
-              </div>
-
-              <div>
-                <span className="eyebrow">
-                  COURSE DETAILS
-                </span>
-
-                <h2>
-                  {title}
-                </h2>
-              </div>
-
-            </div>
-
-            <div className="course-details-grid">
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Subject
-                </span>
-
-                <strong>
-                  {subject || "—"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Subject Code
-                </span>
-
-                <strong>
-                  {subjectCode || "—"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Branch
-                </span>
-
-                <strong>
-                  {branch || "—"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Semester
-                </span>
-
-                <strong>
-                  {semester || "—"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span className="detail-label">
-                  Credits
-                </span>
-
-                <strong>
-                  {credits || "—"}
-                </strong>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* ABOUT */}
-
-          <div className="about-card">
-
-            <div className="about-heading">
-
-              <div className="about-icon">
-                ℹ
-              </div>
-
-              <div>
-                <span className="eyebrow">
-                  ABOUT THIS RESOURCE
-                </span>
-
-                <h2>
-                  About these notes
-                </h2>
-              </div>
-
-            </div>
-
-            <div className="about-content">
-
-              <span className="quote-mark">
-                “
-              </span>
-
-              <p>
-                {description ||
-                  "Study material for this course."}
-              </p>
-
-              <span className="book-decoration">
-                📖
-              </span>
-
-            </div>
-
-          </div>
-
-        </section>
 
         {/* ===================================================
             UNITS
@@ -989,7 +882,7 @@ function NoteDetails() {
                 Units
               </h2>
 
-              <p>Explore unit notes and course PDFs.</p>
+              <p>Explore unit-wise notes and syllabus materials.</p>
 
             </div>
 
@@ -1082,93 +975,75 @@ function NoteDetails() {
 
                     <div className="module-inner">
 
-                      <div className="module-resource-grid">
+                      <div className={`module-resource-grid ${unit.notes && unit.notes.trim() ? "has-notes" : "pdf-only"}`}>
 
-                        {/* UNIT NOTES */}
-
-                        <div className="module-notes-box">
-
-                          <div className="resource-title">
-
-                            <div className="resource-icon" aria-hidden="true">
-                              <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M7 3.75h7l4.25 4.3v12.2H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z" />
-                                <path d="M14 3.75v4.5h4.25M8.5 12h7M8.5 15.5h7" />
-                              </svg>
+                        {/* UNIT NOTES (Only displayed when real notes content exists) */}
+                        {Boolean(unit.notes && unit.notes.trim()) && (
+                          <div className="module-notes-box">
+                            <div className="resource-title">
+                              <div className="resource-icon">
+                                📝
+                              </div>
+                              <div>
+                                <span>UNIT NOTES</span>
+                                <small>Important concepts and summary</small>
+                              </div>
                             </div>
 
-                            <div>
-
-                              <span>
-                                UNIT NOTES
-                              </span>
-
-                              <small>
-                                Study notes
-                              </small>
-
+                            <div className="notes-text">
+                              <p>{unit.notes}</p>
                             </div>
-
                           </div>
-
-                          <div className="notes-text">
-
-                            {unit.notes ? (
-                              <p>
-                                {unit.notes}
-                              </p>
-                            ) : (
-                              <p className="empty-text">
-                                No notes available
-                                for this unit.
-                              </p>
-                            )}
-
-                          </div>
-
-                        </div>
+                        )}
 
                         {/* PDF */}
-
                         <div className="module-pdf-box">
+                          <div className="resource-title-row">
+                            <div className="resource-title">
+                              <div className="resource-icon pdf-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                  <polyline points="14 2 14 8 20 8" />
+                                  <line x1="16" y1="13" x2="8" y2="13" />
+                                  <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                              </div>
 
-                          <div className="resource-title">
-
-                            <div className="resource-icon pdf-icon">
-                              PDF
+                              <div className="resource-title-meta">
+                                <span>
+                                  UNIT {unit.number} PDF
+                                </span>
+                                <small>
+                                  Official study file · Verified syllabus
+                                </small>
+                              </div>
                             </div>
 
-                            <div>
-
-                              <span>
-                                UNIT{" "}
-                                {unit.number}{" "}
-                                PDF
+                            {pdfUrl && (
+                              <span className="pdf-verified-chip">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                                Document Ready
                               </span>
-
-                              <small>
-                                Study material
-                                document
-                              </small>
-
-                            </div>
-
+                            )}
                           </div>
 
                           {pdfUrl ? (
-
                             <div className="pdf-actions">
-
                               <button
                                 type="button"
                                 className="open-pdf-button"
                                 onClick={() =>
-                                  openPdf(
-                                    unit.pdf
-                                  )
+                                  openPdf(unit.pdf)
                                 }
                               >
-                                ↗ Open PDF
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                  <polyline points="15 3 21 3 21 9" />
+                                  <line x1="10" y1="14" x2="21" y2="3" />
+                                </svg>
+                                <span>Open PDF</span>
                               </button>
 
                               <button
@@ -1181,19 +1056,19 @@ function NoteDetails() {
                                   )
                                 }
                               >
-                                ↓ Download
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                  <polyline points="7 10 12 15 17 10" />
+                                  <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                <span>Download</span>
                               </button>
-
                             </div>
-
                           ) : (
-
-                            <div className="pdf-unavailable">
-                              PDF not available
-                            </div>
-
+                            <p className="no-pdf">
+                              No PDF uploaded for this unit.
+                            </p>
                           )}
-
                         </div>
 
                       </div>
@@ -1209,13 +1084,13 @@ function NoteDetails() {
                             <div>
 
                               <span className="preview-label">
-                                PDF PREVIEW
+                                DOCUMENT PREVIEW
                               </span>
 
                               <strong>
                                 Unit{" "}
                                 {unit.number}{" "}
-                                document
+                                Material
                               </strong>
 
                             </div>
@@ -1535,15 +1410,7 @@ function NoteDetails() {
 
         </section>
 
-        {/* ===================================================
-            AUTHOR PROFILE
-        ==================================================== */}
 
-        <section className="author-profile-section">
-
-          <AuthorProfile note={note} />
-
-        </section>
 
         {/* ===================================================
             FOOTER
@@ -1575,6 +1442,15 @@ function NoteDetails() {
         </section>
 
       </main>
+    </div>
+
+    {/* =====================================================
+        RIGHT COLUMN: DEVELOPER PROFILES & JNTU UPLOAD
+    ====================================================== */}
+    <aside className="note-right-column">
+      <AuthorProfile />
+    </aside>
+  </div>
 
       {/* =====================================================
           BACK TO TOP

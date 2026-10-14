@@ -1,75 +1,85 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ReferenceGlassShatter from "./ReferenceGlassShatter";
 
+
+
+// Department cards matching reference image layout and tags:
+// 0: CSE, 1: ECE, 2: AIML, 3: MECH, 4: CIVIL
 const BRANCHES = [
   {
     id: "01",
-    name: "Computer Science",
+    name: "Computer Science Engineering",
     code: "CSE",
-    tag: "AI & Software Systems",
+    tag: "SOFTWARE SYSTEMS",
     image: "/branches/cse.jpg",
-    accent: "#f5bd3f", // Emerald Horizon Gold
-    filterQuery: "CSE",
+    accent: "#00d4ff",
+    filterQuery: "Computer Science",
   },
   {
     id: "02",
-    name: "Electronics & Comm",
+    name: "Electronics & Communication",
     code: "ECE",
-    tag: "VLSI & Embedded Systems",
+    tag: "VLSI & EMBEDDED SYSTEMS",
     image: "/branches/ece.jpg",
-    accent: "#ffe29a", // Light Gold
-    filterQuery: "ECE",
+    accent: "#00e5ff",
+    filterQuery: "Electronics",
   },
   {
     id: "03",
     name: "AI & Machine Learning",
     code: "AIML",
-    tag: "Neural Nets & Data Science",
+    tag: "NEURAL NETS & DATA SCIENCE",
     image: "/branches/aiml.jpg",
-    accent: "#5eead4", // Emerald Mint / Cyan
-    filterQuery: "AIML",
+    accent: "#00d4ff",
+    filterQuery: "Artificial Intelligence",
   },
   {
     id: "04",
     name: "Mechanical Engineering",
     code: "MECH",
-    tag: "Robotics & Automation",
+    tag: "ROBOTICS & AUTOMATION",
     image: "/branches/mech.jpg",
-    accent: "#fbbf24", // Warm Amber Gold
-    filterQuery: "MECH",
+    accent: "#00d4ff",
+    filterQuery: "Mechanical",
   },
   {
     id: "05",
     name: "Civil Engineering",
     code: "CIVIL",
-    tag: "Smart Infrastructure",
+    tag: "SMART INFRASTRUCTURE",
     image: "/branches/civil.jpg",
-    accent: "#34d399", // Deep Emerald Accent
-    filterQuery: "CIVIL",
+    accent: "#00d4ff",
+    filterQuery: "Civil",
   },
 ];
 
-function BranchSection({ selectedBranch = "", onSelectBranch }) {
+function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [shatteringBranch, setShatteringBranch] = useState(null);
 
   const containerRef = useRef(null);
-  const orbitSceneRef = useRef(null);
   const sceneRef = useRef(null);
   const cardRefs = useRef([]);
 
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
-  const angleRef = useRef(0);
+  const angleRef = useRef(Math.PI / 10);
   const hoveredIndexRef = useRef(null);
+  const shatteringRef = useRef(null);
 
   useEffect(() => {
     hoveredIndexRef.current = hoveredIndex;
   }, [hoveredIndex]);
 
   useEffect(() => {
+    shatteringRef.current = shatteringBranch;
+  }, [shatteringBranch]);
+
+  useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      setIsMobile(window.innerWidth <= 640);
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -77,7 +87,7 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
   }, []);
 
   const handleMouseMove = (e) => {
-    if (isMobile || !containerRef.current) return;
+    if (isMobile || !containerRef.current || shatteringBranch) return;
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -85,8 +95,8 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
     const normX = (e.clientX - centerX) / (rect.width / 2);
     const normY = (e.clientY - centerY) / (rect.height / 2);
 
-    mouseRef.current.targetX = normX * 10;
-    mouseRef.current.targetY = -normY * 8;
+    mouseRef.current.targetX = normX * 8;
+    mouseRef.current.targetY = -normY * 6;
   };
 
   const handleMouseLeave = () => {
@@ -95,42 +105,34 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
     setHoveredIndex(null);
   };
 
-  const handleExploreCatalogClick = (e) => {
-    e.preventDefault();
-    if (orbitSceneRef.current) {
-      orbitSceneRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    } else {
-      const el = document.getElementById("branch-cards") || document.getElementById("features");
-      el?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  };
-
   useEffect(() => {
     if (isMobile) return;
 
     let animId;
 
     const animate = () => {
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.06;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.06;
+      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
+      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
 
       if (sceneRef.current) {
         sceneRef.current.style.transform = `rotateX(${mouseRef.current.y.toFixed(2)}deg) rotateY(${mouseRef.current.x.toFixed(2)}deg)`;
       }
 
       const currentHovered = hoveredIndexRef.current;
-      const speed = currentHovered !== null ? 0.001 : 0.0028;
+      const isShatteringActive = shatteringRef.current !== null;
+      // Freeze rotation during shatter explosion so the camera stays locked on the shattering card
+      const speed = isShatteringActive ? 0 : (currentHovered !== null ? 0.0004 : 0.0016);
       angleRef.current = (angleRef.current + speed) % (Math.PI * 2);
 
       const width = window.innerWidth;
-      let rx = 300; 
-      let ry = 22;
+      let rx = 310;
+      let ry = 18;
       let rz = 160;
 
       if (width <= 1100) {
-        rx = 245;
-        ry = 18;
-        rz = 125;
+        rx = 255;
+        ry = 15;
+        rz = 130;
       }
 
       const total = BRANCHES.length;
@@ -148,28 +150,29 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
 
         const normZ = z / rz; // -1 (back) to +1 (front center)
 
-        const rotY = isHovered ? 0 : -(x / rx) * 18;
+        // Smooth yaw: front center faces camera (rotY = 0), side cards subtly angle along curve
+        const rotY = isHovered ? 0 : -(x / rx) * 16;
 
-        let scale = 0.88 + normZ * 0.16;
-        let zIndex = Math.round(100 + normZ * 60);
+        let scale = 0.88 + normZ * 0.16; // 0.72 (back) to 1.04 (front)
+        let zIndex = Math.round(90 + normZ * 60); // 30 to 150
 
         if (isHovered) {
-          scale = 1.14;
-          zIndex = 350;
+          scale = 1.12;
+          zIndex = 300;
         }
 
-        const shadowBlur = Math.round(14 + normZ * 14);
-        const shadowY = Math.round(6 + normZ * 6);
-        const shadowAlpha = (0.2 + Math.max(0, normZ) * 0.3).toFixed(3);
+        const shadowBlur = Math.round(16 + normZ * 16);
+        const shadowY = Math.round(8 + normZ * 8);
+        const shadowAlpha = (0.2 + Math.max(0, normZ) * 0.35).toFixed(3);
 
         cardEl.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${rotY.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
         cardEl.style.opacity = "1";
         cardEl.style.zIndex = zIndex;
 
         if (isHovered) {
-          cardEl.style.boxShadow = "0 24px 54px rgba(0, 0, 0, 0.85), 0 0 12px rgba(245, 189, 63, 0.12)";
+          cardEl.style.boxShadow = "0 28px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 229, 255, 0.45)";
         } else {
-          cardEl.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha})`;
+          cardEl.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha}), 0 0 ${Math.round(Math.max(0, normZ) * 16)}px rgba(0, 229, 255, ${(Math.max(0, normZ) * 0.25).toFixed(2)})`;
         }
       });
 
@@ -180,9 +183,22 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
     return () => cancelAnimationFrame(animId);
   }, [isMobile]);
 
+  const hasNavigatedRef = useRef(false);
+
+  const triggerBranchNavigation = (item) => {
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+    if (onSelectBranch) {
+      onSelectBranch(item.code, item.name);
+    } else {
+      navigate(`/notes?branch=${encodeURIComponent(item.code)}`);
+    }
+  };
+
+  const activeShatteringItem = BRANCHES.find((b) => b.code === shatteringBranch);
+
   return (
     <section 
-      id="features"
       className="branches-section" 
       ref={containerRef} 
       onMouseMove={handleMouseMove} 
@@ -190,23 +206,46 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
     >
       <div className="branches-container">
 
-        {/* Section Header styled in Emerald Horizon design */}
-        <div className="section-heading branches-header">
-          <p className="eyebrow">ACADEMIC DEPARTMENTS</p>
-          <h2>
-            Explore engineering <em>disciplines.</em>
+        {/* Section Header: "— Browse by Branch —" + Subtitle */}
+        <div className="branches-header">
+          <div className="branches-eyebrow-wrapper">
+            <span className="branches-eyebrow-line" />
+            <span className="branches-eyebrow">Browse by Branch</span>
+            <span className="branches-eyebrow-line" />
+          </div>
+          <h2 className="branches-title">
+            Explore academic resources by engineering department
           </h2>
-          <p className="branches-subtitle">
-            Interactive 3D navigation across university departments. Select a branch to access verified notes, question papers, and lab manuals.
-          </p>
         </div>
 
         {/* 3D Orbit Layout */}
-        <div className="orbit-scene" id="branch-cards" ref={orbitSceneRef}>
-          
-          <div className="orbit-world" ref={sceneRef}>
+        <div className="orbit-scene">
 
-            {/* Department Cards */}
+          {/* Luminous Floor Light Pool under Center Card */}
+          <div className="orbit-ground-glow" />
+
+          {/* ====================================================
+              FULLSCREEN GLASS SHATTER DISPERSAL (ONLY PIECES)
+              ==================================================== */}
+          {activeShatteringItem && (
+            <ReferenceGlassShatter
+              onComplete={() => triggerBranchNavigation(activeShatteringItem)}
+            />
+          )}
+
+          {/* ====================================================
+              3D CAROUSEL WORLD (Cards suspended in 3D Space)
+              Hidden immediately during shatter so no cards are visible
+              ==================================================== */}
+          <div 
+            className="orbit-world" 
+            ref={sceneRef}
+            style={{ 
+              display: activeShatteringItem ? "none" : "flex",
+              opacity: activeShatteringItem ? 0 : 1, 
+              pointerEvents: activeShatteringItem ? "none" : "auto",
+            }}
+          >
             {BRANCHES.map((item, index) => {
               const isSelected = Boolean(
                 selectedBranch &&
@@ -214,32 +253,37 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
                  selectedBranch.toLowerCase() === item.name.toLowerCase() ||
                  selectedBranch.toLowerCase() === item.code.toLowerCase())
               );
+              const isShattering = shatteringBranch === item.code;
 
               const handleCardClick = (e) => {
                 e.preventDefault();
-                if (onSelectBranch) {
-                  onSelectBranch(item.code, item.name);
-                } else {
-                  navigate(`/notes?branch=${encodeURIComponent(item.code)}`);
-                }
+                if (shatteringBranch) return; // Prevent double trigger while shattering
+
+                hasNavigatedRef.current = false;
+                setShatteringBranch(item.code);
+                // Sound removed as requested
+
+                // Failsafe timer: navigate after 1150ms if onComplete hasn't fired yet
+                window.setTimeout(() => {
+                  triggerBranchNavigation(item);
+                }, 1150);
               };
 
               return (
                 <div
                   key={item.id}
                   ref={(el) => (cardRefs.current[index] = el)}
-                  className={`orbit-item ${hoveredIndex === index ? "is-hovered" : ""} ${isSelected ? "is-selected" : ""}`}
+                  className={`orbit-item ${hoveredIndex === index ? "is-hovered" : ""} ${isSelected ? "is-selected" : ""} ${isShattering ? "is-shattering" : ""}`}
                   style={{ "--index": index, "--accent": item.accent }}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
+                  onMouseEnter={() => !shatteringBranch && setHoveredIndex(index)}
+                  onMouseLeave={() => !shatteringBranch && setHoveredIndex(null)}
                   onClick={handleCardClick}
-                  title={`Explore ${item.name}`}
+                  title={`View ${item.name} notes & resources`}
                   role="button"
                   tabIndex={0}
                 >
-                  {/* Seamless 3D Solid Card Panel */}
                   <article className="branch-card">
-                    {/* High-res Image Background */}
+                    {/* Background Graphics */}
                     <img 
                       src={item.image} 
                       alt={item.name} 
@@ -247,93 +291,44 @@ function BranchSection({ selectedBranch = "", onSelectBranch }) {
                       loading="eager"
                     />
 
-                    {/* Cinematic Multi-stop Overlay */}
+                    {/* Dark Glass Overlay */}
                     <div className="branch-card-gradient" />
 
-                    {/* Subtle, soft ambient accent (significantly reduced glare) */}
-                    <div 
-                      className="branch-card-glow"
-                      style={{
-                        background: `radial-gradient(circle at 80% 20%, ${item.accent}14 0%, transparent 60%)`
-                      }}
-                    />
+                    {/* Ambient Accent Glow */}
+                    <div className="branch-card-glow" />
 
-                    {/* Top Bar: Code Badge and ID */}
+                    {/* Top Pill Badge: ● CODE */}
                     <div className="branch-card-top">
-                      <span 
-                        className="branch-code-badge"
-                        style={{
-                          borderColor: `${item.accent}44`,
-                          boxShadow: "none"
-                        }}
-                      >
-                        <span 
-                          className="badge-dot" 
-                          style={{ 
-                            backgroundColor: item.accent,
-                            boxShadow: `0 0 3px ${item.accent}88`
-                          }} 
-                        />
+                      <span className="branch-code-badge">
+                        <span className="badge-dot" />
                         {item.code}
                       </span>
-                      <span className="branch-number">{item.id}</span>
+
+                      {isSelected && (
+                        <span className="branch-active-pill">
+                          ● ACTIVE
+                        </span>
+                      )}
                     </div>
 
-                    {/* Bottom Bar: Tag, Title, and Accent Line */}
+                    {/* Bottom Content: Tag, Title, Glowing Line */}
                     <div className="branch-body">
                       <div className="branch-tag-row">
-                        <span className="branch-tag" style={{ color: item.accent }}>
+                        <span className="branch-tag">
                           {item.tag}
                         </span>
-                        {isSelected && (
-                          <span 
-                            className="branch-active-pill" 
-                            style={{ 
-                              borderColor: item.accent, 
-                              color: "#ffffff",
-                              backgroundColor: `${item.accent}55`
-                            }}
-                          >
-                            ● ACTIVE
-                          </span>
-                        )}
                       </div>
 
                       <h3 className="branch-name">{item.name}</h3>
 
-                      <div className="branch-action-row">
-                        <span 
-                          className="branch-line"
-                          style={{
-                            background: `linear-gradient(90deg, ${item.accent}, rgba(255, 226, 154, 0.4), transparent)`
-                          }}
-                        />
-                        <span className="branch-action-text">Explore Notes →</span>
-                      </div>
+                      <span className="branch-line" />
                     </div>
                   </article>
                 </div>
               );
             })}
-
           </div>
-        </div>
 
-        {/* Ambition Statement aligned perfectly under 3D Cards */}
-        <div className="branches-cta-footer">
-          <p className="eyebrow">READY TO EXCEL?</p>
-          <h2>
-            Turn your ambition into<br />
-            <em>academic success.</em>
-          </h2>
-          <a
-            href="#branch-cards"
-            className="primary-btn branches-cta-btn"
-            onClick={handleExploreCatalogClick}
-            aria-label="Explore 3D department cards catalog"
-          >
-            Explore Catalog <span>→</span>
-          </a>
         </div>
 
       </div>
