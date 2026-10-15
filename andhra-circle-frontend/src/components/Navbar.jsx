@@ -196,18 +196,62 @@ function Navbar() {
     {
       name: "Home",
       path: "/",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      ),
+    },
+    {
+      name: "Notes",
+      path: "/notes",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
+          <path d="M6 6h10" />
+          <path d="M6 10h10" />
+        </svg>
+      ),
     },
     {
       name: "CGPA & SGPA Calculator",
       path: "/calculator",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect width="16" height="20" x="4" y="2" rx="2" />
+          <line x1="8" x2="16" y1="6" y2="6" />
+          <line x1="16" x2="16" y1="14" y2="18" />
+          <path d="M16 10h.01" />
+          <path d="M12 10h.01" />
+          <path d="M8 10h.01" />
+          <path d="M12 14h.01" />
+          <path d="M8 14h.01" />
+          <path d="M12 18h.01" />
+          <path d="M8 18h.01" />
+        </svg>
+      ),
     },
     {
       name: "Upload Materials",
       path: "/upload-materials",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" x2="12" y1="3" y2="15" />
+        </svg>
+      ),
     },
     {
       name: "Student Profile",
       path: "/profile",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+          <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+        </svg>
+      ),
     },
     {
       name: "Notifications",
@@ -259,9 +303,11 @@ function Navbar() {
                       to={item.path}
                       className={({ isActive }) =>
                         isActive
-                          ? "nav-link active"
-                          : "nav-link"
+                          ? "nav-link active nav-notif-btn"
+                          : "nav-link nav-notif-btn"
                       }
+                      title="Notifications"
+                      aria-label="Notifications"
                       onClick={() => {
                         handleOpenNotifications();
                         if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
@@ -269,13 +315,21 @@ function Navbar() {
                         }
                       }}
                     >
-                      <span className="nav-notif-text">
-                        {hasNewAlert && (
-                          <span className="nav-notif-bell" title="New Alert!">
-                            🔔
-                          </span>
-                        )}
-                        {item.name}
+                      <span className="nav-notif-bell-icon-wrapper" aria-hidden="true">
+                        <svg
+                          className={`nav-notif-svg-bell ${hasNewAlert ? "is-ringing" : ""}`}
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
                       </span>
 
                       {hasNewAlert ? (
@@ -328,10 +382,11 @@ function Navbar() {
                   to={item.path}
                   className={({ isActive }) =>
                     isActive
-                      ? "nav-link active"
-                      : "nav-link"
+                      ? "nav-link active nav-link-with-icon"
+                      : "nav-link nav-link-with-icon"
                   }
                 >
+                  {item.icon && <span className="nav-item-icon">{item.icon}</span>}
                   <span>{item.name}</span>
                 </NavLink>
               </li>

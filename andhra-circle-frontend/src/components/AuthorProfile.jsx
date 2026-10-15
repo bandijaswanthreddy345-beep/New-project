@@ -35,11 +35,6 @@ const developers = [
 
 function AuthorProfile() {
   const [activeDeveloper, setActiveDeveloper] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState({ type: "", text: "" });
@@ -52,15 +47,14 @@ function AuthorProfile() {
   });
   const developer = developers[activeDeveloper];
 
+  // Automatically advance developers every 3 seconds
   useEffect(() => {
-    if (!isPlaying) return undefined;
-
     const intervalId = window.setInterval(() => {
       setActiveDeveloper((current) => (current + 1) % developers.length);
-    }, 4000);
+    }, 3000);
 
     return () => window.clearInterval(intervalId);
-  }, [isPlaying]);
+  }, []);
 
   useEffect(() => {
     if (!isUploadModalOpen) return undefined;
@@ -245,13 +239,6 @@ function AuthorProfile() {
                 />
               ))}
             </div>
-            <button
-              className="developer-carousel-toggle"
-              onClick={() => setIsPlaying((playing) => !playing)}
-              type="button"
-            >
-              {isPlaying ? "Pause" : "Play"}
-            </button>
           </div>
 
           <div className="jntu-upload-card">

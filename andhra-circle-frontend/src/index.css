@@ -240,6 +240,27 @@ ul {
   width: 100%;
 }
 
+.nav-link-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.nav-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #64748b;
+  transition: color var(--transition), transform var(--transition);
+}
+
+.nav-links a:hover .nav-item-icon,
+.nav-links a.active .nav-item-icon {
+  color: var(--primary);
+  transform: translateY(-0.5px);
+}
+
 /* =========================================================
    3D METAL SEARCH BUTTON (METAL-FX)
 ========================================================= */
@@ -547,18 +568,19 @@ ul {
   -webkit-backdrop-filter: blur(20px);
   border: 1.5px solid #ffefb388;
   border-radius: 18px;
-  box-shadow: inset 0 1px 0 0 #ffefb333, 0 4px 20px #00000060, 0 0 12px #ffefb318;
+  box-shadow: 0 16px 36px #00000050, 0 0 16px #ffefb322, inset 0 1px 0 0 #ffefb333;
   display: flex;
   align-items: center;
   padding: 0 10px 0 14px;
   gap: 12px;
+  overflow: hidden;
   transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
 .hero-ai-bar:focus-within {
   border-color: #ffefb3;
   background: #000000;
-  box-shadow: inset 0 1px 0 0 #ffefb355, 0 0 24px #ffefb333, 0 6px 24px #00000080;
+  box-shadow: 0 20px 45px #00000065, 0 0 24px #ffefb344, inset 0 1px 0 0 #ffefb355;
 }
 
 /* Frosted Avatar Badge Pod */
@@ -592,13 +614,27 @@ ul {
   flex-shrink: 0;
 }
 
-/* Input Field */
-.hero-ai-input {
+/* Input Field - Completely Clean, No Blue Focus Lines */
+.hero-ai-input,
+.hero-ai-input:focus,
+.hero-ai-input:focus-visible,
+.hero-ai-input:focus-within,
+.hero-ai-input:active {
   flex: 1;
   height: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
+  background: transparent !important;
+  border: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  outline: none !important;
+  outline-style: none !important;
+  outline-width: 0 !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
   font-size: 14.5px;
   font-weight: 450;
   color: #FFFFFF;
@@ -762,9 +798,12 @@ ul {
   color: #ffefb3;
   font-size: 12.5px;
   font-weight: 550;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 6px #00000030;
+  height: 32px;
+  box-sizing: border-box;
 }
 
 .hero-ai-pill-icon {
@@ -785,15 +824,18 @@ ul {
 }
 
 /* =========================================================
-   STARTER CHIP (PROFILE BUILDER)
+   STARTER CHIPS (PROFILE BUILDER & BRANCH QUICK ACCESS)
    ========================================================= */
 
 .hero-ai-starter-chips {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  margin-top: 16px;
+  gap: 8px;
+  margin-top: 14px;
   width: 100%;
+  max-width: 650px;
   animation: heroAiFadeIn 0.3s ease;
 }
 
@@ -801,38 +843,41 @@ ul {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 22px;
+  gap: 6px;
+  padding: 6px 14px;
   border-radius: 9999px;
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 650;
   letter-spacing: -0.01em;
+  white-space: nowrap;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
+  height: 32px;
+  box-sizing: border-box;
 }
 
 .starter-pill-highlight {
   background: #000000 !important;
-  border: 1.5px solid #ffefb366 !important;
+  border: 1px solid #ffefb3aa !important;
   color: #ffefb3 !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 16px rgba(255, 239, 179, 0.15), inset 0 1px 0 rgba(255, 239, 179, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 239, 179, 0.2) !important;
 }
 
 .starter-pill-highlight:hover {
-  background: #0d0f17 !important;
+  background: #ffefb3 !important;
   border-color: #ffefb3 !important;
-  color: #ffffff !important;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 239, 179, 0.3) !important;
+  color: #000000 !important;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 20px rgba(255, 239, 179, 0.45) !important;
 }
 
 .starter-pill-highlight:active {
-  transform: scale(0.98) translateY(0);
+  transform: scale(0.97);
 }
 
 .starter-pill-sparkle {
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1;
 }
 
@@ -1159,14 +1204,21 @@ ul {
   box-shadow: 0 0 16px #fed86633, inset 0 1px 0 #ffffff22;
 }
 
-.chat-modal-input-field {
+.chat-modal-input-field,
+.chat-modal-input-field:focus,
+.chat-modal-input-field:focus-visible,
+.chat-modal-input-field:active {
   flex: 1;
-  border: none;
-  background: transparent;
+  border: none !important;
+  outline: none !important;
+  outline-style: none !important;
+  outline-width: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
   color: #ffffff;
   font-size: 14px;
   font-weight: 500;
-  outline: none;
+  -webkit-appearance: none !important;
 }
 
 .chat-modal-input-field::placeholder {
@@ -1596,6 +1648,201 @@ ul {
   background: #ffffff;
   box-shadow: 0 0 8px #ffefb3aa;
   transform: translateY(-0.5px);
+}
+
+/* =========================================================
+   INTERACTIVE BRANCH HUB SHOWCASE INSIDE CHATBOT
+   ========================================================= */
+
+.chat-branch-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.chat-branch-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(255, 239, 179, 0.12) 0%, rgba(0, 0, 0, 0.6) 100%);
+  border: 1px solid #ffefb344;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.chat-branch-icon {
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: #000000;
+  border: 1px solid #ffefb355;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.chat-branch-title-box {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-branch-title-box h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.chat-branch-title-box p {
+  margin: 2px 0 0;
+  font-size: 10.5px;
+  color: #ffefb3cc;
+  line-height: 1.3;
+}
+
+/* Category Filter Tabs inside Chat */
+.chat-branch-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.chat-branch-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #0a0a0a;
+  border: 1px solid #ffffff1a;
+  color: #cbd5e1;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.chat-branch-tab:hover {
+  background: #181818;
+  border-color: #ffefb366;
+  color: #ffefb3;
+}
+
+.chat-branch-tab.is-active {
+  background: #ffefb3 !important;
+  color: #000000 !important;
+  border-color: #ffefb3 !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(255, 239, 179, 0.4);
+}
+
+/* Direct Branch Quick Action Buttons Bar */
+.chat-branch-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed #ffffff22;
+}
+
+.chat-branch-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #000000;
+  border: 1px solid #ffefb355;
+  color: #ffefb3;
+  font-size: 10px;
+  font-weight: 650;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.chat-branch-link-btn:hover {
+  background: #ffefb3;
+  color: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(255, 239, 179, 0.35);
+}
+
+/* Curriculum Semesters Accordion / List in Chat */
+.chat-curriculum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.chat-curriculum-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-curriculum-list::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.chat-sem-card {
+  background: #0b0f19;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.chat-sem-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fed866;
+  margin: 0 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-sem-subjects-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chat-sem-sub-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #141b2d;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  font-size: 9.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chat-sem-sub-pill:hover {
+  background: #ffefb3;
+  color: #000000;
+  border-color: #ffefb3;
+  transform: translateY(-0.5px);
+}
+
+.chat-sem-sub-credits {
+  color: #94a3b8;
+  font-size: 8.5px;
 }
 
 /* Related Subjects & Cross-Resource Explorer */
@@ -5756,6 +6003,53 @@ textarea:focus-visible {
   50% {
     box-shadow: 0 3px 14px rgba(225, 29, 72, 0.8), 0 0 8px rgba(255, 255, 255, 0.4);
   }
+}
+
+.nav-notif-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px !important;
+  border-radius: 10px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.nav-notif-btn::after {
+  display: none !important;
+}
+
+.nav-notif-btn:hover {
+  background: rgba(1, 62, 55, 0.08);
+  color: var(--primary) !important;
+}
+
+.nav-notif-btn.active {
+  background: rgba(1, 62, 55, 0.12);
+  color: var(--primary-dark) !important;
+}
+
+.nav-notif-bell-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.nav-notif-svg-bell {
+  display: block;
+  stroke: currentColor;
+  transform-origin: top center;
+  transition: all 0.2s ease;
+}
+
+.nav-notif-btn:hover .nav-notif-svg-bell {
+  transform: scale(1.1);
+  stroke: var(--primary);
+}
+
+.nav-notif-svg-bell.is-ringing {
+  animation: bellWiggle 2.8s ease-in-out infinite;
 }
 
 .nav-notif-bell {

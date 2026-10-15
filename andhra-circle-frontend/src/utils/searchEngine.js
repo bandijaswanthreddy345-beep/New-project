@@ -40,11 +40,67 @@ export const SUBJECT_ALIASES = {
 };
 
 // =========================================================================
+// BRANCH DIRECTORY & METADATA
+// =========================================================================
+export const BRANCH_DIRECTORY = {
+  CSE: {
+    code: "CSE",
+    name: "Computer Science & Engineering",
+    icon: "💻",
+    description: "Official lecture notes, lab manuals, question papers, and R23/R20 curriculum for Computer Science & Engineering.",
+    aliases: ["cse", "computer science", "computer science engineering", "computer science & engineering", "cs", "information science", "ise", "information technology", "it"],
+    portalQuery: "CSE",
+  },
+  AIML: {
+    code: "AIML",
+    name: "Artificial Intelligence & Machine Learning",
+    icon: "🤖",
+    description: "Verified Python code, Deep Learning lecture notes, Machine Learning exam papers, and official curriculum for AI & ML.",
+    aliases: ["aiml", "ai", "ml", "artificial intelligence", "machine learning", "ai & ml", "ai and ml", "ai & data science", "data science", "ds"],
+    portalQuery: "AIML",
+  },
+  ECE: {
+    code: "ECE",
+    name: "Electronics & Communication Engineering",
+    icon: "📡",
+    description: "Electronic Devices, Digital Logic, Signals & Systems, VLSI notes, laboratory manuals, and semester exam papers.",
+    aliases: ["ece", "electronics", "electronics and communication", "electronics & communication", "electronics and communication engineering", "ec"],
+    portalQuery: "ECE",
+  },
+  ME: {
+    code: "ME",
+    name: "Mechanical Engineering",
+    icon: "⚙️",
+    description: "Thermodynamics, Fluid Mechanics, Engineering Mechanics, Manufacturing notes, workshop manuals, and papers.",
+    aliases: ["me", "mech", "mechanical", "mechanical engineering", "mechanical engg"],
+    portalQuery: "ME",
+  },
+  CE: {
+    code: "CE",
+    name: "Civil Engineering",
+    icon: "🏗️",
+    description: "Strength of Materials, Surveying, Structural Analysis, Concrete Technology notes, field work manuals, and papers.",
+    aliases: ["ce", "civil", "civil engineering"],
+    portalQuery: "CE",
+  },
+  EEE: {
+    code: "EEE",
+    name: "Electrical & Electronics Engineering",
+    icon: "⚡",
+    description: "Circuit Theory, Electrical Machines, Power Systems, Control Systems lecture notes, laboratory manuals, and papers.",
+    aliases: ["eee", "electrical", "electrical engineering", "electrical & electronics", "electrical & electronics engineering"],
+    portalQuery: "EEE",
+  },
+};
+
+// =========================================================================
 // STATIC VERIFIED FALLBACK CURRICULUM & CORE RESOURCES
 // (Guarantees instant, rich, accurate results even when offline or DB empty)
 // =========================================================================
 const FALLBACK_CORE_RESOURCES = [
+  // -----------------------------------------------------------------------
   // CSE / AIML Notes
+  // -----------------------------------------------------------------------
   {
     _id: "core-note-ds-1",
     title: "Data Structures through C - Complete Lecture Notes (Units 1-5)",
@@ -143,7 +199,166 @@ const FALLBACK_CORE_RESOURCES = [
     description: "Supervised Learning, Regression, Decision Trees, SVM, Naive Bayes, Unsupervised Clustering, PCA and Model Evaluation.",
     author: "AIML Research Group",
   },
+
+  // -----------------------------------------------------------------------
+  // ECE Notes
+  // -----------------------------------------------------------------------
+  {
+    _id: "core-note-edc-1",
+    title: "Electronic Devices & Circuits (EDC) - Comprehensive Notes",
+    subject: "Electronic Devices & Circuits",
+    subjectCode: "23A04201T",
+    branch: "ECE",
+    semester: "1-2",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Semiconductor diodes, Zener diode, BJT characteristics, JFET, MOSFET, Biasing techniques, and Small signal amplifiers.",
+    author: "Dept of ECE",
+  },
+  {
+    _id: "core-note-dld-1",
+    title: "Digital Logic Design (DLD) - Complete Unit 1 to 5 Notes",
+    subject: "Digital Logic Design",
+    subjectCode: "23A04301T",
+    branch: "ECE",
+    semester: "2-1",
+    year: "2nd Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Boolean algebra, K-maps, Combinational logic, Adders, Multiplexers, Flip-Flops, Shift Registers, Counters and FSM design.",
+    author: "Dept of ECE",
+  },
+  {
+    _id: "core-note-ss-1",
+    title: "Signals & Systems - Full Academic Study Guide",
+    subject: "Signals & Systems",
+    subjectCode: "23A04302T",
+    branch: "ECE",
+    semester: "2-1",
+    year: "2nd Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Continuous and Discrete time signals, LTI systems, Fourier Series, Fourier Transform, Laplace Transform, Z-Transforms.",
+    author: "Dept of ECE",
+  },
+
+  // -----------------------------------------------------------------------
+  // ME (Mechanical) Notes
+  // -----------------------------------------------------------------------
+  {
+    _id: "core-note-em-1",
+    title: "Engineering Mechanics - Comprehensive Lecture Notes",
+    subject: "Engineering Mechanics",
+    subjectCode: "23A03101T",
+    branch: "ME",
+    semester: "1-1",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Statics of particles, Equilibrium of rigid bodies, Centroid and Center of Gravity, Moment of Inertia, Friction, Dynamics.",
+    author: "Dept of Mechanical Engineering",
+  },
+  {
+    _id: "core-note-thermo-1",
+    title: "Engineering Thermodynamics - Complete Unit 1 to 5 Notes",
+    subject: "Engineering Thermodynamics",
+    subjectCode: "23A03301T",
+    branch: "ME",
+    semester: "2-1",
+    year: "2nd Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Zeroth, First & Second laws of thermodynamics, Entropy, Pure substances, Air standard cycles (Otto, Diesel, Dual), Vapour power cycles.",
+    author: "Dept of Mechanical Engineering",
+  },
+  {
+    _id: "core-note-fm-1",
+    title: "Fluid Mechanics & Hydraulic Machinery - Verified Notes",
+    subject: "Fluid Mechanics & Hydraulic Machinery",
+    subjectCode: "23A03401T",
+    branch: "ME",
+    semester: "2-2",
+    year: "2nd Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Fluid properties, Pressure measurement, Fluid kinematics, Bernoulli equation, Boundary layer theory, Turbines & Pumps.",
+    author: "Dept of Mechanical Engineering",
+  },
+
+  // -----------------------------------------------------------------------
+  // CE (Civil) Notes
+  // -----------------------------------------------------------------------
+  {
+    _id: "core-note-som-1",
+    title: "Strength of Materials - Complete Academic Notes",
+    subject: "Strength of Materials",
+    subjectCode: "23A01301T",
+    branch: "CE",
+    semester: "2-1",
+    year: "2nd Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Simple stresses & strains, Shear force and Bending moment diagrams, Flexural & Shear stresses, Torsion of shafts, Deflection of beams.",
+    author: "Dept of Civil Engineering",
+  },
+  {
+    _id: "core-note-survey-1",
+    title: "Surveying & Geomatics - Lecture Notes (Units 1-5)",
+    subject: "Surveying & Geomatics",
+    subjectCode: "23A01201T",
+    branch: "CE",
+    semester: "1-2",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Chain & Compass surveying, Leveling & Contouring, Theodolite traversing, Curves, Total Station and GPS principles.",
+    author: "Dept of Civil Engineering",
+  },
+
+  // -----------------------------------------------------------------------
+  // EEE Notes
+  // -----------------------------------------------------------------------
+  {
+    _id: "core-note-beee-1",
+    title: "Basic Electrical & Electronics Engineering - Units 1 to 5",
+    subject: "Basic Electrical & Electronics Engineering",
+    subjectCode: "23A02101T",
+    branch: "EEE",
+    semester: "1-1",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "DC Circuit analysis, AC fundamentals, Single phase transformers, DC machines, Diodes & Transistors fundamentals.",
+    author: "Dept of EEE",
+  },
+  {
+    _id: "core-note-eca-1",
+    title: "Electrical Circuit Analysis & Network Theory - Complete Notes",
+    subject: "Electrical Circuit Analysis",
+    subjectCode: "23A02201T",
+    branch: "EEE",
+    semester: "1-2",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Notes",
+    icon: "📘",
+    description: "Network theorems (Thevenin, Norton, Superposition), Resonance, Transient analysis, Two-port network parameters.",
+    author: "Dept of EEE",
+  },
+
+  // -----------------------------------------------------------------------
   // Question Papers
+  // -----------------------------------------------------------------------
   {
     _id: "core-paper-ds-1",
     title: "Data Structures through C - Semester End Regular Exam Paper",
@@ -196,7 +411,75 @@ const FALLBACK_CORE_RESOURCES = [
     icon: "📄",
     description: "Previous question paper covering scheduling algorithms, banker's algorithm, paging and segmentation.",
   },
+  {
+    _id: "core-paper-edc-1",
+    title: "Electronic Devices & Circuits (EDC) - Regular Exam Question Paper",
+    subject: "Electronic Devices & Circuits",
+    subjectCode: "23A04201T",
+    branch: "ECE",
+    semester: "1-2",
+    year: "2024",
+    regulation: "R23",
+    type: "Question Paper",
+    icon: "📄",
+    description: "Official question paper covering PN junctions, BJT amplifiers, JFET characteristics and rectifiers.",
+  },
+  {
+    _id: "core-paper-dld-1",
+    title: "Digital Logic Design (DLD) - Semester End Exam Paper",
+    subject: "Digital Logic Design",
+    subjectCode: "23A04301T",
+    branch: "ECE",
+    semester: "2-1",
+    year: "2024",
+    regulation: "R23",
+    type: "Question Paper",
+    icon: "📄",
+    description: "Exam paper covering K-map reduction, synchronous counters, multiplexers and shift registers.",
+  },
+  {
+    _id: "core-paper-em-1",
+    title: "Engineering Mechanics - 1st Year Exam Question Paper",
+    subject: "Engineering Mechanics",
+    subjectCode: "23A03101T",
+    branch: "ME",
+    semester: "1-1",
+    year: "2024",
+    regulation: "R23",
+    type: "Question Paper",
+    icon: "📄",
+    description: "JNTUA regular exam paper covering equilibrium of forces, friction, centroid, and work-energy theorem.",
+  },
+  {
+    _id: "core-paper-som-1",
+    title: "Strength of Materials - Semester End Examination Paper",
+    subject: "Strength of Materials",
+    subjectCode: "23A01301T",
+    branch: "CE",
+    semester: "2-1",
+    year: "2024",
+    regulation: "R23",
+    type: "Question Paper",
+    icon: "📄",
+    description: "Previous year exam paper with numerical problems on SFD, BMD, bending stress and deflection.",
+  },
+  {
+    _id: "core-paper-eca-1",
+    title: "Electrical Circuit Analysis - Previous Year Question Paper",
+    subject: "Electrical Circuit Analysis",
+    subjectCode: "23A02201T",
+    branch: "EEE",
+    semester: "1-2",
+    year: "2024",
+    regulation: "R23",
+    type: "Question Paper",
+    icon: "📄",
+    description: "Question paper covering mesh & nodal analysis, Thevenin theorem, resonance and transient circuits.",
+  },
+
+  // -----------------------------------------------------------------------
   // Lab Programs
+  // -----------------------------------------------------------------------
   {
     _id: "core-lab-ds-1",
     title: "Data Structures Laboratory - Verified C Programs & Viva Guide",
@@ -236,7 +519,62 @@ const FALLBACK_CORE_RESOURCES = [
     icon: "🧪",
     description: "Oracle SQL scripts, PL/SQL blocks, procedures, functions, packages and database normalization case studies.",
   },
-  // Syllabus
+  {
+    _id: "core-lab-edc-1",
+    title: "Electronic Devices & Circuits Lab - Verified Experiments Manual",
+    subject: "Electronic Devices & Circuits Lab",
+    subjectCode: "23A04201P",
+    branch: "ECE",
+    semester: "1-2",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Lab Program",
+    icon: "🧪",
+    description: "V-I characteristics of PN & Zener diode, Half/Full wave rectifiers, BJT Common Emitter input/output characteristics.",
+  },
+  {
+    _id: "core-lab-me-1",
+    title: "Engineering Workshop & Manufacturing Practice Lab Manual",
+    subject: "Workshop & Manufacturing Practice",
+    subjectCode: "23A03101P",
+    branch: "ME",
+    semester: "1-1",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Lab Program",
+    icon: "🧪",
+    description: "Carpentry, Fitting, Tin-Smithy, House wiring, Welding and Blacksmithy trades with detailed sketches and procedures.",
+  },
+  {
+    _id: "core-lab-ce-1",
+    title: "Surveying Field Work & Mapping Practical Manual",
+    subject: "Surveying Field Work Lab",
+    subjectCode: "23A01201P",
+    branch: "CE",
+    semester: "1-2",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Lab Program",
+    icon: "🧪",
+    description: "Profile leveling, Contouring, Theodolite traversing, Triangulation, Height and distance determination experiments.",
+  },
+  {
+    _id: "core-lab-eee-1",
+    title: "Electrical Circuits & Simulation Lab - Verified Experiments",
+    subject: "Electrical Circuits Laboratory",
+    subjectCode: "23A02201P",
+    branch: "EEE",
+    semester: "1-2",
+    year: "1st Year",
+    regulation: "R23",
+    type: "Lab Program",
+    icon: "🧪",
+    description: "Verification of Kirchhoff's Laws, Superposition, Thevenin's, Norton's theorems and series/parallel resonance circuits.",
+  },
+
+  // -----------------------------------------------------------------------
+  // Official Syllabus Copies
+  // -----------------------------------------------------------------------
   {
     _id: "core-syl-r23-cse",
     title: "JNTUA R23 CSE B.Tech Complete Course Structure & Syllabus",
@@ -261,7 +599,58 @@ const FALLBACK_CORE_RESOURCES = [
     icon: "📚",
     description: "Official R23 regulation syllabus for AIML, covering Deep Learning, NLP, Data Science, Vision and Robotics.",
   },
+  {
+    _id: "core-syl-r23-ece",
+    title: "JNTUA R23 ECE B.Tech Complete Course Structure & Syllabus",
+    subject: "Electronics & Communication Curriculum",
+    branch: "ECE",
+    semester: "All Semesters",
+    year: "1st - 4th Year",
+    regulation: "R23",
+    type: "Syllabus",
+    icon: "📚",
+    description: "Official R23 scheme for ECE: Analog circuits, Digital systems, Antennas, VLSI, DSP and Wireless communications.",
+  },
+  {
+    _id: "core-syl-r23-me",
+    title: "JNTUA R23 Mechanical Engineering Complete Syllabus & Scheme",
+    subject: "Mechanical Engineering Curriculum",
+    branch: "ME",
+    semester: "All Semesters",
+    year: "1st - 4th Year",
+    regulation: "R23",
+    type: "Syllabus",
+    icon: "📚",
+    description: "APSCHE R23 official course structure for Mechanical Engineering covering Thermal, Design, Manufacturing and Robotics.",
+  },
+  {
+    _id: "core-syl-r23-ce",
+    title: "JNTUA R23 Civil Engineering Course Structure & Syllabus",
+    subject: "Civil Engineering Curriculum",
+    branch: "CE",
+    semester: "All Semesters",
+    year: "1st - 4th Year",
+    regulation: "R23",
+    type: "Syllabus",
+    icon: "📚",
+    description: "Official R23 syllabus for Civil Engineering: Structural, Geotechnical, Environmental, Water Resources & Transportation.",
+  },
+  {
+    _id: "core-syl-r23-eee",
+    title: "JNTUA R23 Electrical & Electronics Engineering Course Syllabus",
+    subject: "Electrical & Electronics Curriculum",
+    branch: "EEE",
+    semester: "All Semesters",
+    year: "1st - 4th Year",
+    regulation: "R23",
+    type: "Syllabus",
+    icon: "📚",
+    description: "APSCHE R23 scheme for EEE: Power Systems, Electrical Machines, Control Systems, Power Electronics and Smart Grids.",
+  },
+
+  // -----------------------------------------------------------------------
   // Notifications
+  // -----------------------------------------------------------------------
   {
     _id: "core-notif-1",
     title: "JNTUA B.Tech R20/R23 Semester End Examination Timetable 2024-25",
@@ -646,6 +1035,117 @@ export async function performSearch(query, options = {}) {
     relatedSubjects,
     suggestedQueries,
     categoryCounts,
+  };
+}
+
+/**
+ * Detect if a user query corresponds to an engineering branch
+ */
+export function detectBranchFromQuery(rawQuery) {
+  if (!rawQuery || typeof rawQuery !== "string") return null;
+
+  const q = rawQuery.toLowerCase().trim().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, " ").replace(/\s+/g, " ");
+  const words = q.split(" ").filter(Boolean);
+
+  for (const branch of Object.values(BRANCH_DIRECTORY)) {
+    // Exact code match
+    if (words.includes(branch.code.toLowerCase()) || q === branch.code.toLowerCase()) {
+      return branch;
+    }
+
+    // Alias matches
+    for (const alias of branch.aliases) {
+      const aliasClean = alias.toLowerCase().trim();
+      if (q === aliasClean || words.includes(aliasClean)) {
+        return branch;
+      }
+      // Substring check for multi-word aliases like "computer science"
+      if (aliasClean.includes(" ") && q.includes(aliasClean)) {
+        return branch;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Retrieve comprehensive academic hub data for an engineering branch
+ * Gathers notes, question papers, syllabus, lab programs, and 8-semester curriculum
+ */
+export async function getBranchHubData(branchCodeOrQuery) {
+  const branchObj =
+    typeof branchCodeOrQuery === "object" && branchCodeOrQuery.code
+      ? branchCodeOrQuery
+      : detectBranchFromQuery(branchCodeOrQuery) || BRANCH_DIRECTORY[String(branchCodeOrQuery).toUpperCase()] || BRANCH_DIRECTORY.CSE;
+
+  const code = branchObj.code;
+  const allResources = await getAllResources();
+
+  // Normalize matching helper
+  const matchesBranch = (item) => {
+    const itemBranch = String(item.branch || item.department || "").toUpperCase();
+    if (!itemBranch) return false;
+    if (itemBranch === code) return true;
+    if (code === "ME" && (itemBranch === "MECH" || itemBranch === "MECHANICAL")) return true;
+    if (code === "CE" && (itemBranch === "CIVIL")) return true;
+    if (code === "CSE" && (itemBranch === "CS" || itemBranch === "IT")) return true;
+    // Common 1st year subjects apply to all branches
+    if (itemBranch === "COMMON" || itemBranch === "ALL") return true;
+    return false;
+  };
+
+  const branchResources = allResources.filter(matchesBranch);
+
+  const notes = branchResources.filter((r) => r.type === "Notes");
+  const papers = branchResources.filter((r) => r.type === "Question Paper");
+  const syllabus = branchResources.filter((r) => r.type === "Syllabus");
+  const labs = branchResources.filter((r) => r.type === "Lab Program");
+
+  // Construct 8 semester curriculum from R23_SUBJECTS_BY_BRANCH_SEM
+  const semesters = [];
+  for (let semNum = 1; semNum <= 8; semNum++) {
+    const key = `${code}-${semNum}`;
+    const subjects = (R23_SUBJECTS_BY_BRANCH_SEM && R23_SUBJECTS_BY_BRANCH_SEM[key]) || [];
+    const yearLabel = semNum <= 2 ? "1st Year" : semNum <= 4 ? "2nd Year" : semNum <= 6 ? "3rd Year" : "4th Year";
+    const semName = `${yearLabel}, Sem ${((semNum - 1) % 2) + 1} (${Math.ceil(semNum / 2)}-${((semNum - 1) % 2) + 1})`;
+
+    semesters.push({
+      semNum,
+      semName,
+      subjects: subjects.map((s) => ({
+        name: s.name,
+        credits: s.credits,
+        isLab: s.name.toLowerCase().includes("lab") || s.name.toLowerCase().includes("laboratory"),
+      })),
+    });
+  }
+
+  // Follow-up query recommendations
+  const suggestions = [
+    `${code} 1st Year Notes`,
+    `${code} Question Papers`,
+    `${code} Lab Manuals`,
+    `R23 ${code} Syllabus`,
+    `📊 ${code} CGPA Calculator`,
+  ];
+
+  return {
+    branch: branchObj,
+    totalCount: branchResources.length,
+    counts: {
+      notes: notes.length,
+      papers: papers.length,
+      syllabus: syllabus.length,
+      labs: labs.length,
+    },
+    notes,
+    papers,
+    syllabus,
+    labs,
+    allResources: branchResources,
+    semesters,
+    suggestions,
   };
 }
 

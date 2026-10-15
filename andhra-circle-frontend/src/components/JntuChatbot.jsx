@@ -1,11 +1,257 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { BorderBeam } from "border-beam";
 import { BotAvatar } from "bot-avatars";
 import { MetalFx, useMetalBend } from "metal-fx";
 import { ThinkingOrb } from "thinking-orbs";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
-import { performSearch, formatResourceAction } from "../utils/searchEngine";
+import {
+  performSearch,
+  formatResourceAction,
+  detectBranchFromQuery,
+  getBranchHubData,
+  BRANCH_DIRECTORY,
+} from "../utils/searchEngine";
+
+/**
+ * Interactive Branch Showcase component rendered inside chatbot messages.
+ * Allows filtering branch content by All, Notes, Papers, Syllabus, Labs, and Curriculum.
+ */
+function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
+  const [activeTab, setActiveTab] = useState("all");
+  const navigate = useNavigate();
+
+  if (!hub || !hub.branch) return null;
+  const { branch, counts, semesters } = hub;
+
+  const currentItems =
+    activeTab === "all"
+      ? hub.allResources
+      : activeTab === "notes"
+      ? hub.notes
+      : activeTab === "papers"
+      ? hub.papers
+      : activeTab === "syllabus"
+      ? hub.syllabus
+      : activeTab === "labs"
+      ? hub.labs
+      : [];
+
+  return (
+    <div className="chat-branch-hub">
+      {/* Branch Header Banner */}
+      <div className="chat-branch-header">
+        <div className="chat-branch-icon">{branch.icon || "🎓"}</div>
+        <div className="chat-branch-title-box">
+          <h4>{branch.name} ({branch.code})</h4>
+          <p>{branch.description}</p>
+        </div>
+      </div>
+
+      {/* Interactive Category Filter Tabs */}
+      <div className="chat-branch-tabs">
+        <button
+          type="button"
+          className={`chat-branch-tab ${activeTab === "all" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("all")}
+        >
+          📂 All ({hub.totalCount})
+        </button>
+        <button
+          type="button"
+          className={`chat-branch-tab ${activeTab === "notes" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("notes")}
+        >
+          📘 Notes ({counts.notes})
+        </button>
+        <button
+          type="button"
+          className={`chat-branch-tab ${activeTab === "papers" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("papers")}
+        >
+          📝 Papers ({counts.papers})
+        </button>
+        <button
+          type="button"
+          className={`chat-branch-tab ${activeTab === "syllabus" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("syllabus")}
+        >
+          📑 Syllabus ({counts.syllabus})
+        </button>
+        <button
+          type="button"
+          className={`chat-branch-tab ${activeTab === "labs" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("labs")}
+        >
+          💻 Labs ({counts.labs})
+        </button>
+        <button
+          type="button"
+          className={`chat-branch-tab ${activeTab === "curriculum" ? "is-active" : ""}`}
+          onClick={() => setActiveTab("curriculum")}
+        >
+          🗓️ Curriculum (8 Sems)
+        </button>
+      </div>
+
+      {/* Direct Quick Action Links */}
+      <div className="chat-branch-quick-links">
+        <button
+          type="button"
+          className="chat-branch-link-btn"
+          onClick={() => {
+            onCloseModal();
+            navigate(`/notes?branch=${branch.code}`);
+          }}
+        >
+          📘 {branch.code} Notes Portal →
+        </button>
+        <button
+          type="button"
+          className="chat-branch-link-btn"
+          onClick={() => {
+            onCloseModal();
+            navigate(`/papers?branch=${branch.code}`);
+          }}
+        >
+          📝 {branch.code} Question Papers →
+        </button>
+        <button
+          type="button"
+          className="chat-branch-link-btn"
+          onClick={() => {
+            onCloseModal();
+            navigate(`/syllabus?branch=${branch.code}`);
+          }}
+        >
+          📑 {branch.code} Syllabus →
+        </button>
+        <button
+          type="button"
+          className="chat-branch-link-btn"
+          onClick={() => {
+            onCloseModal();
+            navigate(`/lab-programs?branch=${branch.code}`);
+          }}
+        >
+          🔬 {branch.code} Lab Manuals →
+        </button>
+      </div>
+
+      {/* Tab Content Display */}
+      {activeTab === "curriculum" ? (
+        <div className="chat-curriculum-list">
+          {semesters.map((sem) => (
+            <div key={sem.semNum} className="chat-sem-card">
+              <div className="chat-sem-title">
+                <span>{sem.semName}</span>
+                <span style={{ fontSize: "9px", color: "#94a3b8" }}>
+                  {sem.subjects.length} Subjects
+                </span>
+              </div>
+              <div className="chat-sem-subjects-wrap">
+                {sem.subjects.map((sub, sIdx) => (
+                  <button
+                    key={sIdx}
+                    type="button"
+                    className="chat-sem-sub-pill"
+                    onClick={() => onSelectQuery(`${sub.name} notes`)}
+                    title={`Find notes and syllabus for ${sub.name}`}
+                  >
+                    <span>{sub.isLab ? "💻" : "📚"}</span>
+                    <span>{sub.name}</span>
+                    <span className="chat-sem-sub-credits">({sub.credits}C)</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="chat-result-cards">
+          {currentItems.length === 0 ? (
+            <div style={{ padding: "12px", textAlign: "center", color: "#94a3b8", fontSize: "11px" }}>
+              No {activeTab} recorded yet for {branch.code}. Check other categories or open the full catalog.
+            </div>
+          ) : (
+            currentItems.map((resItem, rIdx) => {
+              const action = formatResourceAction(resItem);
+              const typeClass =
+                resItem.type === "Notes" ? "chat-tag-notes"
+                : resItem.type === "Question Paper" ? "chat-tag-paper"
+                : resItem.type === "Syllabus" ? "chat-tag-syllabus"
+                : resItem.type === "Lab Program" ? "chat-tag-lab"
+                : "chat-tag-notif";
+
+              return (
+                <div
+                  key={resItem._id || rIdx}
+                  className="chat-result-card"
+                  onClick={() => {
+                    onCloseModal();
+                    navigate(action.path);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      onCloseModal();
+                      navigate(action.path);
+                    }
+                  }}
+                >
+                  <div className="chat-result-top-row">
+                    <span className={`chat-result-type-tag ${typeClass}`}>
+                      <span>{resItem.icon || "📄"}</span>
+                      <span>{resItem.type}</span>
+                    </span>
+                    {resItem.subjectCode && (
+                      <span className="chat-result-badge">{resItem.subjectCode}</span>
+                    )}
+                  </div>
+
+                  <h5 className="chat-result-title">{resItem.title}</h5>
+
+                  {resItem.description && (
+                    <p className="chat-result-desc">{resItem.description}</p>
+                  )}
+
+                  <div className="chat-result-badges">
+                    {resItem.branch && (
+                      <span className="chat-result-badge">Dept: {resItem.branch}</span>
+                    )}
+                    {resItem.semester && (
+                      <span className="chat-result-badge">Sem: {resItem.semester}</span>
+                    )}
+                    {resItem.regulation && (
+                      <span className="chat-result-badge">{resItem.regulation}</span>
+                    )}
+                  </div>
+
+                  <div className="chat-result-btn-row">
+                    <span style={{ fontSize: "10px", color: "#94a3b8" }}>
+                      {resItem.subject || resItem.type}
+                    </span>
+                    <button
+                      type="button"
+                      className="chat-result-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCloseModal();
+                        navigate(action.path);
+                      }}
+                    >
+                      <span>{action.label}</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function JntuChatbot() {
   const [messages, setMessages] = useState([]);
@@ -284,12 +530,29 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 5. ACCURATE ACADEMIC SEARCH & RELATED CONTENT DISCOVERY
+    // 5. ACCURATE ACADEMIC SEARCH & BRANCH HUB CONTENT
     // =========================================================
+    // Check if the query is asking about a specific engineering branch (CSE, AIML, ECE, ME, CE, EEE)
+    const detectedBranch = detectBranchFromQuery(rawQuery);
+    if (detectedBranch) {
+      const branchHub = await getBranchHubData(detectedBranch);
+      return {
+        text: `Here is all official academic content & verified curriculum for ${branchHub.branch.name} (${branchHub.branch.code}):`,
+        isBranch: true,
+        branchHub,
+        action: {
+          label: `Browse ${branchHub.branch.code} in Full Catalog →`,
+          path: `/search?query=${encodeURIComponent(branchHub.branch.code)}`,
+        },
+        suggestions: branchHub.suggestions,
+      };
+    }
+
     const searchRes = await performSearch(rawQuery);
 
     if (searchRes.results && searchRes.results.length > 0) {
-      const topItems = searchRes.results.slice(0, 3).map((item) => {
+      // Display matched items for comprehensive query coverage
+      const allItems = searchRes.results.map((item) => {
         const action = formatResourceAction(item);
         return {
           ...item,
@@ -300,7 +563,7 @@ function JntuChatbot() {
 
       return {
         text: `Found ${searchRes.results.length} verified academic resource${searchRes.results.length > 1 ? "s" : ""} matching "${rawQuery}":`,
-        matchedResources: topItems,
+        matchedResources: allItems,
         relatedResources: searchRes.relatedResources,
         relatedSubjects: searchRes.relatedSubjects,
         action: {
@@ -376,6 +639,8 @@ function JntuChatbot() {
         matchedResources: responseData.matchedResources,
         relatedResources: responseData.relatedResources,
         relatedSubjects: responseData.relatedSubjects,
+        isBranch: responseData.isBranch,
+        branchHub: responseData.branchHub,
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -447,96 +712,87 @@ function JntuChatbot() {
           HERO HOME COMMAND BAR (CLEAN TRIGGER BAR)
           ========================================================= */}
       <div className="hero-ai-bar-anchor">
-        <BorderBeam
-          size="sm"
-          colorVariant="gold"
-          strength={0.5}
-          active={true}
-          theme="dark"
-          borderRadius={18}
-          className="hero-ai-beam"
-        >
-          <form className="hero-ai-bar" onSubmit={handleHeroSubmit}>
-            <div
-              className="hero-ai-avatar-badge"
-              title="Click to open JNTU AI Chatbot"
-              onClick={() => {
-                setIsModalOpen(true);
-                if (messages.length === 0) {
-                  handleSend("Hi");
-                }
-              }}
-            >
-              <BotAvatar
-                type="ghost"
-                color="#FFFFFF"
-                size={32}
-                state={isTyping ? "working" : "default"}
-              />
-            </div>
-
-            <input
-              ref={inputRef}
-              type="text"
-              className="hero-ai-input"
-              placeholder="Ask JNTU AI or say 'Build my student profile'..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleHeroKeyDown}
-              aria-label="Ask JNTU AI"
-              autoComplete="off"
+        <form className="hero-ai-bar" onSubmit={handleHeroSubmit}>
+          <div
+            className="hero-ai-avatar-badge"
+            title="Click to open JNTU AI Chatbot"
+            onClick={() => {
+              setIsModalOpen(true);
+              if (messages.length === 0) {
+                handleSend("Hi");
+              }
+            }}
+          >
+            <BotAvatar
+              type="ghost"
+              color="#FFFFFF"
+              size={32}
+              state={isTyping ? "working" : "default"}
             />
+          </div>
 
-            {/* ACTION CONTROLS */}
-            <div className="hero-ai-send-wrapper">
-              {hasHeroInput && (
-                <button
-                  type="button"
-                  className="hero-ai-clear-btn"
-                  onClick={() => setInput("")}
-                  title="Clear input"
-                  aria-label="Clear input"
-                >
-                  ✕
-                </button>
-              )}
+          <input
+            ref={inputRef}
+            type="text"
+            className="hero-ai-input"
+            placeholder="Ask JNTU AI or say 'Build my student profile' or enter branch (CSE, AIML, ECE)..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleHeroKeyDown}
+            aria-label="Ask JNTU AI"
+            autoComplete="off"
+            style={{ outline: "none", border: "none", boxShadow: "none" }}
+          />
 
-              <MetalFx
-                ref={sendMetalRef}
-                preset="chromatic"
-                variant="circle"
-                theme="dark"
-                strength={1}
-                innerShadow
-                className="hero-ai-metal-send-wrapper"
+          {/* ACTION CONTROLS */}
+          <div className="hero-ai-send-wrapper">
+            {hasHeroInput && (
+              <button
+                type="button"
+                className="hero-ai-clear-btn"
+                onClick={() => setInput("")}
+                title="Clear input"
+                aria-label="Clear input"
               >
-                <button
-                  type="submit"
-                  className="hero-ai-send-btn"
-                  aria-label="Send query and open overlay"
-                  disabled={!hasHeroInput}
-                  title="Send query"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </button>
-              </MetalFx>
-            </div>
-          </form>
-        </BorderBeam>
+                ✕
+              </button>
+            )}
 
-        {/* Clean, centered Quick Launch Chip for Student Profile Builder */}
+            <MetalFx
+              ref={sendMetalRef}
+              preset="chromatic"
+              variant="circle"
+              theme="dark"
+              strength={1}
+              innerShadow
+              className="hero-ai-metal-send-wrapper"
+            >
+              <button
+                type="submit"
+                className="hero-ai-send-btn"
+                aria-label="Send query and open overlay"
+                disabled={!hasHeroInput}
+                title="Send query"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </button>
+            </MetalFx>
+          </div>
+        </form>
+
+        {/* Quick Launch Chips for Student Profile & Branch Hubs */}
         <div className="hero-ai-starter-chips">
           <button
             type="button"
@@ -544,7 +800,55 @@ function JntuChatbot() {
             onClick={handleStartProfileBuilder}
           >
             <span className="starter-pill-sparkle">✨</span>
-            <span>Build your Student Profile using AI Chatbot</span>
+            <span>Build Student Profile</span>
+          </button>
+          <button
+            type="button"
+            className="hero-ai-quick-pill"
+            onClick={() => handleSend("CSE")}
+          >
+            <span className="hero-ai-pill-icon">💻</span>
+            <span>CSE</span>
+          </button>
+          <button
+            type="button"
+            className="hero-ai-quick-pill"
+            onClick={() => handleSend("AIML")}
+          >
+            <span className="hero-ai-pill-icon">🤖</span>
+            <span>AIML</span>
+          </button>
+          <button
+            type="button"
+            className="hero-ai-quick-pill"
+            onClick={() => handleSend("ECE")}
+          >
+            <span className="hero-ai-pill-icon">📡</span>
+            <span>ECE</span>
+          </button>
+          <button
+            type="button"
+            className="hero-ai-quick-pill"
+            onClick={() => handleSend("Mechanical")}
+          >
+            <span className="hero-ai-pill-icon">⚙️</span>
+            <span>ME</span>
+          </button>
+          <button
+            type="button"
+            className="hero-ai-quick-pill"
+            onClick={() => handleSend("Civil")}
+          >
+            <span className="hero-ai-pill-icon">🏗️</span>
+            <span>Civil</span>
+          </button>
+          <button
+            type="button"
+            className="hero-ai-quick-pill"
+            onClick={() => handleSend("EEE")}
+          >
+            <span className="hero-ai-pill-icon">⚡</span>
+            <span>EEE</span>
           </button>
         </div>
       </div>
@@ -620,23 +924,51 @@ function JntuChatbot() {
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
+                      onClick={() => handleSend("CSE")}
+                    >
+                      💻 CSE Hub
+                    </button>
+                    <button
+                      type="button"
+                      className="chat-modal-sugg-pill"
+                      onClick={() => handleSend("AIML")}
+                    >
+                      🤖 AIML Hub
+                    </button>
+                    <button
+                      type="button"
+                      className="chat-modal-sugg-pill"
+                      onClick={() => handleSend("ECE")}
+                    >
+                      📡 ECE Hub
+                    </button>
+                    <button
+                      type="button"
+                      className="chat-modal-sugg-pill"
+                      onClick={() => handleSend("Mechanical")}
+                    >
+                      ⚙️ ME Hub
+                    </button>
+                    <button
+                      type="button"
+                      className="chat-modal-sugg-pill"
+                      onClick={() => handleSend("Civil")}
+                    >
+                      🏗️ Civil Hub
+                    </button>
+                    <button
+                      type="button"
+                      className="chat-modal-sugg-pill"
+                      onClick={() => handleSend("EEE")}
+                    >
+                      ⚡ EEE Hub
+                    </button>
+                    <button
+                      type="button"
+                      className="chat-modal-sugg-pill"
                       onClick={() => handleSend("CGPA & SGPA Calculator")}
                     >
                       📊 CGPA Calculator
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("Student Profile")}
-                    >
-                      👤 Student Profile
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("Notes for AIML")}
-                    >
-                      📘 AIML Notes
                     </button>
                   </div>
                 </div>
@@ -695,6 +1027,15 @@ function JntuChatbot() {
                                 </div>
                               </div>
                             </div>
+                          )}
+
+                          {/* Interactive Branch Hub View (Shows all content when branch name is queried) */}
+                          {msg.isBranch && msg.branchHub && (
+                            <BranchHubView
+                              hub={msg.branchHub}
+                              onSelectQuery={(q) => handleSend(q)}
+                              onCloseModal={handleCloseModal}
+                            />
                           )}
 
                           {/* Interactive Academic Resource Cards */}

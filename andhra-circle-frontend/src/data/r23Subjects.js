@@ -394,6 +394,84 @@ export const R23_SUBJECTS_BY_BRANCH_SEM = {
   "CE-8": [
     { name: "Full Semester Industrial Internship / Major Project", credits: 12, grade: "O" },
   ],
+
+  // =======================================================================
+  // 6. ELECTRICAL & ELECTRONICS ENGINEERING (EEE)
+  // =======================================================================
+  "EEE-1": [
+    { name: "Communicative English", credits: 3, grade: "A+" },
+    { name: "Linear Algebra & Calculus", credits: 3, grade: "A+" },
+    { name: "Engineering Chemistry", credits: 3, grade: "O" },
+    { name: "Basic Civil & Mechanical Engineering", credits: 3, grade: "A" },
+    { name: "Introduction to Programming (C/Python)", credits: 3, grade: "O" },
+    { name: "Communicative English Laboratory", credits: 1.5, grade: "O" },
+    { name: "Engineering Chemistry Laboratory", credits: 1.5, grade: "O" },
+    { name: "Computer Programming Laboratory", credits: 1.5, grade: "O" },
+    { name: "Health and Wellness / Yoga & Sports", credits: 0.5, grade: "O" },
+  ],
+  "EEE-2": [
+    { name: "Differential Equations & Vector Calculus", credits: 3, grade: "A+" },
+    { name: "Engineering Physics", credits: 3, grade: "O" },
+    { name: "Basic Electrical & Electronics Engineering", credits: 3, grade: "A" },
+    { name: "Engineering Graphics & Modeling", credits: 3, grade: "A+" },
+    { name: "Electrical Circuit Analysis", credits: 3, grade: "O" },
+    { name: "Engineering Physics Laboratory", credits: 1.5, grade: "O" },
+    { name: "Electrical Circuits Laboratory", credits: 1.5, grade: "O" },
+    { name: "Basic Workshop / IT Work Practice", credits: 1.5, grade: "O" },
+    { name: "NSS / NCC / Community Service Project", credits: 0.5, grade: "O" },
+  ],
+  "EEE-3": [
+    { name: "Electromagnetic Fields", credits: 3, grade: "O" },
+    { name: "Electrical Machines - I (DC Machines & Transformers)", credits: 3, grade: "O" },
+    { name: "Electronic Devices & Analog Circuits", credits: 3, grade: "A+" },
+    { name: "Network Theory & Signals", credits: 3, grade: "A" },
+    { name: "Complex Variables & Numerical Methods", credits: 3, grade: "A+" },
+    { name: "Electrical Machines - I Laboratory", credits: 1.5, grade: "O" },
+    { name: "Analog Electronics Laboratory", credits: 1.5, grade: "O" },
+    { name: "Electrical Simulation & CAD Skill Lab", credits: 2, grade: "O" },
+    { name: "Environmental Science (Mandatory)", credits: 0.5, grade: "O" },
+  ],
+  "EEE-4": [
+    { name: "Electrical Machines - II (AC Machines)", credits: 3, grade: "O" },
+    { name: "Power Systems - I (Generation & Transmission)", credits: 3, grade: "A+" },
+    { name: "Digital Logic Design & Microcontrollers", credits: 3, grade: "A+" },
+    { name: "Control Systems Engineering", credits: 3, grade: "O" },
+    { name: "Thermal & Prime Movers Engineering", credits: 3, grade: "A" },
+    { name: "Electrical Machines - II Laboratory", credits: 1.5, grade: "O" },
+    { name: "Control Systems & Microcontrollers Lab", credits: 1.5, grade: "O" },
+    { name: "MATLAB & IoT for Power Systems Lab", credits: 2, grade: "O" },
+  ],
+  "EEE-5": [
+    { name: "Power Electronics", credits: 3, grade: "O" },
+    { name: "Power Systems - II (Operation & Control)", credits: 3, grade: "A+" },
+    { name: "Measurements & Instrumentation", credits: 3, grade: "A" },
+    { name: "Microprocessor Architecture & Interfacing", credits: 3, grade: "A+" },
+    { name: "Professional Elective - I (Renewable Energy Systems)", credits: 3, grade: "O" },
+    { name: "Power Electronics Laboratory", credits: 1.5, grade: "O" },
+    { name: "Measurements & Instrumentation Lab", credits: 1.5, grade: "O" },
+    { name: "Community Service Project / Internship", credits: 2, grade: "O" },
+  ],
+  "EEE-6": [
+    { name: "Power System Protection & Switchgear", credits: 3, grade: "O" },
+    { name: "Electric Drives & Control", credits: 3, grade: "O" },
+    { name: "Smart Grid Technologies & EV Systems", credits: 3, grade: "A+" },
+    { name: "Professional Elective - II (High Voltage Engineering)", credits: 3, grade: "A" },
+    { name: "Open Elective - I", credits: 3, grade: "A" },
+    { name: "Power Systems Simulation Lab", credits: 1.5, grade: "O" },
+    { name: "Electric Vehicles & Drives Lab", credits: 1.5, grade: "O" },
+    { name: "Technical Seminar & Project Planning", credits: 2, grade: "O" },
+  ],
+  "EEE-7": [
+    { name: "Utilization of Electrical Energy & Traction", credits: 3, grade: "O" },
+    { name: "Professional Elective - III (Power Quality & FACTS)", credits: 3, grade: "A+" },
+    { name: "Professional Elective - IV (AI in Power Engineering)", credits: 3, grade: "A+" },
+    { name: "Open Elective - II", credits: 3, grade: "A" },
+    { name: "Universal Human Values & Professional Ethics", credits: 3, grade: "O" },
+    { name: "Capstone Major Project - Phase 1", credits: 3, grade: "O" },
+  ],
+  "EEE-8": [
+    { name: "Full Semester Industrial Internship / Major Project", credits: 12, grade: "O" },
+  ],
 };
 
 // Flattened global subject dictionary for ultra-fast instant credit lookup
