@@ -1,328 +1,260 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import API from "../api/api";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import "./UploadMaterials.css";
-
-const MATERIAL_TYPES = [
-  {
-    id: "notes",
-    title: "Lecture Notes",
-    desc: "Complete module notes, handwritten faculty guides, and unit blueprints.",
-    icon: "📘",
-    path: "/upload-note",
-    color: "#0f766e",
-  },
-  {
-    id: "papers",
-    title: "Question Papers",
-    desc: "Previous university mid-term & semester end examination papers.",
-    icon: "📝",
-    path: "/upload-paper",
-    color: "#0284c7",
-  },
-  {
-    id: "syllabus",
-    title: "Syllabus Copies",
-    desc: "Official university academic curriculum, course outcomes & unit structure.",
-    icon: "📜",
-    path: "/upload-syllabus",
-    color: "#7c3aed",
-  },
-  {
-    id: "labs",
-    title: "Lab Programs",
-    desc: "Practical manuals, verified lab code implementations, and viva voce banks.",
-    icon: "💻",
-    path: "/upload-lab-program",
-    color: "#059669",
-  },
-  {
-    id: "notifications",
-    title: "Academic Circulars",
-    desc: "Official university exam timetables, fee notifications, and academic calendars.",
-    icon: "📢",
-    path: "/upload-notification",
-    color: "#ea580c",
-  },
-];
 
 export default function UploadMaterials() {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState("notes");
-  const [title, setTitle] = useState("");
-  const [branch, setBranch] = useState("AIML");
-  const [semester, setSemester] = useState("6th Sem");
-  const [regulation, setRegulation] = useState("R20");
-  const [faculty, setFaculty] = useState("");
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState({ type: "", text: "" });
+  const [uploadForm, setUploadForm] = useState({
+    materialType: "",
+    comment: "",
+    name: "",
+    email: "",
+  });
 
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
     }
   };
 
-  const handleQuickUpload = async (e) => {
-    e.preventDefault();
-    if (!title.trim()) {
-      setStatusMsg({ type: "error", text: "Please enter the title / subject name." });
+  const handleUploadFormChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === "materialType") {
+      setSelectedFile(null);
+    }
+
+    setUploadForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0] || null;
+
+    if (file && (file.type !== "application/pdf" || file.size > 20 * 1024 * 1024)) {
+      setSelectedFile(null);
+      event.target.value = "";
+      setSubmitMessage({
+        type: "error",
+        text:
+          file.type !== "application/pdf"
+            ? "Please choose a PDF file."
+            : "The PDF file must be 20 MB or smaller.",
+      });
       return;
     }
-    if (!file) {
-      setStatusMsg({ type: "error", text: "Please select a PDF document to upload." });
+
+    setSelectedFile(file);
+    setSubmitMessage({ type: "", text: "" });
+  };
+
+  const handleUploadSubmit = async (event) => {
+    event.preventDefault();
+
+    const { materialType, comment, name, email } = uploadForm;
+
+    if (!materialType || !name.trim() || !email.trim()) {
+      setSubmitMessage({
+        type: "error",
+        text: "Please select a material type and fill in your name and email.",
+      });
+      return;
+    }
+
+    if (materialType === "notes" && !selectedFile) {
+      setSubmitMessage({
+        type: "error",
+        text: "Please attach the PDF notes you want to upload.",
+      });
       return;
     }
 
     try {
-      setUploading(true);
-      setStatusMsg({ type: "", text: "" });
+      setIsSubmitting(true);
+      setSubmitMessage({ type: "", text: "" });
 
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("subject", title);
-      formData.append("branch", branch);
-      formData.append("semester", semester);
-      formData.append("regulation", regulation);
-      formData.append("faculty", faculty || "Academic Faculty");
-      formData.append("pdf", file);
+      formData.append("materialType", materialType);
+      formData.append("comment", comment.trim());
+      formData.append("name", name.trim());
+      formData.append("email", email.trim());
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
 
-      // Submit to corresponding endpoint
-      let endpoint = "/notes";
-      if (selectedType === "papers") endpoint = "/papers";
-      else if (selectedType === "syllabus") endpoint = "/syllabus";
-      else if (selectedType === "labs") endpoint = "/lab-programs";
-      else if (selectedType === "notifications") endpoint = "/notifications";
-
-      await API.post(endpoint, formData, {
+      await API.post("/user-materials", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setStatusMsg({
+      setSubmitMessage({
         type: "success",
-        text: `Material "${title}" successfully uploaded to the JNTU academic repository!`,
+        text: "Your material submission has been saved successfully.",
       });
-      setTitle("");
-      setFaculty("");
-      setFile(null);
-    } catch (err) {
-      console.error("Upload error:", err);
-      // Fallback success feedback for student peer uploads
-      setStatusMsg({
-        type: "success",
-        text: `Material "${title}" submitted successfully for peer review!`,
+
+      setUploadForm({
+        materialType: "",
+        comment: "",
+        name: "",
+        email: "",
       });
-      setTitle("");
-      setFaculty("");
-      setFile(null);
+      setSelectedFile(null);
+
+      window.setTimeout(() => {
+        handleClose();
+      }, 1000);
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message || "Unable to submit your material right now.";
+
+      setSubmitMessage({
+        type: "error",
+        text: errorMessage,
+      });
     } finally {
-      setUploading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="upm-page-wrapper">
-      <Navbar />
+    <div
+      className="upload-modal-overlay upload-page-overlay"
+      onClick={handleClose}
+      role="presentation"
+    >
+      <div
+        className="upload-modal"
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upload-materials-title"
+      >
+        <button
+          type="button"
+          className="upload-modal-close"
+          onClick={handleClose}
+          aria-label="Close upload form"
+        >
+          ×
+        </button>
 
-      <main className="upm-main-container">
-        {/* Header Hero */}
-        <section className="upm-header-hero">
-          <div className="upm-hero-badge">
-            <span className="upm-badge-pulse" />
-            <span>Academic Contribution Hub</span>
-          </div>
-          <h1 className="upm-hero-title">Upload Study Materials</h1>
-          <p className="upm-hero-subtitle">
-            Contribute lecture notes, previous question papers, lab manuals, and syllabus copies to help thousands of JNTU engineering students.
-          </p>
-        </section>
+        <h2 id="upload-materials-title">Upload Materials</h2>
+        <p className="upload-modal-subtitle">
+          Upload notes, papers, syllabus, or lab programs in PDF format only.
+        </p>
 
-        {/* 5 Material Category Cards */}
-        <section className="upm-category-grid">
-          {MATERIAL_TYPES.map((cat) => (
-            <div
-              key={cat.id}
-              className={`upm-cat-card ${selectedType === cat.id ? "active" : ""}`}
-              onClick={() => setSelectedType(cat.id)}
+        <form className="upload-material-form" onSubmit={handleUploadSubmit}>
+          <label className="upload-field-label" htmlFor="material-type">
+            Material Type <span>*</span>
+          </label>
+          <div className="upload-select-wrap">
+            <select
+              id="material-type"
+              name="materialType"
+              value={uploadForm.materialType}
+              onChange={handleUploadFormChange}
+              className="upload-select"
+              required
             >
-              <div className="upm-cat-icon" style={{ backgroundColor: `${cat.color}15`, color: cat.color }}>
-                {cat.icon}
-              </div>
-              <h3 className="upm-cat-title">{cat.title}</h3>
-              <p className="upm-cat-desc">{cat.desc}</p>
-              <div className="upm-cat-actions">
-                <button
-                  type="button"
-                  className="upm-cat-select-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedType(cat.id);
-                  }}
-                >
-                  {selectedType === cat.id ? "Selected Form ✓" : "Upload Here"}
-                </button>
-                <button
-                  type="button"
-                  className="upm-cat-admin-link"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(cat.path);
-                  }}
-                  title="Open Dedicated Admin Uploader"
-                >
-                  Advanced ↗
-                </button>
-              </div>
-            </div>
-          ))}
-        </section>
-
-        {/* Direct Upload Form Card */}
-        <section className="upm-form-card">
-          <div className="upm-form-header">
-            <div>
-              <span className="upm-form-tag">
-                {MATERIAL_TYPES.find((m) => m.id === selectedType)?.title || "Lecture Notes"}
-              </span>
-              <h2 className="upm-form-title">Submit Academic Document</h2>
-              <p className="upm-form-sub">
-                Fill in the course details and attach your verified academic PDF document.
-              </p>
-            </div>
+              <option value="" disabled>
+                Select Material Type
+              </option>
+              <option value="notes">Notes</option>
+              <option value="syllabus">Syllabus</option>
+              <option value="question-papers">Question Papers or Solutions</option>
+              <option value="academic-report">Academic Report</option>
+              <option value="lab-manual">Lab Manual</option>
+            </select>
           </div>
 
-          {statusMsg.text && (
-            <div className={`upm-status-alert ${statusMsg.type === "error" ? "alert-error" : "alert-success"}`}>
-              {statusMsg.text}
+          {uploadForm.materialType === "notes" && (
+            <div className="upload-file-field">
+              <label className="upload-field-label" htmlFor="notes-file">
+                Notes PDF <span>*</span>
+              </label>
+              <input
+                id="notes-file"
+                name="file"
+                type="file"
+                accept="application/pdf,.pdf"
+                onChange={handleFileChange}
+                required
+              />
+              <span className="upload-file-hint">
+                PDF only, up to 20 MB.
+                {selectedFile ? ` Selected: ${selectedFile.name}` : ""}
+              </span>
             </div>
           )}
 
-          <form onSubmit={handleQuickUpload} className="upm-form-layout">
-            <div className="upm-form-grid">
-              <div className="upm-form-group span-2">
-                <label>Resource Title / Subject Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Deep Learning & Neural Networks Unit-1 to 5"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                  className="upm-input"
-                />
-              </div>
-
-              <div className="upm-form-group">
-                <label>Engineering Department *</label>
-                <select
-                  value={branch}
-                  onChange={(e) => setBranch(e.target.value)}
-                  className="upm-select"
-                >
-                  <option value="AIML">Artificial Intelligence & ML (AIML)</option>
-                  <option value="CSE">Computer Science & Engg (CSE)</option>
-                  <option value="ECE">Electronics & Communication (ECE)</option>
-                  <option value="EEE">Electrical & Electronics (EEE)</option>
-                  <option value="ME">Mechanical Engineering (ME)</option>
-                  <option value="CE">Civil Engineering (CE)</option>
-                </select>
-              </div>
-
-              <div className="upm-form-group">
-                <label>Semester *</label>
-                <select
-                  value={semester}
-                  onChange={(e) => setSemester(e.target.value)}
-                  className="upm-select"
-                >
-                  <option value="1st Sem">1st Semester (1-1)</option>
-                  <option value="2nd Sem">2nd Semester (1-2)</option>
-                  <option value="3rd Sem">3rd Semester (2-1)</option>
-                  <option value="4th Sem">4th Semester (2-2)</option>
-                  <option value="5th Sem">5th Semester (3-1)</option>
-                  <option value="6th Sem">6th Semester (3-2)</option>
-                  <option value="7th Sem">7th Semester (4-1)</option>
-                  <option value="8th Sem">8th Semester (4-2)</option>
-                </select>
-              </div>
-
-              <div className="upm-form-group">
-                <label>Academic Regulation *</label>
-                <select
-                  value={regulation}
-                  onChange={(e) => setRegulation(e.target.value)}
-                  className="upm-select"
-                >
-                  <option value="R23">R23 Regulation</option>
-                  <option value="R20">R20 Regulation</option>
-                  <option value="R19">R19 Regulation</option>
-                  <option value="R16">R16 Regulation</option>
-                </select>
-              </div>
-
-              <div className="upm-form-group">
-                <label>Faculty / Author Name (Optional)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Prof. K. S. Rao, Department of AIML"
-                  value={faculty}
-                  onChange={(e) => setFaculty(e.target.value)}
-                  className="upm-input"
-                />
-              </div>
-
-              {/* PDF File Drag / Picker */}
-              <div className="upm-form-group span-2">
-                <label>Attach PDF File *</label>
-                <div className="upm-file-dropzone">
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleFileChange}
-                    id="upm-file-input"
-                    className="upm-hidden-file"
-                  />
-                  <label htmlFor="upm-file-input" className="upm-dropzone-label">
-                    <div className="upm-dropzone-icon">📁</div>
-                    <div className="upm-dropzone-text">
-                      <strong>{file ? file.name : "Click to select or drag & drop PDF file"}</strong>
-                      <span>{file ? `${(file.size / 1024 / 1024).toFixed(2)} MB PDF selected` : "Supported formats: .PDF (Max 50MB)"}</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
+          <div className="upload-comment-box">
+            <div className="upload-avatar" aria-hidden="true">
+              👤
             </div>
+            <textarea
+              name="comment"
+              placeholder="Your Comment"
+              rows={4}
+              className="upload-comment-input"
+              value={uploadForm.comment}
+              onChange={handleUploadFormChange}
+            />
+          </div>
 
-            <div className="upm-submit-row">
-              <button
-                type="submit"
-                disabled={uploading}
-                className="upm-btn-submit"
-              >
-                {uploading ? (
-                  <>
-                    <span className="upm-spinner" />
-                    <span>Uploading Material...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                    <span>Submit & Publish Material</span>
-                  </>
-                )}
-              </button>
+          <div className="upload-input-row">
+            <span className="upload-input-icon" aria-hidden="true">
+              👤
+            </span>
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter your Name*"
+              value={uploadForm.name}
+              onChange={handleUploadFormChange}
+              required
+            />
+          </div>
+
+          <div className="upload-input-row">
+            <span className="upload-input-icon" aria-hidden="true">
+              @
+            </span>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your Email*"
+              value={uploadForm.email}
+              onChange={handleUploadFormChange}
+              required
+            />
+          </div>
+
+          {submitMessage.text && (
+            <div
+              className={`upload-form-message ${submitMessage.type === "error" ? "error" : "success"}`}
+            >
+              {submitMessage.text}
             </div>
-          </form>
-        </section>
-      </main>
+          )}
 
-      <Footer />
+          <div className="upload-submit-row">
+            <button
+              type="submit"
+              className="upload-submit-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Uploading..." : "Submit Material"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

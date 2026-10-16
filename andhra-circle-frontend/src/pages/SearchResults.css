@@ -1051,3 +1051,118 @@
     padding-right: 18px;
   }
 }
+
+/* =========================================================
+   SEARCH CATEGORY TABS & RELATED CONTENT PANEL
+   ========================================================= */
+
+.search-filter-tabs-wrapper {
+  max-width: 900px;
+  margin: 14px auto 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  scrollbar-width: none;
+}
+
+.search-filter-tabs-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.search-category-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #d0d7e2;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.search-category-tab:hover {
+  background: #ffffff;
+  border-color: #1f4fa3;
+  color: #1f4fa3;
+}
+
+.search-category-tab.active {
+  background: #1f4fa3;
+  border-color: #1f4fa3;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(31, 79, 163, 0.25);
+  font-weight: 600;
+}
+
+.search-tab-count {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.search-category-tab.active .search-tab-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Related Content & Suggestions Container */
+.search-related-panel {
+  max-width: 900px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.7) 0%, rgba(248, 250, 252, 0.85) 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.05);
+}
+
+.search-related-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e40af;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.search-related-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search-related-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.search-related-chip:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.2);
+}

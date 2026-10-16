@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "./LikeReactionButton";
 
 function QuestionPapers({ search = "" }) {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isStandalonePage = location.pathname.startsWith("/papers") || location.pathname !== "/";
 
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,10 +91,13 @@ function QuestionPapers({ search = "" }) {
   };
 
   const getPaperContext = (paper) => {
-    if (paper.description && paper.description.trim()) {
-      return paper.description;
+    if (paper && paper.description && paper.description.trim()) {
+      const desc = paper.description.trim();
+      if (!desc.toLowerCase().startsWith("previous university examination")) {
+        return desc;
+      }
     }
-    return `Previous university examination question paper for ${paper.branch || "engineering"} ${paper.semester || ""}.`;
+    return "";
   };
 
   const getPdfUrl = (pdfUrl) => {
@@ -279,6 +285,47 @@ function QuestionPapers({ search = "" }) {
     }
   };
 
+  // Render Top Navigation Bar with Back Button in the Left Corner
+  const renderTopBar = () => {
+    if (!isStandalonePage) return null;
+
+    return (
+      <div className="papers-page-topbar">
+        <button
+          type="button"
+          className="papers-back-btn"
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/");
+            }
+          }}
+          title="Go back to previous page"
+        >
+          <span className="papers-back-icon-wrap" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+          </span>
+          <span>Back</span>
+        </button>
+
+        <div className="papers-topbar-breadcrumb">
+          <button type="button" onClick={() => navigate("/")} className="papers-breadcrumb-link">
+            Home
+          </button>
+          <span className="papers-breadcrumb-slash">/</span>
+          <span className="papers-breadcrumb-current">
+            <span className="papers-breadcrumb-dot" aria-hidden="true" />
+            Question Papers
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   // ==========================================
   // LOADING UI
   // ==========================================
@@ -286,6 +333,7 @@ function QuestionPapers({ search = "" }) {
   if (loading) {
     return (
       <section className="papers-section">
+        {renderTopBar()}
         <div className="section-heading">
           <span className="section-tag">EXAM RESOURCES</span>
           <h2>Previous Question Papers</h2>
@@ -303,6 +351,7 @@ function QuestionPapers({ search = "" }) {
   if (error) {
     return (
       <section className="papers-section">
+        {renderTopBar()}
         <div className="section-heading">
           <span className="section-tag">EXAM RESOURCES</span>
           <h2>Previous Question Papers</h2>
@@ -326,6 +375,7 @@ function QuestionPapers({ search = "" }) {
 
   return (
     <section className="papers-section">
+      {renderTopBar()}
       <div className="section-heading">
         <span className="section-tag">EXAM RESOURCES</span>
         <h2>Previous Question Papers</h2>
@@ -370,9 +420,11 @@ function QuestionPapers({ search = "" }) {
                   {getPaperDisplayTitle(paper)}
                 </h3>
 
-                <p className="resource-desc">
-                  {getPaperContext(paper)}
-                </p>
+                {getPaperContext(paper) ? (
+                  <p className="resource-desc">
+                    {getPaperContext(paper)}
+                  </p>
+                ) : null}
 
                 {/* Metadata Chips */}
                 <div className="resource-meta-chips">
@@ -422,7 +474,7 @@ function QuestionPapers({ search = "" }) {
                   <div className="resource-stats-left">
                     <span className="stat-chip stat-chip-views" title={`${paper.views || 0} Total Views`}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                       <span className="stat-count">{paper.views || 0}</span>
@@ -456,7 +508,7 @@ function QuestionPapers({ search = "" }) {
                     onClick={() => handleView(paper)}
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z" />
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                     View PDF

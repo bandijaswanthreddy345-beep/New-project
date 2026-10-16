@@ -1,10 +1,11 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { MetalFx, useMetalBend } from "metal-fx";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import profile from "../assets/jaswanth.png.png";
 import StudentProfileModal from "../components/StudentProfileModal";
 import { getStoredStudentData } from "../data/studentData";
+import AuthorProfile from "../components/AuthorProfile";
 import "./Notes.css";
 
 // Branch definitions matching homepage engineering departments
@@ -12,100 +13,184 @@ const BRANCH_TABS = [
   {
     code: "CSE",
     name: "Computer Science Engineering",
-    keywords: ["computer", "cse", "cs"],
+    aliases: [
+      "computer science and engineering",
+      "computer science & engineering",
+      "computer science",
+      "cse",
+      "information science",
+      "information science engineering",
+      "ise",
+      "information technology",
+      "it",
+      "cs",
+    ],
   },
   {
     code: "ECE",
     name: "Electronics & Communication",
-    keywords: ["electronics", "ece", "ec"],
-  },
-  {
-    code: "EEE",
-    name: "Electrical & Electronics",
-    keywords: ["electrical", "eee", "ee"],
+    aliases: [
+      "electronics and communication",
+      "electronics and communication engineering",
+      "electronics & communication engineering",
+      "electronics",
+      "ece",
+    ],
   },
   {
     code: "ME",
     name: "Mechanical Engineering",
-    keywords: ["mechanical", "mech", "me"],
+    aliases: [
+      "mechanical",
+      "mechanical engg",
+      "mechanical engineering",
+      "mech",
+      "me",
+    ],
   },
   {
     code: "CE",
     name: "Civil Engineering",
-    keywords: ["civil", "ce"],
+    aliases: [
+      "civil",
+      "civil engineering",
+      "ce",
+    ],
   },
   {
     code: "AIML",
     name: "AI & Machine Learning",
-    keywords: ["artificial", "aiml", "machine", "ai"],
+    aliases: [
+      "artificial intelligence and machine learning",
+      "artificial intelligence & machine learning",
+      "artificial intelligence",
+      "machine learning",
+      "ai and machine learning",
+      "ai & machine learning",
+      "ai & data science",
+      "aiml",
+      "ai",
+      "ml",
+    ],
   },
 ];
 
-// Curated subjects for standard reference matching academic syllabus
-const CURATED_SUBJECTS = {
-  CSE: [
-    { title: "Data Structures", semester: "3rd Sem" },
-    { title: "Operating Systems", semester: "5th Sem" },
-    { title: "Database Management Systems", semester: "3rd Sem" },
-    { title: "Computer Networks", semester: "6th Sem" },
-  ],
-  ECE: [
-    { title: "Signals & Systems", semester: "3rd Sem" },
-    { title: "Digital Signal Processing", semester: "5th Sem" },
-    { title: "VLSI Design", semester: "6th Sem" },
-    { title: "Microprocessors & Microcontrollers", semester: "4th Sem" },
-  ],
-  EEE: [
-    { title: "Power Systems Analysis", semester: "5th Sem" },
-    { title: "Electrical Machines", semester: "3rd Sem" },
-    { title: "Control Systems Engineering", semester: "4th Sem" },
-    { title: "Power Electronics", semester: "6th Sem" },
-  ],
-  ME: [
-    { title: "Thermodynamics", semester: "3rd Sem" },
-    { title: "Fluid Mechanics", semester: "4th Sem" },
-    { title: "Design of Machine Elements", semester: "5th Sem" },
-    { title: "Manufacturing Technology", semester: "3rd Sem" },
-  ],
-  CE: [
-    { title: "Structural Analysis", semester: "4th Sem" },
-    { title: "Geotechnical Engineering", semester: "5th Sem" },
-    { title: "Surveying & Geomatics", semester: "3rd Sem" },
-    { title: "Transportation Engineering", semester: "6th Sem" },
-  ],
-  AIML: [
-    { title: "Deep Learning", semester: "7th Sem" },
-    { title: "Big Data Analytics", semester: "4th Sem" },
-    { title: "Machine Learning Fundamentals", semester: "5th Sem" },
-    { title: "Natural Language Processing", semester: "6th Sem" },
-  ],
+const normalizeBranch = (branch) =>
+  String(branch || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const noteMatchesBranch = (noteBranch, tab) => {
+  const normalizedBranch = normalizeBranch(noteBranch);
+  return [tab.code, tab.name, ...tab.aliases].some(
+    (branch) => normalizeBranch(branch) === normalizedBranch
+  );
 };
 
-function Notes() {
+// Resource Configuration for Unified Study Library Dashboard
+const RESOURCE_CONFIG = {
+  notes: {
+    key: "notes",
+    label: "Notes",
+    eyebrow: "JNTU Circle · Study Library",
+    title: "Notes & Study Materials",
+    subtitle: "Find lecture notes, module guides, and study resources for your engineering branch.",
+    searchPlaceholder: (branch) => `Search ${branch} notes, subjects, codes...`,
+    emptyTitle: "No Notes Available",
+    emptyDesc: "No study materials match your search or filter criteria for this department.",
+  },
+  papers: {
+    key: "papers",
+    label: "Question Papers",
+    eyebrow: "JNTU Circle · University Papers",
+    title: "Question Papers",
+    subtitle: "Access previous semester exam question papers, mid tests, and model papers.",
+    searchPlaceholder: (branch) => `Search ${branch} question papers, exams, years...`,
+    emptyTitle: "No Question Papers Available",
+    emptyDesc: "No examination papers match your search or filter criteria for this department.",
+  },
+  syllabus: {
+    key: "syllabus",
+    label: "Syllabus",
+    eyebrow: "JNTU Circle · Academic Curriculum",
+    title: "Syllabus",
+    subtitle: "Official university course curriculum, subject units, and academic regulations.",
+    searchPlaceholder: (branch) => `Search ${branch} syllabus, subjects, regulations...`,
+    emptyTitle: "No Syllabus Available",
+    emptyDesc: "No curriculum records match your search or filter criteria for this department.",
+  },
+  labs: {
+    key: "labs",
+    label: "Lab Programs",
+    eyebrow: "JNTU Circle · Laboratory Manuals",
+    title: "Lab Programs",
+    subtitle: "Practical experiment codes, laboratory records, and viva preparation manuals.",
+    searchPlaceholder: (branch) => `Search ${branch} lab programs, experiments, codes...`,
+    emptyTitle: "No Lab Programs Available",
+    emptyDesc: "No laboratory materials match your search or filter criteria for this department.",
+  },
+};
+
+// Format title helper
+const formatTitle = (raw) => {
+  if (!raw) return "";
+  return String(raw)
+    .split(" ")
+    .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ""))
+    .join(" ");
+};
+
+function Notes({ initialType }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Get initial branch from URL param or default to "CSE"
+  // Detect active resource type based on prop, route path, or query param
+  const getResourceFromPath = useCallback(() => {
+    if (initialType && RESOURCE_CONFIG[initialType]) return initialType;
+    if (location.pathname.startsWith("/papers")) return "papers";
+    if (location.pathname.startsWith("/syllabus")) return "syllabus";
+    if (location.pathname.startsWith("/lab-programs")) return "labs";
+    const typeParam = searchParams.get("type");
+    if (typeParam && RESOURCE_CONFIG[typeParam]) return typeParam;
+    return "notes";
+  }, [initialType, location.pathname, searchParams]);
+
+  const [activeResource, setActiveResource] = useState(getResourceFromPath);
+
+  // Sync resource type if route changes
+  useEffect(() => {
+    const detected = getResourceFromPath();
+    setActiveResource(detected);
+  }, [getResourceFromPath]);
+
+  // Initial branch from URL param or default to "CSE"
   const urlBranch = (searchParams.get("branch") || searchParams.get("search") || "CSE").toUpperCase();
-  const matchedTab = BRANCH_TABS.find(
-    (b) => b.code === urlBranch || b.keywords.some((k) => urlBranch.toLowerCase().includes(k))
+  const matchedTab = BRANCH_TABS.find((tab) =>
+    noteMatchesBranch(urlBranch, tab)
   );
 
   const [activeBranch, setActiveBranch] = useState(matchedTab ? matchedTab.code : "CSE");
   const [selectedSemester, setSelectedSemester] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  const [notes, setNotes] = useState([]);
+
+  // Academic Resource Data Stores
+  const [notesData, setNotesData] = useState([]);
+  const [papersData, setPapersData] = useState([]);
+  const [syllabusData, setSyllabusData] = useState([]);
+  const [labsData, setLabsData] = useState([]);
+
   const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [studentData, setStudentData] = useState(getStoredStudentData());
-  const [downloadingId, setDownloadingId] = useState(null);
   const [pulsingBranch, setPulsingBranch] = useState(null);
+
   const searchInputRef = useRef(null);
   const searchMetalRef = useRef(null);
 
   // Hook for cursor-driven liquid metal bend interaction
   useMetalBend(searchMetalRef);
 
+  // Profile synchronization listener
   useEffect(() => {
     const handleProfileSync = () => {
       setStudentData(getStoredStudentData());
@@ -118,129 +203,306 @@ function Notes() {
   useEffect(() => {
     const b = searchParams.get("branch") || searchParams.get("search");
     if (b) {
-      const found = BRANCH_TABS.find(
-        (t) => t.code === b.toUpperCase() || t.keywords.some((k) => b.toLowerCase().includes(k))
-      );
+      const found = BRANCH_TABS.find((tab) => noteMatchesBranch(b, tab));
       if (found) {
         setActiveBranch(found.code);
       }
     }
   }, [searchParams]);
 
-  // Fetch real notes from MongoDB backend
+  // Fetch all 4 academic resources in parallel for instant instantaneous switching
   useEffect(() => {
-    const fetchNotes = async () => {
+    let isMounted = true;
+
+    const fetchAllResources = async () => {
       try {
         setLoading(true);
-        const res = await API.get("/notes");
-        let data = [];
-        if (Array.isArray(res.data)) {
-          data = res.data;
-        } else if (Array.isArray(res.data?.notes)) {
-          data = res.data.notes;
-        } else if (Array.isArray(res.data?.data)) {
-          data = res.data.data;
+
+        const [notesRes, papersRes, syllabusRes, labsRes] = await Promise.allSettled([
+          API.get("/notes"),
+          API.get("/papers"),
+          API.get("/syllabus"),
+          API.get("/lab-programs"),
+        ]);
+
+        if (!isMounted) return;
+
+        // Notes extract
+        if (notesRes.status === "fulfilled") {
+          const res = notesRes.value;
+          const data = Array.isArray(res.data)
+            ? res.data
+            : Array.isArray(res.data?.notes)
+            ? res.data.notes
+            : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
+          setNotesData(data);
         }
-        setNotes(data);
+
+        // Papers extract
+        if (papersRes.status === "fulfilled") {
+          const res = papersRes.value;
+          const data = Array.isArray(res.data)
+            ? res.data
+            : Array.isArray(res.data?.papers)
+            ? res.data.papers
+            : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
+          setPapersData(data);
+        }
+
+        // Syllabus extract
+        if (syllabusRes.status === "fulfilled") {
+          const res = syllabusRes.value;
+          const data = Array.isArray(res.data)
+            ? res.data
+            : Array.isArray(res.data?.syllabus)
+            ? res.data.syllabus
+            : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
+          setSyllabusData(data);
+        }
+
+        // Lab programs extract
+        if (labsRes.status === "fulfilled") {
+          const res = labsRes.value;
+          const data = Array.isArray(res.data)
+            ? res.data
+            : Array.isArray(res.data?.programs)
+            ? res.data.programs
+            : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
+          setLabsData(data);
+        }
       } catch (err) {
-        console.error("Error fetching notes:", err);
+        console.error("Error fetching academic resources:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
-    fetchNotes();
+
+    fetchAllResources();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Format note title cleanly
-  const formatTitle = (raw) => {
-    if (!raw) return "Subject Notes";
-    return raw
-      .split(" ")
-      .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ""))
-      .join(" ");
-  };
+  // Helper: Backend upload URL resolution
+  const getBackendBaseUrl = useCallback(() => {
+    const apiBaseUrl = API.defaults?.baseURL || "http://localhost:5000/api";
+    return apiBaseUrl.replace(/\/api\/?$/, "").replace(/\/$/, "");
+  }, []);
 
-  // Build the list of notes for the active branch
-  const displayNotes = useMemo(() => {
-    const activeTab = BRANCH_TABS.find((t) => t.code === activeBranch);
-    const keywords = activeTab ? activeTab.keywords : ["cse"];
-
-    // 1. Filter real backend notes belonging to this branch
-    const backendMatching = notes.filter((n) => {
-      const bText = String(n.branch || "").toLowerCase();
-      return keywords.some((k) => bText.includes(k));
-    });
-
-    const mappedBackend = backendMatching.map((n) => {
-      let title = n.subject || n.title;
-      if (title.toLowerCase() === "notes" && n.subject) {
-        title = n.subject;
+  const getPdfUrl = useCallback((pdfUrl) => {
+    if (!pdfUrl) return "";
+    let value = String(pdfUrl).trim();
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      try {
+        const url = new URL(value);
+        url.pathname = url.pathname.replace(/^\/api\/uploads\//, "/uploads/");
+        return url.toString();
+      } catch {
+        return value;
       }
-      const sem = n.semester ? n.semester.replace(/semester/i, "Sem").trim() : "3rd Sem";
-      return {
-        id: n._id,
-        title: formatTitle(title),
-        semester: sem,
-        branchCode: activeBranch,
-        isBackend: true,
-      };
-    });
+    }
+    value = value.replace(/^\/?api\/uploads\//, "/uploads/");
+    if (!value.startsWith("/")) {
+      value = `/${value}`;
+    }
+    return `${getBackendBaseUrl()}${value}`;
+  }, [getBackendBaseUrl]);
 
-    // 2. Curated subjects
-    const curated = (CURATED_SUBJECTS[activeBranch] || CURATED_SUBJECTS.CSE).map((c, idx) => ({
-      id: `curated-${activeBranch}-${idx}`,
-      title: c.title,
-      semester: c.semester,
-      branchCode: activeBranch,
-      isBackend: false,
-    }));
+  const getPdfFileName = useCallback((pdfUrl) => {
+    if (!pdfUrl) return "";
+    try {
+      const full = getPdfUrl(pdfUrl);
+      const pathname = new URL(full).pathname;
+      return decodeURIComponent(pathname.split("/").pop() || "");
+    } catch {
+      const parts = String(pdfUrl).split("/");
+      return decodeURIComponent(parts.pop() || "");
+    }
+  }, [getPdfUrl]);
 
-    // Combine backend items with curated items (avoiding duplicates)
-    const combined = [...mappedBackend];
-    curated.forEach((c) => {
-      if (!combined.some((item) => item.title.toLowerCase() === c.title.toLowerCase())) {
-        combined.push(c);
-      }
-    });
+  // Unified items mapping for current active branch
+  const activeTab = useMemo(
+    () => BRANCH_TABS.find((t) => t.code === activeBranch),
+    [activeBranch]
+  );
 
-    // 3. Filter by search query
-    let filtered = combined;
+  // 1. Mapped Notes
+  const mappedNotes = useMemo(() => {
+    if (!activeTab) return [];
+    return notesData
+      .filter((n) => noteMatchesBranch(n.branch, activeTab))
+      .map((n) => {
+        let title = n.subject || n.title;
+        if (title.toLowerCase() === "notes" && n.subject) {
+          title = n.subject;
+        }
+        const sem = n.semester ? n.semester.replace(/semester/i, "Sem").trim() : "";
+        return {
+          id: n._id,
+          title: formatTitle(title),
+          semester: sem,
+          branchCode: activeBranch,
+          extraBadge: n.subjectCode || "",
+          pdfUrl: n.pdfUrl || "",
+          resourceType: "notes",
+        };
+      });
+  }, [notesData, activeTab, activeBranch]);
+
+  // 2. Mapped Question Papers
+  const mappedPapers = useMemo(() => {
+    if (!activeTab) return [];
+    return papersData
+      .filter((p) => noteMatchesBranch(p.branch, activeTab))
+      .map((p) => {
+        const rawTitle = String(p.title || "").trim();
+        const subj = String(p.subject || "").trim();
+        let displayTitle = "";
+        const genericWords = ["question paper", "paper", "semester", "mid", "makeup", "supply"];
+        if (subj && genericWords.includes(rawTitle.toLowerCase())) {
+          displayTitle = `${formatTitle(subj)} (${formatTitle(rawTitle)})`;
+        } else if (subj && !rawTitle) {
+          displayTitle = formatTitle(subj);
+        } else {
+          displayTitle = formatTitle(rawTitle || subj || "Question Paper");
+        }
+
+        const sem = p.semester ? p.semester.replace(/semester/i, "Sem").trim() : "";
+        const metaItems = [];
+        if (p.year) metaItems.push(p.year);
+        if (p.examType && !displayTitle.toLowerCase().includes(p.examType.toLowerCase())) {
+          metaItems.push(p.examType);
+        }
+
+        return {
+          id: p._id,
+          title: displayTitle,
+          semester: sem,
+          branchCode: activeBranch,
+          extraBadge: metaItems.join(" • "),
+          pdfUrl: p.pdfUrl || "",
+          resourceType: "papers",
+        };
+      });
+  }, [papersData, activeTab, activeBranch]);
+
+  // 3. Mapped Syllabus
+  const mappedSyllabus = useMemo(() => {
+    if (!activeTab) return [];
+    return syllabusData
+      .filter((s) => noteMatchesBranch(s.branch, activeTab))
+      .map((s) => {
+        const subj = String(s.subject || "").trim();
+        let title = String(s.title || "Syllabus").trim();
+        if (subj && (title.toLowerCase() === "syllabus" || !title)) {
+          title = `${formatTitle(subj)} Syllabus`;
+        } else if (!subj && (!title || title.toLowerCase() === "syllabus")) {
+          title = "Syllabus";
+        } else {
+          title = formatTitle(title);
+        }
+
+        const sem = s.semester ? s.semester.replace(/semester/i, "Sem").trim() : "";
+        const metaItems = [];
+        if (s.regulation) metaItems.push(s.regulation);
+        if (s.subjectCode) metaItems.push(s.subjectCode);
+
+        return {
+          id: s._id,
+          title: title,
+          semester: sem,
+          branchCode: activeBranch,
+          extraBadge: metaItems.join(" • "),
+          pdfUrl: s.pdfUrl || "",
+          resourceType: "syllabus",
+        };
+      });
+  }, [syllabusData, activeTab, activeBranch]);
+
+  // 4. Mapped Lab Programs
+  const mappedLabs = useMemo(() => {
+    if (!activeTab) return [];
+    return labsData
+      .filter((l) => noteMatchesBranch(l.branch, activeTab))
+      .map((l) => {
+        const subj = String(l.subject || "").trim();
+        let title = String(l.title || "Lab Program").trim();
+        if (subj && (title.toLowerCase() === "lab program" || title.toLowerCase() === "lab" || title.toLowerCase() === subj.toLowerCase())) {
+          title = `${formatTitle(subj)} Lab`;
+        } else {
+          title = formatTitle(title || subj || "Lab Program");
+        }
+
+        const sem = l.semester ? l.semester.replace(/semester/i, "Sem").trim() : "";
+        const metaItems = [];
+        if (l.subjectCode) metaItems.push(l.subjectCode);
+
+        return {
+          id: l._id,
+          title: title,
+          semester: sem,
+          branchCode: activeBranch,
+          extraBadge: metaItems.join(" • "),
+          pdfUrl: l.pdfUrl || "",
+          resourceType: "labs",
+        };
+      });
+  }, [labsData, activeTab, activeBranch]);
+
+  // Filter items for current active resource by search and semester
+  const displayItems = useMemo(() => {
+    let list = [];
+    if (activeResource === "notes") list = mappedNotes;
+    else if (activeResource === "papers") list = mappedPapers;
+    else if (activeResource === "syllabus") list = mappedSyllabus;
+    else if (activeResource === "labs") list = mappedLabs;
+
+    // Filter by search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (item) => item.title.toLowerCase().includes(q) || item.semester.toLowerCase().includes(q)
+      list = list.filter(
+        (item) =>
+          item.title.toLowerCase().includes(q) ||
+          item.semester.toLowerCase().includes(q) ||
+          (item.extraBadge && item.extraBadge.toLowerCase().includes(q))
       );
     }
 
-    // 4. Filter by semester dropdown
+    // Filter by semester dropdown
     if (selectedSemester !== "ALL") {
       const s = selectedSemester.toLowerCase();
-      filtered = filtered.filter((item) => item.semester.toLowerCase().includes(s));
+      list = list.filter((item) => item.semester.toLowerCase().includes(s));
     }
 
-    return filtered;
-  }, [notes, activeBranch, searchQuery, selectedSemester]);
+    return list;
+  }, [activeResource, mappedNotes, mappedPapers, mappedSyllabus, mappedLabs, searchQuery, selectedSemester]);
 
-  // Memoized count of study resources per engineering branch
-  const branchCounts = useMemo(() => {
-    const counts = {};
-    BRANCH_TABS.forEach((tab) => {
-      const keywords = tab.keywords;
-      const backendMatching = notes.filter((n) => {
-        const bText = String(n.branch || "").toLowerCase();
-        return keywords.some((k) => bText.includes(k));
-      });
-      const curated = CURATED_SUBJECTS[tab.code] || [];
-      const titleSet = new Set(
-        backendMatching.map((n) => String(n.subject || n.title || "").toLowerCase().trim())
-      );
-      curated.forEach((c) => titleSet.add(c.title.toLowerCase().trim()));
-      counts[tab.code] = titleSet.size || curated.length || 4;
-    });
-    return counts;
-  }, [notes]);
+  // Switch between academic resource types (Notes, Question Papers, Syllabus, Lab Programs)
+  const handleSwitchResource = (type) => {
+    setActiveResource(type);
+    const pathMap = {
+      notes: "/notes",
+      papers: "/papers",
+      syllabus: "/syllabus",
+      labs: "/lab-programs",
+    };
+    const targetPath = pathMap[type] || "/notes";
+    const branchParam = activeBranch && activeBranch !== "CSE" ? `?branch=${activeBranch}` : "";
+    if (location.pathname !== targetPath) {
+      navigate(`${targetPath}${branchParam}`, { replace: false });
+    }
+  };
 
-  // Handle branch tab switch with reactive search button feedback
+  // Handle branch tab switch
   const handleSelectBranch = (code) => {
     setPulsingBranch(code);
     setTimeout(() => setPulsingBranch(null), 500);
@@ -248,7 +510,7 @@ function Notes() {
     setSearchParams({ branch: code });
   };
 
-  // Handle direct search execution via search button
+  // Handle search submit
   const handleExecuteSearch = () => {
     setPulsingBranch(activeBranch);
     setTimeout(() => setPulsingBranch(null), 500);
@@ -257,145 +519,82 @@ function Notes() {
     }
   };
 
-  // Handle viewing a note
-  const handleViewNote = (item) => {
-    if (item.isBackend && item.id) {
+  // Handle View Action
+  const handleViewItem = async (item) => {
+    if (item.resourceType === "notes") {
+      if (item.id) {
+        navigate(`/notes/${item.id}`);
+        return;
+      }
+    }
+
+    // Record view counts on backend
+    if (item.resourceType === "papers") {
+      API.put(`/papers/${item.id}/view`).catch(() => {});
+    } else if (item.resourceType === "syllabus") {
+      API.put(`/syllabus/${item.id}/view`).catch(() => {});
+    } else if (item.resourceType === "labs") {
+      API.put(`/lab-programs/${item.id}/view`).catch(() => {});
+    }
+
+    const fileName = getPdfFileName(item.pdfUrl);
+    if (fileName) {
+      navigate(`/pdf/${encodeURIComponent(fileName)}`);
+    } else if (item.pdfUrl) {
+      window.open(getPdfUrl(item.pdfUrl), "_blank");
+    } else if (item.id) {
       navigate(`/notes/${item.id}`);
     } else {
-      // Find matching note in backend or navigate to the first available note
-      const activeTab = BRANCH_TABS.find((t) => t.code === activeBranch);
-      const keywords = activeTab ? activeTab.keywords : ["cse"];
-      const match = notes.find((n) => {
-        const bText = String(n.branch || "").toLowerCase();
-        return keywords.some((k) => bText.includes(k));
-      });
-      if (match) {
-        navigate(`/notes/${match._id}`);
-      } else if (notes.length > 0) {
-        navigate(`/notes/${notes[0]._id}`);
-      } else {
-        alert(`Accessing ${item.title} notes for ${item.branchCode}...`);
-      }
+      alert("No document file is attached to this record.");
     }
   };
 
-  // Handle downloading note file or study material package
-  const handleDownloadNote = async (e, item) => {
-    e.stopPropagation();
+  // Handle Download Action
+  const handleDownloadPdf = async (item, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!item.pdfUrl) return;
+
+    const fullUrl = getPdfUrl(item.pdfUrl);
+    const fileName = getPdfFileName(item.pdfUrl) || `${item.title}.pdf`;
+
     try {
       setDownloadingId(item.id);
 
-      // 1. Identify backend note (either directly or by searching notes array)
-      let targetNote = null;
-      if (item.isBackend && item.id) {
-        targetNote = notes.find((n) => n._id === item.id);
-      } else {
-        const activeTab = BRANCH_TABS.find((t) => t.code === activeBranch);
-        const keywords = activeTab ? activeTab.keywords : ["cse"];
-        targetNote =
-          notes.find((n) => {
-            const bText = String(n.branch || "").toLowerCase();
-            const titleText = String(n.subject || n.title || "").toLowerCase();
-            return (
-              keywords.some((k) => bText.includes(k)) &&
-              (titleText.includes(item.title.toLowerCase()) ||
-                item.title.toLowerCase().includes(titleText))
-            );
-          }) ||
-          notes.find((n) => {
-            const bText = String(n.branch || "").toLowerCase();
-            return keywords.some((k) => bText.includes(k));
-          }) ||
-          (notes.length > 0 ? notes[0] : null);
+      // Increment download counter
+      if (item.resourceType === "papers") {
+        API.put(`/papers/${item.id}/download`).catch(() => {});
+      } else if (item.resourceType === "syllabus") {
+        API.put(`/syllabus/${item.id}/download`).catch(() => {});
+      } else if (item.resourceType === "labs") {
+        API.put(`/lab-programs/${item.id}/download`).catch(() => {});
       }
 
-      // 2. Check for uploaded PDF
-      const pdfPath =
-        targetNote?.module1Pdf ||
-        targetNote?.pdfUrl ||
-        targetNote?.module2Pdf ||
-        targetNote?.module3Pdf;
-
-      let downloadedSuccessfully = false;
-
-      if (pdfPath) {
-        const downloadUrl = pdfPath.startsWith("http")
-          ? pdfPath
-          : `http://localhost:5000${pdfPath}`;
-        const fileName = `${item.title.replace(/[^a-zA-Z0-9_-]/g, "_")}_${
-          item.branchCode || activeBranch
-        }_Notes.pdf`;
-
-        try {
-          const res = await fetch(downloadUrl);
-          if (res.ok) {
-            const blob = await res.blob();
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = blobUrl;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(blobUrl);
-
-            downloadedSuccessfully = true;
-            if (targetNote?._id) {
-              API.put(`/notes/${targetNote._id}/download`).catch(() => {});
-            }
-          }
-        } catch (fetchErr) {
-          console.warn("Server file unavailable, falling back to academic study package:", fetchErr);
-        }
+      const response = await fetch(fullUrl);
+      if (!response.ok) {
+        throw new Error("Download failed");
       }
 
-      if (!downloadedSuccessfully) {
-        // Generate an official academic study package document for this subject
-        const content = `=====================================================
-JNTU CIRCLE — ACADEMIC REPOSITORY
-Subject: ${item.title}
-Branch: ${item.branchCode || activeBranch}
-Semester: ${item.semester || "Current Semester"}
-Student Account: ${studentData.name || "Chinnu"} (${studentData.hallTicket || "22B91A4201"})
-Curriculum: ${studentData.regulation || "R20 Regulation"}
-=====================================================
-
-SYLLABUS & MODULE BLUEPRINT:
------------------------------------------------------
-Unit 1: Foundational Theory & Core Principles
-Unit 2: Mathematical Formulations & Architecture
-Unit 3: Design Frameworks & Analytical Methods
-Unit 4: Systems Implementation & Industry Standards
-Unit 5: Advanced Applications & Emerging Topics
-
-EXAMINATION PREPARATION CHECKLIST:
-1. Review previous year university question papers for ${item.title}.
-2. Practice module derivations and block diagrams.
-3. For additional module notes, access JNTU Circle at: http://localhost:5173/notes
-
-Generated securely by JNTU Circle Student Academic Portal.
-`;
-        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${item.title.replace(/[^a-zA-Z0-9_-]/g, "_")}_${
-          item.branchCode || activeBranch
-        }_Study_Notes.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      }
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
-      console.error("Error downloading notes:", err);
-      alert(`Preparing ${item.title} notes download... Please try again.`);
+      console.warn("Direct download failed, opening in new tab:", err);
+      window.open(fullUrl, "_blank");
     } finally {
-      setTimeout(() => {
-        setDownloadingId(null);
-      }, 700);
+      setDownloadingId(null);
     }
   };
+
+  const currentConfig = RESOURCE_CONFIG[activeResource] || RESOURCE_CONFIG.notes;
 
   return (
     <div className="notes-dashboard-container">
@@ -430,8 +629,8 @@ Generated securely by JNTU Circle Student Academic Portal.
 
             <button
               type="button"
-              className="sidebar-link active"
-              onClick={() => navigate("/notes")}
+              className={`sidebar-link ${activeResource === "notes" ? "active" : ""}`}
+              onClick={() => handleSwitchResource("notes")}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -444,8 +643,8 @@ Generated securely by JNTU Circle Student Academic Portal.
 
             <button
               type="button"
-              className="sidebar-link"
-              onClick={() => navigate("/papers")}
+              className={`sidebar-link ${activeResource === "papers" ? "active" : ""}`}
+              onClick={() => handleSwitchResource("papers")}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -458,14 +657,27 @@ Generated securely by JNTU Circle Student Academic Portal.
 
             <button
               type="button"
-              className="sidebar-link"
-              onClick={() => navigate("/syllabus")}
+              className={`sidebar-link ${activeResource === "syllabus" ? "active" : ""}`}
+              onClick={() => handleSwitchResource("syllabus")}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
               </svg>
               <span>Syllabus</span>
+            </button>
+
+            <button
+              type="button"
+              className={`sidebar-link ${activeResource === "labs" ? "active" : ""}`}
+              onClick={() => handleSwitchResource("labs")}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <path d="M10 2v7.31L4.17 19.5A2 2 0 0 0 5.89 22h12.22a2 2 0 0 0 1.72-2.5L14 9.31V2" />
+                <path d="M8.5 2h7" />
+                <path d="M7 16h10" />
+              </svg>
+              <span>Lab Programs</span>
             </button>
 
             <button
@@ -483,7 +695,7 @@ Generated securely by JNTU Circle Student Academic Portal.
             </button>
           </nav>
 
-          {/* Bottom Profile Pill (Clickable & Opens Student Profile) */}
+          {/* Bottom Profile Pill */}
           <button
             type="button"
             className="sidebar-profile"
@@ -510,12 +722,31 @@ Generated securely by JNTU Circle Student Academic Portal.
         <main className="notes-main-panel">
           <section className="notes-opening-panel" aria-labelledby="notes-page-title">
             <header className="notes-page-header">
+              {/* Quick Resource Switcher Pills */}
+              <div className="notes-resource-switcher" role="tablist" aria-label="Academic Resource Selector">
+                {Object.values(RESOURCE_CONFIG).map((res) => {
+                  const isActive = activeResource === res.key;
+                  return (
+                    <button
+                      key={res.key}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      className={`resource-switch-tab ${isActive ? "active" : ""}`}
+                      onClick={() => handleSwitchResource(res.key)}
+                    >
+                      {res.label}
+                    </button>
+                  );
+                })}
+              </div>
+
               <span className="notes-eyebrow">
                 <span className="notes-eyebrow-dot" aria-hidden="true" />
-                JNTU Circle · Study Library
+                {currentConfig.eyebrow}
               </span>
-              <h1 className="notes-page-title" id="notes-page-title">Notes & Study Materials</h1>
-              <p className="notes-page-subtitle">Find lecture notes, module guides, and study resources for your engineering branch.</p>
+              <h1 className="notes-page-title" id="notes-page-title">{currentConfig.title}</h1>
+              <p className="notes-page-subtitle">{currentConfig.subtitle}</p>
             </header>
 
             <div className="notes-filters-row">
@@ -534,7 +765,7 @@ Generated securely by JNTU Circle Student Academic Portal.
                       type="button"
                       className="metal-search-btn notes-metal-search-btn"
                       onClick={handleExecuteSearch}
-                      title="Search notes"
+                      title={`Search ${currentConfig.label}`}
                       aria-label="Search"
                     >
                       <svg
@@ -558,7 +789,7 @@ Generated securely by JNTU Circle Student Academic Portal.
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder={`Search ${activeBranch} notes, subjects, codes...`}
+                  placeholder={currentConfig.searchPlaceholder(activeBranch)}
                   className="notes-search-input"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -585,7 +816,6 @@ Generated securely by JNTU Circle Student Academic Portal.
               >
                 <option value="CSE">CSE — Computer Science</option>
                 <option value="ECE">ECE — Electronics & Comm.</option>
-                <option value="EEE">EEE — Electrical Eng.</option>
                 <option value="ME">ME — Mechanical Eng.</option>
                 <option value="CE">CE — Civil Eng.</option>
                 <option value="AIML">AIML — AI & Data Science</option>
@@ -610,24 +840,23 @@ Generated securely by JNTU Circle Student Academic Portal.
             </div>
           </section>
 
-          {/* Two-Column Body: Branch Tabs + Notes Folder Cards */}
+          {/* Two-Column Body: Branch Tabs + Subject Folder Cards */}
           <div className="notes-split-view">
             {/* Left Branch Tabs Column */}
             <div className="notes-branch-sidebar">
               {BRANCH_TABS.map((tab) => {
                 const isActive = activeBranch === tab.code;
                 const isPulsing = pulsingBranch === tab.code;
-                const count = branchCounts[tab.code] || 0;
                 return (
                   <button
                     key={tab.code}
                     type="button"
                     className={`branch-nav-pill ${isActive ? "active" : ""} ${isPulsing ? "is-pulsing" : ""}`}
                     onClick={() => handleSelectBranch(tab.code)}
-                    title={`Search ${tab.name}`}
-                    aria-label={`Search ${tab.name}`}
+                    title={`View ${tab.name}`}
+                    aria-label={`View ${tab.name}`}
                   >
-                    {/* Reactive Branch Specific Emoji / Icon */}
+                    {/* Reactive Branch Specific Icon */}
                     <span 
                       className={`branch-icon-box ${tab.code.toLowerCase()}-icon ${isPulsing ? "reactive-burst" : ""}`}
                     >
@@ -643,11 +872,6 @@ Generated securely by JNTU Circle Student Academic Portal.
                           <rect x="4" y="4" width="16" height="16" rx="2.5" fill="#ea580c" fillOpacity="0.12" />
                           <rect x="9" y="9" width="6" height="6" rx="1" fill="#ea580c" fillOpacity="0.28" />
                           <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3" />
-                        </svg>
-                      )}
-                      {tab.code === "EEE" && (
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="#d97706" fillOpacity="0.22" />
                         </svg>
                       )}
                       {tab.code === "ME" && (
@@ -681,9 +905,9 @@ Generated securely by JNTU Circle Student Academic Portal.
               })}
             </div>
 
-            {/* Right Column: Subject Folder Cards List */}
+            {/* Right Column: Unified Subject Folder Cards List */}
             <div 
-              key={`${activeBranch}-${selectedSemester}-${searchQuery}`}
+              key={`${activeResource}-${activeBranch}-${selectedSemester}-${searchQuery}`}
               className="notes-cards-container"
             >
               {loading ? (
@@ -692,15 +916,15 @@ Generated securely by JNTU Circle Student Academic Portal.
                   <div className="notes-skeleton-card" />
                   <div className="notes-skeleton-card" />
                 </>
-              ) : displayNotes.length === 0 ? (
+              ) : displayItems.length === 0 ? (
                 <div className="notes-empty-state">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
-                  <h3>No Notes Available</h3>
-                  <p>No study materials match your search or filter criteria for this department.</p>
+                  <h3>{currentConfig.emptyTitle}</h3>
+                  <p>{currentConfig.emptyDesc}</p>
                   <button
                     type="button"
                     className="empty-reset-btn"
@@ -713,9 +937,9 @@ Generated securely by JNTU Circle Student Academic Portal.
                   </button>
                 </div>
               ) : (
-                displayNotes.map((item) => (
+                displayItems.map((item) => (
                   <article key={item.id} className="notes-folder-card">
-                    {/* Folder Icon & Subject Details */}
+                    {/* Folder Icon & Resource Details */}
                     <div className="folder-card-left">
                       {/* Deep Emerald & Sunbeam Dual-Tone Folder Icon */}
                       <svg
@@ -743,14 +967,45 @@ Generated securely by JNTU Circle Student Academic Portal.
                         <h3 className="folder-card-title">{item.title}</h3>
                         <p className="folder-card-sub">
                           <span className="folder-branch-tag">{item.branchCode}</span>
-                          <span>•</span>
-                          <span>{item.semester}</span>
+                          {item.semester && (
+                            <>
+                              <span>•</span>
+                              <span>{item.semester}</span>
+                            </>
+                          )}
+                          {item.extraBadge && (
+                            <>
+                              <span>•</span>
+                              <span>{item.extraBadge}</span>
+                            </>
+                          )}
                         </p>
                       </div>
                     </div>
 
-                    {/* Action Button: View */}
+                    {/* Action Buttons: Download & View */}
                     <div className="folder-card-actions">
+                      {item.pdfUrl && (
+                        <button
+                          type="button"
+                          className={`folder-download-btn ${downloadingId === item.id ? "downloading" : ""}`}
+                          onClick={(e) => handleDownloadPdf(item, e)}
+                          disabled={downloadingId === item.id}
+                          title={`Download ${item.title} PDF`}
+                        >
+                          {downloadingId === item.id ? (
+                            <span className="download-spinner" />
+                          ) : (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                              <polyline points="7 10 12 15 17 10" />
+                              <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                          )}
+                          <span>Download</span>
+                        </button>
+                      )}
+
                       <MetalFx
                         preset="gold"
                         variant="button"
@@ -763,7 +1018,7 @@ Generated securely by JNTU Circle Student Academic Portal.
                         <button
                           type="button"
                           className="folder-view-btn"
-                          onClick={() => handleViewNote(item)}
+                          onClick={() => handleViewItem(item)}
                           title={`View ${item.title}`}
                         >
                           View
@@ -776,6 +1031,14 @@ Generated securely by JNTU Circle Student Academic Portal.
             </div>
           </div>
         </main>
+
+        {/* =========================================================
+            RIGHT COLUMN: DEVELOPER PROFILES & JNTU UPLOAD
+            (Matches Note Details design & placement)
+            ========================================================= */}
+        <aside className="notes-right-column">
+          <AuthorProfile />
+        </aside>
 
       </div>
 

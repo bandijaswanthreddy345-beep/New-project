@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JNTU Circle - Project Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #F6F3ED;
+      --frame-color: #B89E7E;
+      --frame-inner: #DAC9B4;
+      --title-color: #54351F;
+      --accent-brown: #795548;
+      --gold-accent: #C58A2B;
+      --text-dark: #212B36;
+      --text-muted: #64748B;
+      --card-bg: #FFFFFF;
+      --card-border: #E2D9CB;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #1A1A1A;
+      color: var(--text-dark);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Fixed 16:9 Slide Stage */
+    .deck-container {
+      position: relative;
+      width: 94vw;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bg-color);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 2.2% 3.5%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      transform: scale(0.985);
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-color);
+      z-index: 1;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+      z-index: 2;
+    }
+
+    /* Outer Framing (matching reference image) */
+    .slide-frame {
+      position: absolute;
+      inset: 16px;
+      border: 2px solid var(--frame-color);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .slide-frame::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid var(--frame-inner);
+      pointer-events: none;
+    }
+
+    /* Slide Header */
+    .slide-header {
+      text-align: center;
+      margin-top: 6px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .slide-category {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold-accent);
+      margin-bottom: 2px;
+    }
+
+    .slide-title {
+      font-family: 'Georgia', serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--title-color);
+      letter-spacing: -0.5px;
+    }
+
+    .slide-divider {
+      width: 90px;
+      height: 3px;
+      background: var(--gold-accent);
+      margin: 8px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Slide Body Layouts */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      gap: 24px;
+      position: relative;
+      z-index: 3;
+      padding: 0 12px;
+      align-items: stretch;
+    }
+
+    .card {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 22px 26px;
+      box-shadow: 0 4px 14px rgba(84, 53, 31, 0.04);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-family: 'Georgia', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--title-color);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text-dark);
+    }
+
+    .card-list li {
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .card-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--gold-accent);
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .card-list strong {
+      color: var(--title-color);
+    }
+
+    /* Slide Footer (matching reference image) */
+    .slide-footer {
+      position: absolute;
+      bottom: 22px;
+      left: 36px;
+      right: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 12;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--accent-brown);
+    }
+
+    .slide-footer-center {
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .slide-page-num {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-style: normal;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      position: absolute;
+      right: 0;
+    }
+
+    /* Slide 1: Flow of Presentation layout matching reference image */
+    .flow-container {
+      display: flex;
+      width: 100%;
+      gap: 40px;
+      padding: 10px 40px;
+    }
+
+    .flow-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .flow-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flow-title {
+      font-family: 'Georgia', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--title-color);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .flow-title:hover {
+      color: var(--gold-accent);
+    }
+
+    .flow-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-left: 24px;
+      margin-top: 2px;
+    }
+
+    /* Slide 0: Title Cover */
+    .cover-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 4;
+      padding: 0 40px;
+    }
+
+    .cover-badge {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: var(--gold-accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .cover-main-title {
+      font-family: 'Georgia', serif;
+      font-size: 3.2rem;
+      font-weight: 700;
+      color: var(--title-color);
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+
+    .cover-subtitle {
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--accent-brown);
+      max-width: 820px;
+      margin-bottom: 24px;
+    }
+
+    .cover-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px 40px;
+      box-shadow: 0 8px 24px rgba(84, 53, 31, 0.06);
+    }
+
+    .cover-dept {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--title-color);
+    }
+
+    .cover-college {
+      font-size: 1rem;
+      color: var(--accent-brown);
+      margin-top: 2px;
+    }
+
+    .cover-tech {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* Table styling for Literature Review */
+    .table-container {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.86rem;
+      background: var(--card-bg);
+      box-shadow: 0 4px 12px rgba(84, 53, 31, 0.05);
+    }
+
+    .table-container th, .table-container td {
+      padding: 11px 14px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+    }
+
+    .table-container th {
+      background: var(--title-color);
+      color: #FFF;
+      font-family: 'Georgia', serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .table-container th.col-highlight {
+      background: var(--gold-accent);
+    }
+
+    .table-container td:first-child {
+      text-align: left;
+      font-weight: 600;
+      color: var(--title-color);
+    }
+
+    .table-container td.highlight-cell {
+      background: #FDFBF7;
+      font-weight: 700;
+      color: var(--title-color);
+    }
+
+    /* 3-card Architecture Slide */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      width: 100%;
+    }
+
+    .arch-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .arch-tier {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gold-accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .arch-name {
+      font-family: 'Georgia', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--title-color);
+      margin-bottom: 4px;
+    }
+
+    .arch-tech {
+      font-size: 0.82rem;
+      color: var(--accent-brown);
+      font-weight: 600;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    /* Controls Bar */
+    .deck-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 14px;
+      color: #CCC;
+      font-size: 0.9rem;
+    }
+
+    .control-btn {
+      background: #2C2C2C;
+      color: #FFF;
+      border: 1px solid #444;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .control-btn:hover {
+      background: var(--gold-accent);
+      color: #000;
+      border-color: var(--gold-accent);
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: #FFF;
+        overflow: visible;
+      }
+      .deck-controls {
+        display: none !important;
+      }
+      .deck-container {
+        width: 100% !important;
+        max-width: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+      .slide {
+        position: relative !important;
+        page-break-after: always !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        height: 100vh !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Presentation Viewport -->
+  <div class="deck-container" id="deckContainer">
+    <div class="slide-frame"></div>
+
+    <!-- Slide 0: Cover -->
+    <section class="slide active" id="slide-0">
+      <div class="cover-body">
+        <span class="cover-badge">Major Project Presentation</span>
+        <h1 class="cover-main-title">JNTU CIRCLE (ANDHRA CIRCLE)</h1>
+        <p class="cover-subtitle">A Unified Academic Resource Ecosystem & Smart University Intelligence Platform</p>
+        
+        <div class="cover-card">
+          <div class="cover-dept">Department of Artificial Intelligence and Machine Learning</div>
+          <div class="cover-college">M.S. Engineering College</div>
+          <div class="cover-tech">Architecture: React 19 • Vite • Node.js • Express • MongoDB Atlas • JNTUA Background Sync</div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+      </footer>
+    </section>
+
+    <!-- Slide 1: Flow of Presentation (Replicating User's Reference Slide) -->
+    <section class="slide" id="slide-1">
+      <header class="slide-header">
+        <h2 class="slide-title">Flow of Presentation</h2>
+        <div class="slide-divider"></div>
+      </header>
+
+      <div class="slide-body">
+        <div class="flow-container">
+          <!-- Left Column: 1 to 5 -->
+          <div class="flow-column">
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(2)">1. Abstract</span>
+              <span class="flow-desc">Executive summary, problem motivation & system overview</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(3)">2. Introduction</span>
+              <span class="flow-desc">Collegiate engineering context & academic challenges</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(4)">3. Problem Statement</span>
+              <span class="flow-desc">Critical fragmentation & university communication gaps</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(5)">4. Literature Review</span>
+              <span class="flow-desc">Comparative analysis against existing academic portals</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(6)">5. Proposed System</span>
+              <span class="flow-desc">Decoupled MERN architecture & modular resource pillars</span>
+            </div>
+          </div>
+
+          <!-- Right Column: 6 to 10 -->
+          <div class="flow-column">
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(7)">6. System Architecture</span>
+              <span class="flow-desc">3-tier client-server microservices flow & sync pipeline</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(8)">7. Key Features & Demonstration</span>
+              <span class="flow-desc">Unit notes, JNTU GPA calc, live notice daemon & labs</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(9)">8. Implementation & Progress</span>
+              <span class="flow-desc">Database schema, REST controllers & security milestones</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(10)">9. Future Scope</span>
+              <span class="flow-desc">AI question paper trend analysis & RAG study tutor</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-title" onclick="goToSlide(11)">10. Conclusion</span>
+              <span class="flow-desc">Project impact, engineering learnings & summary</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">1/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 2: Abstract -->
+    <section class="slide" id="slide-2">
+      <header class="slide-header">
+        <div class="slide-category">Executive Summary</div>
+        <h2 class="slide-title">1. Abstract</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="card">
+          <h3 class="card-title">Core Challenge & Motivation</h3>
+          <ul class="card-list">
+            <li><strong>Academic Friction:</strong> Engineering students across 150+ affiliated colleges face severe resource fragmentation across ad-heavy blogs and unstructured chat groups.</li>
+            <li><strong>Monolithic File Fatigue:</strong> Downloading heavy 200MB scanned textbook PDFs wastes mobile data and time when preparing for targeted internal unit exams.</li>
+            <li><strong>Missed Circulars:</strong> Crucial university fee dates, timetables, and revaluation notices are frequently missed inside congested portals.</li>
+            <li><strong>Vision:</strong> Build an open-access, ad-free intelligence ecosystem specifically tailored to JNTU curricula (R19, R20, R23).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">The Solution & Technical Highlights</h3>
+          <ul class="card-list">
+            <li><strong>Full-Stack MERN Architecture:</strong> High-performance frontend with React 19 + Vite, powered by Node.js, Express REST API, and MongoDB Atlas.</li>
+            <li><strong>Autonomous Background Sync:</strong> Headless daemon (<code>jntuaSyncService</code>) continuously pulls verified B.Tech circulars from official university APIs.</li>
+            <li><strong>Academic Intelligence Suite:</strong> Regulation-accurate 10-point SGPA/CGPA grade engines and 75% attendance threshold calculators.</li>
+            <li><strong>Collaborative Hub:</strong> Modular Unit 1–5 PDF streaming, community material submissions, and peer discussion boards.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">2/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 3: Introduction -->
+    <section class="slide" id="slide-3">
+      <header class="slide-header">
+        <div class="slide-category">Context & Vision</div>
+        <h2 class="slide-title">2. Introduction</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="card">
+          <h3 class="card-title">Engineering Academic Landscape</h3>
+          <ul class="card-list">
+            <li><strong>High-Stakes Curricula:</strong> Engineering programs require continuous internal evaluations, laboratory practicals, and semester finals in short 16-week cycles.</li>
+            <li><strong>Departmental Breadth:</strong> Standardized curriculum spans AIML, CSE, ECE, MECH, and CIVIL with dedicated subject codes.</li>
+            <li><strong>Information Dispersion:</strong> Crucial lecture notes, question banks, and syllabus copies are unindexed and difficult to search.</li>
+            <li><strong>Student Inequity:</strong> Students in remote colleges often lack access to top-tier handwritten faculty notes.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Platform Objectives</h3>
+          <ul class="card-list">
+            <li><strong>Single Unified Destination:</strong> Curated repository for Notes, Previous Question Papers, Lab Manuals, Syllabi, and Live Exam Notifications.</li>
+            <li><strong>Unit-Level Granularity:</strong> Break subjects into concise Units 1 through 5 with in-browser zero-install reading.</li>
+            <li><strong>High Performance:</strong> Sub-100ms response times, zero paywalls, zero ads, and responsive glassmorphic UI.</li>
+            <li><strong>Student-Centric Ethos:</strong> Engineered "Built by Students, for Students" with interactive command search.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">3/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 4: Problem Statement -->
+    <section class="slide" id="slide-4">
+      <header class="slide-header">
+        <div class="slide-category">Identified Inefficiencies</div>
+        <h2 class="slide-title">3. Problem Statement</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="card">
+          <h3 class="card-title">Resource & Communication Barriers</h3>
+          <ul class="card-list">
+            <li><strong>Resource Fragmentation:</strong> Crucial materials live on ephemeral Google Drive links that break, expire, or require restricted permissions.</li>
+            <li><strong>Information Overload in Circulars:</strong> University portals list B.Tech, M.Tech, MBA, MCA, and Pharmacy notices in one unfilterable table.</li>
+            <li><strong>Costly Deadlines Missed:</strong> Students incur heavy late fees or lose revaluation windows due to buried notices.</li>
+            <li><strong>Bandwidth Inefficiency:</strong> Downloading full textbooks over cellular connections during exam weeks causes frustration.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Academic Tooling & Peer Gaps</h3>
+          <ul class="card-list">
+            <li><strong>Inaccurate GPA Tools:</strong> Commercial GPA calculators use generic percentages rather than JNTU's 10-point scale (O:10, A+:9, A:8, B+:7, B:6, C:5, P:4, F:0).</li>
+            <li><strong>Attendance Compliance Guesswork:</strong> Students lack visibility into safe bunk allowances to remain above the mandatory 75% rule.</li>
+            <li><strong>Unverified Materials:</strong> Notes floating on social media lack quality control, syllabus alignment, or administrative moderation.</li>
+            <li><strong>Fragmented Lab Code:</strong> Lab manuals lack verified code, execution outputs, and viva preparation questions in one place.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">4/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 5: Literature Review -->
+    <section class="slide" id="slide-5">
+      <header class="slide-header">
+        <div class="slide-category">Comparative Benchmark</div>
+        <h2 class="slide-title">4. Literature Review</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body" style="padding: 0 4px;">
+        <table class="table-container">
+          <thead>
+            <tr>
+              <th>Evaluation Feature</th>
+              <th>Official Portals</th>
+              <th>Commercial Sites</th>
+              <th>Social Channels</th>
+              <th class="col-highlight">Proposed JNTU Circle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Regulation Filtering (R20/R23)</td>
+              <td>Partial / Cluttered</td>
+              <td>❌ No / Generic</td>
+              <td>❌ Scattered / Unindexed</td>
+              <td class="highlight-cell">✅ Native Branch & Regulation Filter</td>
+            </tr>
+            <tr>
+              <td>Unit-Wise Notes (Units 1–5)</td>
+              <td>❌ Not Provided</td>
+              <td>❌ Paywalled / Incomplete</td>
+              <td>❌ Broken Drive Links</td>
+              <td class="highlight-cell">✅ Dedicated Unit 1–5 Modularity</td>
+            </tr>
+            <tr>
+              <td>Live Exam Circular Auto-Sync</td>
+              <td>✅ Raw PDF list</td>
+              <td>❌ Not Available</td>
+              <td>❌ Dependent on forwards</td>
+              <td class="highlight-cell">✅ Autonomous Background Daemon</td>
+            </tr>
+            <tr>
+              <td>JNTU CGPA / SGPA Engine</td>
+              <td>❌ Not Available</td>
+              <td>❌ Generic percentage</td>
+              <td>❌ Not Available</td>
+              <td class="highlight-cell">✅ Official 10-Point Scale & Presets</td>
+            </tr>
+            <tr>
+              <td>In-Browser PDF Reader</td>
+              <td>❌ Download Only</td>
+              <td>❌ Gated behind paywall</td>
+              <td>❌ External viewer needed</td>
+              <td class="highlight-cell">✅ Embedded Zero-Install Viewer</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">5/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 6: Proposed System -->
+    <section class="slide" id="slide-6">
+      <header class="slide-header">
+        <div class="slide-category">Methodology & Pillars</div>
+        <h2 class="slide-title">5. Proposed System</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="card">
+          <h3 class="card-title">Four Functional Pillars</h3>
+          <ul class="card-list">
+            <li><strong>Pillar 1: Modular Academic Repository:</strong> High-quality indexed unit notes (Units 1 to 5), past question papers by year/regulation, syllabi, and lab manuals.</li>
+            <li><strong>Pillar 2: Autonomous Sync Engine:</strong> Scheduled background worker querying university endpoints, filtering B.Tech circulars, and updating MongoDB.</li>
+            <li><strong>Pillar 3: Academic Intelligence Suite:</strong> Regulation-accurate SGPA/CGPA formulas and automated 75% attendance threshold algorithms.</li>
+            <li><strong>Pillar 4: Student Hub & Governance:</strong> Discussion threads, heart-burst likes, community submissions, and admin moderation queues.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Key Engineering Innovations</h3>
+          <ul class="card-list">
+            <li><strong>Granular PDF Delivery:</strong> Chunked module streaming lets students review individual units on smartphones without downloading huge books.</li>
+            <li><strong>Autonomous Data Scraping:</strong> Eliminates human administrative effort in reposting urgent university circulars.</li>
+            <li><strong>Accurate Grade Point Logic:</strong> Strictly adheres to JNTU grade points: O (10), A+ (9), A (8), B+ (7), B (6), C (5), P (4), F (0).</li>
+            <li><strong>Role-Based Access Control (RBAC):</strong> Admin vetting workflow ensures all community-uploaded materials are verified before public release.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">6/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 7: System Architecture -->
+    <section class="slide" id="slide-7">
+      <header class="slide-header">
+        <div class="slide-category">Microservices & Flow</div>
+        <h2 class="slide-title">6. System Architecture</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="arch-grid">
+          <div class="arch-card">
+            <span class="arch-tier">Tier 1 • Presentation</span>
+            <h4 class="arch-name">Frontend Layer</h4>
+            <div class="arch-tech">React 19 • Vite • Tailwind/CSS</div>
+            <ul class="card-list" style="font-size: 0.88rem;">
+              <li>JntuChatbot Command Search</li>
+              <li>Faceted Branch & Semester Filters</li>
+              <li>Embedded PDF Document Viewer</li>
+              <li>SGPA/CGPA & Attendance Calculator</li>
+              <li>Admin Moderation Dashboard</li>
+            </ul>
+          </div>
+          <div class="arch-card">
+            <span class="arch-tier">Tier 2 • Application Logic</span>
+            <h4 class="arch-name">Backend API Gateway</h4>
+            <div class="arch-tech">Node.js • Express REST API</div>
+            <ul class="card-list" style="font-size: 0.88rem;">
+              <li>JWT Authentication & Role Middleware</li>
+              <li>10 Resource Controllers (CRUD)</li>
+              <li>Multer Multipart File Pipeline</li>
+              <li>Autonomous JNTUA Sync Daemon</li>
+              <li>Rate Limiting & Error Handlers</li>
+            </ul>
+          </div>
+          <div class="arch-card">
+            <span class="arch-tier">Tier 3 • Storage & Services</span>
+            <h4 class="arch-name">Data & External Services</h4>
+            <div class="arch-tech">MongoDB Atlas • JNTUA API</div>
+            <ul class="card-list" style="font-size: 0.88rem;">
+              <li>MongoDB Atlas Document Collections</li>
+              <li>Static Document Storage (/uploads)</li>
+              <li>Official University API Endpoint</li>
+              <li>B.Tech Regex Filter Engine</li>
+              <li>Indexed Query Performance</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">7/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 8: Key Features & Demonstration -->
+    <section class="slide" id="slide-8">
+      <header class="slide-header">
+        <div class="slide-category">Core Capabilities</div>
+        <h2 class="slide-title">7. Key Features & Demonstration</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="card">
+          <h3 class="card-title">Resource Experience</h3>
+          <ul class="card-list">
+            <li><strong>Unit 1 to 5 Granular Notes:</strong> Displays individual module syllabi, downloadable PDFs, and view counters.</li>
+            <li><strong>In-Browser PDF Reader:</strong> Read full notes without downloading external software, complete with zoom and navigation.</li>
+            <li><strong>Automated Notice Scraper:</strong> Ingests university exam circulars, strips non-engineering degrees, and auto-links Drive/PDF files.</li>
+            <li><strong>Executable Lab Manuals:</strong> Verified code snippets, sample test cases, outputs, and viva questions.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Student Intelligence Tools</h3>
+          <ul class="card-list">
+            <li><strong>JNTU GPA Calculator:</strong> Preloaded subject credits for AIML, CSE, ECE, MECH, and CIVIL with custom elective support.</li>
+            <li><strong>Attendance Analyzer:</strong> Calculates safe bunk allowance while staying safely above the mandatory 75% university rule.</li>
+            <li><strong>Verified Academic Reports:</strong> Printable cumulative transcript summary with rank and distinction badges.</li>
+            <li><strong>Peer Community:</strong> Student material upload workflow with an administrative approval queue.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">8/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 9: Implementation & Progress -->
+    <section class="slide" id="slide-9">
+      <header class="slide-header">
+        <div class="slide-category">Technical Deliverables</div>
+        <h2 class="slide-title">8. Implementation & Progress</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="card">
+          <h3 class="card-title">Backend & Database Achievements</h3>
+          <ul class="card-list">
+            <li><strong>8 Mongoose Schemas:</strong> User, Note, Paper, Syllabus, Notification, LabProgram, Comment, and UserMaterial.</li>
+            <li><strong>10 REST Controllers:</strong> Complete CRUD APIs handling file streams, queries, authentication, and stats.</li>
+            <li><strong>Background Sync Daemon:</strong> Resilient background worker with duplicate-prevention hashing and error-handling fallbacks.</li>
+            <li><strong>Security Architecture:</strong> Salted password hashing using bcryptjs and stateless JWT authorization.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Frontend Engineering & UI Metrics</h3>
+          <ul class="card-list">
+            <li><strong>40+ Modular Components:</strong> Built with React 19 and Vite for instant hot-module reloading and sub-second builds.</li>
+            <li><strong>CSS Token Design System:</strong> Polished glassmorphic aesthetics, fluid responsive layouts, and zero external UI bloat.</li>
+            <li><strong>Interactive Micro-Interactions:</strong> Heart-burst physics like animations and animated modal dialogs.</li>
+            <li><strong>Cross-Device Validation:</strong> Rigorously tested across mobile, tablet, and desktop viewports with sub-100ms load times.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">9/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 10: Future Scope -->
+    <section class="slide" id="slide-10">
+      <header class="slide-header">
+        <div class="slide-category">Roadmap & Vision</div>
+        <h2 class="slide-title">9. Future Scope</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="card">
+          <h3 class="card-title">AI & Machine Learning Extensions</h3>
+          <ul class="card-list">
+            <li><strong>NLP Question Paper Trend Analyzer:</strong> Train NLP models on 5-year past question papers to predict high-probability questions per unit.</li>
+            <li><strong>RAG-Powered AI Study Tutor:</strong> Ingest verified unit notes into a localized vector database to provide instant doubt resolution.</li>
+            <li><strong>Automated Result Aggregator:</strong> Scrape semester grade sheets directly via student university hall ticket numbers.</li>
+            <li><strong>Audio Revision Podcasts:</strong> AI text-to-speech engine generating 5-minute concise audio revision summaries for each module.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Ecosystem & Platform Scaling</h3>
+          <ul class="card-list">
+            <li><strong>WhatsApp & WebPush Alerts:</strong> Direct alerts on student phones when exam fee dates or timetables are published.</li>
+            <li><strong>Multi-University Taxonomy:</strong> Expand database taxonomy to support sister institutions (JNTUK, JNTUH, AU, SVU).</li>
+            <li><strong>Faculty Evaluation Portal:</strong> Verified professor accounts for publishing official lecture slides and practice quizzes.</li>
+            <li><strong>Progressive Web App (PWA):</strong> Service workers for full offline reading of visited lecture units.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">10/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 11: Conclusion -->
+    <section class="slide" id="slide-11">
+      <header class="slide-header">
+        <div class="slide-category">Final Assessment</div>
+        <h2 class="slide-title">10. Conclusion</h2>
+        <div class="slide-divider"></div>
+      </header>
+      <div class="slide-body">
+        <div class="card">
+          <h3 class="card-title">Project Achievements</h3>
+          <ul class="card-list">
+            <li><strong>Complete Academic Solution:</strong> Successfully built and verified JNTU Circle as an all-in-one resource and intelligence portal.</li>
+            <li><strong>Eliminated Resource Hunting:</strong> Replaced hours of scattered searching with instantaneous branch and regulation filtering.</li>
+            <li><strong>Zero Missed Circulars:</strong> Autonomous sync service ensures crucial exam deadlines and fee schedules are received immediately.</li>
+            <li><strong>Academic Integrity:</strong> Empowered students with university-accurate SGPA/CGPA and attendance calculators.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Key Learnings & Real-World Impact</h3>
+          <ul class="card-list">
+            <li><strong>Full-Stack Mastery:</strong> Hands-on implementation of decoupled MERN architecture, REST APIs, and automated background daemons.</li>
+            <li><strong>Authentic Student Impact:</strong> Solved a widespread pain point experienced by thousands of university engineering students.</li>
+            <li><strong>Scalable Foundation:</strong> Modular architecture ready for future AI/ML analytics integrations.</li>
+            <li><strong>Engineering Excellence:</strong> Demonstrates how clean software engineering directly enhances higher education workflows.</li>
+          </ul>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">11/12</span>
+      </footer>
+    </section>
+
+    <!-- Slide 12: Thank You -->
+    <section class="slide" id="slide-12">
+      <div class="cover-body">
+        <h1 class="cover-main-title" style="font-size: 3.8rem; margin-bottom: 12px;">THANK YOU</h1>
+        <p class="cover-subtitle" style="font-size: 1.4rem; margin-bottom: 26px;">Questions & Discussions are Welcome</p>
+        
+        <div class="cover-card" style="padding: 22px 50px;">
+          <div class="cover-dept" style="font-size: 1.25rem;">Department of Artificial Intelligence and Machine Learning</div>
+          <div class="cover-college" style="font-size: 1.1rem;">M.S. Engineering College</div>
+          <div class="cover-tech" style="font-size: 0.95rem; margin-top: 10px;">Project: JNTU Circle (Andhra Circle) • MERN Full-Stack Portal</div>
+        </div>
+      </div>
+      <footer class="slide-footer">
+        <div class="slide-footer-center">Department of Artificial Intelligence and Machine Learning, MS Engineering College</div>
+        <span class="slide-page-num">12/12</span>
+      </footer>
+    </section>
+
+  </div>
+
+  <!-- Interactive Controls Bar -->
+  <div class="deck-controls">
+    <button class="control-btn" onclick="prevSlide()">◀ Previous</button>
+    <span id="slideIndicator" style="font-weight: 600; min-width: 100px; text-align: center;">Slide 1 / 13</span>
+    <button class="control-btn" onclick="nextSlide()">Next ▶</button>
+    <button class="control-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button class="control-btn" onclick="window.print()">🖨️ Print / PDF</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 13;
+
+    function showSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= totalSlides) index = totalSlides - 1;
+      
+      document.querySelectorAll('.slide').forEach((s, idx) => {
+        s.classList.toggle('active', idx === index);
+      });
+      
+      currentSlide = index;
+      document.getElementById('slideIndicator').innerText = `Slide ${currentSlide + 1} / ${totalSlides}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) showSlide(currentSlide - 1);
+    }
+
+    function goToSlide(slideIndex) {
+      showSlide(slideIndex);
+    }
+
+    function toggleFullscreen() {
+      const elem = document.getElementById('deckContainer');
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => alert("Fullscreen error: " + err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'Home') {
+        showSlide(0);
+      } else if (e.key === 'End') {
+        showSlide(totalSlides - 1);
+      }
+    });
+  </script>
+</body>
+</html>

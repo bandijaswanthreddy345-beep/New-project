@@ -1,23 +1,53 @@
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import BranchSection from "../components/BranchSection";
+import LatestNotes from "../components/LatestNotes";
+import QuestionPapers from "../components/QuestionPapers";
+import LatestSyllabus from "../components/LatestSyllabus";
+import LabPrograms from "../pages/LabPrograms";
 import Footer from "../components/Footer";
 
 function Home() {
   return (
     <>
-      {/* Header from Emerald Horizon */}
+      {/* =========================
+          NAVBAR
+      ========================== */}
       <Navbar />
 
-      <main>
-        {/* Hero Section from Emerald Horizon */}
-        <Hero />
+      {/* =========================
+          HERO SECTION
+      ========================== */}
+      <Hero />
 
-        {/* 3D Academic Department Cards (Matched to Emerald Horizon Theme) with Ambition Statement */}
-        <BranchSection />
+      {/* =========================
+          HOME CONTENT
+      ========================== */}
+      <main className="home-main">
+        <section className="home-content">
+          {/* Branches (3D Orbit Model) */}
+          <BranchSection />
+
+          {/* Academic Resources Wrapper */}
+          <div id="academic-resources-section" className="academic-resources-anchor">
+            {/* Latest Notes */}
+            <LatestNotes />
+
+            {/* Question Papers */}
+            <QuestionPapers />
+
+            {/* Latest Syllabus */}
+            <LatestSyllabus />
+
+            {/* Lab Programs */}
+            <LabPrograms />
+          </div>
+        </section>
       </main>
 
-      {/* Footer from Emerald Horizon */}
+      {/* =========================
+          FOOTER
+      ========================== */}
       <Footer />
     </>
   );
