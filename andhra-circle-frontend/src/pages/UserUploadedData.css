@@ -1,8 +1,13 @@
+/* =========================================================
+   USER UPLOADED MATERIALS ADMIN PAGE
+   Royal Blue + White + Navy Design System
+   ========================================================= */
+
 .user-uploaded-page {
   min-height: 100vh;
   padding: 42px max(24px, calc((100vw - 1240px) / 2)) 72px;
-  background: #f4f7f6;
-  color: #18332e;
+  background: var(--background, #f8fafc);
+  color: var(--text-primary, #0f172a);
 }
 
 .user-uploaded-header {
@@ -14,21 +19,25 @@
 }
 
 .user-uploaded-eyebrow {
-  color: #a47c1b;
+  color: var(--primary, #2563eb);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .user-uploaded-header h1 {
   margin: 8px 0;
-  color: #073e35;
+  color: var(--navy, #0f172a);
   font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 .user-uploaded-header p {
   margin: 0;
-  color: #60736e;
+  color: var(--text-muted, #64748b);
+  font-size: 14.5px;
 }
 
 .user-uploaded-header-actions {
@@ -39,14 +48,20 @@
 
 .user-uploaded-header-actions button {
   min-height: 42px;
-  padding: 9px 15px;
-  border: 1px solid #b9d1c9;
+  padding: 9px 18px;
+  border: 1px solid var(--border, #e2e8f0);
   border-radius: 10px;
-  background: #fff;
-  color: #124f43;
+  background: #ffffff;
+  color: var(--navy, #0f172a);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-uploaded-header-actions button:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
 .user-uploaded-header-actions button:disabled {
@@ -55,9 +70,15 @@
 }
 
 .user-uploaded-header-actions .user-uploaded-back {
-  background: #0d5a4d;
-  border-color: #0d5a4d;
-  color: #fff;
+  background: var(--primary, #2563eb);
+  border-color: var(--primary, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.user-uploaded-header-actions .user-uploaded-back:hover:not(:disabled) {
+  background: var(--primary-hover, #1d4ed8);
+  border-color: var(--primary-hover, #1d4ed8);
 }
 
 .user-uploaded-summary {
@@ -67,10 +88,10 @@
   min-width: 210px;
   margin-bottom: 22px;
   padding: 16px 20px;
-  border: 1px solid #d9e8e2;
+  border: 1px solid var(--border, #e2e8f0);
   border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(16, 63, 53, 0.06);
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
 }
 
 .user-uploaded-summary > span {
@@ -83,21 +104,22 @@
 }
 
 .user-uploaded-summary strong {
-  color: #0c594b;
+  color: var(--primary, #2563eb);
   font-size: 1.35rem;
+  font-weight: 800;
 }
 
 .user-uploaded-summary div span {
-  color: #647570;
+  color: var(--text-muted, #64748b);
   font-size: 0.85rem;
 }
 
 .user-uploaded-table-wrap {
   overflow-x: auto;
-  border: 1px solid #d9e8e2;
+  border: 1px solid var(--border, #e2e8f0);
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 10px 30px rgba(16, 63, 53, 0.06);
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
 }
 
 .user-uploaded-table {
@@ -109,18 +131,19 @@
 .user-uploaded-table th,
 .user-uploaded-table td {
   padding: 15px 16px;
-  border-bottom: 1px solid #edf2ef;
+  border-bottom: 1px solid #f1f5f9;
   vertical-align: top;
 }
 
 .user-uploaded-table th {
-  background: #eaf3ef;
-  color: #315a50;
+  background: #f8fafc;
+  color: var(--text-secondary, #475569);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+  border-bottom: 1px solid var(--border, #e2e8f0);
 }
 
 .user-uploaded-table tbody tr:last-child td {
@@ -128,19 +151,22 @@
 }
 
 .user-uploaded-table tbody tr:hover {
-  background: #f9fcfa;
+  background: #f8fafc;
 }
 
 .user-uploaded-type,
 .user-uploaded-status {
   display: inline-flex;
-  padding: 5px 9px;
+  padding: 5px 10px;
   border-radius: 999px;
-  background: #edf6f1;
-  color: #145847;
   font-size: 0.78rem;
   font-weight: 750;
   white-space: nowrap;
+}
+
+.user-uploaded-type {
+  background: var(--primary-light, #eff6ff);
+  color: var(--primary, #2563eb);
 }
 
 .user-uploaded-name,
@@ -150,11 +176,12 @@
 
 .user-uploaded-name {
   margin-bottom: 4px;
-  color: #203a34;
+  color: var(--text-primary, #0f172a);
+  font-weight: 700;
 }
 
 .user-uploaded-email {
-  color: #55756d;
+  color: var(--text-muted, #64748b);
   font-size: 0.86rem;
   text-decoration: none;
 }
@@ -167,51 +194,53 @@
 .user-uploaded-comment {
   min-width: 190px;
   max-width: 300px;
-  color: #52645f;
+  color: var(--text-secondary, #475569);
   overflow-wrap: anywhere;
+  font-size: 13.5px;
 }
 
 .user-uploaded-file {
-  color: #0c6655;
+  color: var(--primary, #2563eb);
   font-weight: 700;
   overflow-wrap: anywhere;
 }
 
 .user-uploaded-no-file {
-  color: #899791;
+  color: var(--text-muted, #94a3b8);
   font-size: 0.85rem;
 }
 
 .user-uploaded-status.status-pending {
-  background: #fff5d8;
-  color: #805d0a;
+  background: #fef3c7;
+  color: var(--warning, #b45309);
 }
 
 .user-uploaded-status.status-approved {
-  background: #e4f7ed;
-  color: #15633e;
+  background: #ecfdf5;
+  color: var(--success, #15803d);
 }
 
 .user-uploaded-status.status-rejected {
-  background: #fff0ee;
-  color: #9b392d;
+  background: #fef2f2;
+  color: var(--error, #dc2626);
 }
 
 .user-uploaded-delete {
-  padding: 7px 11px;
-  border: 1px solid #e8bcb5;
+  padding: 7px 12px;
+  border: 1px solid #fecaca;
   border-radius: 8px;
-  background: #fff7f5;
-  color: #963b30;
+  background: #fef2f2;
+  color: var(--error, #dc2626);
   font: inherit;
   font-size: 0.84rem;
   font-weight: 750;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .user-uploaded-delete:hover:not(:disabled) {
-  border-color: #ca7569;
-  background: #ffebe7;
+  border-color: #f87171;
+  background: #fee2e2;
 }
 
 .user-uploaded-delete:disabled {
@@ -222,11 +251,11 @@
 .user-uploaded-empty,
 .user-uploaded-message {
   padding: 36px 24px;
-  border: 1px solid #d9e8e2;
+  border: 1px solid var(--border, #e2e8f0);
   border-radius: 16px;
-  background: #fff;
+  background: #ffffff;
   text-align: center;
-  color: #60736e;
+  color: var(--text-muted, #64748b);
 }
 
 .user-uploaded-empty > span {
@@ -235,7 +264,7 @@
 
 .user-uploaded-empty h2 {
   margin: 10px 0 6px;
-  color: #164b40;
+  color: var(--navy, #0f172a);
 }
 
 .user-uploaded-empty p {
@@ -244,9 +273,9 @@
 
 .user-uploaded-error {
   margin-bottom: 18px;
-  border-color: #f0c8c3;
-  background: #fff7f5;
-  color: #913d32;
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: var(--error, #dc2626);
 }
 
 @media (max-width: 700px) {

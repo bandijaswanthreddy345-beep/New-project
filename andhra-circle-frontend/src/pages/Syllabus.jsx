@@ -663,7 +663,7 @@ function Syllabus({ search: propSearch = "" }) {
                     marginTop: "14px",
                     padding: "8px 18px",
                     borderRadius: "999px",
-                    background: "#013e37",
+                    background: "#2563eb",
                     color: "#ffffff",
                     border: "none",
                     fontWeight: 650,
