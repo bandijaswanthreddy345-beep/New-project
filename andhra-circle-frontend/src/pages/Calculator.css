@@ -103,9 +103,9 @@
 }
 
 .calc-tab-btn.active {
-  background-color: #0f766e;
+  background-color: #2563eb;
   color: #ffffff;
-  box-shadow: 0 4px 12px #0f766e33;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 .tab-icon {
@@ -154,7 +154,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #0284c7, #2563eb, #0f766e);
+  background: linear-gradient(90deg, #0284c7, #2563eb, #2563eb);
 }
 
 .calc-student-header-top {
@@ -341,8 +341,8 @@
 }
 
 .calc-select:focus {
-  border-color: #0f766e;
-  box-shadow: 0 0 0 3px #0f766e20;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 /* =========================================================
@@ -400,8 +400,8 @@
 }
 
 .calc-input-text:focus {
-  border-color: #0f766e;
-  background-color: #f0fdfa;
+  border-color: #2563eb;
+  background-color: #eff6ff;
 }
 
 .calc-select-cell {
@@ -430,9 +430,9 @@
 }
 
 .calc-auto-credit-box:focus-within {
-  border-color: #0f766e;
-  background-color: #f0fdfa;
-  box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.15);
+  border-color: #2563eb;
+  background-color: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
 .calc-input-credit {
@@ -450,7 +450,7 @@
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  background-color: #0f766e;
+  background-color: #2563eb;
   color: #ffffff;
   padding: 2px 6px;
   border-radius: 5px;
@@ -479,9 +479,9 @@
 }
 
 .calc-input-marks:focus {
-  border-color: #0f766e;
-  background-color: #f0fdfa;
-  box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.15);
+  border-color: #2563eb;
+  background-color: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
 .calc-marks-grade-badge {
@@ -637,8 +637,8 @@
   gap: 4px;
   font-size: 11px;
   font-weight: 700;
-  color: #0f766e;
-  background-color: #ccfbf1;
+  color: #2563eb;
+  background-color: #eff6ff;
   border-radius: 6px;
   padding: 2px 8px;
   width: fit-content;
@@ -669,8 +669,8 @@
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.05em;
-  color: #0f766e;
-  background-color: #ccfbf1;
+  color: #2563eb;
+  background-color: #eff6ff;
   padding: 4px 10px;
   border-radius: 9999px;
 }
@@ -691,8 +691,8 @@
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0f766e, #0d9488);
-  box-shadow: 0 10px 25px #0f766e3d;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -772,7 +772,7 @@
 }
 
 .text-accent {
-  color: #0f766e !important;
+  color: #2563eb !important;
 }
 
 .calc-formula-note {
@@ -800,7 +800,7 @@
   justify-content: center;
   gap: 8px;
   padding: 12px;
-  background-color: #0f766e;
+  background-color: #2563eb;
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -808,11 +808,11 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px #0f766e33;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2);
 }
 
 .calc-btn-save-profile:hover {
-  background-color: #0d9488;
+  background-color: #1d4ed8;
   transform: translateY(-1px);
 }
 
@@ -945,13 +945,13 @@
 }
 
 .calc-target-input:focus {
-  border-color: #0f766e;
-  box-shadow: 0 0 0 3px #0f766e1a;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .target-highlight {
-  border-color: #0f766e;
-  background-color: #f0fdfa;
+  border-color: #2563eb;
+  background-color: #eff6ff;
 }
 
 .calc-input-hint {
@@ -1010,7 +1010,7 @@
 .calc-btn-complete-task {
   width: 100%;
   padding: 13px 20px;
-  background: linear-gradient(135deg, #0f766e, #0284c7);
+  background: linear-gradient(135deg, #2563eb, #0284c7);
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -1021,14 +1021,14 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.3);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   margin-bottom: 10px;
 }
 
 .calc-btn-complete-task:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(15, 118, 110, 0.4);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
 }
 
 .calc-completion-modal-backdrop {
@@ -1095,7 +1095,7 @@
 }
 
 .calc-modal-score-banner {
-  background: linear-gradient(135deg, #042f2e, #0f766e);
+  background: linear-gradient(135deg, #0f172a, #2563eb);
   color: #ffffff;
   border-radius: 16px;
   padding: 22px;
@@ -1104,7 +1104,7 @@
   gap: 20px;
   align-items: center;
   margin-bottom: 24px;
-  box-shadow: 0 10px 25px -5px rgba(15, 118, 110, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.35);
 }
 
 @media (max-width: 520px) {
@@ -1122,7 +1122,7 @@
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.06em;
-  color: #99f6e4;
+  color: #bfdbfe;
   text-transform: uppercase;
   margin-bottom: 4px;
 }
@@ -1138,7 +1138,7 @@
 .calc-modal-score-class {
   font-size: 12px;
   font-weight: 700;
-  color: #ccfbf1;
+  color: #eff6ff;
   background-color: rgba(255, 255, 255, 0.15);
   padding: 4px 10px;
   border-radius: 6px;
@@ -1163,7 +1163,7 @@
 }
 
 .calc-modal-stat-pill span {
-  color: #99f6e4;
+  color: #bfdbfe;
   font-weight: 600;
 }
 
