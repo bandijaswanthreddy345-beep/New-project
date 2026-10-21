@@ -10,13 +10,20 @@ export const DEFAULT_STUDENT_DATA = {
   year: "3rd Year",
   semester: "6th Semester",
   regulation: "R20 Regulation",
-  cgpa: "8.85",
-  credits: "132 / 160",
+  cgpa: "9.18",
+  sgpa: "9.42",
+  credits: "142 / 160",
   attendance: "89.4%",
+  backlogs: "0 Backlogs",
   email: "chinnu@student.jntu.ac.in",
   phone: "+91 98765 43210",
   batch: "2022 - 2026",
-  mentor: "Dr. K. S. Rao, Professor (Dept. of AIML)",
+  examCountdown: "STARTS IN 06D : 14H",
+  examSchedule: [
+    { code: "CS701PC", title: "Cloud Computing Architecture", time: "10:00 AM - 01:00 PM", date: "Dec 04, 2026" },
+    { code: "CS702PE", title: "Deep Reinforcement Learning", time: "10:00 AM - 01:00 PM", date: "Dec 07, 2026" },
+    { code: "CS703PC", title: "Information Security Systems", time: "10:00 AM - 01:00 PM", date: "Dec 10, 2026" },
+  ],
   savedNotes: [
     {
       id: "aiml-601",

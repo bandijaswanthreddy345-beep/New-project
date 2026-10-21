@@ -216,9 +216,6 @@ function AuthorProfile() {
                     : "author-role-tag--dev"
                 }`}
               >
-                <span className="author-role-bullet" aria-hidden="true">
-                  {developer.title === "PLATFORM CREATOR" ? "★" : "✦"}
-                </span>
                 {developer.title}
               </span>
               <h3>{developer.name}</h3>
@@ -243,27 +240,40 @@ function AuthorProfile() {
 
           <div className="jntu-upload-card">
             <div className="jntu-upload-header">
-              <h3>Upload Study Materials</h3>
+              <h3 className="text-base font-bold text-[#F5F5FA] mb-2">Upload Study Materials</h3>
             </div>
 
-            <p className="jntu-upload-copy">
+            <p className="jntu-upload-copy text-xs text-[#94A3B8] leading-relaxed mb-4">
               JNTU Circle grows with the help of students who share their notes,
               question papers, and study materials. If you have clear, useful
-              notes, you can upload them and support thousands of JNTU students.
+              notes, upload them and support thousands of fellow engineers.
             </p>
 
+            {/* Stitch Dashed Dropzone Box */}
+            <div
+              onClick={() => setIsUploadModalOpen(true)}
+              className="border border-dashed border-[#8B5CF6]/40 hover:border-[#8B5CF6] rounded-2xl p-4 mb-4 text-center cursor-pointer bg-[#08090D]/50 hover:bg-[#8B5CF6]/5 transition-all flex flex-col items-center justify-center gap-1.5"
+            >
+              <div className="w-8 h-8 rounded-xl bg-[#161724] border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6]">
+                <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
+              </div>
+              <span className="text-xs font-semibold text-[#F5F5FA]">Drop PDF, DOCX or scanned sheets</span>
+              <span className="text-[10px] text-[#64748B]">or browse files from device</span>
+            </div>
+
+            {/* Stitch Solid Purple Gradient Upload Button */}
             <button
               type="button"
-              className="jntu-upload-button"
+              className="jntu-upload-cta-btn"
               onClick={() => setIsUploadModalOpen(true)}
             >
-              Upload Materials <span aria-hidden="true">↑</span>
+              <span>Upload Materials</span>
+              <span aria-hidden="true">↑</span>
             </button>
 
-            <p className="jntu-upload-footnote">
-              Your notes can help others learn better and make JNTU Circle a
-              stronger community resource.
-            </p>
+            <div className="pt-3 mt-3 border-t border-[#292733] flex items-center gap-2 text-[11px] text-[#64748B]">
+              <span>Your verified submissions earn community contributor credits and badge recognition.</span>
+            </div>
           </div>
         </div>
       </section>
@@ -341,7 +351,7 @@ function AuthorProfile() {
 
               <div className="upload-comment-box">
                 <div className="upload-avatar" aria-hidden="true">
-                  👤
+                  <span className="material-symbols-outlined text-[16px]">person</span>
                 </div>
                 <textarea
                   name="comment"
@@ -355,7 +365,7 @@ function AuthorProfile() {
 
               <div className="upload-input-row">
                 <span className="upload-input-icon" aria-hidden="true">
-                  👤
+                  <span className="material-symbols-outlined text-[16px]">person</span>
                 </span>
                 <input
                   type="text"

@@ -23,6 +23,7 @@ import QuestionPapers from "./components/QuestionPapers";
 import Notifications from "./components/Notifications";
 import Calculator from "./pages/Calculator";
 import UploadMaterials from "./pages/UploadMaterials";
+import JntuChatbot from "./components/JntuChatbot";
 
 // =========================
 // Authentication Pages
@@ -186,6 +187,16 @@ function App() {
       <Route
         path="/sgpa-calculator"
         element={<Calculator />}
+      />
+
+      <Route
+        path="/cgpa"
+        element={<Navigate to="/cgpa-calculator" replace />}
+      />
+
+      <Route
+        path="/sgpa"
+        element={<Navigate to="/sgpa-calculator" replace />}
       />
 
 
@@ -446,6 +457,9 @@ function App() {
       </svg>
       <span className="floating-whatsapp-tooltip">Join WhatsApp Community</span>
     </a>
+
+    {/* JNTU AI Chatbot (Global floating trigger & modal overlay) */}
+    <JntuChatbot />
     </>
   );
 }

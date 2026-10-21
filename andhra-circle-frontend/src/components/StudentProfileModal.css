@@ -190,17 +190,6 @@
   background: #013e37;
 }
 
-.sp-status-indicator {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #10b981;
-  border: 3px solid #ffffff;
-}
-
 .sp-identity-text {
   flex: 1;
 }
@@ -272,24 +261,26 @@
 }
 
 .sp-edit-toggle-btn {
-  background: #ffffff;
-  border: 1px solid #c8ded7;
-  color: #013e37;
-  padding: 8px 16px;
-  border-radius: 10px;
+  background: #161724;
+  border: 1.5px solid #292733;
+  color: #F5F5FA;
+  padding: 8px 18px;
+  border-radius: 9999px;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 750;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(1, 62, 55, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  letter-spacing: 0.2px;
 }
 
 .sp-edit-toggle-btn:hover,
 .sp-edit-toggle-btn.active {
-  background: #013e37;
+  background: #8B5CF6;
   color: #ffffff;
-  border-color: #013e37;
-  box-shadow: 0 4px 12px rgba(1, 62, 55, 0.2);
+  border-color: #8B5CF6;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.45);
+  transform: translateY(-1px);
 }
 
 /* =========================================================
@@ -858,3 +849,247 @@
     padding: 18px 20px;
   }
 }
+
+/* =========================================================
+   STUDENT PROFILE MODAL — STITCH OBSIDIAN DARK THEME OVERRIDES
+   Harmonized with Homepage (#08090D, #12131B, #8B5CF6)
+   ========================================================= */
+.sp-modal-backdrop {
+  background: rgba(8, 9, 13, 0.88) !important;
+  backdrop-filter: blur(16px) !important;
+}
+
+.sp-modal-container {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  color: #F5F5FA !important;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 35px rgba(139, 92, 246, 0.18) !important;
+}
+
+.sp-modal-banner {
+  background: #161724 !important;
+  border-bottom: 1px solid #292733 !important;
+  color: #F5F5FA !important;
+}
+
+.sp-banner-title {
+  color: #F5F5FA !important;
+}
+
+.sp-banner-tag {
+  color: #C4B5FD !important;
+}
+
+.sp-banner-btn {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  color: #C4B5FD !important;
+}
+
+.sp-banner-btn:hover {
+  background: #1f2033 !important;
+  border-color: #8B5CF6 !important;
+  color: #ffffff !important;
+}
+
+.sp-close-btn {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  color: #94A3B8 !important;
+}
+
+.sp-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: #EF4444 !important;
+  color: #F87171 !important;
+}
+
+.sp-identity-card {
+  background: #12131B !important;
+  border-bottom: 1px solid #292733 !important;
+}
+
+.sp-student-name {
+  color: #F5F5FA !important;
+}
+
+.sp-verified-badge {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border: 1px solid rgba(139, 92, 246, 0.35) !important;
+  color: #C4B5FD !important;
+}
+
+.sp-sub-info {
+  color: #94A3B8 !important;
+}
+
+.sp-sub-roll {
+  background: #161724 !important;
+  border: 1px solid #292733 !important;
+  color: #C4B5FD !important;
+}
+
+.sp-sub-branch {
+  color: #94A3B8 !important;
+}
+
+.sp-sub-sem {
+  color: #A78BFA !important;
+  font-weight: 700 !important;
+}
+
+.sp-edit-toggle-btn,
+.sp-edit-profile-btn {
+  background: #161724 !important;
+  border: 1.5px solid #292733 !important;
+  color: #F5F5FA !important;
+}
+
+.sp-edit-toggle-btn:hover,
+.sp-edit-toggle-btn.active,
+.sp-edit-profile-btn:hover {
+  background: #8B5CF6 !important;
+  border-color: #8B5CF6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.45) !important;
+}
+
+.sp-metrics-grid {
+  background: #0f1017 !important;
+  border-bottom: 1px solid #292733 !important;
+}
+
+.sp-metric-tile {
+  background: #161724 !important;
+  border: 1px solid #292733 !important;
+  box-shadow: none !important;
+}
+
+.sp-metric-tile:hover {
+  border-color: rgba(139, 92, 246, 0.4) !important;
+}
+
+.sp-metric-label {
+  color: #94A3B8 !important;
+}
+
+.sp-metric-val {
+  color: #F5F5FA !important;
+}
+
+.sp-metric-val.sp-gold,
+.sp-metric-val.sp-emerald,
+.sp-metric-val.sp-reg {
+  color: #C4B5FD !important;
+}
+
+.sp-metric-max,
+.sp-metric-sub {
+  color: #64748B !important;
+}
+
+.sp-tabs-nav {
+  background: #12131B !important;
+  border-bottom: 1px solid #292733 !important;
+}
+
+.sp-tab-btn {
+  color: #94A3B8 !important;
+}
+
+.sp-tab-btn:hover {
+  color: #F5F5FA !important;
+}
+
+.sp-tab-btn.active {
+  color: #C4B5FD !important;
+  border-bottom-color: #8B5CF6 !important;
+}
+
+.sp-modal-body {
+  background: #0d0e15 !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #292733 transparent !important;
+}
+
+.sp-modal-body::-webkit-scrollbar-thumb {
+  background: #292733 !important;
+  border-radius: 6px !important;
+}
+
+.sp-details-grid {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+}
+
+.sp-label {
+  color: #94A3B8 !important;
+}
+
+.sp-value {
+  color: #F5F5FA !important;
+}
+
+.sp-value a {
+  color: #C4B5FD !important;
+}
+
+.sp-status-active {
+  color: #34D399 !important;
+}
+
+.sp-sgpa-table-card,
+.sp-form-card {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+}
+
+.sp-sgpa-table th {
+  background: #161724 !important;
+  color: #94A3B8 !important;
+  border-bottom: 1px solid #292733 !important;
+}
+
+.sp-sgpa-table td {
+  color: #F5F5FA !important;
+  border-bottom: 1px solid #292733/60 !important;
+}
+
+.sp-input,
+.sp-select {
+  background: #08090D !important;
+  border: 1.5px solid #292733 !important;
+  color: #F5F5FA !important;
+}
+
+.sp-input:focus,
+.sp-select:focus {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
+}
+
+.sp-save-btn {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35) !important;
+}
+
+.sp-modal-footer {
+  background: #12131B !important;
+  border-top: 1px solid #292733 !important;
+}
+
+.sp-footer-info {
+  color: #64748B !important;
+}
+
+.sp-footer-close-btn {
+  background: #8B5CF6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35) !important;
+}
+
+.sp-footer-close-btn:hover {
+  background: #7C3AED !important;
+}
+

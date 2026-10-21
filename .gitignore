@@ -5,3 +5,13 @@ dist
 dist-ssr
 *.local
 .DS_Store
+__pycache__/
+*.pyc
+FreeVideo/
+stitch_*
+user_*
+branches_bg_*
+gpu-restart.ps1
+*.backup.*
+*.original_backup.*
+andhra-circle-presentation.html

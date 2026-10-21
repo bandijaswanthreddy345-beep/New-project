@@ -145,7 +145,7 @@ function CommentSection({ noteId }) {
         <div className="comments-heading">
 
           <div className="comments-icon">
-            <span>💬</span>
+            <span className="material-symbols-outlined text-[18px]">chat</span>
           </div>
 
           <div className="comments-heading-content">
@@ -182,7 +182,7 @@ function CommentSection({ noteId }) {
         <div className="comment-form-title-wrapper">
 
           <div className="comment-form-title-icon">
-            ✎
+            <span className="material-symbols-outlined text-[16px]">edit</span>
           </div>
 
           <div>
@@ -288,7 +288,7 @@ function CommentSection({ noteId }) {
               </>
             ) : (
               <>
-                <span>➤</span>
+                <span className="material-symbols-outlined text-[16px]">send</span>
                 Post Comment
               </>
             )}
@@ -381,7 +381,7 @@ function CommentSection({ noteId }) {
                   }
                   className="comment-action-button comment-like-button"
                 >
-                  <span>👍</span>
+                  <span className="material-symbols-outlined text-[16px]">thumb_up</span>
                   <span className="comment-action-count">
                     {item.likes || 0}
                   </span>

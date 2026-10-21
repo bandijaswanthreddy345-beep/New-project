@@ -1,7 +1,7 @@
-/* ==========================================
+/* =========================================================
    AUTHOR PROFILE & DEVELOPER TEAM SECTION
-   Matches JNTU Circle Deep Green & Gold Theme
-========================================== */
+   Harmonized with Stitch Obsidian Dark Palette (#08090D, #12131B, #8B5CF6)
+   ========================================================= */
 
 .author-section {
   position: relative;
@@ -11,10 +11,7 @@
   background: transparent;
 }
 
-/* ==========================================
-   SECTION HEADING
-========================================== */
-
+/* Section Heading */
 .author-section-heading {
   margin-bottom: 16px;
   text-align: left;
@@ -23,12 +20,12 @@
 .section-tag {
   display: inline-flex;
   align-items: center;
-  padding: 5px 13px;
+  padding: 5px 14px;
   margin-bottom: 8px;
   border-radius: 999px;
-  background: rgba(255, 239, 179, 0.15);
-  border: 1px solid rgba(255, 239, 179, 0.38);
-  color: #ffefb3;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #C4B5FD;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 1.2px;
@@ -37,28 +34,23 @@
 
 .author-section-heading h2 {
   margin: 0;
-  color: #ffffff;
-  font-size: 26px;
+  color: #F5F5FA;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.4px;
 }
 
-/* ==========================================
-   TEAM CARD (SIDEBAR COMPACT PORTRAIT)
-========================================== */
-
+/* Team Card (Obsidian Surface) */
 .team-card {
   position: relative;
   z-index: 10;
   width: 100%;
   padding: 24px 20px;
-  background: linear-gradient(155deg, #ffffff 0%, #f7faf8 100%);
-  border: 1px solid rgba(255, 239, 179, 0.45);
+  background: #12131B;
+  border: 1px solid #292733;
   border-radius: 20px;
-  box-shadow:
-    0 18px 44px rgba(0, 25, 20, 0.32),
-    0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -66,16 +58,13 @@
   box-sizing: border-box;
 }
 
-/* ==========================================
-   VISION QUOTE
-========================================== */
-
+/* Vision Quote */
 .team-quote {
   position: relative;
   margin: 0;
   padding: 14px 16px 14px 20px;
-  background: #eef7f4;
-  border-left: 3.5px solid #0f766e;
+  background: rgba(139, 92, 246, 0.08);
+  border-left: 3.5px solid #8B5CF6;
   border-radius: 0 12px 12px 0;
 }
 
@@ -85,14 +74,14 @@
   left: 6px;
   font-size: 28px;
   font-family: Georgia, serif;
-  color: rgba(15, 118, 110, 0.28);
+  color: rgba(139, 92, 246, 0.35);
   line-height: 1;
   pointer-events: none;
 }
 
 .team-quote p {
   margin: 0 0 6px 0;
-  color: #134e4a;
+  color: #CBD5E1;
   font-size: 12.5px;
   line-height: 1.6;
   font-style: italic;
@@ -102,16 +91,13 @@
   display: block;
   font-size: 10.5px;
   font-weight: 700;
-  color: #0f766e;
+  color: #C4B5FD;
   font-style: normal;
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
 
-/* ==========================================
-   DEVELOPER SLIDE
-========================================== */
-
+/* Developer Slide */
 .developer-slide {
   display: flex;
   flex-direction: column;
@@ -127,22 +113,13 @@
   height: 124px;
   border-radius: 26px;
   overflow: hidden;
-  border: 3.5px solid #0f766e;
+  border: 3px solid #8B5CF6;
   box-shadow:
-    0 10px 24px rgba(15, 118, 110, 0.28),
-    0 0 0 4px rgba(255, 239, 179, 0.45);
-  background: #eaf1fb;
+    0 10px 24px rgba(139, 92, 246, 0.28),
+    0 0 0 4px rgba(139, 92, 246, 0.15);
+  background: #161724;
   flex-shrink: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Black ring for Platform Creator & Developer portraits */
-.developer-slide-image--creator,
-.developer-slide-image--dev {
-  border-color: #000000;
-  box-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.25),
-    0 0 0 3.5px rgba(0, 0, 0, 0.1);
 }
 
 .developer-slide-image img {
@@ -164,67 +141,36 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 14px;
+  padding: 4px 12px;
   margin-bottom: 2px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.95px;
   text-transform: uppercase;
-  transition: all 0.25s ease;
-  background: #000000;
-  color: #ffffff;
-  border: 1.5px solid #000000;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
-}
-
-/* Black badge for Platform Creator */
-.author-role-tag--creator {
-  background: #000000;
-  color: #ffffff;
-  border: 1.5px solid #000000;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
-}
-
-/* Black badge for Developer */
-.author-role-tag--dev {
-  background: #000000;
-  color: #ffffff;
-  border: 1.5px solid #000000;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
-}
-
-.author-role-bullet {
-  font-size: 11px;
-  line-height: 1;
-  color: #ffffff;
-}
-
-.author-role-tag--creator .author-role-bullet,
-.author-role-tag--dev .author-role-bullet {
-  color: #ffffff;
+  background: #181926;
+  color: #C4B5FD;
+  border: 1px solid #8B5CF6;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.2);
 }
 
 .developer-slide-copy h3 {
   margin: 0;
-  color: #013e37;
-  font-size: 20px;
+  color: #F5F5FA;
+  font-size: 19px;
   font-weight: 800;
   line-height: 1.25;
 }
 
 .developer-slide-copy p {
   margin: 0;
-  color: #0d9488;
-  font-size: 13px;
-  font-weight: 600;
+  color: #94A3B8;
+  font-size: 12.5px;
+  font-weight: 500;
   line-height: 1.45;
 }
 
-/* ==========================================
-   CAROUSEL CONTROLS
-========================================== */
-
+/* Carousel Controls */
 .developer-carousel-controls {
   display: flex;
   align-items: center;
@@ -239,395 +185,87 @@
 }
 
 .developer-carousel-dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 999px;
   border: none;
-  background: #cbd5e1;
+  background: #292733;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
 }
 
 .developer-carousel-dot.is-active {
-  width: 26px;
-  background: #0f766e;
-  box-shadow: 0 0 10px rgba(15, 118, 110, 0.35);
+  width: 22px;
+  background: #8B5CF6;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 .developer-carousel-toggle {
   background: transparent;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #292733;
   border-radius: 999px;
-  padding: 4px 13px;
+  padding: 4px 12px;
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: #94A3B8;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .developer-carousel-toggle:hover {
-  border-color: #0f766e;
-  color: #0f766e;
-  background: #f0fdf4;
+  border-color: #8B5CF6;
+  color: #F5F5FA;
+  background: #181926;
 }
 
-/* ==========================================
-   JNTU UPLOAD STUDY MATERIALS CARD
-========================================== */
-
+/* Upload Materials Card */
 .jntu-upload-card {
-  background: #f3f8f5;
-  border: 1px solid rgba(1, 62, 55, 0.14);
-  border-top: 3.5px solid #d9a726;
-  border-radius: 16px;
-  padding: 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 4px;
+  position: relative;
+  width: 100%;
+  margin-top: 18px;
+  padding: 20px;
+  background: #12131B;
+  border: 1px solid #292733;
+  border-radius: 20px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
+  text-align: left;
 }
 
-.jntu-upload-header h3 {
-  margin: 0;
-  color: #013e37;
-  font-size: 16.5px;
+.jntu-upload-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
   font-weight: 800;
-  letter-spacing: -0.2px;
+  color: #F5F5FA;
 }
 
-.jntu-upload-copy {
-  margin: 0;
-  font-size: 12.5px;
+.jntu-upload-card p {
+  margin: 0 0 16px 0;
+  font-size: 12px;
   line-height: 1.55;
-  color: #374151;
+  color: #94A3B8;
 }
 
-.jntu-upload-button {
-  display: inline-flex;
+.jntu-upload-cta-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+  transition: all 0.25s ease;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
-  padding: 12px 18px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
-  transition: all 0.22s ease;
 }
 
-.jntu-upload-button:hover {
+.jntu-upload-cta-btn:hover {
   transform: translateY(-2px);
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.42);
-}
-
-.jntu-upload-button:active {
-  transform: translateY(0);
-}
-
-.jntu-upload-button span {
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.jntu-upload-footnote {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.45;
-  color: #6b7280;
-  font-style: italic;
-}
-
-/* ==========================================
-   UPLOAD MODAL OVERLAY & FORM
-========================================== */
-
-.upload-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: rgba(0, 24, 20, 0.78);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.upload-modal {
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 32px 28px;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(15, 118, 110, 0.15);
-  animation: uploadModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-sizing: border-box;
-}
-
-@keyframes uploadModalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.94) translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.upload-modal-close {
-  position: absolute;
-  top: 18px;
-  right: 20px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  font-size: 22px;
-  line-height: 1;
-  color: #4b5563;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.upload-modal-close:hover {
-  background: #fee2e2;
-  color: #b91c1c;
-  border-color: #fca5a5;
-}
-
-#upload-materials-title {
-  margin: 0 0 6px 0;
-  font-size: 22px;
-  font-weight: 800;
-  color: #013e37;
-  letter-spacing: -0.3px;
-}
-
-.upload-modal-subtitle {
-  margin: 0 0 20px 0;
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.45;
-}
-
-.upload-material-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.upload-field-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 6px;
-}
-
-.upload-field-label span {
-  color: #dc2626;
-}
-
-.upload-select-wrap {
-  position: relative;
-}
-
-.upload-select {
-  width: 100%;
-  padding: 11px 14px;
-  border: 1.5px solid #d1d5db;
-  border-radius: 12px;
-  background: #ffffff;
-  font-size: 14px;
-  color: #111827;
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
-}
-
-.upload-select:focus {
-  border-color: #059669;
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-}
-
-.upload-file-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px 14px;
-  background: #f0fdf4;
-  border: 1.5px dashed #059669;
-  border-radius: 12px;
-}
-
-.upload-file-field input[type="file"] {
-  font-size: 13px;
-  color: #374151;
-  cursor: pointer;
-}
-
-.upload-file-hint {
-  font-size: 11.5px;
-  color: #047857;
-  font-weight: 600;
-}
-
-.upload-comment-box {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  padding: 10px 14px;
-  border: 1.5px solid #d1d5db;
-  border-radius: 12px;
-  background: #f9fafb;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
-}
-
-.upload-comment-box:focus-within {
-  border-color: #059669;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-}
-
-.upload-avatar {
-  font-size: 16px;
-  margin-top: 3px;
-  color: #6b7280;
-}
-
-.upload-comment-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 13.5px;
-  color: #111827;
-  resize: vertical;
-  font-family: inherit;
-  min-height: 80px;
-}
-
-.upload-input-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 10px 14px;
-  border: 1.5px solid #d1d5db;
-  border-radius: 12px;
-  background: #f9fafb;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
-}
-
-.upload-input-row:focus-within {
-  border-color: #059669;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-}
-
-.upload-input-icon {
-  font-size: 15px;
-  color: #6b7280;
-}
-
-.upload-input-row input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 13.5px;
-  color: #111827;
-  font-family: inherit;
-}
-
-.upload-form-message {
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.upload-form-message.error {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
-}
-
-.upload-form-message.success {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #86efac;
-}
-
-.upload-submit-row {
-  margin-top: 4px;
-}
-
-.upload-submit-button {
-  width: 100%;
-  padding: 13px 20px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  color: #ffffff;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
-  transition: all 0.2s ease;
-}
-
-.upload-submit-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.42);
-}
-
-.upload-submit-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* ==========================================
-   RESPONSIVE STYLES
-========================================== */
-
-@media (max-width: 600px) {
-  .team-card {
-    padding: 20px 16px;
-    border-radius: 18px;
-  }
-
-  .developer-slide-image {
-    width: 110px;
-    height: 110px;
-  }
-
-  .upload-modal {
-    padding: 24px 18px;
-    border-radius: 20px;
-  }
+  box-shadow: 0 10px 24px rgba(139, 92, 246, 0.5);
 }

@@ -2,11 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import { performSearch, formatResourceAction } from "../utils/searchEngine";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import StudentProfileModal from "../components/StudentProfileModal";
+import { getStoredStudentData } from "../data/studentData";
 import "./SearchResults.css";
 
 function SearchResults() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [, setStudentData] = useState(getStoredStudentData());
 
   // =========================================================
   // URL SEARCH QUERY
@@ -309,12 +315,12 @@ function SearchResults() {
   // =========================================================
 
   const categoryTabs = [
-    { id: "all", label: "All Resources", count: searchData.categoryCounts.all },
-    { id: "Notes", label: "📘 Notes", count: searchData.categoryCounts.notes },
-    { id: "Question Paper", label: "📄 Question Papers", count: searchData.categoryCounts.papers },
-    { id: "Syllabus", label: "📚 Syllabus", count: searchData.categoryCounts.syllabus },
-    { id: "Lab Program", label: "🧪 Lab Programs", count: searchData.categoryCounts.labs },
-    { id: "Notification", label: "📢 Notifications", count: searchData.categoryCounts.notifications },
+    { id: "all", label: "All Resources", icon: "folder_open", count: searchData.categoryCounts.all },
+    { id: "Notes", label: "Notes", icon: "description", count: searchData.categoryCounts.notes },
+    { id: "Question Paper", label: "Question Papers", icon: "assignment", count: searchData.categoryCounts.papers },
+    { id: "Syllabus", label: "Syllabus", icon: "list_alt", count: searchData.categoryCounts.syllabus },
+    { id: "Lab Program", label: "Lab Programs", icon: "science", count: searchData.categoryCounts.labs },
+    { id: "Notification", label: "Notifications", icon: "campaign", count: searchData.categoryCounts.notifications },
   ];
 
   // =========================================================
@@ -322,29 +328,32 @@ function SearchResults() {
   // =========================================================
 
   return (
-    <main className="search-page">
-      {/* Animated ambient background */}
-      <div className="search-animated-background" aria-hidden="true">
-        <div className="search-gradient-orb search-orb-one"></div>
-        <div className="search-gradient-orb search-orb-two"></div>
-        <div className="search-gradient-orb search-orb-three"></div>
-        <div className="search-gradient-orb search-orb-four"></div>
-        <div className="search-background-wave search-wave-one"></div>
-        <div className="search-background-wave search-wave-two"></div>
-        <div className="search-background-glow"></div>
-      </div>
+    <div className="bg-[#08090D] text-[#F5F5FA] min-h-screen selection:bg-[#8B5CF6]/30 selection:text-white relative flex flex-col justify-between">
+      <Navbar onOpenProfile={() => setIsProfileOpen(true)} />
 
-      {/* =====================================================
-          FULL SCREEN SEARCH HEADER & CATEGORY TABS
-      ====================================================== */}
-      <section className="search-top">
-        <div className="search-bar">
-          <span className="search-icon" aria-hidden="true">
-            🔍
-          </span>
+      <main className="w-full pt-6 md:pt-8 pb-16 bg-[#08090D] relative flex-1 search-page">
+        {/* Animated ambient background */}
+        <div className="search-animated-background" aria-hidden="true">
+          <div className="search-gradient-orb search-orb-one"></div>
+          <div className="search-gradient-orb search-orb-two"></div>
+          <div className="search-gradient-orb search-orb-three"></div>
+          <div className="search-gradient-orb search-orb-four"></div>
+          <div className="search-background-wave search-wave-one"></div>
+          <div className="search-background-wave search-wave-two"></div>
+          <div className="search-background-glow"></div>
+        </div>
 
-          <input
-            type="text"
+        {/* =====================================================
+            FULL SCREEN SEARCH HEADER & CATEGORY TABS
+        ====================================================== */}
+        <section className="search-top">
+          <div className="search-bar">
+            <span className="search-icon" aria-hidden="true">
+              <span className="material-symbols-outlined text-[20px] text-[#8B5CF6]">search</span>
+            </span>
+
+            <input
+              type="text"
             value={search}
             onChange={handleSearchChange}
             placeholder="Search notes, question papers, syllabus, lab programs, subjects..."
@@ -377,6 +386,9 @@ function SearchResults() {
                 }`}
                 onClick={() => setActiveCategory(tab.id)}
               >
+                {tab.icon && (
+                  <span className="material-symbols-outlined text-[15px]">{tab.icon}</span>
+                )}
                 <span>{tab.label}</span>
                 <span className="search-tab-count">{tab.count}</span>
               </button>
@@ -398,7 +410,7 @@ function SearchResults() {
             searchData.suggestedQueries.length > 0) && (
             <div className="search-related-panel">
               <h3 className="search-related-title">
-                <span>💡</span>
+                <span className="material-symbols-outlined text-[16px] text-[#C4B5FD]">lightbulb</span>
                 <span>Related Content & Sibling Subjects</span>
               </h3>
 
@@ -411,7 +423,7 @@ function SearchResults() {
                     className="search-related-chip"
                     onClick={() => handleQuickSearch(`${rel.subject || rel.title} ${rel.type}`)}
                   >
-                    <span>{rel.icon}</span>
+                    <span className="material-symbols-outlined text-[15px]">{rel.icon || "description"}</span>
                     <span>
                       {rel.type}: <strong>{rel.subject || rel.title}</strong>
                     </span>
@@ -426,7 +438,7 @@ function SearchResults() {
                     className="search-related-chip"
                     onClick={() => handleQuickSearch(`${sub.name} notes`)}
                   >
-                    <span>📚</span>
+                    <span className="material-symbols-outlined text-[15px]">school</span>
                     <span>
                       {sub.name} ({sub.branch} Sem {sub.semester})
                     </span>
@@ -441,7 +453,7 @@ function SearchResults() {
                     className="search-related-chip"
                     onClick={() => handleQuickSearch(sug)}
                   >
-                    <span>✨</span>
+                    <span className="material-symbols-outlined text-[15px]">search</span>
                     <span>{sug}</span>
                   </button>
                 ))}
@@ -612,7 +624,18 @@ function SearchResults() {
             </div>
           )}
       </section>
-    </main>
+      </main>
+
+      {/* Universal Footer */}
+      <Footer />
+
+      {/* Student Profile Modal */}
+      <StudentProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        onProfileUpdated={(updated) => setStudentData(updated)}
+      />
+    </div>
   );
 }
 

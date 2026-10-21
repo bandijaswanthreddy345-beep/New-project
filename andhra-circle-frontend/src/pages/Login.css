@@ -1,6 +1,6 @@
 /* =========================================================
-   JNTU CIRCLE — PROFESSIONAL AUTHENTICATION STYLING
-   Harmonized with Deep Midnight Emerald & Sunbeam Gold Theme
+   JNTU CIRCLE — PREMIUM AUTHENTICATION STYLING
+   Harmonized with Stitch Obsidian Glass & Electric Violet Palette
    ========================================================= */
 
 .login-page-wrapper {
@@ -15,18 +15,12 @@
   justify-content: center;
   position: relative;
   font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #012622;
+  color: #F5F5FA;
   overflow-x: hidden;
-
-  /* Rich Ambient Midnight Emerald Background with Subtle Radial Glow */
-  background: 
-    radial-gradient(circle at 50% 0%, rgba(7, 87, 76, 0.45) 0%, transparent 55%),
-    radial-gradient(circle at 85% 85%, rgba(217, 167, 38, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 15% 75%, rgba(2, 89, 79, 0.3) 0%, transparent 45%),
-    #002420;
+  background: #08090D;
 }
 
-/* Subtle Geometric Background Watermark */
+/* Atmospheric Background Grid & Ambient Violet Glow */
 .login-bg-decorations {
   position: absolute;
   inset: 0;
@@ -39,8 +33,8 @@
   position: absolute;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 239, 179, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 239, 179, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(139, 92, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 75%);
   -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 75%);
@@ -51,21 +45,21 @@
   top: -120px;
   left: 50%;
   transform: translateX(-50%);
-  width: 600px;
-  height: 360px;
+  width: 700px;
+  height: 420px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(1, 62, 55, 0.7) 0%, rgba(0, 36, 32, 0) 70%);
-  filter: blur(50px);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
+  filter: blur(60px);
 }
 
 .login-bg-orb-2 {
   position: absolute;
   bottom: -100px;
-  right: 10%;
-  width: 400px;
-  height: 400px;
+  right: 15%;
+  width: 450px;
+  height: 450px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(217, 167, 38, 0.15) 0%, rgba(0, 36, 32, 0) 70%);
+  background: radial-gradient(circle, rgba(39, 33, 59, 0.35) 0%, transparent 70%);
   filter: blur(60px);
 }
 
@@ -86,16 +80,16 @@
   gap: 8px;
   padding: 8px 18px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 239, 179, 0.22);
-  color: #ffefb3;
+  background: #12131B;
+  border: 1px solid #292733;
+  color: #C4B5FD;
   font-size: 13px;
   font-weight: 650;
   text-decoration: none;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .login-back-home-btn svg {
@@ -105,11 +99,11 @@
 }
 
 .login-back-home-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: #161724;
   color: #ffffff;
-  border-color: #d9a726;
+  border-color: #8B5CF6;
   transform: translateX(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
 }
 
 .login-back-home-btn:hover svg {
@@ -117,7 +111,7 @@
 }
 
 /* =========================================================
-   AUTHENTICATION CARD CONTAINER
+   AUTHENTICATION CARD CONTAINER (OBSIDIAN GLASS)
    ========================================================= */
 
 .login-auth-card {
@@ -125,14 +119,16 @@
   z-index: 1;
   width: 100%;
   max-width: 440px;
-  background: #ffffff;
+  background: #12131B;
+  border: 1px solid #292733;
   border-radius: 26px;
   padding: 40px 38px 36px;
   box-sizing: border-box;
   box-shadow: 
-    0 24px 64px rgba(0, 0, 0, 0.42),
-    0 4px 16px rgba(0, 36, 32, 0.15),
-    0 0 0 1px rgba(255, 239, 179, 0.2);
+    0 24px 64px rgba(0, 0, 0, 0.65),
+    0 0 30px rgba(139, 92, 246, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   animation: loginCardSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -162,7 +158,6 @@
   align-items: center;
   text-decoration: none;
   gap: 12px;
-  group: pointer;
   transition: transform 0.2s ease;
 }
 
@@ -176,24 +171,24 @@
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  background: radial-gradient(circle, #013e37 0%, #002420 100%);
+  background: #181926;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3px;
+  padding: 4px;
   box-sizing: border-box;
-  border: 2px solid rgba(217, 167, 38, 0.55);
+  border: 1.5px solid rgba(139, 92, 246, 0.5);
   box-shadow: 
-    0 0 20px rgba(217, 167, 38, 0.3),
-    0 4px 14px rgba(0, 36, 32, 0.25);
+    0 0 20px rgba(139, 92, 246, 0.3),
+    0 4px 14px rgba(0, 0, 0, 0.4);
   transition: all 0.25s ease;
 }
 
 .login-brand-link:hover .login-logo-glow-ring {
-  border-color: #d9a726;
+  border-color: #A78BFA;
   box-shadow: 
-    0 0 28px rgba(217, 167, 38, 0.45),
-    0 6px 18px rgba(0, 36, 32, 0.3);
+    0 0 28px rgba(139, 92, 246, 0.5),
+    0 6px 18px rgba(0, 0, 0, 0.5);
 }
 
 .login-logo-img {
@@ -214,14 +209,13 @@
   margin: 0;
   font-size: 23px;
   font-weight: 850;
-  color: #002420;
+  color: #F5F5FA;
   line-height: 1.15;
   letter-spacing: -0.4px;
 }
 
 .login-brand-name .font-deltha {
-  font-family: 'Deltha', 'Deltha Font', 'Plus Jakarta Sans', sans-serif;
-  color: #b5830a;
+  color: #C4B5FD;
 }
 
 .login-brand-tagline {
@@ -230,12 +224,12 @@
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.8px;
-  color: #02594f;
+  color: #C4B5FD;
   text-transform: uppercase;
-  background: #e6f3f1;
+  background: rgba(139, 92, 246, 0.15);
   padding: 2px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(2, 89, 79, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 /* Sub-heading */
@@ -249,14 +243,14 @@
   margin: 0;
   font-size: 19px;
   font-weight: 800;
-  color: #012622;
+  color: #F5F5FA;
   letter-spacing: -0.3px;
 }
 
 .login-main-sub {
   margin: 5px 0 0;
   font-size: 13px;
-  color: #4b6b66;
+  color: #94A3B8;
   line-height: 1.45;
 }
 
@@ -288,15 +282,15 @@
 }
 
 .login-alert-error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
 }
 
 .login-alert-admin {
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #065f46;
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #C4B5FD;
 }
 
 .login-alert-icon {
@@ -329,12 +323,12 @@
   justify-content: space-between;
   font-size: 13px;
   font-weight: 700;
-  color: #013e37;
+  color: #F5F5FA;
   letter-spacing: 0.1px;
 }
 
 .login-required-star {
-  color: #dc2626;
+  color: #EF4444;
   margin-left: 2px;
 }
 
@@ -351,7 +345,7 @@
   left: 14px;
   width: 17px;
   height: 17px;
-  color: #628781;
+  color: #8B5CF6;
   pointer-events: none;
   transition: color 0.2s ease;
 }
@@ -360,11 +354,11 @@
   width: 100%;
   padding: 12px 14px 12px 42px;
   border-radius: 12px;
-  border: 1.5px solid #d4e5df;
-  background: #fbfdfc;
+  border: 1.5px solid #292733;
+  background: #08090D;
   font-size: 14px;
-  font-weight: 600;
-  color: #012622;
+  font-weight: 500;
+  color: #F5F5FA;
   outline: none;
   box-sizing: border-box;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -372,26 +366,21 @@
 }
 
 .login-text-input::placeholder {
-  color: #8da6a0;
-  font-weight: 450;
+  color: #64748B;
+  font-weight: 400;
 }
 
 .login-text-input:hover {
-  border-color: #a8cfc6;
-  background: #ffffff;
+  border-color: #3b3749;
+  background: #0b0d14;
 }
 
 .login-text-input:focus {
-  border-color: #013e37;
-  background: #ffffff;
+  border-color: #8B5CF6;
+  background: #08090D;
   box-shadow: 
-    0 0 0 3.5px rgba(1, 62, 55, 0.12),
-    0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.login-text-input:focus + .login-input-icon,
-.login-input-wrapper:focus-within .login-input-icon {
-  color: #013e37;
+    0 0 0 3.5px rgba(139, 92, 246, 0.2),
+    0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Password Toggle Eye Button */
@@ -407,7 +396,7 @@
   background: transparent;
   border: none;
   padding: 4px;
-  color: #628781;
+  color: #94A3B8;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -417,7 +406,7 @@
 }
 
 .login-password-toggle-btn:hover {
-  color: #013e37;
+  color: #F5F5FA;
 }
 
 .login-password-toggle-btn svg {
@@ -439,67 +428,66 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: #3b5752;
+  color: #94A3B8;
   cursor: pointer;
   user-select: none;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .login-remember-checkbox {
   width: 15px;
   height: 15px;
   border-radius: 4px;
-  accent-color: #013e37;
+  accent-color: #8B5CF6;
   cursor: pointer;
 }
 
 .login-forgot-link {
-  color: #02594f;
+  color: #C4B5FD;
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 600;
   transition: all 0.18s ease;
 }
 
 .login-forgot-link:hover {
-  color: #b5830a;
+  color: #DDD6FE;
   text-decoration: underline;
 }
 
 /* =========================================================
-   SUBMIT BUTTON (MIDNIGHT EMERALD & SUNBEAM GOLD)
+   SUBMIT BUTTON (ELECTRIC VIOLET GRADIENT)
    ========================================================= */
 
 .login-submit-btn {
-  width: 100%;
-  padding: 13.5px 24px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 239, 179, 0.35);
-  background: radial-gradient(ellipse at 35% 20%, #07574c 0%, #01352f 70%, #00241f 100%);
-  color: #ffefb3;
-  font-size: 14.5px;
-  font-weight: 750;
-  letter-spacing: 0.2px;
-  cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: #ffffff;
+  font-size: 14.5px;
+  font-weight: 750;
+  letter-spacing: 0.1px;
+  cursor: pointer;
+  outline: none;
   box-shadow: 
-    0 4px 14px rgba(1, 62, 55, 0.25),
-    0 1px 3px rgba(0, 0, 0, 0.1);
+    0 4px 18px rgba(139, 92, 246, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: inherit;
   margin-top: 4px;
+  font-family: inherit;
 }
 
 .login-submit-btn:hover {
-  background: radial-gradient(ellipse at 40% 25%, #08695c 0%, #013e37 70%, #002722 100%);
-  color: #ffffff;
-  border-color: #d9a726;
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
   transform: translateY(-1.5px);
   box-shadow: 
-    0 8px 24px rgba(1, 62, 55, 0.35),
-    0 2px 6px rgba(0, 0, 0, 0.15);
+    0 8px 24px rgba(139, 92, 246, 0.55),
+    0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .login-submit-btn:active {
@@ -507,7 +495,7 @@
 }
 
 .login-submit-btn:disabled {
-  opacity: 0.75;
+  opacity: 0.65;
   cursor: not-allowed;
   transform: none;
 }
@@ -524,8 +512,8 @@
 .login-spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 239, 179, 0.25);
-  border-top-color: #ffefb3;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: loginSpin 0.7s linear infinite;
   display: inline-block;
@@ -543,20 +531,20 @@
   margin: 18px 0 0;
   text-align: center;
   font-size: 13px;
-  color: #4b6b66;
+  color: #94A3B8;
   font-weight: 500;
 }
 
 .login-register-cta {
-  color: #013e37;
-  font-weight: 750;
+  color: #C4B5FD;
+  font-weight: 700;
   text-decoration: none;
   margin-left: 4px;
   transition: all 0.18s ease;
 }
 
 .login-register-cta:hover {
-  color: #b5830a;
+  color: #DDD6FE;
   text-decoration: underline;
 }
 
@@ -568,9 +556,9 @@
   gap: 6px;
   margin-top: 22px;
   padding-top: 18px;
-  border-top: 1px solid #edf4f1;
+  border-top: 1px solid #292733;
   font-size: 11px;
-  color: #63857f;
+  color: #64748B;
   font-weight: 600;
   letter-spacing: 0.2px;
 }
@@ -578,7 +566,7 @@
 .login-security-badge svg {
   width: 13px;
   height: 13px;
-  color: #02594f;
+  color: #8B5CF6;
 }
 
 /* =========================================================

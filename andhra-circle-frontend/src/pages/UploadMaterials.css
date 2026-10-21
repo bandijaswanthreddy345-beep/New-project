@@ -267,3 +267,55 @@
   opacity: 0.65;
   cursor: not-allowed;
 }
+
+/* =========================================================
+   UPLOAD MATERIALS MODAL — STITCH OBSIDIAN DARK THEME OVERRIDES
+   Harmonized with Homepage (#08090D, #12131B, #8B5CF6)
+   ========================================================= */
+.upload-page-overlay {
+  background: rgba(8, 9, 13, 0.88) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.upload-modal {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  color: #F5F5FA !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6) !important;
+}
+
+.upload-modal h2 {
+  color: #F5F5FA !important;
+}
+
+.upload-modal-subtitle {
+  color: #94A3B8 !important;
+}
+
+.upload-field-label {
+  color: #CBD5E1 !important;
+}
+
+.upload-select,
+.upload-text-input,
+.upload-textarea {
+  background: #08090D !important;
+  border: 1px solid #292733 !important;
+  color: #F5F5FA !important;
+}
+
+.upload-select:focus,
+.upload-text-input:focus,
+.upload-textarea:focus {
+  border-color: #8B5CF6 !important;
+}
+
+.upload-submit-button {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35) !important;
+}
+
+.upload-submit-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #9333ea 0%, #8B5CF6 100%) !important;
+  box-shadow: 0 8px 22px rgba(139, 92, 246, 0.5) !important;
+}

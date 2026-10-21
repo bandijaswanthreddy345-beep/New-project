@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import profileImg from "../assets/jaswanth.png.png";
 import "./StudentProfileModal.css";
+import brandLogo from "../assets/jntu-brand-logo-v2.png";
 
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 
@@ -20,6 +21,17 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
       setSaveSuccess(false);
     }
   }, [isOpen]);
+
+  // Synchronize on external student data changes
+  useEffect(() => {
+    const handleSync = () => {
+      const current = getStoredStudentData();
+      setStudent(current);
+      setEditForm(current);
+    };
+    window.addEventListener("studentProfileUpdated", handleSync);
+    return () => window.removeEventListener("studentProfileUpdated", handleSync);
+  }, []);
 
   // Close on Escape key press
   useEffect(() => {
@@ -70,7 +82,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
           <div className="sp-banner-glow" />
           <div className="sp-banner-content">
             <div className="sp-banner-brand">
-              <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sp-banner-logo" />
+              <img src={brandLogo} alt="JNTU Circle" className="sp-banner-logo" />
               <div>
                 <span className="sp-banner-title">JNTU CIRCLE</span>
                 <span className="sp-banner-tag">OFFICIAL STUDENT PORTAL</span>
@@ -92,7 +104,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
                 onClick={onClose}
                 title="Close Profile"
               >
-                ✕
+                <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
           </div>
@@ -102,7 +114,6 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
         <div className="sp-identity-card">
           <div className="sp-avatar-wrapper">
             <img src={profileImg} alt={student.name} className="sp-avatar-img" />
-            <span className="sp-status-indicator" title="Active Student Status" />
           </div>
 
           <div className="sp-identity-text">
@@ -131,7 +142,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
               className={`sp-edit-toggle-btn ${activeTab === "edit" ? "active" : ""}`}
               onClick={() => setActiveTab(activeTab === "edit" ? "overview" : "edit")}
             >
-              {activeTab === "edit" ? "View Overview" : "Edit Profile ✎"}
+              {activeTab === "edit" ? "View Overview" : "Edit Profile"}
             </button>
           </div>
         </div>
@@ -170,28 +181,28 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
             className={`sp-tab-btn ${activeTab === "overview" ? "active" : ""}`}
             onClick={() => setActiveTab("overview")}
           >
-            🎓 Academic Details
+            <span className="material-symbols-outlined text-[17px]">school</span> Academic Details
           </button>
           <button 
             type="button" 
             className={`sp-tab-btn ${activeTab === "grades" ? "active" : ""}`}
             onClick={() => setActiveTab("grades")}
           >
-            📊 Semester Grades (SGPA)
+            <span className="material-symbols-outlined text-[17px]">bar_chart</span> Semester Grades (SGPA)
           </button>
           <button 
             type="button" 
             className={`sp-tab-btn ${activeTab === "notes" ? "active" : ""}`}
             onClick={() => setActiveTab("notes")}
           >
-            📚 Saved Study Notes ({student.savedNotes?.length || 0})
+            <span className="material-symbols-outlined text-[17px]">bookmark</span> Saved Study Notes ({student.savedNotes?.length || 0})
           </button>
           <button 
             type="button" 
             className={`sp-tab-btn ${activeTab === "edit" ? "active" : ""}`}
             onClick={() => setActiveTab("edit")}
           >
-            ⚙️ Edit Information
+            <span className="material-symbols-outlined text-[17px]">manage_accounts</span> Edit Information
           </button>
         </div>
 
@@ -435,6 +446,50 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
                       name="cgpa" 
                       value={editForm.cgpa} 
                       onChange={handleEditChange} 
+                    />
+                  </div>
+
+                  <div className="sp-field">
+                    <label>Current SGPA</label>
+                    <input 
+                      type="text" 
+                      name="sgpa" 
+                      value={editForm.sgpa || ""} 
+                      onChange={handleEditChange} 
+                      placeholder="e.g. 9.42"
+                    />
+                  </div>
+
+                  <div className="sp-field">
+                    <label>Overall Attendance (%)</label>
+                    <input 
+                      type="text" 
+                      name="attendance" 
+                      value={editForm.attendance || ""} 
+                      onChange={handleEditChange} 
+                      placeholder="e.g. 89.4%"
+                    />
+                  </div>
+
+                  <div className="sp-field">
+                    <label>Credits Completed</label>
+                    <input 
+                      type="text" 
+                      name="credits" 
+                      value={editForm.credits || ""} 
+                      onChange={handleEditChange} 
+                      placeholder="e.g. 142 / 160"
+                    />
+                  </div>
+
+                  <div className="sp-field">
+                    <label>Standing Backlogs</label>
+                    <input 
+                      type="text" 
+                      name="backlogs" 
+                      value={editForm.backlogs || ""} 
+                      onChange={handleEditChange} 
+                      placeholder="e.g. 0 Backlogs"
                     />
                   </div>
 
