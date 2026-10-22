@@ -80,25 +80,42 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const [isPaused, setIsPaused] = useState(false);
+  const pauseTimerRef = useRef(null);
+
   // Synchronize if selectedBranch prop changes externally
   useEffect(() => {
     if (selectedBranch) {
-      const idx = BRANCHES.findIndex(
-        (b) => b.code.toLowerCase() === selectedBranch.toLowerCase()
-      );
+      const idx = BRANCHES.findIndex((b) => {
+        const bCode = b.code.toLowerCase();
+        const sCode = selectedBranch.toLowerCase();
+        return (
+          bCode === sCode ||
+          (sCode === "me" && bCode === "mech") ||
+          (sCode === "mech" && bCode === "me") ||
+          (sCode === "civil" && (bCode === "civil" || bCode === "ce")) ||
+          (sCode === "ce" && bCode === "civil")
+        );
+      });
       if (idx !== -1) {
         setActiveIndex(idx);
+        setIsPaused(true);
+        if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+        pauseTimerRef.current = setTimeout(() => {
+          setIsPaused(false);
+        }, 6000);
       }
     }
   }, [selectedBranch]);
 
-  // Smooth continuous auto-rotation: always keeps moving smoothly even when in view or out of view
+  // Smooth continuous auto-rotation: pauses briefly when a branch pill is chosen
   useEffect(() => {
+    if (isPaused) return;
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % BRANCHES.length);
     }, 2800);
     return () => clearInterval(timer);
-  }, []);
+  }, [isPaused]);
 
   const prevBranch = () => {
     setActiveIndex((prev) => (prev - 1 + BRANCHES.length) % BRANCHES.length);

@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AuthorProfile from "../components/AuthorProfile";
 import StudentProfileModal from "../components/StudentProfileModal";
@@ -633,11 +632,233 @@ function Notes({ initialType }) {
 
   return (
     <div className="bg-[#08090D] text-[#F5F5FA] min-h-screen selection:bg-[#8B5CF6]/30 selection:text-white relative flex flex-col justify-between">
-      {/* Top Navbar */}
-      <Navbar onOpenProfile={() => setIsProfileOpen(true)} />
+      
+      {/* =========================================================
+          FULL-PAGE ACADEMIC RESOURCE HEADER (NEW PAGE HEADER)
+          Full-width, edge-to-edge header across the top of the entire page
+          ========================================================= */}
+      <header className="w-full bg-[#12131B]/95 backdrop-blur-md border-b border-[#292733] relative overflow-hidden shadow-2xl z-30">
+        <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-[#8B5CF6]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -top-20 w-80 h-80 bg-[#8B5CF6]/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Main Content Canvas */}
-      <main className="w-full py-6 sm:py-8 md:py-10 pb-16 bg-[#08090D] relative flex-1">
+        <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-5 sm:py-6 flex flex-col gap-5 sm:gap-6">
+          {/* Top Navigation Row: Rounded Pill Tabs + Right Eyebrow & Portal Action */}
+          <div className="flex flex-wrap items-center justify-between gap-3" role="tablist" aria-label="Academic Resource Selector">
+            {/* Left Switcher Pill Group in Dark Container */}
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-full bg-[#08090D]/80 border border-[#292733]/80 overflow-x-auto max-w-full custom-scrollbar">
+              {/* Home Tab */}
+              <button
+                type="button"
+                role="tab"
+                onClick={() => navigate("/")}
+                className="px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold tracking-wider uppercase transition-all duration-200 flex items-center gap-2 text-[#94A3B8] hover:text-[#C4B5FD] hover:bg-[#161724] border border-transparent shrink-0 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[17px]">home</span>
+                <span>HOME</span>
+              </button>
+
+              {/* Notes Pill */}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeResource === "notes"}
+                onClick={() => handleSwitchResource("notes")}
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 shrink-0 cursor-pointer ${
+                  activeResource === "notes"
+                    ? "text-[#C4B5FD] bg-[#161724] border border-[#8B5CF6]/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]"
+                    : "text-[#94A3B8] hover:text-white hover:bg-[#161724] border border-transparent"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[17px]">description</span>
+                <span>Notes</span>
+              </button>
+
+              {/* Question Papers */}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeResource === "papers"}
+                onClick={() => handleSwitchResource("papers")}
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 shrink-0 cursor-pointer ${
+                  activeResource === "papers"
+                    ? "text-[#C4B5FD] bg-[#161724] border border-[#8B5CF6]/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]"
+                    : "text-[#94A3B8] hover:text-white hover:bg-[#161724] border border-transparent"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[17px]">assignment</span>
+                <span>Question Papers</span>
+              </button>
+
+              {/* Syllabus */}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeResource === "syllabus"}
+                onClick={() => handleSwitchResource("syllabus")}
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 shrink-0 cursor-pointer ${
+                  activeResource === "syllabus"
+                    ? "text-[#C4B5FD] bg-[#161724] border border-[#8B5CF6]/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]"
+                    : "text-[#94A3B8] hover:text-white hover:bg-[#161724] border border-transparent"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[17px]">menu_book</span>
+                <span>Syllabus</span>
+              </button>
+
+              {/* Lab Programs */}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeResource === "labs"}
+                onClick={() => handleSwitchResource("labs")}
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 shrink-0 cursor-pointer ${
+                  activeResource === "labs"
+                    ? "text-[#C4B5FD] bg-[#161724] border border-[#8B5CF6]/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]"
+                    : "text-[#94A3B8] hover:text-white hover:bg-[#161724] border border-transparent"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[17px]">science</span>
+                <span>Lab Programs</span>
+              </button>
+            </div>
+
+            {/* Right Eyebrow Badge Pill & Student Portal */}
+            <div className="flex items-center gap-2.5">
+              <div className="hidden sm:flex items-center px-4 py-2 rounded-full bg-[#08090D] border border-[#292733] text-[11px] font-semibold text-[#94A3B8] tracking-wider uppercase">
+                {currentConfig.eyebrow}
+              </div>
+
+              {/* Student Portal button to open Student Profile Modal */}
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen(true)}
+                className="px-3.5 py-1.5 rounded-full bg-[#d0bcff] text-[#23005c] text-xs font-bold hover:bg-[#c4b5fd] transition-all shadow-[0_0_12px_rgba(208,188,255,0.25)] flex items-center gap-1.5 cursor-pointer"
+                title="Student Portal Profile"
+                aria-label="Student Portal"
+              >
+                <span className="material-symbols-outlined text-[16px]">account_circle</span>
+                <span className="hidden md:inline">Student Portal</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Title & Description */}
+          <div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#F5F5FA] tracking-tight mb-2.5">
+              {currentConfig.title}
+            </h1>
+            <p className="text-sm md:text-base text-[#94A3B8] max-w-3xl leading-relaxed">
+              {currentConfig.subtitle}
+            </p>
+          </div>
+
+          {/* Search and Filters Row matching Stitch */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+            {/* Clean Dark Capsule Search Bar */}
+            <div className="md:col-span-6 relative flex items-center bg-[#08090D] border border-[#292733] hover:border-[#8B5CF6]/50 focus-within:border-[#8B5CF6]/70 rounded-full p-1.5 pl-2 gap-2 transition-all shadow-sm">
+              {/* Normal Clean Search Icon Button */}
+              <button
+                type="button"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-[#161724] transition-colors shrink-0 cursor-pointer"
+                aria-label="Search"
+                title="Search study materials"
+                onClick={handleExecuteSearch}
+              >
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
+                </svg>
+              </button>
+
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder={currentConfig.searchPlaceholder(activeBranch)}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleExecuteSearch();
+                  }
+                }}
+                className="w-full bg-transparent text-sm text-[#F5F5FA] placeholder-[#64748B] outline-none pr-2 py-1"
+              />
+
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    if (searchInputRef.current) searchInputRef.current.focus();
+                  }}
+                  className="text-[#94A3B8] hover:text-white text-xs px-2 py-0.5 rounded-full bg-[#161724] hover:bg-[#202134] border border-[#292733] mr-1 cursor-pointer transition-colors shrink-0"
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Branch Selector Dropdown */}
+            <div className="md:col-span-3 relative flex items-center">
+              <select
+                value={activeBranch}
+                onChange={(e) => handleSelectBranch(e.target.value)}
+                className="w-full px-4 py-3 pr-10 bg-[#08090D] border border-[#292733] focus:border-[#8B5CF6] rounded-xl text-sm text-[#F5F5FA] outline-none transition-all cursor-pointer appearance-none"
+              >
+                <option value="CSE">CSE — Computer Science Eng...</option>
+                <option value="ECE">ECE — Electronics & Comm.</option>
+                <option value="ME">ME — Mechanical Engineering</option>
+                <option value="CE">CE — Civil Engineering</option>
+                <option value="AIML">AIML — AI & Machine Learning</option>
+                <option value="EEE">EEE — Electrical & Electronics</option>
+              </select>
+              <div className="absolute right-3.5 inset-y-0 flex items-center pointer-events-none">
+                <span className="material-symbols-outlined text-[#94A3B8] text-[18px] leading-none">
+                  keyboard_arrow_down
+                </span>
+              </div>
+            </div>
+
+            {/* Semester Selector Dropdown */}
+            <div className="md:col-span-3 relative flex items-center">
+              <select
+                value={selectedSemester}
+                onChange={(e) => setSelectedSemester(e.target.value)}
+                className="w-full px-4 py-3 pr-10 bg-[#08090D] border border-[#292733] focus:border-[#8B5CF6] rounded-xl text-sm text-[#F5F5FA] outline-none transition-all cursor-pointer appearance-none"
+              >
+                <option value="ALL">All Semesters</option>
+                <option value="1st">1st Semester</option>
+                <option value="2nd">2nd Semester</option>
+                <option value="3rd">3rd Semester</option>
+                <option value="4th">4th Semester</option>
+                <option value="5th">5th Semester</option>
+                <option value="6th">6th Semester</option>
+                <option value="7th">7th Semester</option>
+                <option value="8th">8th Semester</option>
+              </select>
+              <div className="absolute right-3.5 inset-y-0 flex items-center pointer-events-none">
+                <span className="material-symbols-outlined text-[#94A3B8] text-[18px] leading-none">
+                  keyboard_arrow_down
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Canvas (Full-width responsive workspace) */}
+      <main className="w-full py-8 md:py-10 pb-20 bg-[#08090D] relative flex-1">
         {/* Architectural Grid & Ambient Violet Glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-35 z-0">
           <div className="absolute -top-[18%] left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-[#8B5CF6]/10 rounded-full blur-[140px]" />
@@ -656,213 +877,7 @@ function Notes({ initialType }) {
           </svg>
         </div>
 
-        <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col gap-8">
-          
-          {/* =========================================================
-              STITCH STUDY LIBRARY CONTROL PANEL & HERO
-              ========================================================= */}
-          <section className="bg-[#12131B] border border-[#292733] rounded-3xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-md shadow-2xl">
-            <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-[#8B5CF6]/10 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Top Navigation Row: Rounded Pill Tabs + Right Eyebrow */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-8" role="tablist" aria-label="Academic Resource Selector">
-              {/* Left Switcher Pill Group in Dark Container */}
-              <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-full bg-[#08090D]/80 border border-[#292733]/80">
-                {/* Home Tab */}
-                <button
-                  type="button"
-                  role="tab"
-                  onClick={() => navigate("/")}
-                  className="px-5 py-2 rounded-full text-xs sm:text-sm font-semibold tracking-wider uppercase transition-all duration-200 flex items-center gap-2 text-[#94A3B8] hover:text-[#C4B5FD] hover:bg-[#161724] border border-transparent"
-                >
-                  <span className="material-symbols-outlined text-[17px]">home</span>
-                  <span>HOME</span>
-                </button>
-
-                {/* Notes Pill */}
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeResource === "notes"}
-                  onClick={() => handleSwitchResource("notes")}
-                  className={`px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
-                    activeResource === "notes"
-                      ? "text-[#C4B5FD] bg-[#161724] border border-[#8B5CF6]/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]"
-                      : "text-[#94A3B8] hover:text-white hover:bg-[#161724] border border-transparent"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[17px]">description</span>
-                  <span>Notes</span>
-                </button>
-
-                {/* Question Papers */}
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeResource === "papers"}
-                  onClick={() => handleSwitchResource("papers")}
-                  className={`px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
-                    activeResource === "papers"
-                      ? "text-[#C4B5FD] bg-[#161724] border border-[#8B5CF6]/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]"
-                      : "text-[#94A3B8] hover:text-white hover:bg-[#161724] border border-transparent"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[17px]">assignment</span>
-                  <span>Question Papers</span>
-                </button>
-
-                {/* Syllabus */}
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeResource === "syllabus"}
-                  onClick={() => handleSwitchResource("syllabus")}
-                  className={`px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
-                    activeResource === "syllabus"
-                      ? "text-[#C4B5FD] bg-[#161724] border border-[#8B5CF6]/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]"
-                      : "text-[#94A3B8] hover:text-white hover:bg-[#161724] border border-transparent"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[17px]">menu_book</span>
-                  <span>Syllabus</span>
-                </button>
-
-                {/* Lab Programs */}
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeResource === "labs"}
-                  onClick={() => handleSwitchResource("labs")}
-                  className={`px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
-                    activeResource === "labs"
-                      ? "text-[#C4B5FD] bg-[#161724] border border-[#8B5CF6]/50 shadow-[0_0_12px_rgba(139,92,246,0.3)]"
-                      : "text-[#94A3B8] hover:text-white hover:bg-[#161724] border border-transparent"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[17px]">science</span>
-                  <span>Lab Programs</span>
-                </button>
-              </div>
-
-              {/* Right Eyebrow Badge Pill from Stitch */}
-              <div className="hidden lg:flex items-center px-4 py-2 rounded-full bg-[#08090D] border border-[#292733] text-[11px] font-semibold text-[#94A3B8] tracking-wider uppercase">
-                {currentConfig.eyebrow}
-              </div>
-            </div>
-
-            {/* Title & Description */}
-            <div className="mb-8">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#F5F5FA] tracking-tight mb-2.5">
-                {currentConfig.title}
-              </h1>
-              <p className="text-sm md:text-base text-[#94A3B8] max-w-3xl leading-relaxed">
-                {currentConfig.subtitle}
-              </p>
-            </div>
-
-            {/* Search and Filters Row matching Stitch */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
-              {/* Clean Dark Capsule Search Bar */}
-              <div className="md:col-span-6 relative flex items-center bg-[#08090D] border border-[#292733] hover:border-[#8B5CF6]/50 focus-within:border-[#8B5CF6]/70 rounded-full p-1.5 pl-2 gap-2 transition-all shadow-sm">
-                {/* Normal Clean Search Icon Button */}
-                <button
-                  type="button"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-[#161724] transition-colors shrink-0 cursor-pointer"
-                  aria-label="Search"
-                  title="Search study materials"
-                  onClick={handleExecuteSearch}
-                >
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="11" cy="11" r="7" />
-                    <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
-                  </svg>
-                </button>
-
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder={currentConfig.searchPlaceholder(activeBranch)}
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleExecuteSearch();
-                    }
-                  }}
-                  className="w-full bg-transparent text-sm text-[#F5F5FA] placeholder-[#64748B] outline-none pr-2 py-1"
-                />
-
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchQuery("");
-                      if (searchInputRef.current) searchInputRef.current.focus();
-                    }}
-                    className="text-[#94A3B8] hover:text-white text-xs px-2 py-0.5 rounded-full bg-[#161724] hover:bg-[#202134] border border-[#292733] mr-1 cursor-pointer transition-colors shrink-0"
-                    title="Clear search"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-
-              {/* Branch Selector Dropdown */}
-              <div className="md:col-span-3 relative flex items-center">
-                <select
-                  value={activeBranch}
-                  onChange={(e) => handleSelectBranch(e.target.value)}
-                  className="w-full px-4 py-3 pr-10 bg-[#08090D] border border-[#292733] focus:border-[#8B5CF6] rounded-xl text-sm text-[#F5F5FA] outline-none transition-all cursor-pointer appearance-none"
-                >
-                  <option value="CSE">CSE — Computer Science Eng...</option>
-                  <option value="ECE">ECE — Electronics & Comm.</option>
-                  <option value="ME">ME — Mechanical Engineering</option>
-                  <option value="CE">CE — Civil Engineering</option>
-                  <option value="AIML">AIML — AI & Machine Learning</option>
-                  <option value="EEE">EEE — Electrical & Electronics</option>
-                </select>
-                <div className="absolute right-3.5 inset-y-0 flex items-center pointer-events-none">
-                  <span className="material-symbols-outlined text-[#94A3B8] text-[18px] leading-none">
-                    keyboard_arrow_down
-                  </span>
-                </div>
-              </div>
-
-              {/* Semester Selector Dropdown */}
-              <div className="md:col-span-3 relative flex items-center">
-                <select
-                  value={selectedSemester}
-                  onChange={(e) => setSelectedSemester(e.target.value)}
-                  className="w-full px-4 py-3 pr-10 bg-[#08090D] border border-[#292733] focus:border-[#8B5CF6] rounded-xl text-sm text-[#F5F5FA] outline-none transition-all cursor-pointer appearance-none"
-                >
-                  <option value="ALL">All Semesters</option>
-                  <option value="1st">1st Semester</option>
-                  <option value="2nd">2nd Semester</option>
-                  <option value="3rd">3rd Semester</option>
-                  <option value="4th">4th Semester</option>
-                  <option value="5th">5th Semester</option>
-                  <option value="6th">6th Semester</option>
-                  <option value="7th">7th Semester</option>
-                  <option value="8th">8th Semester</option>
-                </select>
-                <div className="absolute right-3.5 inset-y-0 flex items-center pointer-events-none">
-                  <span className="material-symbols-outlined text-[#94A3B8] text-[18px] leading-none">
-                    keyboard_arrow_down
-                  </span>
-                </div>
-              </div>
-            </div>
-          </section>
+        <div className="relative z-10 w-full max-w-[1750px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 flex flex-col gap-8">
 
           {/* =========================================================
               MAIN CONTENT VIEW (DEPARTMENTS + STITCH STUDY CARDS + TEAM)

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import BranchSection from "../components/BranchSection";
@@ -9,8 +10,21 @@ import Footer from "../components/Footer";
 import StudentProfileModal from "../components/StudentProfileModal";
 
 function Home() {
+  const location = useLocation();
   const [selectedBranch, setSelectedBranch] = useState("");
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (location.hash === "#departments") {
+      const timer = setTimeout(() => {
+        const el = document.getElementById("departments");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash]);
 
   return (
     <div className="bg-[#08090D] text-[#F5F5FA] min-h-screen selection:bg-primary-container selection:text-on-primary-container relative">

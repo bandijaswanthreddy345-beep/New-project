@@ -239,25 +239,35 @@ function QuestionPapersSection() {
                   </span>
                 </div>
 
-                {/* Interactive Like Reaction */}
+                {/* Interactive Like Reaction (Redesigned Heart & Clean Transparent Background) */}
                 <button
                   type="button"
-                  aria-label="Bookmark paper"
+                  aria-label="Like paper"
+                  title={paper.isLiked ? "Liked" : "Like paper"}
                   onClick={(e) => toggleLike(paper.id, e)}
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#08090D] border transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 p-1 bg-transparent border-none transition-all cursor-pointer group/like select-none ${
                     paper.isLiked
-                      ? "border-[#f43f5e]/60 text-[#f43f5e] shadow-[0_0_10px_rgba(244,63,94,0.25)]"
-                      : "border-[#292733] text-[#A3A3B5] hover:text-[#f43f5e] hover:border-[#f43f5e]/40"
+                      ? "text-[#f43f5e]"
+                      : "text-[#94A3B8] hover:text-[#f43f5e]"
                   }`}
                 >
+                  <svg
+                    viewBox="0 0 24 24"
+                    className={`w-4 h-4 transition-all duration-200 group-hover/like:scale-110 active:scale-90 ${
+                      paper.isLiked
+                        ? "fill-[#f43f5e] stroke-[#f43f5e]"
+                        : "fill-none stroke-current stroke-[2] group-hover/like:stroke-[#f43f5e]"
+                    }`}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
                   <span
-                    className={`material-symbols-outlined text-[14px] transition-transform ${
-                      paper.isLiked ? "scale-110 text-[#f43f5e]" : ""
+                    className={`font-semibold text-[11px] tabular-nums transition-colors ${
+                      paper.isLiked ? "text-[#f43f5e]" : "text-white group-hover/like:text-[#f43f5e]"
                     }`}
                   >
-                    {paper.isLiked ? "favorite" : "favorite_border"}
-                  </span>
-                  <span className={`font-semibold text-[11px] ${paper.isLiked ? "text-[#f43f5e]" : ""}`}>
                     {paper.likes}
                   </span>
                 </button>

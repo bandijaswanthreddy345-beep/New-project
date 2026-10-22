@@ -1,10 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getStoredStudentData } from "../data/studentData";
+import API from "../api/api";
+import {
+  getStoredStudentData,
+  getBranchExamSchedule,
+  computeLiveCountdown,
+} from "../data/studentData";
 
 function AcademicConsole() {
   const navigate = useNavigate();
   const [student, setStudent] = useState(getStoredStudentData());
+  const [timetableLink, setTimetableLink] = useState(
+    "https://drive.google.com/file/d/1y7wCLbwIrrUImTdN0iY3iEWtVoiMEa6q/view?usp=drive_link"
+  );
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const handleSync = () => {
@@ -14,8 +23,73 @@ function AcademicConsole() {
     return () => window.removeEventListener("studentProfileUpdated", handleSync);
   }, []);
 
+  // Synchronize official examination timetable link from real university notifications
+  useEffect(() => {
+    let isMounted = true;
+    const fetchTimetable = async () => {
+      try {
+        const res = await API.get("/notifications");
+        const list = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.notifications)
+          ? res.data.notifications
+          : [];
+        const tt = list.find(
+          (n) =>
+            n.title &&
+            (n.title.toLowerCase().includes("timetable") ||
+              n.title.toLowerCase().includes("time table")) &&
+            n.link
+        );
+        if (tt && tt.link && isMounted) {
+          setTimetableLink(tt.link);
+        }
+      } catch (e) {
+        // Fallback default
+      }
+    };
+    fetchTimetable();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Dynamically synchronize examination schedule based on student's branch
+  const activeSchedule = useMemo(() => {
+    if (
+      student.examSchedule &&
+      Array.isArray(student.examSchedule) &&
+      student.examSchedule.length > 0 &&
+      !student.examSchedule.some((e) => e.date?.includes("Dec 04"))
+    ) {
+      return student.examSchedule;
+    }
+    return getBranchExamSchedule(student.branchCode || student.branch);
+  }, [student]);
+
+  const firstExamDateStr = activeSchedule[0]?.date || "Nov 04, 2026";
+  const [countdownText, setCountdownText] = useState(() =>
+    computeLiveCountdown(`${firstExamDateStr} 10:00:00`)
+  );
+
+  // Keep countdown strictly synchronized with the first scheduled examination date
+  useEffect(() => {
+    const update = () => {
+      setCountdownText(computeLiveCountdown(`${firstExamDateStr} 10:00:00`));
+    };
+    update();
+    const timer = setInterval(update, 60000);
+    return () => clearInterval(timer);
+  }, [firstExamDateStr]);
+
   const handleDownloadTimeTable = () => {
-    navigate("/notifications");
+    setIsDownloading(true);
+    if (timetableLink) {
+      window.open(timetableLink, "_blank", "noopener,noreferrer");
+    } else {
+      navigate("/notifications");
+    }
+    setTimeout(() => setIsDownloading(false), 2000);
   };
 
   const cgpaNum = parseFloat(student.cgpa) || 9.18;
@@ -157,22 +231,18 @@ function AcademicConsole() {
               <span className="font-label-caps text-label-caps uppercase text-[#A3A3B5] tracking-wider">
                 Semester Examination Schedule
               </span>
-              <span className="px-2 py-0.5 rounded bg-[#27213B] text-[#C4B5FD] font-label-mono-sm text-label-mono-sm">
-                {student.examCountdown || "STARTS IN 06D : 14H"}
+              <span className="px-2.5 py-0.5 rounded bg-[#27213B] text-[#C4B5FD] font-label-mono-sm text-label-mono-sm border border-[#8B5CF6]/30 shadow-[0_0_8px_rgba(139,92,246,0.2)]">
+                {countdownText || student.examCountdown || "STARTS IN 12D : 20H"}
               </span>
             </div>
 
             {/* Exam Items */}
             <div className="flex flex-col gap-2.5">
-              {(student.examSchedule || [
-                { code: "CS701PC", title: "Cloud Computing Architecture", time: "10:00 AM - 01:00 PM", date: "Dec 04, 2026" },
-                { code: "CS702PE", title: "Deep Reinforcement Learning", time: "10:00 AM - 01:00 PM", date: "Dec 07, 2026" },
-                { code: "CS703PC", title: "Information Security Systems", time: "10:00 AM - 01:00 PM", date: "Dec 10, 2026" },
-              ]).map((exam, idx) => (
-                <div key={idx} className="p-3 rounded bg-[#12131B] border border-[#292733] flex items-center justify-between">
+              {activeSchedule.map((exam, idx) => (
+                <div key={idx} className="p-3 rounded bg-[#12131B] border border-[#292733] hover:border-[#8B5CF6]/40 transition-colors flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-label-mono-sm text-label-mono-sm text-[#8B5CF6]">
+                      <span className="font-label-mono-sm text-label-mono-sm text-[#8B5CF6] font-semibold">
                         {exam.code}
                       </span>
                       <span className="font-body-sm text-body-sm font-medium text-[#F5F5FA]">
@@ -197,10 +267,13 @@ function AcademicConsole() {
               <button
                 type="button"
                 onClick={handleDownloadTimeTable}
-                className="px-3 py-1.5 rounded bg-[#8B5CF6]/20 border border-[#8B5CF6]/50 text-[#C4B5FD] font-label-mono-sm text-label-mono-sm hover:bg-[#8B5CF6] hover:text-[#F5F5FA] transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-[#8B5CF6]/20 border border-[#8B5CF6]/50 text-[#C4B5FD] font-label-mono-sm text-label-mono-sm hover:bg-[#8B5CF6] hover:text-[#F5F5FA] transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                title="Download official university examination timetable"
               >
-                <span className="material-symbols-outlined text-[15px]">download</span>
-                Download time table
+                <span className="material-symbols-outlined text-[15px]">
+                  {isDownloading ? "hourglass_top" : "download"}
+                </span>
+                {isDownloading ? "Opening timetable..." : "Download time table"}
               </button>
             </div>
           </div>

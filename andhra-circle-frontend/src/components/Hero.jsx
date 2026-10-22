@@ -37,7 +37,12 @@ function Hero({ onOpenProfile, onSelectBranch, selectedBranch = "" }) {
     if (onSelectBranch) {
       onSelectBranch(code);
     }
-    navigate(`/notes?branch=${encodeURIComponent(code)}`);
+    const el = document.getElementById("departments");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      navigate(`/#departments`);
+    }
   };
 
   return (
