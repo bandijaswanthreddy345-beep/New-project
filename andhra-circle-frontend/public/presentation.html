@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>JNTU Circle — Project Overview & Pitch Presentation</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js 4.4 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* =========================================================
+           EMERALD HORIZON DESIGN TOKENS
+           ========================================================= */
+        :root {
+            --bg-deep: #010e0c;
+            --bg-surface: #021a16;
+            --bg-card: rgba(2, 26, 22, 0.75);
+            --bg-card-hover: rgba(3, 36, 30, 0.9);
+            --line: rgba(245, 189, 63, 0.16);
+            --line-strong: rgba(245, 189, 63, 0.35);
+            --gold: #f5bd3f;
+            --gold-light: #ffefb3;
+            --gold-glow: rgba(245, 189, 63, 0.22);
+            --mint: #5eead4;
+            --mint-glow: rgba(94, 234, 212, 0.18);
+            --text-main: #f5fbf9;
+            --text-muted: #8fa5a0;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'DM Sans', sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            user-select: none;
+        }
+
+        /* Ambient Background Mesh */
+        .ambient-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 18% 12%, rgba(245, 189, 63, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 82% 88%, rgba(94, 234, 212, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(2, 28, 24, 0.8) 0%, transparent 80%),
+                linear-gradient(180deg, #010d0b 0%, #031c18 50%, #010d0b 100%);
+        }
+
+        /* Subtle Animated Gold Horizon Line */
+        .ambient-horizon {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+            opacity: 0.75;
+            z-index: 999;
+        }
+
+        /* 16:9 Widescreen Presentation Shell */
+        .slide-deck {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .slide-frame {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw; /* 16:9 */
+            max-height: 100vh;
+            max-width: 177.78vh; /* 16:9 */
+            aspect-ratio: 16 / 9;
+            background: rgba(2, 22, 19, 0.6);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Single Slide Viewport */
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 48px 64px 72px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.97) translateY(12px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+        }
+
+        /* Top Meta Header in Slide */
+        .slide-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .slide-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            background: rgba(245, 189, 63, 0.08);
+            border: 1px solid var(--line-strong);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold-light);
+        }
+
+        .slide-badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 8px var(--gold);
+        }
+
+        .slide-org {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Slide Main Body */
+        .slide-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Typography */
+        .eyebrow {
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        h1.hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(38px, 4.4vw, 68px);
+            line-height: 1.05;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 14px;
+            letter-spacing: -0.01em;
+        }
+
+        h1.hero-title em {
+            color: var(--gold-light);
+            font-style: italic;
+        }
+
+        h2.section-title {
+            font-family: var(--font-serif);
+            font-size: clamp(28px, 3vw, 44px);
+            line-height: 1.15;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        h2.section-title em {
+            color: var(--gold-light);
+            font-style: italic;
+        }
+
+        p.subtitle {
+            font-size: clamp(14px, 1.25vw, 17px);
+            line-height: 1.6;
+            color: var(--text-muted);
+            max-width: 680px;
+        }
+
+        /* Slide Footer Strip */
+        .slide-footer-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 11px;
+            color: #5d7570;
+            letter-spacing: 0.05em;
+        }
+
+        /* Cards & Layout Patterns */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            width: 100%;
+            margin-top: 18px;
+        }
+
+        .grid-split {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 36px;
+            align-items: center;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .luxury-card {
+            background: var(--bg-card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 22px 24px;
+            backdrop-filter: blur(14px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .luxury-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 2px;
+            background: var(--gold);
+            opacity: 0.7;
+        }
+
+        .luxury-card:hover {
+            border-color: var(--line-strong);
+            background: var(--bg-card-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-icon {
+            font-size: 26px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--text-muted);
+        }
+
+        .card-tag {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-top: 12px;
+        }
+
+        /* Metric Hero Pill */
+        .metric-big-card {
+            background: rgba(2, 28, 23, 0.85);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-big-number {
+            font-family: var(--font-heading);
+            font-size: clamp(32px, 3.2vw, 48px);
+            font-weight: 700;
+            color: var(--gold-light);
+            line-height: 1;
+            margin-bottom: 6px;
+            text-shadow: 0 0 20px rgba(245, 189, 63, 0.3);
+        }
+
+        .metric-big-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ab3ae;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Interactive UI Mockup Box for Chatbot */
+        .mockup-chat-box {
+            background: #000000;
+            border: 1.5px solid var(--line-strong);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(245, 189, 63, 0.1);
+            position: relative;
+        }
+
+        .mockup-chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 14px;
+        }
+
+        .mockup-chat-bubble {
+            background: rgba(2, 28, 24, 0.8);
+            border: 1px solid rgba(245, 189, 63, 0.2);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .mockup-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mockup-chip {
+            padding: 6px 12px;
+            border-radius: 9999px;
+            background: rgba(245, 189, 63, 0.12);
+            border: 1px solid var(--gold);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gold-light);
+        }
+
+        /* Charts Container */
+        .chart-box {
+            position: relative;
+            width: 100%;
+            height: clamp(210px, 24vh, 260px);
+            background: rgba(1, 15, 13, 0.6);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        /* Bottom Floating Deck Controls */
+        .deck-controls {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(2, 24, 20, 0.88);
+            border: 1px solid var(--line-strong);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .deck-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .deck-btn:hover {
+            background: var(--gold);
+            color: #000000;
+            border-color: var(--gold);
+            transform: scale(1.08);
+        }
+
+        .deck-counter {
+            font-family: var(--font-heading);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gold-light);
+            min-width: 55px;
+            text-align: center;
+        }
+
+        /* Progress Bar */
+        .deck-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #d4a024, var(--gold), var(--mint));
+            width: 10%;
+            transition: width 0.35s ease;
+            z-index: 1001;
+        }
+
+        /* Slide Overview Modal ('O' Key) */
+        .overview-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(1, 14, 12, 0.94);
+            backdrop-filter: blur(25px);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .overview-overlay.open {
+            display: flex;
+        }
+
+        .overview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .overview-thumb {
+            background: var(--bg-surface);
+            border: 1.5px solid var(--line);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 160px;
+        }
+
+        .overview-thumb:hover {
+            border-color: var(--gold);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(245, 189, 63, 0.2);
+        }
+
+        .overview-thumb.active {
+            border-color: var(--gold);
+            background: rgba(245, 189, 63, 0.1);
+        }
+
+        /* Timeline Roadmap styles */
+        .roadmap-track {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            position: relative;
+            margin-top: 24px;
+        }
+
+        .roadmap-card {
+            background: var(--bg-card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 18px;
+            position: relative;
+        }
+
+        .roadmap-card.active-phase {
+            border-color: var(--gold);
+            background: rgba(245, 189, 63, 0.08);
+        }
+
+        .roadmap-pill {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            background: rgba(245, 189, 63, 0.16);
+            color: var(--gold-light);
+            margin-bottom: 8px;
+        }
+
+        /* Help Tooltip */
+        .key-hints {
+            display: flex;
+            gap: 14px;
+            font-size: 11px;
+            color: #617974;
+            align-items: center;
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: inherit;
+            color: #d1dedb;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Ambient Line & Dynamic Progress Bar -->
+    <div class="ambient-horizon"></div>
+    <div class="deck-progress" id="progressBar"></div>
+    <div class="ambient-mesh"></div>
+
+    <!-- 16:9 Presentation Viewport Frame -->
+    <div class="slide-deck">
+        <div class="slide-frame">
+
+            <!-- ========================================================
+                 SLIDE 1: TITLE / HERO SLIDE
+                 ======================================================== -->
+            <div class="slide active" data-slide="1">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> Official Project Deck</span>
+                    <span class="slide-org">JNTU Circle • Emerald Horizon Edition</span>
+                </div>
+
+                <div class="slide-body" style="text-align: center; align-items: center;">
+                    <p class="eyebrow">YOUR ACADEMIC COMPANION</p>
+                    <h1 class="hero-title">
+                        Where <em>vision</em><br>meets possibility.
+                    </h1>
+                    <p class="subtitle" style="text-align: center; margin: 0 auto 28px;">
+                        The unified digital academic platform, AI student advisor, and multi-department resource hub engineered specifically for JNTU engineering students.
+                    </p>
+
+                    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                        <span class="mockup-chip">🎓 JNTU B.Tech R20 & R23</span>
+                        <span class="mockup-chip">🤖 Context-Aware AI Chatbot</span>
+                        <span class="mockup-chip">🪐 3D Department Orbit</span>
+                        <span class="mockup-chip">📊 SGPA & CGPA Precision Engine</span>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>Presented by JNTU Circle Core Development Team</span>
+                    <span>Press [→] or [Space] to advance</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 2: THE PROBLEM (ACADEMIC FRAGMENTATION)
+                 ======================================================== -->
+            <div class="slide" data-slide="2">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> The Challenge</span>
+                    <span class="slide-org">Problem Identification</span>
+                </div>
+
+                <div class="slide-body">
+                    <p class="eyebrow">THE ACADEMIC DILEMMA</p>
+                    <h2 class="section-title">The Cost of <em>Academic Fragmentation</em></h2>
+                    <p class="subtitle">
+                        Every semester, thousands of engineering students struggle with decentralized, unverified resources and outdated portals.
+                    </p>
+
+                    <div class="grid-3">
+                        <div class="luxury-card">
+                            <span class="card-icon">🗂️</span>
+                            <h3 class="card-title">Scattered Study Materials</h3>
+                            <p class="card-desc">
+                                Subject notes, model papers, and lab manuals are fragmented across hundreds of temporary WhatsApp groups and broken Google Drive links.
+                            </p>
+                            <span class="card-tag">72% Time Wasted Searching</span>
+                        </div>
+
+                        <div class="luxury-card">
+                            <span class="card-icon">⏱️</span>
+                            <h3 class="card-title">Manual Grade Calculation</h3>
+                            <p class="card-desc">
+                                Complex credit-weighting formulas in R20 & R23 regulations make manual SGPA/CGPA forecasting prone to errors and stress during exam season.
+                            </p>
+                            <span class="card-tag">High Error Rates</span>
+                        </div>
+
+                        <div class="luxury-card">
+                            <span class="card-icon">📢</span>
+                            <h3 class="card-title">Delayed University Notices</h3>
+                            <p class="card-desc">
+                                Critical timetable changes, revaluation windows, and academic calendar revisions are buried in cumbersome 30-page university PDF circulars.
+                            </p>
+                            <span class="card-tag">Missed Critical Deadlines</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>Problem Validation • Engineering Student Pain Points Survey</span>
+                    <span>Slide 02 of 10</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 3: THE SOLUTION & ECOSYSTEM VALUE
+                 ======================================================== -->
+            <div class="slide" data-slide="3">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> The Solution</span>
+                    <span class="slide-org">Value Proposition</span>
+                </div>
+
+                <div class="slide-body">
+                    <div class="grid-split">
+                        <div>
+                            <p class="eyebrow">THE PLATFORM</p>
+                            <h2 class="section-title">Built for a <em>Bold Academic Presence</em></h2>
+                            <p class="subtitle" style="margin-bottom: 20px;">
+                                JNTU Circle replaces chaotic study workflows with a centralized, verified, and distraction-free academic powerhouse.
+                            </p>
+
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                                    <span style="color: var(--gold); font-size: 16px;">✦</span>
+                                    <div>
+                                        <strong style="color: #ffffff; font-size: 14px;">Instant Verified Repository</strong>
+                                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Faculty-vetted semester lecture notes, previous year question papers & lab programs.</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                                    <span style="color: var(--gold); font-size: 16px;">✦</span>
+                                    <div>
+                                        <strong style="color: #ffffff; font-size: 14px;">Integrated AI Academic Advisor</strong>
+                                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Conversational profile builder and academic advisor responding in sub-second latency.</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                                    <span style="color: var(--gold); font-size: 16px;">✦</span>
+                                    <div>
+                                        <strong style="color: #ffffff; font-size: 14px;">Real-Time Notification Radar</strong>
+                                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Instant categorized circular previews straight from official university notifications.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Chart: Before vs After Efficiency -->
+                        <div>
+                            <div class="chart-box">
+                                <canvas id="efficiencyRadarChart"></canvas>
+                            </div>
+                            <p style="font-size: 11px; text-align: center; color: var(--text-muted); margin-top: 8px;">
+                                Efficiency Benchmark: Traditional Portals vs. JNTU Circle (Index: 0-100)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>Solution Architecture • Strategic Transformation</span>
+                    <span>Slide 03 of 10</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 4: SYSTEM ARCHITECTURE & TECH STACK
+                 ======================================================== -->
+            <div class="slide" data-slide="4">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> Engineering</span>
+                    <span class="slide-org">System Architecture</span>
+                </div>
+
+                <div class="slide-body">
+                    <p class="eyebrow">MODERN ENGINEERING</p>
+                    <h2 class="section-title">High-Performance <em>Full-Stack Architecture</em></h2>
+                    <p class="subtitle">
+                        Built for blazing-fast speed, high concurrency, and seamless mobile responsiveness.
+                    </p>
+
+                    <div class="grid-4">
+                        <div class="luxury-card">
+                            <span class="card-icon">⚡</span>
+                            <h3 class="card-title">Frontend Tier</h3>
+                            <p class="card-desc">
+                                React 19, Vite 8, React Router v7, and handcrafted Vanilla CSS design system for zero runtime overhead.
+                            </p>
+                            <span class="card-tag">sub-second render</span>
+                        </div>
+
+                        <div class="luxury-card">
+                            <span class="card-icon">🌐</span>
+                            <h3 class="card-title">API & Backend</h3>
+                            <p class="card-desc">
+                                Node.js & Express RESTful services with strict schema validation, robust CORS policies, and rate-limiting.
+                            </p>
+                            <span class="card-tag">99.9% uptime</span>
+                        </div>
+
+                        <div class="luxury-card">
+                            <span class="card-icon">💾</span>
+                            <h3 class="card-title">Database Tier</h3>
+                            <p class="card-desc">
+                                MongoDB Atlas cluster with structured Mongoose models for Materials, Circulars, Feedback & Student Profiles.
+                            </p>
+                            <span class="card-tag">Elastic Scalability</span>
+                        </div>
+
+                        <div class="luxury-card">
+                            <span class="card-icon">✨</span>
+                            <h3 class="card-title">Luxury UI Engine</h3>
+                            <p class="card-desc">
+                                3D CSS perspective transforms, BorderBeam shaders, MetalFx chromatic buttons, and ThinkingOrb animations.
+                            </p>
+                            <span class="card-tag">Emerald Horizon</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>Full-Stack Modular Specs • Vite + Express + MongoDB</span>
+                    <span>Slide 04 of 10</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 5: JNTU AI ASSISTANT & PROFILE WIZARD
+                 ======================================================== -->
+            <div class="slide" data-slide="5">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> Key Feature 01</span>
+                    <span class="slide-org">Conversational AI</span>
+                </div>
+
+                <div class="slide-body">
+                    <div class="grid-split">
+                        <div>
+                            <p class="eyebrow">INTELLIGENT COMPANION</p>
+                            <h2 class="section-title">The JNTU <em>AI Assistant</em></h2>
+                            <p class="subtitle" style="margin-bottom: 20px;">
+                                A tailored natural language assistant that understands JNTU regulations, branches, subjects, and student queries.
+                            </p>
+
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div class="luxury-card" style="padding: 14px 18px;">
+                                    <strong style="color: #fff; font-size: 13.5px;">Interactive Student Profile Wizard</strong>
+                                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Conversational onboarding that extracts name, roll number, regulation, and branch seamlessly.</p>
+                                </div>
+                                <div class="luxury-card" style="padding: 14px 18px;">
+                                    <strong style="color: #fff; font-size: 13.5px;">Contextual Academic Retrieval</strong>
+                                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Understands intent: maps questions to specific semester syllabus, notes, and lab experiments.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Mockup Graphic -->
+                        <div class="mockup-chat-box">
+                            <div class="mockup-chat-header">
+                                <span style="font-size: 12px; font-weight: 700; color: var(--gold-light);">🤖 JNTU Circle AI • Online</span>
+                                <span style="font-size: 10px; color: #5eead4;">● Active Wizard</span>
+                            </div>
+                            <div class="mockup-chat-bubble">
+                                <strong style="color: var(--gold); display: block; font-size: 11px; margin-bottom: 4px;">JNTU AI ASSISTANT</strong>
+                                "Welcome! I can pull up verified notes, calculate your CGPA, or build your verified Student Profile. What are you looking for today?"
+                            </div>
+                            <div class="mockup-chips">
+                                <span class="mockup-chip">✨ Build Student Profile</span>
+                                <span class="mockup-chip">📊 CGPA Calculator</span>
+                                <span class="mockup-chip">📘 AIML Notes</span>
+                                <span class="mockup-chip">🎓 Timetables</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>Proprietary Rule Engine & NLP Intent Matching</span>
+                    <span>Slide 05 of 10</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 6: 3D DEPARTMENT RESOURCE ORBIT
+                 ======================================================== -->
+            <div class="slide" data-slide="6">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> Key Feature 02</span>
+                    <span class="slide-org">Department Hub</span>
+                </div>
+
+                <div class="slide-body">
+                    <p class="eyebrow">ACADEMIC DEPARTMENTS</p>
+                    <h2 class="section-title">Interactive <em>3D Department Navigation</em></h2>
+                    <p class="subtitle">
+                        An immersive 3D carousel providing instant access to categorized course materials across all engineering disciplines.
+                    </p>
+
+                    <div class="grid-4" style="grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 20px;">
+                        <div class="luxury-card" style="padding: 16px;">
+                            <span style="font-size: 11px; font-weight: 800; color: var(--gold);">01 • CSE</span>
+                            <h4 style="font-size: 14px; color: #fff; margin: 8px 0 4px;">Computer Science</h4>
+                            <p style="font-size: 11px; color: var(--text-muted);">AI, Systems & Software Engineering.</p>
+                            <span class="card-tag">180+ Notes</span>
+                        </div>
+
+                        <div class="luxury-card" style="padding: 16px;">
+                            <span style="font-size: 11px; font-weight: 800; color: var(--gold-light);">02 • ECE</span>
+                            <h4 style="font-size: 14px; color: #fff; margin: 8px 0 4px;">Electronics & Comm</h4>
+                            <p style="font-size: 11px; color: var(--text-muted);">VLSI, Signals & Embedded Systems.</p>
+                            <span class="card-tag">145+ Notes</span>
+                        </div>
+
+                        <div class="luxury-card" style="padding: 16px;">
+                            <span style="font-size: 11px; font-weight: 800; color: #5eead4;">03 • AIML</span>
+                            <h4 style="font-size: 14px; color: #fff; margin: 8px 0 4px;">AI & Machine Learning</h4>
+                            <p style="font-size: 11px; color: var(--text-muted);">Neural Networks & Data Science.</p>
+                            <span class="card-tag">160+ Notes</span>
+                        </div>
+
+                        <div class="luxury-card" style="padding: 16px;">
+                            <span style="font-size: 11px; font-weight: 800; color: #fbbf24;">04 • MECH</span>
+                            <h4 style="font-size: 14px; color: #fff; margin: 8px 0 4px;">Mechanical Engg</h4>
+                            <p style="font-size: 11px; color: var(--text-muted);">Robotics, CAD & Thermal Systems.</p>
+                            <span class="card-tag">110+ Notes</span>
+                        </div>
+
+                        <div class="luxury-card" style="padding: 16px;">
+                            <span style="font-size: 11px; font-weight: 800; color: #34d399;">05 • CIVIL</span>
+                            <h4 style="font-size: 14px; color: #fff; margin: 8px 0 4px;">Civil Engineering</h4>
+                            <p style="font-size: 11px; color: var(--text-muted);">Smart Infrastructure & Geotech.</p>
+                            <span class="card-tag">95+ Notes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>3D Revolving Orbit Scene • Click-to-Redirect Catalog</span>
+                    <span>Slide 06 of 10</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 7: ACADEMIC UTILITIES (CALCULATOR & REPORTS)
+                 ======================================================== -->
+            <div class="slide" data-slide="7">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> Key Feature 03</span>
+                    <span class="slide-org">Academic Tooling</span>
+                </div>
+
+                <div class="slide-body">
+                    <p class="eyebrow">PRECISION UTILITIES</p>
+                    <h2 class="section-title">Grade Forecaster & <em>University Radar</em></h2>
+                    <p class="subtitle">
+                        Empowering students with tools to plan their academics and never miss an official announcement.
+                    </p>
+
+                    <div class="grid-split" style="gap: 24px; margin-top: 20px;">
+                        <div class="luxury-card">
+                            <span class="card-icon">📊</span>
+                            <h3 class="card-title" style="font-size: 19px;">Regulation-Aware SGPA & CGPA Engine</h3>
+                            <p class="card-desc" style="font-size: 13.5px; margin-bottom: 12px;">
+                                Pre-programmed credit weights for R20 and R23 regulations across 8 semesters. Includes target grade simulator and backlogs impact analyzer.
+                            </p>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span class="mockup-chip">Weighted Credits</span>
+                                <span class="mockup-chip">SGPA to CGPA</span>
+                                <span class="mockup-chip">Grade Export</span>
+                            </div>
+                        </div>
+
+                        <div class="luxury-card">
+                            <span class="card-icon">📜</span>
+                            <h3 class="card-title" style="font-size: 19px;">Official University Circulars & Results</h3>
+                            <p class="card-desc" style="font-size: 13.5px; margin-bottom: 12px;">
+                                Real-time sync of official JNTU exam timetables, revaluation portals, academic calendars, and syllabus revisions with live navbar pop-up previews.
+                            </p>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span class="mockup-chip">Exam Alerts</span>
+                                <span class="mockup-chip">Fast Result Lookups</span>
+                                <span class="mockup-chip">PDF Direct Previews</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>High Utility Student Retention Drivers</span>
+                    <span>Slide 07 of 10</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 8: TRACTION & PERFORMANCE METRICS
+                 ======================================================== -->
+            <div class="slide" data-slide="8">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> Impact & Traction</span>
+                    <span class="slide-org">Performance Metrics</span>
+                </div>
+
+                <div class="slide-body">
+                    <div class="grid-split">
+                        <div>
+                            <p class="eyebrow">DATA & ADOPTION</p>
+                            <h2 class="section-title">Rapid Student <em>Growth & Engagement</em></h2>
+                            <p class="subtitle" style="margin-bottom: 18px;">
+                                Consistent month-over-month adoption powered by word-of-mouth student advocacy and high exam-season retention.
+                            </p>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div class="metric-big-card">
+                                    <div class="metric-big-number">15,000+</div>
+                                    <div class="metric-big-label">Active Student Visits</div>
+                                </div>
+                                <div class="metric-big-card">
+                                    <div class="metric-big-number">1,200+</div>
+                                    <div class="metric-big-label">Verified Materials</div>
+                                </div>
+                                <div class="metric-big-card">
+                                    <div class="metric-big-number">99.4%</div>
+                                    <div class="metric-big-label">Search Accuracy</div>
+                                </div>
+                                <div class="metric-big-card">
+                                    <div class="metric-big-number">&lt; 1.2s</div>
+                                    <div class="metric-big-label">Avg Access Latency</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart.js Monthly Active Growth Area Chart -->
+                        <div>
+                            <div class="chart-box">
+                                <canvas id="growthLineChart"></canvas>
+                            </div>
+                            <p style="font-size: 11px; text-align: center; color: var(--text-muted); margin-top: 8px;">
+                                Monthly Resource Downloads & Exam Queries (Jan — Oct)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>Analytics Overview • Verified Semester Sessions</span>
+                    <span>Slide 08 of 10</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 9: STRATEGIC ROADMAP
+                 ======================================================== -->
+            <div class="slide" data-slide="9">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> Future Vision</span>
+                    <span class="slide-org">Strategic Roadmap</span>
+                </div>
+
+                <div class="slide-body">
+                    <p class="eyebrow">INNOVATION HORIZON</p>
+                    <h2 class="section-title">Strategic Roadmap & <em>Next Milestones</em></h2>
+                    <p class="subtitle">
+                        Transforming JNTU Circle from a resource repository into an AI-augmented student lifecycle companion.
+                    </p>
+
+                    <div class="roadmap-track">
+                        <div class="roadmap-card active-phase">
+                            <span class="roadmap-pill">Phase 01 • Current</span>
+                            <h4 style="font-size: 15px; color: #fff; margin-bottom: 6px;">Foundation & Core</h4>
+                            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                                AI Chatbot wizard, 3D department catalog, SGPA/CGPA engine, and live circular alerts deployed with Emerald Horizon design.
+                            </p>
+                        </div>
+
+                        <div class="roadmap-card">
+                            <span class="roadmap-pill" style="background: rgba(94, 234, 212, 0.15); color: #5eead4;">Phase 02 • Q1</span>
+                            <h4 style="font-size: 15px; color: #fff; margin-bottom: 6px;">OCR & Smart Summaries</h4>
+                            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                                Computer vision scan for handwritten faculty notes with AI-generated quick revision flashcards and formula cheat sheets.
+                            </p>
+                        </div>
+
+                        <div class="roadmap-card">
+                            <span class="roadmap-pill" style="background: rgba(255, 255, 255, 0.1); color: #ddd;">Phase 03 • Q2</span>
+                            <h4 style="font-size: 15px; color: #fff; margin-bottom: 6px;">Study Pods & Practice</h4>
+                            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                                Collaborative study rooms, peer Q&A threads, and timed mock semester examinations with automated performance analytics.
+                            </p>
+                        </div>
+
+                        <div class="roadmap-card">
+                            <span class="roadmap-pill" style="background: rgba(255, 255, 255, 0.1); color: #ddd;">Phase 04 • Q3</span>
+                            <h4 style="font-size: 15px; color: #fff; margin-bottom: 6px;">Multi-Varsity Scaling</h4>
+                            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                                Expansion to affiliated universities across Andhra Pradesh and Telangana with automated multi-regulation mapping.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>Engineering Milestones • Scalable Long-Term Roadmap</span>
+                    <span>Slide 09 of 10</span>
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 SLIDE 10: CLOSING & LIVE DEMO CTA
+                 ======================================================== -->
+            <div class="slide" data-slide="10">
+                <div class="slide-header">
+                    <span class="slide-badge"><span class="slide-badge-dot"></span> Conclusion</span>
+                    <span class="slide-org">Live Application Demo</span>
+                </div>
+
+                <div class="slide-body" style="text-align: center; align-items: center;">
+                    <p class="eyebrow">READY TO EXCEL?</p>
+                    <h1 class="hero-title">
+                        Turn your ambition into<br><em>academic success.</em>
+                    </h1>
+                    <p class="subtitle" style="text-align: center; margin: 0 auto 30px;">
+                        JNTU Circle empowers the next generation of engineers with the clarity, speed, and intelligence they deserve.
+                    </p>
+
+                    <div style="display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                        <a href="http://localhost:5173" target="_blank" style="display: inline-flex; align-items: center; gap: 10px; background: var(--gold); color: #000; padding: 14px 32px; border-radius: 9999px; text-decoration: none; font-weight: 700; font-size: 14px; box-shadow: 0 4px 20px rgba(245, 189, 63, 0.4); transition: transform 0.2s;">
+                            Launch JNTU Circle App <span>→</span>
+                        </a>
+                        <button onclick="toggleOverview()" class="deck-btn" style="width: auto; height: auto; padding: 13px 24px; border-radius: 9999px; font-weight: 600; font-size: 13px;">
+                            📑 View Slide Index
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 32px;" class="key-hints">
+                        <span><kbd>←</kbd> <kbd>→</kbd> Navigate</span>
+                        <span><kbd>Space</kbd> Advance</span>
+                        <span><kbd>F</kbd> Fullscreen</span>
+                        <span><kbd>O</kbd> Slide Index</span>
+                        <span><kbd>P</kbd> Auto-Play</span>
+                    </div>
+                </div>
+
+                <div class="slide-footer-strip">
+                    <span>JNTU Circle • Built with Passion for Andhra Pradesh Engineering Students</span>
+                    <span>Slide 10 of 10</span>
+                </div>
+            </div>
+
+        </div><!-- /.slide-frame -->
+    </div><!-- /.slide-deck -->
+
+    <!-- ========================================================
+         DECK NAVIGATION FLOATING TOOLBAR
+         ======================================================== -->
+    <div class="deck-controls">
+        <button class="deck-btn" onclick="prevSlide()" title="Previous slide (Left Arrow)">←</button>
+        <span class="deck-counter" id="deckCounter">1 / 10</span>
+        <button class="deck-btn" onclick="nextSlide()" title="Next slide (Right Arrow / Space)">→</button>
+        <button class="deck-btn" id="autoPlayBtn" onclick="toggleAutoPlay()" title="Auto-Play Slideshow (P)">▶</button>
+        <button class="deck-btn" onclick="toggleOverview()" title="Slide Overview (O)">📑</button>
+        <button class="deck-btn" onclick="toggleFullScreen()" title="Fullscreen (F)">⛶</button>
+    </div>
+
+    <!-- ========================================================
+         SLIDE OVERVIEW MODAL
+         ======================================================== -->
+    <div class="overview-overlay" id="overviewOverlay" onclick="handleOverlayClick(event)">
+        <div class="overview-header">
+            <div>
+                <h2 style="font-family: var(--font-serif); font-size: 28px; color: var(--gold-light);">Slide Index</h2>
+                <p style="color: var(--text-muted); font-size: 13px;">Click any card to jump immediately to that slide</p>
+            </div>
+            <button class="deck-btn" onclick="toggleOverview()" style="font-size: 16px;">✕</button>
+        </div>
+        <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+
+    <!-- ========================================================
+         INTERACTIVE PRESENTATION CONTROLLER & CHARTS SCRIPT
+         ======================================================== -->
+    <script>
+        let currentSlide = 1;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let isAutoPlaying = false;
+        let autoPlayInterval = null;
+
+        const counterEl = document.getElementById('deckCounter');
+        const progressEl = document.getElementById('progressBar');
+        const autoPlayBtn = document.getElementById('autoPlayBtn');
+        const overviewOverlay = document.getElementById('overviewOverlay');
+        const overviewGrid = document.getElementById('overviewGrid');
+
+        // Titles for overview grid
+        const slideMetadata = [
+            { num: 1, title: "Title / Hero", desc: "Where vision meets possibility" },
+            { num: 2, title: "The Problem", desc: "Academic fragmentation & scattered links" },
+            { num: 3, title: "The Solution", desc: "Designed for a bold academic presence" },
+            { num: 4, title: "Tech Architecture", desc: "React, Vite, Express, Mongo & Emerald UI" },
+            { num: 5, title: "AI Assistant", desc: "Contextual query engine & student wizard" },
+            { num: 6, title: "3D Department Hub", desc: "CSE, ECE, AIML, MECH, CIVIL catalog" },
+            { num: 7, title: "Academic Utilities", desc: "R20/R23 SGPA/CGPA engine & circulars" },
+            { num: 8, title: "Traction & Metrics", desc: "15,000+ visits, 1,200+ verified resources" },
+            { num: 9, title: "Strategic Roadmap", desc: "OCR smart flashcards & multi-varsity scaling" },
+            { num: 10, title: "Live Demo & CTA", desc: "Turn ambition into academic success" },
+        ];
+
+        // Populate Overview Thumbnails
+        function buildOverviewGrid() {
+            overviewGrid.innerHTML = '';
+            slideMetadata.forEach(item => {
+                const thumb = document.createElement('div');
+                thumb.className = `overview-thumb ${item.num === currentSlide ? 'active' : ''}`;
+                thumb.onclick = () => {
+                    goToSlide(item.num);
+                    toggleOverview();
+                };
+                thumb.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; font-weight: 800; color: var(--gold);">SLIDE 0${item.num}</span>
+                        <span style="font-size: 10px; color: var(--text-muted);">16:9</span>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 15px; color: #fff; margin-bottom: 4px;">${item.title}</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">${item.desc}</p>
+                    </div>
+                    <span style="font-size: 10px; color: #5eead4;">● Click to view</span>
+                `;
+                overviewGrid.appendChild(thumb);
+            });
+        }
+
+        // Slide State Engine
+        function goToSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            currentSlide = n;
+
+            slides.forEach((slide, idx) => {
+                slide.classList.toggle('active', idx === n - 1);
+            });
+
+            counterEl.textContent = `${currentSlide} / ${totalSlides}`;
+            progressEl.style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+            // Trigger Chart rendering on specific slides
+            if (currentSlide === 3) initRadarChart();
+            if (currentSlide === 8) initGrowthChart();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                goToSlide(currentSlide + 1);
+            } else if (isAutoPlaying) {
+                goToSlide(1); // loop
+            }
+        }
+
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+        }
+
+        // Fullscreen
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Auto Play
+        function toggleAutoPlay() {
+            isAutoPlaying = !isAutoPlaying;
+            if (isAutoPlaying) {
+                autoPlayBtn.textContent = '⏸';
+                autoPlayBtn.style.background = 'var(--gold)';
+                autoPlayBtn.style.color = '#000';
+                autoPlayInterval = setInterval(nextSlide, 5000);
+            } else {
+                autoPlayBtn.textContent = '▶';
+                autoPlayBtn.style.background = '';
+                autoPlayBtn.style.color = '';
+                clearInterval(autoPlayInterval);
+            }
+        }
+
+        // Overview Modal
+        function toggleOverview() {
+            const isOpen = overviewOverlay.classList.contains('open');
+            if (isOpen) {
+                overviewOverlay.classList.remove('open');
+            } else {
+                buildOverviewGrid();
+                overviewOverlay.classList.add('open');
+            }
+        }
+
+        function handleOverlayClick(e) {
+            if (e.target === overviewOverlay) {
+                toggleOverview();
+            }
+        }
+
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            if (overviewOverlay.classList.contains('open')) {
+                if (e.key === 'Escape' || e.key === 'o' || e.key === 'O') {
+                    toggleOverview();
+                }
+                return;
+            }
+
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                case 'PageDown':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                case 'Backspace':
+                case 'PageUp':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    goToSlide(1);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    goToSlide(totalSlides);
+                    break;
+                case 'f':
+                case 'F':
+                    e.preventDefault();
+                    toggleFullScreen();
+                    break;
+                case 'o':
+                case 'O':
+                    e.preventDefault();
+                    toggleOverview();
+                    break;
+                case 'p':
+                case 'P':
+                    e.preventDefault();
+                    toggleAutoPlay();
+                    break;
+            }
+        });
+
+        // Touch Swipe Navigation for Tablets & Mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) nextSlide();
+            if (touchEndX - touchStartX > 50) prevSlide();
+        }, { passive: true });
+
+        // ========================================================
+        // CHART.JS INITIALIZATIONS
+        // ========================================================
+        let radarChartInstance = null;
+        function initRadarChart() {
+            if (radarChartInstance) return;
+            const ctx = document.getElementById('efficiencyRadarChart');
+            if (!ctx) return;
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Search Speed', 'Resource Accuracy', 'Mobile UX', 'Grade Clarity', 'Notice Tracking'],
+                    datasets: [
+                        {
+                            label: 'JNTU Circle',
+                            data: [95, 98, 92, 96, 94],
+                            borderColor: '#f5bd3f',
+                            backgroundColor: 'rgba(245, 189, 63, 0.25)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#ffefb3'
+                        },
+                        {
+                            label: 'Legacy Portals',
+                            data: [35, 45, 25, 20, 40],
+                            borderColor: '#8fa5a0',
+                            backgroundColor: 'rgba(143, 165, 160, 0.15)',
+                            borderWidth: 1.5,
+                            pointBackgroundColor: '#8fa5a0'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0ece9',
+                                font: { size: 11, family: 'DM Sans' }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.08)' },
+                            pointLabels: {
+                                color: '#a0b8b3',
+                                font: { size: 10, family: 'DM Sans' }
+                            },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        let growthChartInstance = null;
+        function initGrowthChart() {
+            if (growthChartInstance) return;
+            const ctx = document.getElementById('growthLineChart');
+            if (!ctx) return;
+
+            growthChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [{
+                        label: 'Resource Downloads (K)',
+                        data: [2.1, 3.8, 6.4, 9.2, 14.8, 11.2, 16.5, 21.0, 27.5, 34.2],
+                        borderColor: '#5eead4',
+                        backgroundColor: 'rgba(94, 234, 212, 0.14)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.38,
+                        pointBackgroundColor: '#f5bd3f',
+                        pointBorderColor: '#010e0c',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#8fa5a0', font: { size: 10, family: 'DM Sans' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#8fa5a0', font: { size: 10, family: 'DM Sans' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize First Slide
+        goToSlide(1);
+    </script>
+</body>
+</html>

@@ -46,7 +46,7 @@ export const BRANCH_DIRECTORY = {
   CSE: {
     code: "CSE",
     name: "Computer Science & Engineering",
-    icon: "💻",
+    icon: "terminal",
     description: "Official lecture notes, lab manuals, question papers, and R23/R20 curriculum for Computer Science & Engineering.",
     aliases: ["cse", "computer science", "computer science engineering", "computer science & engineering", "cs", "information science", "ise", "information technology", "it"],
     portalQuery: "CSE",
@@ -54,7 +54,7 @@ export const BRANCH_DIRECTORY = {
   AIML: {
     code: "AIML",
     name: "Artificial Intelligence & Machine Learning",
-    icon: "🤖",
+    icon: "smart_toy",
     description: "Verified Python code, Deep Learning lecture notes, Machine Learning exam papers, and official curriculum for AI & ML.",
     aliases: ["aiml", "ai", "ml", "artificial intelligence", "machine learning", "ai & ml", "ai and ml", "ai & data science", "data science", "ds"],
     portalQuery: "AIML",
@@ -62,7 +62,7 @@ export const BRANCH_DIRECTORY = {
   ECE: {
     code: "ECE",
     name: "Electronics & Communication Engineering",
-    icon: "📡",
+    icon: "memory",
     description: "Electronic Devices, Digital Logic, Signals & Systems, VLSI notes, laboratory manuals, and semester exam papers.",
     aliases: ["ece", "electronics", "electronics and communication", "electronics & communication", "electronics and communication engineering", "ec"],
     portalQuery: "ECE",
@@ -70,7 +70,7 @@ export const BRANCH_DIRECTORY = {
   ME: {
     code: "ME",
     name: "Mechanical Engineering",
-    icon: "⚙️",
+    icon: "settings",
     description: "Thermodynamics, Fluid Mechanics, Engineering Mechanics, Manufacturing notes, workshop manuals, and papers.",
     aliases: ["me", "mech", "mechanical", "mechanical engineering", "mechanical engg"],
     portalQuery: "ME",
@@ -78,7 +78,7 @@ export const BRANCH_DIRECTORY = {
   CE: {
     code: "CE",
     name: "Civil Engineering",
-    icon: "🏗️",
+    icon: "apartment",
     description: "Strength of Materials, Surveying, Structural Analysis, Concrete Technology notes, field work manuals, and papers.",
     aliases: ["ce", "civil", "civil engineering"],
     portalQuery: "CE",
@@ -86,7 +86,7 @@ export const BRANCH_DIRECTORY = {
   EEE: {
     code: "EEE",
     name: "Electrical & Electronics Engineering",
-    icon: "⚡",
+    icon: "bolt",
     description: "Circuit Theory, Electrical Machines, Power Systems, Control Systems lecture notes, laboratory manuals, and papers.",
     aliases: ["eee", "electrical", "electrical engineering", "electrical & electronics", "electrical & electronics engineering"],
     portalQuery: "EEE",
@@ -111,7 +111,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Arrays, Linked Lists, Stacks, Queues, Binary Trees, Graphs, Sorting and Searching algorithms with C code examples.",
     author: "Dept of Computer Science & Engineering",
   },
@@ -125,7 +125,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Python basics, Control Flow, Functions, Strings, Lists, Tuples, Dictionaries, File I/O, OOP and Exception handling.",
     author: "Dept of AI & Machine Learning",
   },
@@ -139,7 +139,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Process management, CPU Scheduling, Deadlocks, Memory Management, Virtual Memory, and File System Implementation.",
     author: "Faculty of CSE & IT",
   },
@@ -153,7 +153,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "ER Modeling, Relational Algebra, SQL Queries, Normalization (1NF to BCNF), Transaction Processing, ACID properties.",
     author: "JNTUA Resource Group",
   },
@@ -167,7 +167,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Matrices, Eigenvalues & Eigenvectors, Cayley-Hamilton Theorem, Mean Value Theorems, Multiple Integrals.",
     author: "Dept of Mathematics",
   },
@@ -181,7 +181,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "First & Higher order linear differential equations, Vector Differentiation, Gradient, Curl, Divergence, Green's & Stokes' theorems.",
     author: "Dept of Mathematics",
   },
@@ -195,7 +195,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Supervised Learning, Regression, Decision Trees, SVM, Naive Bayes, Unsupervised Clustering, PCA and Model Evaluation.",
     author: "AIML Research Group",
   },
@@ -213,7 +213,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Semiconductor diodes, Zener diode, BJT characteristics, JFET, MOSFET, Biasing techniques, and Small signal amplifiers.",
     author: "Dept of ECE",
   },
@@ -227,7 +227,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Boolean algebra, K-maps, Combinational logic, Adders, Multiplexers, Flip-Flops, Shift Registers, Counters and FSM design.",
     author: "Dept of ECE",
   },
@@ -241,7 +241,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Continuous and Discrete time signals, LTI systems, Fourier Series, Fourier Transform, Laplace Transform, Z-Transforms.",
     author: "Dept of ECE",
   },
@@ -259,7 +259,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Statics of particles, Equilibrium of rigid bodies, Centroid and Center of Gravity, Moment of Inertia, Friction, Dynamics.",
     author: "Dept of Mechanical Engineering",
   },
@@ -273,7 +273,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Zeroth, First & Second laws of thermodynamics, Entropy, Pure substances, Air standard cycles (Otto, Diesel, Dual), Vapour power cycles.",
     author: "Dept of Mechanical Engineering",
   },
@@ -287,7 +287,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Fluid properties, Pressure measurement, Fluid kinematics, Bernoulli equation, Boundary layer theory, Turbines & Pumps.",
     author: "Dept of Mechanical Engineering",
   },
@@ -305,7 +305,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Simple stresses & strains, Shear force and Bending moment diagrams, Flexural & Shear stresses, Torsion of shafts, Deflection of beams.",
     author: "Dept of Civil Engineering",
   },
@@ -319,7 +319,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Chain & Compass surveying, Leveling & Contouring, Theodolite traversing, Curves, Total Station and GPS principles.",
     author: "Dept of Civil Engineering",
   },
@@ -337,7 +337,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "DC Circuit analysis, AC fundamentals, Single phase transformers, DC machines, Diodes & Transistors fundamentals.",
     author: "Dept of EEE",
   },
@@ -351,7 +351,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Notes",
-    icon: "📘",
+    icon: "description",
     description: "Network theorems (Thevenin, Norton, Superposition), Resonance, Transient analysis, Two-port network parameters.",
     author: "Dept of EEE",
   },
@@ -369,7 +369,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "Official JNTUA regular semester examination question paper with full 70-mark split and model solutions.",
   },
   {
@@ -382,7 +382,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "JNTUA B.Tech 1st Year 1st Semester exam paper including coding problems and theoretical questions.",
   },
   {
@@ -395,7 +395,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R20 / R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "Collection of previous year questions on SQL queries, normalization, and concurrency control.",
   },
   {
@@ -408,7 +408,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R20 / R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "Previous question paper covering scheduling algorithms, banker's algorithm, paging and segmentation.",
   },
   {
@@ -421,7 +421,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "Official question paper covering PN junctions, BJT amplifiers, JFET characteristics and rectifiers.",
   },
   {
@@ -434,7 +434,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "Exam paper covering K-map reduction, synchronous counters, multiplexers and shift registers.",
   },
   {
@@ -447,7 +447,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "JNTUA regular exam paper covering equilibrium of forces, friction, centroid, and work-energy theorem.",
   },
   {
@@ -460,7 +460,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "Previous year exam paper with numerical problems on SFD, BMD, bending stress and deflection.",
   },
   {
@@ -473,7 +473,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2024",
     regulation: "R23",
     type: "Question Paper",
-    icon: "📄",
+    icon: "description",
     description: "Question paper covering mesh & nodal analysis, Thevenin theorem, resonance and transient circuits.",
   },
 
@@ -490,7 +490,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Lab Program",
-    icon: "🧪",
+    icon: "science",
     description: "All weekly lab exercises: Stack using array/linked list, Infix to Postfix, Queue, BST traversal, Quick sort, Dijkstra's algorithm.",
   },
   {
@@ -503,7 +503,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Lab Program",
-    icon: "🧪",
+    icon: "science",
     description: "Executable Python scripts for all syllabus lab experiments with sample input/output and viva questions.",
   },
   {
@@ -516,7 +516,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "2nd Year",
     regulation: "R23",
     type: "Lab Program",
-    icon: "🧪",
+    icon: "science",
     description: "Oracle SQL scripts, PL/SQL blocks, procedures, functions, packages and database normalization case studies.",
   },
   {
@@ -529,7 +529,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Lab Program",
-    icon: "🧪",
+    icon: "science",
     description: "V-I characteristics of PN & Zener diode, Half/Full wave rectifiers, BJT Common Emitter input/output characteristics.",
   },
   {
@@ -542,7 +542,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Lab Program",
-    icon: "🧪",
+    icon: "science",
     description: "Carpentry, Fitting, Tin-Smithy, House wiring, Welding and Blacksmithy trades with detailed sketches and procedures.",
   },
   {
@@ -555,7 +555,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Lab Program",
-    icon: "🧪",
+    icon: "science",
     description: "Profile leveling, Contouring, Theodolite traversing, Triangulation, Height and distance determination experiments.",
   },
   {
@@ -568,7 +568,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st Year",
     regulation: "R23",
     type: "Lab Program",
-    icon: "🧪",
+    icon: "science",
     description: "Verification of Kirchhoff's Laws, Superposition, Thevenin's, Norton's theorems and series/parallel resonance circuits.",
   },
 
@@ -584,7 +584,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st - 4th Year",
     regulation: "R23",
     type: "Syllabus",
-    icon: "📚",
+    icon: "library_books",
     description: "Full APSCHE/JNTUA official R23 scheme, credit distribution, course outcomes, textbooks and references.",
   },
   {
@@ -596,7 +596,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st - 4th Year",
     regulation: "R23",
     type: "Syllabus",
-    icon: "📚",
+    icon: "library_books",
     description: "Official R23 regulation syllabus for AIML, covering Deep Learning, NLP, Data Science, Vision and Robotics.",
   },
   {
@@ -608,7 +608,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st - 4th Year",
     regulation: "R23",
     type: "Syllabus",
-    icon: "📚",
+    icon: "library_books",
     description: "Official R23 scheme for ECE: Analog circuits, Digital systems, Antennas, VLSI, DSP and Wireless communications.",
   },
   {
@@ -620,7 +620,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st - 4th Year",
     regulation: "R23",
     type: "Syllabus",
-    icon: "📚",
+    icon: "library_books",
     description: "APSCHE R23 official course structure for Mechanical Engineering covering Thermal, Design, Manufacturing and Robotics.",
   },
   {
@@ -632,7 +632,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st - 4th Year",
     regulation: "R23",
     type: "Syllabus",
-    icon: "📚",
+    icon: "library_books",
     description: "Official R23 syllabus for Civil Engineering: Structural, Geotechnical, Environmental, Water Resources & Transportation.",
   },
   {
@@ -644,7 +644,7 @@ const FALLBACK_CORE_RESOURCES = [
     year: "1st - 4th Year",
     regulation: "R23",
     type: "Syllabus",
-    icon: "📚",
+    icon: "library_books",
     description: "APSCHE R23 scheme for EEE: Power Systems, Electrical Machines, Control Systems, Power Electronics and Smart Grids.",
   },
 
@@ -659,7 +659,7 @@ const FALLBACK_CORE_RESOURCES = [
     semester: "All Semesters",
     regulation: "R20 / R23",
     type: "Notification",
-    icon: "📢",
+    icon: "campaign",
     description: "Official schedule for regular and supplementary examinations, fee payment deadlines, and hall ticket release dates.",
   },
   {
@@ -670,7 +670,7 @@ const FALLBACK_CORE_RESOURCES = [
     semester: "2024-2025",
     regulation: "R20 / R23",
     type: "Notification",
-    icon: "📢",
+    icon: "campaign",
     description: "University circular detailing working Saturdays, mid examinations, preparatory holidays, and semester end dates.",
   },
 ];
@@ -703,7 +703,7 @@ function buildCurriculumResources() {
         regulation: "R23",
         credits: sub.credits,
         type: isLab ? "Lab Program" : "Syllabus",
-        icon: isLab ? "🧪" : "📚",
+        icon: isLab ? "science" : "library_books",
         description: `Official R23 JNTUA Curriculum Course for ${branch} Semester ${semester}. Credits: ${sub.credits}. Standard Target Grade: ${sub.grade || "A+"}.`,
         isCurriculum: true,
       });
@@ -744,11 +744,11 @@ export async function getAllResources(forceRefresh = false) {
       return [];
     };
 
-    const notes = extractArray(notesRes).map((i) => ({ ...i, type: "Notes", icon: "📘" }));
-    const papers = extractArray(papersRes).map((i) => ({ ...i, type: "Question Paper", icon: "📄" }));
-    const syllabus = extractArray(syllabusRes).map((i) => ({ ...i, type: "Syllabus", icon: "📚" }));
-    const notifs = extractArray(notifsRes).map((i) => ({ ...i, type: "Notification", icon: "📢" }));
-    const labs = extractArray(labsRes).map((i) => ({ ...i, type: "Lab Program", icon: "🧪" }));
+    const notes = extractArray(notesRes).map((i) => ({ ...i, type: "Notes", icon: "description" }));
+    const papers = extractArray(papersRes).map((i) => ({ ...i, type: "Question Paper", icon: "description" }));
+    const syllabus = extractArray(syllabusRes).map((i) => ({ ...i, type: "Syllabus", icon: "library_books" }));
+    const notifs = extractArray(notifsRes).map((i) => ({ ...i, type: "Notification", icon: "campaign" }));
+    const labs = extractArray(labsRes).map((i) => ({ ...i, type: "Lab Program", icon: "science" }));
 
     dbResources = [...notes, ...papers, ...syllabus, ...notifs, ...labs];
   } catch (err) {
@@ -1127,7 +1127,7 @@ export async function getBranchHubData(branchCodeOrQuery) {
     `${code} Question Papers`,
     `${code} Lab Manuals`,
     `R23 ${code} Syllabus`,
-    `📊 ${code} CGPA Calculator`,
+    `bar_chart ${code} CGPA Calculator`,
   ];
 
   return {

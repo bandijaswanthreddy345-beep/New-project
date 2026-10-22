@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 import {
   R23_SUBJECTS_BY_BRANCH_SEM,
@@ -43,7 +43,34 @@ export function getGradeInfoFromMarks(marks) {
 }
 
 export default function Calculator() {
-  const [activeTab, setActiveTab] = useState("sgpa"); // "sgpa" | "cgpa"
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const getInitialTab = () => {
+    const p = location.pathname.toLowerCase();
+    const type = searchParams.get("type");
+    if (p.includes("cgpa") || type === "cgpa") return "cgpa";
+    return "sgpa";
+  };
+
+  const [activeTab, setActiveTab] = useState(getInitialTab);
+
+  // Sync tab whenever URL pathname or query param changes
+  useEffect(() => {
+    const p = location.pathname.toLowerCase();
+    const type = searchParams.get("type");
+    if (p.includes("cgpa") || type === "cgpa") {
+      setActiveTab("cgpa");
+    } else if (p.includes("sgpa") || type === "sgpa") {
+      setActiveTab("sgpa");
+    }
+  }, [location.pathname, searchParams]);
+
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+    navigate(tab === "cgpa" ? "/cgpa-calculator" : "/sgpa-calculator", { replace: true });
+  };
   
   // Student Profile Data
   const [studentData, setStudentData] = useState(getStoredStudentData());
@@ -149,7 +176,7 @@ export default function Calculator() {
     ]);
     setTaskCompleted(false);
     setCompletedReport(null);
-    setSaveSuccessMsg("✨ Portal ready for next student! All fields and marks reset fresh.");
+    setSaveSuccessMsg("Portal ready for next student! All fields and marks reset fresh.");
     setTimeout(() => setSaveSuccessMsg(""), 5000);
   };
 
@@ -303,7 +330,8 @@ export default function Calculator() {
       branchCode: branch,
       regulation: `${regulation} Scheme`,
       semester: `Semester ${semester}`,
-      cgpa: activeTab === "sgpa" ? sgpaResult.sgpa : cgpaResult.cgpa,
+      cgpa: activeTab === "sgpa" ? (studentData.cgpa || "9.18") : cgpaResult.cgpa,
+      sgpa: activeTab === "sgpa" ? sgpaResult.sgpa : (studentData.sgpa || "9.42"),
     };
     saveStoredStudentData(updated);
     setSaveSuccessMsg(
@@ -313,8 +341,26 @@ export default function Calculator() {
   };
 
   return (
-    <div className="calc-page-wrapper">
+    <div className="calc-page-wrapper selection:bg-[#8B5CF6]/30 selection:text-white">
       <Navbar />
+
+      {/* Architectural Background Grid & Ambient Violet Glow */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-35 z-0">
+        <div className="absolute -top-[18%] left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-[#8B5CF6]/10 rounded-full blur-[140px]" />
+        <div className="absolute top-[45%] -right-[15%] w-[600px] h-[600px] bg-[#27213B]/20 rounded-full blur-[120px]" />
+        <svg
+          className="w-full h-full stroke-[#292733]/40 [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)]"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <pattern height="48" id="jntu-telemetry-grid-calc" patternUnits="userSpaceOnUse" width="48">
+              <path d="M 48 0 L 0 0 0 48" fill="none" strokeWidth="1" />
+              <circle cx="48" cy="48" fill="#8B5CF6" fillOpacity="0.5" r="0.8" />
+            </pattern>
+          </defs>
+          <rect fill="url(#jntu-telemetry-grid-calc)" height="100%" width="100%" />
+        </svg>
+      </div>
 
       <main className="calc-main-container">
         {/* Top Header Hero */}
@@ -329,17 +375,17 @@ export default function Calculator() {
             <button
               type="button"
               className={`calc-tab-btn ${activeTab === "sgpa" ? "active" : ""}`}
-              onClick={() => setActiveTab("sgpa")}
+              onClick={() => handleTabSwitch("sgpa")}
             >
-              <span className="tab-icon">🎯</span>
+              <span className="tab-icon material-symbols-outlined text-[17px]">track_changes</span>
               <span>SGPA Calculator</span>
             </button>
             <button
               type="button"
               className={`calc-tab-btn ${activeTab === "cgpa" ? "active" : ""}`}
-              onClick={() => setActiveTab("cgpa")}
+              onClick={() => handleTabSwitch("cgpa")}
             >
-              <span className="tab-icon">📊</span>
+              <span className="tab-icon material-symbols-outlined text-[17px]">calculate</span>
               <span>CGPA Calculator</span>
             </button>
           </div>
@@ -732,7 +778,6 @@ export default function Calculator() {
                 <button
                   type="button"
                   className="calc-btn-save-profile"
-                  style={{ marginBottom: "10px" }}
                   onClick={handleSaveCgpaToProfile}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">

@@ -98,7 +98,7 @@ function Login() {
           <Link to="/" className="login-brand-link" title="JNTU Circle Academic Hub">
             <div className="login-logo-glow-ring">
               <img
-                src="/jntu-circle-logo.png"
+                src="/jntu-brand-logo-v2.png"
                 alt="JNTU Circle"
                 className="login-logo-img"
               />
@@ -115,38 +115,12 @@ function Login() {
         {/* Welcome Section */}
         <div className="login-heading-section">
           <h1 className="login-main-title">
-            {adminPrompt ? "Admin Portal Login" : "Sign In to Your Account"}
+            Sign In to Your Account
           </h1>
           <p className="login-main-sub">
-            {adminPrompt
-              ? "Verify administrator credentials to access management tools"
-              : "Access lecture notes, question papers, syllabus & academic tools"}
+            Access lecture notes, question papers, syllabus &amp; academic tools
           </p>
         </div>
-
-        {/* Admin Access Prompt Banner */}
-        {adminPrompt && (
-          <div className="login-alert login-alert-admin" role="status">
-            <svg
-              className="login-alert-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            <div>
-              <strong style={{ display: "block" }}>Admin Authentication Required</strong>
-              <p style={{ margin: "2px 0 0 0", fontSize: "12.5px", opacity: 0.9 }}>
-                {adminMessage || "Please enter your administrator credentials to access the Dashboard."}
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Error Alert Banner */}
         {error && (

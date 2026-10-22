@@ -5,10 +5,9 @@
 
 .note-details-page {
   position: relative;
-  isolation: isolate;
   min-height: 100vh;
-  background: #002b25;
-  color: #10251a;
+  background: transparent;
+  color: #F5F5FA;
   font-family:
     Inter,
     system-ui,
@@ -16,132 +15,6 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-}
-
-/* =========================================================
-   FLOATING BUBBLES ANIMATION BACKDROP (MATCHING REFERENCE)
-========================================================= */
-
-.note-bubbles-container {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.note-bubble {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 32% 30%,
-    rgba(215, 255, 235, 0.72) 0%,
-    rgba(52, 211, 153, 0.45) 38%,
-    rgba(16, 185, 129, 0.22) 65%,
-    rgba(1, 43, 37, 0.1) 100%
-  );
-  box-shadow:
-    0 0 32px rgba(52, 211, 153, 0.38),
-    inset 0 0 16px rgba(255, 255, 255, 0.6),
-    inset 0 0 32px rgba(167, 243, 208, 0.32);
-  border: 1.5px solid rgba(167, 243, 208, 0.5);
-  backdrop-filter: blur(2px);
-  pointer-events: none;
-  will-change: transform, opacity;
-  animation: noteFloatBubble ease-in-out infinite;
-}
-
-.note-bubble-1 {
-  width: 135px;
-  height: 135px;
-  left: 6%;
-  bottom: -150px;
-  animation-duration: 20s;
-  animation-delay: -4s;
-}
-
-.note-bubble-2 {
-  width: 80px;
-  height: 80px;
-  left: 26%;
-  bottom: -100px;
-  animation-duration: 24s;
-  animation-delay: -11s;
-}
-
-.note-bubble-3 {
-  width: 165px;
-  height: 165px;
-  left: 50%;
-  bottom: -180px;
-  animation-duration: 22s;
-  animation-delay: -16s;
-}
-
-.note-bubble-4 {
-  width: 95px;
-  height: 95px;
-  left: 73%;
-  bottom: -110px;
-  animation-duration: 26s;
-  animation-delay: -2s;
-}
-
-.note-bubble-5 {
-  width: 125px;
-  height: 125px;
-  left: 88%;
-  bottom: -140px;
-  animation-duration: 19s;
-  animation-delay: -9s;
-}
-
-.note-bubble-6 {
-  width: 70px;
-  height: 70px;
-  left: 17%;
-  bottom: -90px;
-  animation-duration: 23s;
-  animation-delay: -14s;
-}
-
-.note-bubble-7 {
-  width: 145px;
-  height: 145px;
-  left: 37%;
-  bottom: -160px;
-  animation-duration: 25s;
-  animation-delay: -6s;
-}
-
-.note-bubble-8 {
-  width: 105px;
-  height: 105px;
-  left: 64%;
-  bottom: -120px;
-  animation-duration: 21s;
-  animation-delay: -18s;
-}
-
-@keyframes noteFloatBubble {
-  0% {
-    transform: translateY(0) translateX(0) scale(0.9);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.88;
-  }
-  50% {
-    transform: translateY(-55vh) translateX(34px) scale(1.08);
-    opacity: 0.95;
-  }
-  85% {
-    opacity: 0.78;
-  }
-  100% {
-    transform: translateY(-130vh) translateX(-28px) scale(0.94);
-    opacity: 0;
-  }
 }
 
 /* =========================================================
@@ -259,20 +132,20 @@
 .hero-back-button svg {
   width: 18px;
   height: 18px;
-  stroke: #60a5fa;
+  stroke: #ffefb3;
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .hero-back-button:hover {
-  background: #1e293b;
-  border-color: #2563eb;
+  background: #02594f;
+  border-color: #ffefb3;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
 }
 
 .hero-back-button:focus-visible {
-  outline: 3px solid #2563eb;
+  outline: 3px solid #ffefb3;
   outline-offset: 3px;
 }
 
@@ -290,7 +163,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #d9a726;
   box-shadow: 0 0 12px rgba(255, 239, 179, 0.7);
 }
 
@@ -299,7 +172,7 @@
   margin-top: 0;
   padding: 24px 28px 20px;
   border: 1px solid rgba(1, 62, 55, 0.12);
-  border-left: 4px solid #2563eb;
+  border-left: 4px solid #d9a726;
   border-radius: 16px;
   background: linear-gradient(115deg, #fffdf5 0%, #ffffff 72%, #fff7d8 100%);
   box-shadow:
@@ -323,7 +196,7 @@
   border: 1px solid rgba(1, 62, 55, 0.14);
   border-radius: 999px;
   background: #e6f3f1;
-  color: #0f172a;
+  color: #013e37;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -333,13 +206,13 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #d9a726;
   box-shadow: 0 0 10px rgba(217, 167, 38, 0.38);
 }
 
 .note-hero h1 {
   margin: 14px 0 0;
-  color: #0f172a;
+  color: #013e37;
   font-size: clamp(40px, 5vw, 64px);
   line-height: 1;
   font-weight: 800;
@@ -371,7 +244,7 @@
 
 .hero-subject-item strong {
   display: block;
-  color: #0f172a;
+  color: #013e37;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.4;
@@ -414,7 +287,7 @@
   border: 1px solid rgba(1, 62, 55, 0.12);
   border-radius: 12px;
   background: #f2f8f5;
-  color: #0f172a;
+  color: #013e37;
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
@@ -430,7 +303,7 @@
 }
 
 .hero-tag strong {
-  color: #0f172a;
+  color: #013e37;
   font-size: 12.5px;
   font-weight: 700;
   line-height: 1.35;
@@ -462,7 +335,7 @@
 
 .hero-credits-integrated:hover {
   transform: translateY(-2px);
-  border-color: #2563eb;
+  border-color: #d9a726;
   box-shadow:
     0 12px 28px rgba(217, 167, 38, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
@@ -477,7 +350,7 @@
   border: 1px solid rgba(1, 62, 55, 0.12);
   border-radius: 11px;
   background: #e6f3f1;
-  color: #0f172a;
+  color: #013e37;
 }
 
 .hero-credits-icon svg {
@@ -511,7 +384,7 @@
 }
 
 .hero-credits-value {
-  color: #0f172a;
+  color: #013e37;
   font-size: 26px;
   font-weight: 900;
   line-height: 1;
@@ -567,7 +440,7 @@
     linear-gradient(110deg, rgba(255, 253, 245, 0.98), rgba(255, 239, 179, 0.94));
   box-shadow:
     0 12px 32px rgba(0, 20, 17, 0.18),
-    inset 3px 0 0 #2563eb;
+    inset 3px 0 0 #d9a726;
 }
 
 .credits-summary-icon {
@@ -579,7 +452,7 @@
   border: 1px solid rgba(1, 62, 55, 0.12);
   border-radius: 13px;
   background: #e6f3f1;
-  color: #0f172a;
+  color: #013e37;
 }
 
 .credits-summary-icon svg {
@@ -613,7 +486,7 @@
 .credits-summary-value {
   min-width: 52px;
   margin-left: auto;
-  color: #0f172a;
+  color: #013e37;
   font-size: clamp(26px, 4vw, 36px);
   font-weight: 900;
   line-height: 1;
@@ -659,7 +532,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #d9a726;
   content: "";
 }
 
@@ -698,14 +571,14 @@
   border: 1px solid rgba(255, 239, 179, 0.28);
   border-radius: 14px;
 
-  background: linear-gradient(145deg, #2563eb, #60a5fa);
+  background: linear-gradient(145deg, #d9a726, #ffefb3);
 
   box-shadow:
     0 8px 20px rgba(0, 36, 31, 0.2);
 }
 
 .module-count strong {
-  color: #0f172a;
+  color: #013e37;
 
   font-size: 25px;
   line-height: 1;
@@ -741,7 +614,7 @@
   overflow: hidden;
 
   border: 1px solid #dce7e1;
-  border-left: 3px solid #2563eb;
+  border-left: 3px solid #d9a726;
 
   border-radius: 13px;
 
@@ -765,7 +638,7 @@
 
 .module-card.module-open {
   border-color: #b6cfc3;
-  border-left-color: #2563eb;
+  border-left-color: #d9a726;
 
   box-shadow:
     0 12px 28px rgba(0, 36, 31, 0.09);
@@ -836,7 +709,7 @@
 
 .module-open .module-number {
   border-color: rgba(255, 239, 179, 0.72);
-  background: #eff6ff;
+  background: #ffefb3;
   color: #00241f;
 }
 
@@ -871,7 +744,7 @@
 }
 
 .module-open .module-heading span {
-  color: #bfdbfe;
+  color: #ffefb3;
 }
 
 .module-open .module-heading h3 {
@@ -911,7 +784,7 @@
 .module-open .module-arrow {
   border-color: rgba(255, 239, 179, 0.35);
   background: rgba(255, 239, 179, 0.1);
-  color: #bfdbfe;
+  color: #ffefb3;
 }
 
 /* =========================================================
@@ -1015,7 +888,7 @@
   color: #01352f;
 
   border-color: rgba(217, 167, 38, 0.34);
-  background: #eff6ff;
+  background: #ffefb3;
 
   font-size: 9px;
   font-weight: 900;
@@ -1128,7 +1001,7 @@
 
 .open-pdf-button:hover,
 .download-pdf-button:hover {
-  border-color: #2563eb;
+  border-color: #d9a726;
 
   box-shadow:
     0 5px 14px rgba(0, 36, 31, 0.12);
@@ -2507,16 +2380,16 @@
 
 .note-details-page {
   --note-theme-bg: #002b25;
-  --note-theme-deep: #0f172a;
-  --note-theme-surface: #1e293b;
+  --note-theme-deep: #001f1a;
+  --note-theme-surface: #003831;
   --note-theme-card: #ffffff;
   --note-theme-card-alt: #f7faf8;
   --note-theme-border: rgba(15, 118, 110, 0.16);
-  --note-theme-gold: #eff6ff;
-  --note-theme-gold-bright: #2563eb;
-  --note-theme-teal: #2563eb;
+  --note-theme-gold: #ffefb3;
+  --note-theme-gold-bright: #d9a726;
+  --note-theme-teal: #0f766e;
   --note-theme-emerald: #10b981;
-  --note-theme-text-dark: #0f172a;
+  --note-theme-text-dark: #013e37;
   --note-theme-text-light: #ffffff;
   --note-theme-muted: #597b76;
   background: var(--note-theme-bg);
@@ -2548,7 +2421,7 @@
 
 .note-details-page .hero-back-button:hover {
   border-color: var(--note-theme-gold);
-  background: #1e293b;
+  background: #02594f;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -2610,7 +2483,7 @@
 .note-details-page .modules-header .modules-eyebrow {
   border: 1px solid rgba(255, 239, 179, 0.35);
   background: rgba(255, 239, 179, 0.14);
-  color: #bfdbfe;
+  color: #ffefb3;
 }
 
 .note-details-page .modules-header h2 {
@@ -2627,12 +2500,12 @@
 .note-details-page .module-count {
   border: 1.5px solid rgba(255, 239, 179, 0.45);
   border-radius: 14px;
-  background: linear-gradient(145deg, #2563eb, #60a5fa);
+  background: linear-gradient(145deg, #d9a726, #ffefb3);
   box-shadow: 0 8px 24px rgba(0, 36, 31, 0.28);
 }
 
 .note-details-page .module-count strong {
-  color: #0f172a;
+  color: #013e37;
 }
 
 .note-details-page .module-count span {
@@ -2682,7 +2555,7 @@
 
 .note-details-page .module-open .module-number {
   border-color: rgba(255, 239, 179, 0.85);
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  background: linear-gradient(135deg, #f59e0b, #d9a726);
   color: #01241f;
   box-shadow: 0 0 14px rgba(217, 167, 38, 0.45);
 }
@@ -2693,7 +2566,7 @@
 }
 
 .note-details-page .module-open .module-heading span {
-  color: #bfdbfe;
+  color: #ffefb3;
 }
 
 .note-details-page .module-heading h3 {
@@ -2716,7 +2589,7 @@
 .note-details-page .module-open .module-arrow {
   border-color: rgba(255, 239, 179, 0.4);
   background: rgba(255, 239, 179, 0.15);
-  color: #bfdbfe;
+  color: #ffefb3;
 }
 
 .note-details-page .module-resource-grid {
@@ -2767,7 +2640,7 @@
   place-items: center;
   border-radius: 12px;
   border: 1px solid rgba(217, 167, 38, 0.35);
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  background: linear-gradient(135deg, #fffbeb 0%, #ffefb3 100%);
   color: #01352f;
 }
 
@@ -2893,7 +2766,7 @@
 }
 
 .note-details-page .download-pdf-button:hover {
-  border-color: #2563eb;
+  border-color: #d9a726;
   background: #fffdf5;
   color: #8a6815;
   box-shadow: 0 6px 18px rgba(217, 167, 38, 0.25);
@@ -2917,117 +2790,149 @@
 ========================================================= */
 
 .note-details-page .comments-card {
-  border: 1px solid rgba(255, 239, 179, 0.32);
-  background: linear-gradient(155deg, #ffffff 0%, #f7faf8 100%);
-  box-shadow: 0 16px 44px rgba(0, 20, 16, 0.24);
-  border-radius: 20px;
+  border: 1px solid #292733;
+  background: #12131B;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5);
+  border-radius: 24px;
   overflow: hidden;
 }
 
 .note-details-page .comments-header {
-  border-bottom: 1px solid rgba(1, 62, 55, 0.1);
-  background: linear-gradient(110deg, #013831, #024a41 72%, #035c51);
+  border-bottom: 1px solid #292733;
+  background: #161724;
   padding: 22px 28px;
 }
 
 .note-details-page .comments-icon {
-  border: 1px solid rgba(255, 239, 179, 0.35);
-  background: rgba(255, 239, 179, 0.15);
-  color: #bfdbfe;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.15);
+  color: #C4B5FD;
 }
 
 .note-details-page .comments-heading h2 {
-  color: #ffffff;
+  color: #F5F5FA;
   font-size: 22px;
   font-weight: 800;
 }
 
 .note-details-page .comments-heading p {
-  color: rgba(230, 243, 241, 0.82);
+  color: #94A3B8;
 }
 
 .note-details-page .comments-count {
-  border-color: rgba(255, 239, 179, 0.45);
-  background: rgba(255, 239, 179, 0.15);
-  color: #bfdbfe;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.15);
+  color: #C4B5FD;
 }
 
 .note-details-page .comment-form {
-  border-bottom: 1px solid rgba(1, 62, 55, 0.08);
-  background: #f8fbf9;
+  border-bottom: 1px solid #292733;
+  background: #12131B;
   padding: 24px 28px;
 }
 
 .note-details-page .comment-form-title {
-  color: #0f172a;
+  color: #F5F5FA;
   font-weight: 800;
 }
 
 .note-details-page .comment-field,
 .note-details-page .comment-textarea {
-  border: 1.5px solid #d1d5db;
+  border: 1.5px solid #292733;
   border-radius: 12px;
-  background: #ffffff;
-  color: #111827;
+  background: #08090D;
+  color: #F5F5FA;
   font-size: 14px;
+}
+
+.note-details-page .comment-field::placeholder,
+.note-details-page .comment-textarea::placeholder {
+  color: #64748B;
 }
 
 .note-details-page .comment-field:focus,
 .note-details-page .comment-textarea:focus {
-  border-color: #059669;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+  border-color: #8B5CF6;
+  background: #08090D;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.note-details-page .comment-private-note {
+  color: #64748B;
+  font-size: 12px;
 }
 
 .note-details-page .comment-submit-button {
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #059669, #047857);
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
   font-weight: 700;
+  cursor: pointer;
   transition: all 0.22s ease;
 }
 
 .note-details-page .comment-submit-button:hover {
-  background: linear-gradient(135deg, #10b981, #059669);
-  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.4);
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
+  box-shadow: 0 8px 22px rgba(139, 92, 246, 0.5);
   transform: translateY(-2px);
 }
 
 .note-details-page .comments-list {
-  background: #ffffff;
+  background: #12131B;
   padding: 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .note-details-page .comment-item {
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  background: #f9fafb;
+  border: 1px solid #292733;
+  border-radius: 16px;
+  background: #161724;
+  padding: 16px 20px;
 }
 
 .note-details-page .comment-item:hover {
-  border-color: #d1d5db;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
 .note-details-page .comment-avatar {
-  border: 1px solid rgba(15, 118, 110, 0.2);
-  background: #e6f3f1;
-  color: #0f172a;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  background: #27213B;
+  color: #C4B5FD;
 }
 
 .note-details-page .comment-user-name {
-  color: #0f172a;
+  color: #F5F5FA;
   font-weight: 800;
 }
 
 .note-details-page .comment-date {
-  color: #6b7280;
+  color: #64748B;
+}
+
+.note-details-page .comment-delete-button {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #F87171;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-details-page .comment-delete-button:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #EF4444;
 }
 
 .note-details-page .comment-body p {
-  color: #374151;
+  color: #E2E8F0;
   font-size: 14px;
   line-height: 1.6;
 }
@@ -3039,7 +2944,7 @@
 .note-details-page .section-tag {
   border: 1px solid rgba(255, 239, 179, 0.38);
   background: rgba(255, 239, 179, 0.15);
-  color: #bfdbfe;
+  color: #ffefb3;
 }
 
 .note-details-page .author-role-tag {
@@ -3066,7 +2971,7 @@
 
 .note-details-page .back-to-top {
   border: 1px solid rgba(255, 239, 179, 0.45);
-  background: #2563eb;
+  background: #d9a726;
   color: #01241f;
   box-shadow: 0 8px 25px rgba(217, 167, 38, 0.35);
   transition: all 0.22s ease;
@@ -3078,5 +2983,316 @@
   transform: translateY(-3px);
 }
 
+/* =========================================================
+   NOTE DETAILS — STITCH OBSIDIAN DARK THEME OVERRIDES
+   Harmonized with Homepage (#08090D, #12131B, #8B5CF6)
+   ========================================================= */
+.note-details-page {
+  background: transparent !important;
+  color: #F5F5FA !important;
+}
 
+.note-bubble {
+  background: radial-gradient(
+    circle at 32% 30%,
+    rgba(196, 181, 253, 0.3) 0%,
+    rgba(139, 92, 246, 0.2) 38%,
+    rgba(124, 58, 237, 0.1) 65%,
+    transparent 100%
+  ) !important;
+  box-shadow: 0 0 32px rgba(139, 92, 246, 0.25) !important;
+  border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+.hero-main {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  border-left: 4px solid #8B5CF6 !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4) !important;
+}
+
+.note-hero h1 {
+  color: #F5F5FA !important;
+}
+
+.study-badge {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border-color: rgba(139, 92, 246, 0.35) !important;
+  color: #C4B5FD !important;
+}
+
+.study-badge > span {
+  background: #8B5CF6 !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5) !important;
+}
+
+.hero-subject-details {
+  border-left-color: #292733 !important;
+}
+
+.hero-subject-item span {
+  color: #8B5CF6 !important;
+}
+
+.hero-subject-item strong {
+  color: #F5F5FA !important;
+}
+
+.hero-tag {
+  background: #161724 !important;
+  border-color: #292733 !important;
+  color: #F5F5FA !important;
+}
+
+.hero-tag-label {
+  color: #8B5CF6 !important;
+}
+
+.hero-tag strong {
+  color: #F5F5FA !important;
+}
+
+.hero-credits-integrated {
+  background: #161724 !important;
+  border-color: #292733 !important;
+}
+
+.hero-credits-icon {
+  background: #1f2033 !important;
+  border-color: #292733 !important;
+  color: #8B5CF6 !important;
+}
+
+.module-card {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  border-left: 3px solid #8B5CF6 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+.module-card:hover {
+  border-color: rgba(139, 92, 246, 0.5) !important;
+  border-left-color: #8B5CF6 !important;
+}
+
+.module-header-button {
+  background: transparent !important;
+  color: #F5F5FA !important;
+}
+
+.module-number {
+  background: #181926 !important;
+  border: 1px solid #292733 !important;
+  color: #8B5CF6 !important;
+}
+
+.module-heading span {
+  color: #8B5CF6 !important;
+}
+
+.module-heading h3 {
+  color: #F5F5FA !important;
+}
+
+.module-arrow {
+  color: #94A3B8 !important;
+}
+
+.module-inner {
+  border-top-color: #292733 !important;
+  background: #0D0E15 !important;
+}
+
+.module-notes-box, .module-pdf-box {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  color: #F5F5FA !important;
+}
+
+.comments-card {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+}
+
+.comments-header {
+  background: #161724 !important;
+  border-bottom-color: #292733 !important;
+}
+
+.comments-heading h2 {
+  color: #F5F5FA !important;
+}
+
+.study-footer {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  color: #F5F5FA !important;
+}
+
+.hero-back-button {
+  background: #12131B !important;
+  border-color: #292733 !important;
+  color: #F5F5FA !important;
+}
+
+.hero-back-button:hover {
+  border-color: #8B5CF6 !important;
+}
+
+/* =========================================================
+   PDF PREVIEW & ACTIONS — OBSIDIAN PALETTE
+   ========================================================= */
+.note-details-page .pdf-preview-card,
+.pdf-preview-card {
+  background: #12131B !important;
+  border: 1px solid #292733 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
+  padding: 16px !important;
+}
+
+.note-details-page .preview-label,
+.preview-label {
+  color: #8B5CF6 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+}
+
+.note-details-page .preview-header strong,
+.preview-header strong {
+  color: #F5F5FA !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.note-details-page .new-tab-button,
+.new-tab-button {
+  background: #161724 !important;
+  border: 1px solid #292733 !important;
+  border-radius: 10px !important;
+  color: #C4B5FD !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 7px 14px !important;
+  transition: all 0.2s ease !important;
+}
+
+.note-details-page .new-tab-button:hover,
+.new-tab-button:hover {
+  background: #27213B !important;
+  border-color: #8B5CF6 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+.note-details-page .pdf-frame-wrapper,
+.pdf-frame-wrapper {
+  background: #08090D !important;
+  border: 1px solid #292733 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.note-details-page .open-pdf-button,
+.open-pdf-button {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35) !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 20px !important;
+}
+
+.note-details-page .open-pdf-button:hover,
+.open-pdf-button:hover {
+  background: linear-gradient(135deg, #9D74FF 0%, #8B5CF6 100%) !important;
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+.note-details-page .download-pdf-button,
+.download-pdf-button {
+  background: #161724 !important;
+  border: 1px solid #292733 !important;
+  border-radius: 10px !important;
+  color: #F5F5FA !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 20px !important;
+}
+
+.note-details-page .download-pdf-button:hover,
+.download-pdf-button:hover {
+  background: #27213B !important;
+  border-color: #8B5CF6 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25) !important;
+}
+
+.note-details-page .pdf-verified-chip,
+.pdf-verified-chip {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border: 1px solid rgba(139, 92, 246, 0.35) !important;
+  color: #C4B5FD !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+  padding: 5px 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.note-details-page .pdf-verified-chip svg,
+.pdf-verified-chip svg {
+  stroke: #8B5CF6 !important;
+}
+
+.note-details-page .resource-icon.pdf-icon,
+.resource-icon.pdf-icon {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border: 1px solid rgba(139, 92, 246, 0.4) !important;
+  color: #C4B5FD !important;
+}
+
+.note-details-page .resource-title-meta span,
+.note-details-page .resource-title span,
+.resource-title-meta span,
+.resource-title span {
+  color: #F5F5FA !important;
+  font-weight: 700 !important;
+}
+
+.note-details-page .resource-title-meta small,
+.note-details-page .resource-title small,
+.resource-title-meta small,
+.resource-title small {
+  color: #94A3B8 !important;
+}
+
+.note-details-page .notes-text,
+.notes-text {
+  background: #08090D !important;
+  border: 1px solid #292733 !important;
+  border-radius: 10px !important;
+  padding: 14px 16px !important;
+}
+
+.note-details-page .notes-text p,
+.notes-text p {
+  color: #CBD5E1 !important;
+}
 

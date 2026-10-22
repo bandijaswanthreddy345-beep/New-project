@@ -189,38 +189,25 @@
 
 .search-bar {
   width: 100%;
-
   min-height: 52px;
-
   display: flex;
   align-items: center;
-
   box-sizing: border-box;
-
-  background: #ffffff;
-
-  border: 1px solid #d0d7e2;
-
-  border-radius: 10px;
-
-  box-shadow:
-    0 1px 3px
-    rgba(0, 0, 0, 0.04);
-
+  background: #12131B;
+  border: 1px solid #292733;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-
 .search-bar:focus-within {
-  border-color: #1f4fa3;
-
+  border-color: #8B5CF6;
   box-shadow:
     0 0 0 3px
-    rgba(31, 79, 163, 0.08);
+    rgba(139, 92, 246, 0.2);
 }
-
 
 /* =========================================================
    SEARCH ICON
@@ -228,18 +215,14 @@
 
 .search-icon {
   flex: 0 0 auto;
-
   width: 52px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 21px;
-
   user-select: none;
+  color: #8B5CF6;
 }
-
 
 /* =========================================================
    SEARCH INPUT
@@ -247,16 +230,15 @@
 
 .search-bar input {
   flex: 1;
-
   width: 100%;
   min-width: 0;
-
   height: 52px;
-
-  padding: 0 12px 0 0;
-
+  padding: 0 16px 0 0;
   border: none;
   outline: none;
+  background: transparent;
+  color: #F5F5FA;
+  font-size: 15px;
 
   background: transparent;
 

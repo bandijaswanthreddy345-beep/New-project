@@ -21,8 +21,6 @@ function AdminRoute({ children }) {
         to="/login"
         replace
         state={{
-          adminPrompt: true,
-          message: "Please sign in with your administrator account to access the Admin Dashboard.",
           from: location.pathname,
         }}
       />
@@ -36,8 +34,6 @@ function AdminRoute({ children }) {
         to="/login"
         replace
         state={{
-          adminPrompt: true,
-          message: "Access restricted. Please sign in with an administrator account to access the Admin Dashboard.",
           from: location.pathname,
         }}
       />

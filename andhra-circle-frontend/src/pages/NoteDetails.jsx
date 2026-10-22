@@ -2,6 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import StudentProfileModal from "../components/StudentProfileModal";
+import { getStoredStudentData } from "../data/studentData";
 import "./NoteDetails.css";
 
 function NoteDetails() {
@@ -12,6 +16,8 @@ function NoteDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [openUnit, setOpenUnit] = useState(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [, setStudentData] = useState(getStoredStudentData());
 
   // =========================================================
   // COMMENTS STATE
@@ -644,28 +650,30 @@ function NoteDetails() {
 
   if (error || !note) {
     return (
-      <div className="note-error-page">
-        <div className="note-error-card">
-          <div className="error-icon">
-            📚
+      <div className="bg-[#08090D] text-[#F5F5FA] min-h-screen selection:bg-[#8B5CF6]/30 selection:text-white relative flex flex-col justify-between">
+        <Navbar onOpenProfile={() => setIsProfileOpen(true)} />
+        <main className="w-full pt-28 pb-16 flex items-center justify-center flex-1">
+          <div className="bg-[#12131B] border border-[#292733] rounded-3xl p-10 text-center max-w-md mx-auto shadow-2xl">
+            <div className="w-16 h-16 rounded-2xl bg-[#181928] border border-[#292733] text-[#8B5CF6] flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-[32px]">menu_book</span>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">{error || "Note not found"}</h2>
+            <p className="text-sm text-[#94A3B8] mb-6">We couldn't load this study material.</p>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#8B5CF6] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#6D28D9] text-white font-semibold text-sm transition-all shadow-md"
+            >
+              ← Go Back
+            </button>
           </div>
-
-          <h2>
-            {error || "Note not found"}
-          </h2>
-
-          <p>
-            We couldn't load this study material.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="green-button"
-          >
-            ← Go Back
-          </button>
-        </div>
+        </main>
+        <Footer />
+        <StudentProfileModal
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+          onProfileUpdated={(updated) => setStudentData(updated)}
+        />
       </div>
     );
   }
@@ -675,20 +683,10 @@ function NoteDetails() {
   // =========================================================
 
   return (
-    <div className="note-details-page">
-      {/* =====================================================
-          FLOATING BUBBLES ANIMATION BACKDROP (MATCHING REFERENCE)
-      ====================================================== */}
-      <div className="note-bubbles-container" aria-hidden="true">
-        <span className="note-bubble note-bubble-1"></span>
-        <span className="note-bubble note-bubble-2"></span>
-        <span className="note-bubble note-bubble-3"></span>
-        <span className="note-bubble note-bubble-4"></span>
-        <span className="note-bubble note-bubble-5"></span>
-        <span className="note-bubble note-bubble-6"></span>
-        <span className="note-bubble note-bubble-7"></span>
-        <span className="note-bubble note-bubble-8"></span>
-      </div>
+    <div className="bg-[#08090D] text-[#F5F5FA] min-h-screen selection:bg-[#8B5CF6]/30 selection:text-white relative flex flex-col justify-between">
+      <Navbar onOpenProfile={() => setIsProfileOpen(true)} />
+
+      <main className="w-full pt-6 md:pt-8 pb-16 bg-[#08090D] relative flex-1 note-details-page">
 
       {/* =====================================================
           ❤️ BIG HEART POP OVERLAY
@@ -1417,28 +1415,22 @@ function NoteDetails() {
         ==================================================== */}
 
         <section className="study-footer">
-
           <div className="footer-icon">
-            🎓
+            <span className="material-symbols-outlined text-[24px] text-[#8B5CF6]">school</span>
           </div>
 
           <div>
-
             <strong>
               Study smart. Learn better.
             </strong>
-
             <p>
-              Explore each unit at your own
-              pace.
+              Explore each unit at your own pace.
             </p>
-
           </div>
 
           <div className="footer-books">
-            📚
+            <span className="material-symbols-outlined text-[24px] text-[#8B5CF6]">menu_book</span>
           </div>
-
         </section>
 
       </main>
@@ -1455,7 +1447,6 @@ function NoteDetails() {
       {/* =====================================================
           BACK TO TOP
       ====================================================== */}
-
       <button
         type="button"
         className="back-to-top"
@@ -1465,6 +1456,17 @@ function NoteDetails() {
         ↑
       </button>
 
+      </main>
+
+      {/* Universal Footer */}
+      <Footer />
+
+      {/* Student Profile Modal */}
+      <StudentProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        onProfileUpdated={(updated) => setStudentData(updated)}
+      />
     </div>
   );
 }

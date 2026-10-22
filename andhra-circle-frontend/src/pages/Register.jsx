@@ -71,7 +71,7 @@ function Register() {
           <Link to="/" className="login-brand-link" title="JNTU Circle Academic Hub">
             <div className="login-logo-glow-ring">
               <img
-                src="/jntu-circle-logo.png"
+                src="/jntu-brand-logo-v2.png"
                 alt="JNTU Circle"
                 className="login-logo-img"
               />

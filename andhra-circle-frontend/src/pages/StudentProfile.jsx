@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import profileImg from "../assets/jaswanth.png.png";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import {
   DEFAULT_STUDENT_DATA,
   getStoredStudentData,
@@ -19,6 +21,15 @@ function StudentProfile() {
     const current = getStoredStudentData();
     setStudent(current);
     setEditForm(current);
+
+    const handleSync = () => {
+      const updatedData = getStoredStudentData();
+      setStudent(updatedData);
+      setEditForm(updatedData);
+    };
+
+    window.addEventListener("studentProfileUpdated", handleSync);
+    return () => window.removeEventListener("studentProfileUpdated", handleSync);
   }, []);
 
   const handleEditChange = (e) => {
@@ -43,39 +54,12 @@ function StudentProfile() {
   };
 
   return (
-    <div className="student-profile-page">
-      {/* Top Navigation Bar */}
-      <header className="sp-page-header">
-        <div className="sp-page-header-inner">
-          <div className="sp-header-left" onClick={() => navigate("/")} title="Return to Homepage">
-            <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sp-page-logo" />
-            <div>
-              <h2 className="sp-brand-title"><span className="font-deltha">JNTU</span> Circle</h2>
-              <span className="sp-brand-subtitle">Student Academic Portal</span>
-            </div>
-          </div>
-
-          <div className="sp-header-right">
-            <button 
-              type="button" 
-              className="sp-header-nav-btn" 
-              onClick={() => navigate("/notes")}
-            >
-              ← Back to Notes Portal
-            </button>
-            <button 
-              type="button" 
-              className="sp-header-home-btn" 
-              onClick={() => navigate("/")}
-            >
-              Home
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="bg-[#08090D] text-[#F5F5FA] min-h-screen selection:bg-[#8B5CF6]/30 selection:text-white relative flex flex-col justify-between student-profile-page">
+      {/* Universal Sticky Navbar */}
+      <Navbar onOpenProfile={() => {}} />
 
       {/* Main Container */}
-      <main className="sp-page-main">
+      <main className="w-full pt-6 md:pt-8 pb-16 bg-[#08090D] relative flex-1 sp-page-main">
         <div className="sp-page-card">
 
           {/* Academic Cover Banner */}
@@ -90,7 +74,6 @@ function StudentProfile() {
           <div className="sp-page-identity">
             <div className="sp-avatar-holder">
               <img src={profileImg} alt={student.name} className="sp-profile-photo" />
-              <span className="sp-online-dot" title="Active Enrolled Status" />
             </div>
 
             <div className="sp-identity-details">
@@ -119,7 +102,7 @@ function StudentProfile() {
                 className={`sp-btn-action-primary ${activeTab === "edit" ? "active" : ""}`}
                 onClick={() => setActiveTab(activeTab === "edit" ? "overview" : "edit")}
               >
-                {activeTab === "edit" ? "View Overview" : "Edit Profile ✎"}
+                {activeTab === "edit" ? "View Overview" : "Edit Profile"}
               </button>
             </div>
           </div>
@@ -181,28 +164,28 @@ function StudentProfile() {
               className={`sp-page-tab ${activeTab === "overview" ? "active" : ""}`}
               onClick={() => setActiveTab("overview")}
             >
-              🎓 Academic Details
+              <span className="material-symbols-outlined text-[17px]">school</span> Academic Details
             </button>
             <button 
               type="button" 
               className={`sp-page-tab ${activeTab === "grades" ? "active" : ""}`}
               onClick={() => setActiveTab("grades")}
             >
-              📊 Semester Grade Card (SGPA)
+              <span className="material-symbols-outlined text-[17px]">bar_chart</span> Semester Grade Card (SGPA)
             </button>
             <button 
               type="button" 
               className={`sp-page-tab ${activeTab === "notes" ? "active" : ""}`}
               onClick={() => setActiveTab("notes")}
             >
-              📚 Saved Study Notes ({student.savedNotes?.length || 0})
+              <span className="material-symbols-outlined text-[17px]">bookmark</span> Saved Study Notes ({student.savedNotes?.length || 0})
             </button>
             <button 
               type="button" 
               className={`sp-page-tab ${activeTab === "edit" ? "active" : ""}`}
               onClick={() => setActiveTab("edit")}
             >
-              ⚙️ Edit Profile Information
+              <span className="material-symbols-outlined text-[17px]">manage_accounts</span> Edit Profile Information
             </button>
           </div>
 
@@ -440,6 +423,54 @@ function StudentProfile() {
                     </div>
                   </div>
 
+                  <div className="sp-form-row-2">
+                    <div className="sp-input-group">
+                      <label>Current SGPA</label>
+                      <input 
+                        type="text" 
+                        name="sgpa" 
+                        value={editForm.sgpa || ""} 
+                        onChange={handleEditChange} 
+                        placeholder="e.g. 9.42"
+                      />
+                    </div>
+
+                    <div className="sp-input-group">
+                      <label>Total Attendance</label>
+                      <input 
+                        type="text" 
+                        name="attendance" 
+                        value={editForm.attendance || ""} 
+                        onChange={handleEditChange} 
+                        placeholder="e.g. 89.4%"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sp-form-row-2">
+                    <div className="sp-input-group">
+                      <label>Completed Credits</label>
+                      <input 
+                        type="text" 
+                        name="credits" 
+                        value={editForm.credits || ""} 
+                        onChange={handleEditChange} 
+                        placeholder="e.g. 142 / 160"
+                      />
+                    </div>
+
+                    <div className="sp-input-group">
+                      <label>Standing Backlogs</label>
+                      <input 
+                        type="text" 
+                        name="backlogs" 
+                        value={editForm.backlogs || ""} 
+                        onChange={handleEditChange} 
+                        placeholder="e.g. 0 Backlogs"
+                      />
+                    </div>
+                  </div>
+
                   <div className="sp-input-group">
                     <label>College / Institution</label>
                     <input 
@@ -492,6 +523,9 @@ function StudentProfile() {
 
         </div>
       </main>
+
+      {/* Universal Footer */}
+      <Footer />
     </div>
   );
 }

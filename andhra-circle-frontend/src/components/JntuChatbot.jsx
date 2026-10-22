@@ -1,7 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { BotAvatar } from "bot-avatars";
-import { MetalFx, useMetalBend } from "metal-fx";
 import { ThinkingOrb } from "thinking-orbs";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 import {
@@ -40,7 +38,11 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
     <div className="chat-branch-hub">
       {/* Branch Header Banner */}
       <div className="chat-branch-header">
-        <div className="chat-branch-icon">{branch.icon || "🎓"}</div>
+        <div className="chat-branch-icon">
+          <span className="material-symbols-outlined text-[24px] text-[#C4B5FD]">
+            {branch.icon || "school"}
+          </span>
+        </div>
         <div className="chat-branch-title-box">
           <h4>{branch.name} ({branch.code})</h4>
           <p>{branch.description}</p>
@@ -54,86 +56,96 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
           className={`chat-branch-tab ${activeTab === "all" ? "is-active" : ""}`}
           onClick={() => setActiveTab("all")}
         >
-          📂 All ({hub.totalCount})
+          <span className="material-symbols-outlined text-[14px]">folder_open</span>
+          <span>All ({hub.totalCount})</span>
         </button>
         <button
           type="button"
           className={`chat-branch-tab ${activeTab === "notes" ? "is-active" : ""}`}
           onClick={() => setActiveTab("notes")}
         >
-          📘 Notes ({counts.notes})
+          <span className="material-symbols-outlined text-[14px]">description</span>
+          <span>Notes ({counts.notes})</span>
         </button>
         <button
           type="button"
           className={`chat-branch-tab ${activeTab === "papers" ? "is-active" : ""}`}
           onClick={() => setActiveTab("papers")}
         >
-          📝 Papers ({counts.papers})
+          <span className="material-symbols-outlined text-[14px]">assignment</span>
+          <span>Papers ({counts.papers})</span>
         </button>
         <button
           type="button"
           className={`chat-branch-tab ${activeTab === "syllabus" ? "is-active" : ""}`}
           onClick={() => setActiveTab("syllabus")}
         >
-          📑 Syllabus ({counts.syllabus})
+          <span className="material-symbols-outlined text-[14px]">list_alt</span>
+          <span>Syllabus ({counts.syllabus})</span>
         </button>
         <button
           type="button"
           className={`chat-branch-tab ${activeTab === "labs" ? "is-active" : ""}`}
           onClick={() => setActiveTab("labs")}
         >
-          💻 Labs ({counts.labs})
+          <span className="material-symbols-outlined text-[14px]">science</span>
+          <span>Labs ({counts.labs})</span>
         </button>
         <button
           type="button"
           className={`chat-branch-tab ${activeTab === "curriculum" ? "is-active" : ""}`}
           onClick={() => setActiveTab("curriculum")}
         >
-          🗓️ Curriculum (8 Sems)
+          <span className="material-symbols-outlined text-[14px]">calendar_month</span>
+          <span>Curriculum (8 Sems)</span>
         </button>
       </div>
 
-      {/* Direct Quick Action Links */}
+      {/* Direct Branch Quick Action Buttons Bar */}
       <div className="chat-branch-quick-links">
         <button
           type="button"
           className="chat-branch-link-btn"
           onClick={() => {
             onCloseModal();
-            navigate(`/notes?branch=${branch.code}`);
+            navigate(`/notes?branch=${encodeURIComponent(branch.code)}`);
           }}
         >
-          📘 {branch.code} Notes Portal →
+          <span className="material-symbols-outlined text-[13px]">description</span>
+          <span>{branch.code} Notes Portal</span>
         </button>
         <button
           type="button"
           className="chat-branch-link-btn"
           onClick={() => {
             onCloseModal();
-            navigate(`/papers?branch=${branch.code}`);
+            navigate(`/papers?branch=${encodeURIComponent(branch.code)}`);
           }}
         >
-          📝 {branch.code} Question Papers →
+          <span className="material-symbols-outlined text-[13px]">assignment</span>
+          <span>{branch.code} Question Papers</span>
         </button>
         <button
           type="button"
           className="chat-branch-link-btn"
           onClick={() => {
             onCloseModal();
-            navigate(`/syllabus?branch=${branch.code}`);
+            navigate(`/syllabus?branch=${encodeURIComponent(branch.code)}`);
           }}
         >
-          📑 {branch.code} Syllabus →
+          <span className="material-symbols-outlined text-[13px]">list_alt</span>
+          <span>{branch.code} Syllabus</span>
         </button>
         <button
           type="button"
           className="chat-branch-link-btn"
           onClick={() => {
             onCloseModal();
-            navigate(`/lab-programs?branch=${branch.code}`);
+            navigate(`/labs?branch=${encodeURIComponent(branch.code)}`);
           }}
         >
-          🔬 {branch.code} Lab Manuals →
+          <span className="material-symbols-outlined text-[13px]">science</span>
+          <span>{branch.code} Lab Manuals</span>
         </button>
       </div>
 
@@ -141,25 +153,24 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
       {activeTab === "curriculum" ? (
         <div className="chat-curriculum-list">
           {semesters.map((sem) => (
-            <div key={sem.semNum} className="chat-sem-card">
+            <div key={sem.id} className="chat-sem-card">
               <div className="chat-sem-title">
-                <span>{sem.semName}</span>
-                <span style={{ fontSize: "9px", color: "#94a3b8" }}>
-                  {sem.subjects.length} Subjects
-                </span>
+                <span>{sem.title}</span>
+                <span className="chat-sem-sub-credits">{sem.subjects?.length || 0} subjects</span>
               </div>
               <div className="chat-sem-subjects-wrap">
-                {sem.subjects.map((sub, sIdx) => (
+                {sem.subjects?.map((sub, sIdx) => (
                   <button
                     key={sIdx}
                     type="button"
                     className="chat-sem-sub-pill"
                     onClick={() => onSelectQuery(`${sub.name} notes`)}
-                    title={`Find notes and syllabus for ${sub.name}`}
+                    title={`Search ${sub.name}`}
                   >
-                    <span>{sub.isLab ? "💻" : "📚"}</span>
+                    <span className="material-symbols-outlined text-[12px]">
+                      {sub.isLab ? "science" : "description"}
+                    </span>
                     <span>{sub.name}</span>
-                    <span className="chat-sem-sub-credits">({sub.credits}C)</span>
                   </button>
                 ))}
               </div>
@@ -169,11 +180,11 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
       ) : (
         <div className="chat-result-cards">
           {currentItems.length === 0 ? (
-            <div style={{ padding: "12px", textAlign: "center", color: "#94a3b8", fontSize: "11px" }}>
-              No {activeTab} recorded yet for {branch.code}. Check other categories or open the full catalog.
-            </div>
+            <p style={{ fontSize: "11px", color: "#94a3b8", margin: "6px 0" }}>
+              No {activeTab} indexed yet for this department. Check All tab or browse portal.
+            </p>
           ) : (
-            currentItems.map((resItem, rIdx) => {
+            currentItems.slice(0, 4).map((resItem, idx) => {
               const action = formatResourceAction(resItem);
               const typeClass =
                 resItem.type === "Notes" ? "chat-tag-notes"
@@ -184,7 +195,7 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
 
               return (
                 <div
-                  key={resItem._id || rIdx}
+                  key={resItem._id || idx}
                   className="chat-result-card"
                   onClick={() => {
                     onCloseModal();
@@ -201,7 +212,9 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
                 >
                   <div className="chat-result-top-row">
                     <span className={`chat-result-type-tag ${typeClass}`}>
-                      <span>{resItem.icon || "📄"}</span>
+                      <span className="material-symbols-outlined text-[13px]">
+                        {resItem.icon || "description"}
+                      </span>
                       <span>{resItem.type}</span>
                     </span>
                     {resItem.subjectCode && (
@@ -253,7 +266,7 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
   );
 }
 
-function JntuChatbot() {
+function JntuChatbot({ embedded = false }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [modalInput, setModalInput] = useState("");
@@ -269,15 +282,13 @@ function JntuChatbot() {
     draft: {},
   });
 
+  // Track scroll position: chatbot button should NOT appear when on hero section
+  const [showFloatingBtn, setShowFloatingBtn] = useState(false);
+
   const resultsBodyRef = useRef(null);
   const inputRef = useRef(null);
   const modalInputRef = useRef(null);
-  const sendMetalRef = useRef(null);
-  const modalSendMetalRef = useRef(null);
   const navigate = useNavigate();
-
-  useMetalBend(sendMetalRef);
-  useMetalBend(modalSendMetalRef);
 
   // Auto-scroll ONLY the internal chatbot messages container without scrolling the window/page
   useEffect(() => {
@@ -306,6 +317,50 @@ function JntuChatbot() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen]);
 
+  // Listen for global open requests from Hero search, buttons, etc.
+  useEffect(() => {
+    const handleOpenEvent = (e) => {
+      setIsModalOpen(true);
+      const query = e?.detail?.query;
+      if (query) {
+        handleSend(query);
+      } else if (messages.length === 0) {
+        handleSend("Hi");
+      }
+    };
+    window.addEventListener("open-jntu-chatbot", handleOpenEvent);
+    return () => window.removeEventListener("open-jntu-chatbot", handleOpenEvent);
+  }, []);
+
+  // Floating chatbot icon: hide while in hero section, appear when leaving hero section
+  useEffect(() => {
+    const checkScrollPosition = () => {
+      const heroEl = document.getElementById("hero-section");
+      if (heroEl) {
+        const rect = heroEl.getBoundingClientRect();
+        // Hide button when hero section is still on screen (rect.bottom > 70)
+        // Only show button after user has completely scrolled past the hero section
+        const isPastHero = rect.bottom <= 70;
+        setShowFloatingBtn(isPastHero);
+      } else {
+        // On other routes without hero section, show button
+        setShowFloatingBtn(true);
+      }
+    };
+
+    checkScrollPosition();
+    window.addEventListener("scroll", checkScrollPosition, { passive: true });
+    window.addEventListener("resize", checkScrollPosition, { passive: true });
+
+    const timer = setTimeout(checkScrollPosition, 120);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", checkScrollPosition);
+      window.removeEventListener("resize", checkScrollPosition);
+    };
+  }, []);
+
   // Helper to apply quick profile field updates from NLP
   const handleQuickProfileUpdate = (patch) => {
     const current = getStoredStudentData();
@@ -326,11 +381,11 @@ function JntuChatbot() {
 
       if (step === "NAME") {
         draft.name = rawQuery.trim();
-        draft.shortName = rawQuery.trim().split(" ")[0];
+        draft.shortName = rawQuery.trim().split(" ")[0] || rawQuery.trim();
         setProfileSession({ active: true, step: "HALLTICKET", draft });
         return {
-          text: `Awesome, ${draft.name}! What is your JNTU Hall Ticket / Roll Number? (e.g. 22B91A4201)`,
-          suggestions: ["22B91A4201", "21B91A0501", "23B91A0501"],
+          text: `Nice to meet you, ${draft.name}! What is your University Hall Ticket Number? (e.g. 22B91A4201)`,
+          suggestions: ["22B91A4201", "21B91A0501", "23B91A1201"],
           wizardActive: true,
         };
       }
@@ -410,10 +465,10 @@ function JntuChatbot() {
         setProfileSession({ active: false, step: null, draft: {} });
 
         return {
-          text: `🎉 All set! Your Student Profile has been created and synced live across JNTU Circle.`,
+          text: `All set! Your verified Student Profile has been created and synced live across JNTU Circle.`,
           profilePreview: updated,
           action: { label: "Open Full Student Profile →", path: "/profile" },
-          suggestions: ["📊 CGPA Calculator", "👤 Student Profile", "📘 Notes"],
+          suggestions: ["CGPA Calculator", "Student Profile", "Notes"],
         };
       }
     }
@@ -422,9 +477,9 @@ function JntuChatbot() {
     // 2. TRIGGER PROFILE BUILDER COMMAND
     // =========================================================
     if (
-      q.includes("build") && q.includes("profile") ||
-      q.includes("create") && q.includes("profile") ||
-      q.includes("setup") && q.includes("profile") ||
+      (q.includes("build") && q.includes("profile")) ||
+      (q.includes("create") && q.includes("profile")) ||
+      (q.includes("setup") && q.includes("profile")) ||
       q === "build your student profile using chatbot" ||
       q === "build student profile with ai" ||
       q === "student profile" ||
@@ -432,7 +487,7 @@ function JntuChatbot() {
     ) {
       setProfileSession({ active: true, step: "NAME", draft: {} });
       return {
-        text: `🎓 Let's build your verified JNTU Student Profile together! First, what is your Full Name?`,
+        text: `Let's build your verified JNTU Student Profile together! First, what is your Full Name?`,
         suggestions: ["Chinnu", "Jaswanth Reddy", "K. Suresh"],
         wizardActive: true,
       };
@@ -441,50 +496,46 @@ function JntuChatbot() {
     // =========================================================
     // 3. SINGLE-SHOT PROFILE NLP FIELD UPDATES
     // =========================================================
-    // CGPA Update: e.g. "update cgpa to 9.2", "cgpa 8.9", "set cgpa 9.0"
     const cgpaMatch = q.match(/(?:cgpa|gpa)\s*(?:is|to|:|=)?\s*([0-9]+\.?[0-9]*)/i);
     if (cgpaMatch && (q.includes("cgpa") || q.includes("gpa"))) {
       const newCgpa = parseFloat(cgpaMatch[1]).toFixed(2);
       const updated = handleQuickProfileUpdate({ cgpa: newCgpa });
       return {
-        text: `✅ Updated your Cumulative CGPA to ${newCgpa}! This reflects in your Student Profile and Calculator.`,
+        text: `Updated your Cumulative CGPA to ${newCgpa}! This reflects in your Student Profile and Calculator.`,
         profilePreview: updated,
         action: { label: "Open CGPA Calculator →", path: "/calculator" },
-        suggestions: ["📊 CGPA Calculator", "🎓 View Student Profile"],
+        suggestions: ["CGPA Calculator", "View Student Profile"],
       };
     }
 
-    // Name Update: e.g. "my name is Alex", "change name to Priya"
     const nameMatch = rawQuery.match(/(?:my name is|name is|set name to|change name to)\s+([a-zA-Z\s]+)/i);
     if (nameMatch) {
       const newName = nameMatch[1].trim();
       const updated = handleQuickProfileUpdate({ name: newName, shortName: newName.split(" ")[0] });
       return {
-        text: `✅ Updated your profile name to "${newName}".`,
+        text: `Updated your profile name to "${newName}".`,
         profilePreview: updated,
         action: { label: "Open Student Profile →", path: "/profile" },
       };
     }
 
-    // Hall Ticket Update: e.g. "my hall ticket is 22B91A4201"
     const htMatch = rawQuery.match(/(?:hall ticket|roll number|reg no|ht no)\s*(?:is|to|:|=)?\s*([0-9a-zA-Z]+)/i);
     if (htMatch) {
       const newHt = htMatch[1].trim().toUpperCase();
       const updated = handleQuickProfileUpdate({ hallTicket: newHt });
       return {
-        text: `✅ Updated your Hall Ticket Number to ${newHt}.`,
+        text: `Updated your Hall Ticket Number to ${newHt}.`,
         profilePreview: updated,
         action: { label: "Open Student Profile →", path: "/profile" },
       };
     }
 
-    // Attendance Update: e.g. "attendance 92%"
     const attMatch = q.match(/attendance\s*(?:is|to|:|=)?\s*([0-9]+(?:\.[0-9]+)?%?)/i);
     if (attMatch) {
       const newAtt = attMatch[1].includes("%") ? attMatch[1] : `${attMatch[1]}%`;
       const updated = handleQuickProfileUpdate({ attendance: newAtt });
       return {
-        text: `✅ Updated your Attendance Rate to ${newAtt}.`,
+        text: `Updated your Attendance Rate to ${newAtt}.`,
         profilePreview: updated,
         action: { label: "Open Student Profile →", path: "/profile" },
       };
@@ -494,7 +545,6 @@ function JntuChatbot() {
     // 4. PLATFORM TOOLS & HELPERS
     // =========================================================
 
-    // Calculator Query
     if (q.includes("calculator") || q.includes("cgpa") || q.includes("sgpa") || q.includes("percentage") || q.includes("grade point")) {
       return {
         text: "Interactive CGPA & SGPA Evaluation Engine for R23, R20, R19 regulations with real-time grade calculations.",
@@ -503,16 +553,14 @@ function JntuChatbot() {
       };
     }
 
-    // Student Academic Performance / Transcript Query
     if (q.includes("transcript") || q.includes("marks") || q.includes("result card") || q.includes("progress")) {
       return {
         text: "View your verified academic profile, semester progression, and CGPA trajectory in your Student Profile.",
         action: { label: "View Student Profile →", path: "/profile" },
-        suggestions: ["📊 CGPA Calculator", "👤 Student Profile"],
+        suggestions: ["CGPA Calculator", "Student Profile"],
       };
     }
 
-    // Upload Materials Query
     if (q.includes("upload") || q.includes("contribute") || q.includes("share material") || q.includes("submit note")) {
       return {
         text: "Centralized Academic Upload Portal: contribute lecture notes, question papers, syllabus copies, and lab programs.",
@@ -521,18 +569,16 @@ function JntuChatbot() {
       };
     }
 
-    // Greetings
     if (q.startsWith("hi") || q.startsWith("hello") || q.startsWith("hey") || q.includes("good morning") || q.includes("good evening") || q === "help") {
       return {
         text: "Hello! I am your JNTU AI Academic Assistant. Ask me to find notes, question papers, syllabus, or lab programs for any subject, or build your student profile.",
-        suggestions: ["🚀 Build Student Profile with AI", "Data Structures Notes", "Python Lab Programs", "R23 AIML Syllabus", "📊 CGPA Calculator"],
+        suggestions: ["Build Student Profile", "Data Structures Notes", "Python Lab Programs", "R23 AIML Syllabus", "CGPA Calculator"],
       };
     }
 
     // =========================================================
     // 5. ACCURATE ACADEMIC SEARCH & BRANCH HUB CONTENT
     // =========================================================
-    // Check if the query is asking about a specific engineering branch (CSE, AIML, ECE, ME, CE, EEE)
     const detectedBranch = detectBranchFromQuery(rawQuery);
     if (detectedBranch) {
       const branchHub = await getBranchHubData(detectedBranch);
@@ -551,7 +597,6 @@ function JntuChatbot() {
     const searchRes = await performSearch(rawQuery);
 
     if (searchRes.results && searchRes.results.length > 0) {
-      // Display matched items for comprehensive query coverage
       const allItems = searchRes.results.map((item) => {
         const action = formatResourceAction(item);
         return {
@@ -574,7 +619,6 @@ function JntuChatbot() {
       };
     }
 
-    // Fallback if no matching item found
     return {
       text: `No exact records found for "${rawQuery}". Here are related curriculum subjects and syllabus topics you can check:`,
       relatedSubjects: searchRes.relatedSubjects,
@@ -590,7 +634,6 @@ function JntuChatbot() {
     const query = (textToSend || "").trim();
     if (!query) return;
 
-    // Immediately open the overlay modal
     setIsModalOpen(true);
 
     const userMessage = {
@@ -661,7 +704,6 @@ function JntuChatbot() {
     }
   };
 
-  // Submit from the Hero home command bar
   const handleHeroSubmit = (e) => {
     if (e) e.preventDefault();
     if (input.trim()) {
@@ -671,7 +713,6 @@ function JntuChatbot() {
     }
   };
 
-  // Submit from the Modal Overlay input bar
   const handleModalSubmit = (e) => {
     if (e) e.preventDefault();
     if (modalInput.trim()) {
@@ -679,7 +720,6 @@ function JntuChatbot() {
     }
   };
 
-  // Handle Enter key on hero input (bypass disabled submit button)
   const handleHeroKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -687,7 +727,6 @@ function JntuChatbot() {
     }
   };
 
-  // Handle Enter key on modal input (bypass disabled submit button)
   const handleModalKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -707,154 +746,162 @@ function JntuChatbot() {
   const hasModalInput = modalInput.trim().length > 0;
 
   return (
-    <div className="hero-ai-container">
-      {/* =========================================================
-          HERO HOME COMMAND BAR (CLEAN TRIGGER BAR)
-          ========================================================= */}
-      <div className="hero-ai-bar-anchor">
-        <form className="hero-ai-bar" onSubmit={handleHeroSubmit}>
-          <div
-            className="hero-ai-avatar-badge"
-            title="Click to open JNTU AI Chatbot"
-            onClick={() => {
-              setIsModalOpen(true);
-              if (messages.length === 0) {
-                handleSend("Hi");
-              }
-            }}
-          >
-            <BotAvatar
-              type="ghost"
-              color="#FFFFFF"
-              size={32}
-              state={isTyping ? "working" : "default"}
-            />
-          </div>
+    <>
+      {/* Floating AI Assistant Trigger Button (Hidden on hero section, appears after leaving hero) */}
+      <button
+        type="button"
+        className={`floating-ai-btn ${!showFloatingBtn || isModalOpen ? "hidden-hero" : ""}`}
+        onClick={() => {
+          setIsModalOpen(true);
+          if (messages.length === 0) {
+            handleSend("Hi");
+          }
+        }}
+        title="Ask JNTU AI Copilot"
+        aria-label="Ask JNTU AI Copilot"
+      >
+        <span className="floating-ai-pulse" aria-hidden="true" />
+        <span className="material-symbols-outlined floating-ai-icon">neurology</span>
+        <span className="floating-ai-tooltip">Ask JNTU AI Copilot</span>
+      </button>
 
-          <input
-            ref={inputRef}
-            type="text"
-            className="hero-ai-input"
-            placeholder="Ask JNTU AI or say 'Build my student profile' or enter branch (CSE, AIML, ECE)..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleHeroKeyDown}
-            aria-label="Ask JNTU AI"
-            autoComplete="off"
-            style={{ outline: "none", border: "none", boxShadow: "none" }}
-          />
+      {/* Embedded In-page Command Bar (optional) */}
+      {embedded && (
+        <div className="hero-ai-container">
+          <div className="hero-ai-bar-anchor">
+            <form className="hero-ai-bar" onSubmit={handleHeroSubmit}>
+              <div
+                className="hero-ai-avatar-badge"
+                title="Open JNTU AI Chatbot"
+                onClick={() => {
+                  setIsModalOpen(true);
+                  if (messages.length === 0) {
+                    handleSend("Hi");
+                  }
+                }}
+              >
+                <span className="material-symbols-outlined text-[20px] text-[#C4B5FD]">
+                  neurology
+                </span>
+              </div>
 
-          {/* ACTION CONTROLS */}
-          <div className="hero-ai-send-wrapper">
-            {hasHeroInput && (
+              <input
+                ref={inputRef}
+                type="text"
+                className="hero-ai-input"
+                placeholder="Ask JNTU AI or say 'Build my student profile' or enter branch (CSE, AIML, ECE)..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleHeroKeyDown}
+                aria-label="Ask JNTU AI"
+                autoComplete="off"
+                style={{ outline: "none", border: "none", boxShadow: "none" }}
+              />
+
+              {/* ACTION CONTROLS */}
+              <div className="hero-ai-send-wrapper">
+                {hasHeroInput && (
+                  <button
+                    type="button"
+                    className="hero-ai-clear-btn"
+                    onClick={() => setInput("")}
+                    title="Clear input"
+                    aria-label="Clear input"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">close</span>
+                  </button>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-10 h-10 rounded-full bg-[#8B5CF6] hover:bg-[#7c4def] text-[#F5F5FA] flex items-center justify-center shrink-0 transition-all shadow-[0_0_16px_rgba(139,92,246,0.35)] hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed group/btn"
+                  aria-label="Send query"
+                  disabled={!hasHeroInput}
+                  title="Send query"
+                >
+                  <span className="material-symbols-outlined text-[18px] transition-transform group-hover/btn:translate-x-0.5">
+                    arrow_forward
+                  </span>
+                </button>
+              </div>
+            </form>
+
+            {/* Quick Launch Chips for Student Profile & Branch Hubs */}
+            <div className="hero-ai-starter-chips">
               <button
                 type="button"
-                className="hero-ai-clear-btn"
-                onClick={() => setInput("")}
-                title="Clear input"
-                aria-label="Clear input"
+                className="hero-ai-starter-pill starter-pill-highlight"
+                onClick={handleStartProfileBuilder}
               >
-                ✕
+                <span>Build Student Profile</span>
               </button>
-            )}
-
-            <MetalFx
-              ref={sendMetalRef}
-              preset="chromatic"
-              variant="circle"
-              theme="dark"
-              strength={1}
-              innerShadow
-              className="hero-ai-metal-send-wrapper"
-            >
               <button
-                type="submit"
-                className="hero-ai-send-btn"
-                aria-label="Send query and open overlay"
-                disabled={!hasHeroInput}
-                title="Send query"
+                type="button"
+                className="hero-ai-quick-pill"
+                onClick={() => handleSend("CSE")}
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
+                <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                  terminal
+                </span>
+                <span>CSE</span>
               </button>
-            </MetalFx>
+              <button
+                type="button"
+                className="hero-ai-quick-pill"
+                onClick={() => handleSend("AIML")}
+              >
+                <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                  smart_toy
+                </span>
+                <span>AIML</span>
+              </button>
+              <button
+                type="button"
+                className="hero-ai-quick-pill"
+                onClick={() => handleSend("ECE")}
+              >
+                <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                  memory
+                </span>
+                <span>ECE</span>
+              </button>
+              <button
+                type="button"
+                className="hero-ai-quick-pill"
+                onClick={() => handleSend("Mechanical")}
+              >
+                <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                  settings
+                </span>
+                <span>ME</span>
+              </button>
+              <button
+                type="button"
+                className="hero-ai-quick-pill"
+                onClick={() => handleSend("Civil")}
+              >
+                <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                  apartment
+                </span>
+                <span>Civil</span>
+              </button>
+              <button
+                type="button"
+                className="hero-ai-quick-pill"
+                onClick={() => handleSend("EEE")}
+              >
+                <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                  bolt
+                </span>
+                <span>EEE</span>
+              </button>
+            </div>
           </div>
-        </form>
-
-        {/* Quick Launch Chips for Student Profile & Branch Hubs */}
-        <div className="hero-ai-starter-chips">
-          <button
-            type="button"
-            className="hero-ai-starter-pill starter-pill-highlight"
-            onClick={handleStartProfileBuilder}
-          >
-            <span className="starter-pill-sparkle">✨</span>
-            <span>Build Student Profile</span>
-          </button>
-          <button
-            type="button"
-            className="hero-ai-quick-pill"
-            onClick={() => handleSend("CSE")}
-          >
-            <span className="hero-ai-pill-icon">💻</span>
-            <span>CSE</span>
-          </button>
-          <button
-            type="button"
-            className="hero-ai-quick-pill"
-            onClick={() => handleSend("AIML")}
-          >
-            <span className="hero-ai-pill-icon">🤖</span>
-            <span>AIML</span>
-          </button>
-          <button
-            type="button"
-            className="hero-ai-quick-pill"
-            onClick={() => handleSend("ECE")}
-          >
-            <span className="hero-ai-pill-icon">📡</span>
-            <span>ECE</span>
-          </button>
-          <button
-            type="button"
-            className="hero-ai-quick-pill"
-            onClick={() => handleSend("Mechanical")}
-          >
-            <span className="hero-ai-pill-icon">⚙️</span>
-            <span>ME</span>
-          </button>
-          <button
-            type="button"
-            className="hero-ai-quick-pill"
-            onClick={() => handleSend("Civil")}
-          >
-            <span className="hero-ai-pill-icon">🏗️</span>
-            <span>Civil</span>
-          </button>
-          <button
-            type="button"
-            className="hero-ai-quick-pill"
-            onClick={() => handleSend("EEE")}
-          >
-            <span className="hero-ai-pill-icon">⚡</span>
-            <span>EEE</span>
-          </button>
         </div>
-      </div>
+      )}
 
       {/* =========================================================
-          POPUP MODAL & OVERLAY (COMMUNICATION IS DONE HERE)
+          POPUP MODAL & OVERLAY (MATCHING STITCH FRONTEND PALETTE)
           ========================================================= */}
       {isModalOpen && (
         <div
@@ -873,19 +920,15 @@ function JntuChatbot() {
             <div className="chat-modal-header">
               <div className="chat-modal-header-left">
                 <div className="chat-modal-avatar-wrapper">
-                  <BotAvatar
-                    type="ghost"
-                    color="#FFFFFF"
-                    size={28}
-                    state={isTyping ? "working" : "default"}
-                  />
-                  <span className="chat-modal-status-dot" />
+                  <span className="material-symbols-outlined text-[20px] text-[#C4B5FD]">
+                    neurology
+                  </span>
                 </div>
                 <div>
                   <div className="chat-modal-title-row">
                     <h3 className="chat-modal-title">JNTU Circle AI Assistant</h3>
                     <span className="chat-modal-role-badge">
-                      {profileSession.active ? "Profile Wizard Active" : "Online"}
+                      <span>Online</span>
                     </span>
                   </div>
                   <p className="chat-modal-subtitle">
@@ -902,7 +945,7 @@ function JntuChatbot() {
                 title="Close chat overlay (Esc)"
                 aria-label="Close chat overlay"
               >
-                ✕
+                <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
 
@@ -910,7 +953,11 @@ function JntuChatbot() {
             <div className="chat-modal-body" ref={resultsBodyRef}>
               {messages.length === 0 ? (
                 <div className="chat-modal-empty-state">
-                  <BotAvatar type="ghost" color="#FFFFFF" size={48} state="default" />
+                  <div className="w-14 h-14 rounded-2xl bg-[#8B5CF6]/15 border border-[#8B5CF6]/40 flex items-center justify-center text-[#C4B5FD] shadow-[0_0_20px_rgba(139,92,246,0.3)] mb-3">
+                    <span className="material-symbols-outlined text-[32px] text-[#C4B5FD]">
+                      neurology
+                    </span>
+                  </div>
                   <h4>How can I help you today?</h4>
                   <p>Ask about notes, syllabus, question papers, or build your student profile.</p>
                   <div className="chat-modal-quick-suggestions">
@@ -919,56 +966,77 @@ function JntuChatbot() {
                       className="chat-modal-sugg-pill"
                       onClick={() => handleSend("Build your student profile using chatbot")}
                     >
-                      ✨ Build Student Profile
+                      <span>Build Student Profile</span>
                     </button>
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
                       onClick={() => handleSend("CSE")}
                     >
-                      💻 CSE Hub
+                      <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                        terminal
+                      </span>
+                      <span>CSE Hub</span>
                     </button>
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
                       onClick={() => handleSend("AIML")}
                     >
-                      🤖 AIML Hub
+                      <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                        smart_toy
+                      </span>
+                      <span>AIML Hub</span>
                     </button>
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
                       onClick={() => handleSend("ECE")}
                     >
-                      📡 ECE Hub
+                      <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                        memory
+                      </span>
+                      <span>ECE Hub</span>
                     </button>
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
                       onClick={() => handleSend("Mechanical")}
                     >
-                      ⚙️ ME Hub
+                      <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                        settings
+                      </span>
+                      <span>ME Hub</span>
                     </button>
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
                       onClick={() => handleSend("Civil")}
                     >
-                      🏗️ Civil Hub
+                      <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                        apartment
+                      </span>
+                      <span>Civil Hub</span>
                     </button>
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
                       onClick={() => handleSend("EEE")}
                     >
-                      ⚡ EEE Hub
+                      <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                        bolt
+                      </span>
+                      <span>EEE Hub</span>
                     </button>
                     <button
                       type="button"
                       className="chat-modal-sugg-pill"
                       onClick={() => handleSend("CGPA & SGPA Calculator")}
                     >
-                      📊 CGPA Calculator
+                      <span className="material-symbols-outlined text-[15px] text-[#A3A3B5]">
+                        calculate
+                      </span>
+                      <span>CGPA Calculator</span>
                     </button>
                   </div>
                 </div>
@@ -987,12 +1055,9 @@ function JntuChatbot() {
                       <div className="hero-ai-assistant-card">
                         <div className="hero-ai-assistant-header">
                           <div className="hero-ai-msg-avatar">
-                            <BotAvatar
-                              type="ghost"
-                              color="#FFFFFF"
-                              size={18}
-                              state="default"
-                            />
+                            <span className="material-symbols-outlined text-[15px] text-[#C4B5FD]">
+                              neurology
+                            </span>
                           </div>
                           <span className="hero-ai-tag hero-ai-tag-bot">JNTU AI</span>
                         </div>
@@ -1004,7 +1069,11 @@ function JntuChatbot() {
                           {msg.profilePreview && (
                             <div className="hero-ai-profile-card">
                               <div className="hero-ai-profile-top">
-                                <div className="hero-ai-profile-avatar-box">🎓</div>
+                                <div className="hero-ai-profile-avatar-box">
+                                  <span className="material-symbols-outlined text-[20px] text-[#ffffff]">
+                                    school
+                                  </span>
+                                </div>
                                 <div>
                                   <h4 className="hero-ai-profile-name">{msg.profilePreview.name || "Student"}</h4>
                                   <span className="hero-ai-profile-ht">
@@ -1029,7 +1098,7 @@ function JntuChatbot() {
                             </div>
                           )}
 
-                          {/* Interactive Branch Hub View (Shows all content when branch name is queried) */}
+                          {/* Interactive Branch Hub View */}
                           {msg.isBranch && msg.branchHub && (
                             <BranchHubView
                               hub={msg.branchHub}
@@ -1068,7 +1137,9 @@ function JntuChatbot() {
                                   >
                                     <div className="chat-result-top-row">
                                       <span className={`chat-result-type-tag ${typeClass}`}>
-                                        <span>{resItem.icon || "📄"}</span>
+                                        <span className="material-symbols-outlined text-[13px]">
+                                          {resItem.icon || "description"}
+                                        </span>
                                         <span>{resItem.type}</span>
                                       </span>
                                       {resItem.subjectCode && (
@@ -1123,7 +1194,9 @@ function JntuChatbot() {
                           {((msg.relatedResources && msg.relatedResources.length > 0) || (msg.relatedSubjects && msg.relatedSubjects.length > 0)) && (
                             <div className="chat-related-box">
                               <div className="chat-related-header">
-                                <span>💡</span>
+                                <span className="material-symbols-outlined text-[15px] text-[#C4B5FD]">
+                                  lightbulb
+                                </span>
                                 <span>Related Content & Sibling Subjects:</span>
                               </div>
                               <div className="chat-related-chips">
@@ -1135,7 +1208,10 @@ function JntuChatbot() {
                                     onClick={() => handleSend(`${rel.subject || rel.title} ${rel.type}`)}
                                     title={`Search related ${rel.type}`}
                                   >
-                                    {rel.icon} {rel.type}: {rel.subject || rel.title}
+                                    <span className="material-symbols-outlined text-[13px]">
+                                      {rel.icon || "description"}
+                                    </span>
+                                    <span>{rel.type}: {rel.subject || rel.title}</span>
                                   </button>
                                 ))}
                                 {msg.relatedSubjects && msg.relatedSubjects.map((sub, sIdx) => (
@@ -1146,7 +1222,10 @@ function JntuChatbot() {
                                     onClick={() => handleSend(`${sub.name} notes`)}
                                     title={`Find resources for ${sub.name}`}
                                   >
-                                    📚 {sub.name} ({sub.branch})
+                                    <span className="material-symbols-outlined text-[13px]">
+                                      school
+                                    </span>
+                                    <span>{sub.name} ({sub.branch})</span>
                                   </button>
                                 ))}
                               </div>
@@ -1200,7 +1279,7 @@ function JntuChatbot() {
               )}
             </div>
 
-            {/* Modal Input Footer (Interactive Chat Control) */}
+            {/* Modal Input Footer (Interactive Chat Control matching Frontend Palette) */}
             <div className="chat-modal-footer">
               <form className="chat-modal-input-bar" onSubmit={handleModalSubmit}>
                 <input
@@ -1225,47 +1304,27 @@ function JntuChatbot() {
                     onClick={() => setModalInput("")}
                     title="Clear text"
                   >
-                    ✕
+                    <span className="material-symbols-outlined text-[16px]">close</span>
                   </button>
                 )}
 
-                <MetalFx
-                  ref={modalSendMetalRef}
-                  preset="chromatic"
-                  variant="circle"
-                  theme="dark"
-                  strength={1}
-                  innerShadow
-                  className="chat-modal-metal-wrapper"
+                <button
+                  type="submit"
+                  className="w-10 h-10 rounded-full bg-[#8B5CF6] hover:bg-[#7c4def] text-[#F5F5FA] flex items-center justify-center shrink-0 transition-all shadow-[0_0_16px_rgba(139,92,246,0.35)] hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed group/btn"
+                  disabled={!hasModalInput}
+                  title="Send message"
+                  aria-label="Send message"
                 >
-                  <button
-                    type="submit"
-                    className="chat-modal-send-btn"
-                    disabled={!hasModalInput}
-                    title="Send message"
-                    aria-label="Send message"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                      <polyline points="12 5 19 12 12 19" />
-                    </svg>
-                  </button>
-                </MetalFx>
+                  <span className="material-symbols-outlined text-[18px] transition-transform group-hover/btn:translate-x-0.5">
+                    send
+                  </span>
+                </button>
               </form>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

@@ -1,175 +1,87 @@
-import { useRef, useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../api/api";
+import brandLogo from "../assets/jntu-brand-logo-v2.png";
 
-// Standard fallback notices for the pop-up preview
-const FALLBACK_NOTICES = [
-  {
-    _id: "notif-pop-1",
-    title: "JNTU B.Tech R20/R23 Semester End Exam Timetable 2024-25",
-    description: "Official schedule for regular and supplementary examinations commencing next month.",
-    category: "EXAM",
-    publishedDate: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-    link: "/notifications",
-  },
-  {
-    _id: "notif-pop-2",
-    title: "Revised Academic Calendar & Instruction Days for 2nd, 3rd & 4th Years",
-    description: "University circular detailing working Saturdays and assessment schedules.",
-    category: "CIRCULAR",
-    publishedDate: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-    link: "/notifications",
-  },
-  {
-    _id: "notif-pop-3",
-    title: "Revaluation & Recounting Results for 2-1 and 3-1 Regular Examinations",
-    description: "Results portal is now active for online verification.",
-    category: "RESULTS",
-    publishedDate: new Date(Date.now() - 3 * 86400 * 1000).toISOString(),
-    link: "/notifications",
-  },
-];
-
-function Navbar() {
+function Navbar({ onOpenProfile }) {
+  const location = useLocation();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(1);
+  const [latestAlert, setLatestAlert] = useState(null);
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const notifContainerRef = useRef(null);
-  const hoverTimeoutRef = useRef(null);
+  const notifHoverTimeoutRef = useRef(null);
 
-  const [notificationsList, setNotificationsList] = useState(FALLBACK_NOTICES);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [hasNewAlert, setHasNewAlert] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [showToastAlert, setShowToastAlert] = useState(false);
-  const [activeAlertItem, setActiveAlertItem] = useState(null);
-
-  const isBTechNotice = (n) => {
-    if (!n) return false;
-    const text = `${n.title || ""} ${n.description || ""}`.toLowerCase();
-    const isBTech = text.includes("b.tech") || text.includes("btech") || text.includes("b tech");
-    const isOther =
-      text.includes("b.pharm") ||
-      text.includes("bpharm") ||
-      text.includes("m.pharm") ||
-      text.includes("mpharm") ||
-      text.includes("m.tech") ||
-      text.includes("mtech") ||
-      text.includes("mba") ||
-      text.includes("mca") ||
-      text.includes("ph.d") ||
-      text.includes("phd") ||
-      text.includes("pharm.d") ||
-      text.includes("pharmd");
-    if (isOther && !isBTech) return false;
-    return isBTech;
-  };
-
-  // Fetch real notifications and check for unseen B.Tech alerts
-  const checkNotifications = async () => {
-    try {
-      const res = await API.get("/notifications");
-      if (Array.isArray(res.data) && res.data.length > 0) {
-        const btechOnly = res.data.filter(isBTechNotice);
-        setNotificationsList(btechOnly);
-
-        const latest = btechOnly[0];
-        if (!latest) return;
-
-        const lastSeenId = localStorage.getItem("jntu_last_viewed_notif_id");
-        const lastSeenTime = localStorage.getItem("jntu_last_viewed_notif_time");
-
-        // If never viewed or latest is newer than last seen
-        const isNew = !lastSeenId || latest._id !== lastSeenId;
-
-        if (isNew) {
-          let count = 1;
-          if (lastSeenTime) {
-            const newer = btechOnly.filter(
-              (n) => new Date(n.createdAt || n.publishedDate) > new Date(lastSeenTime)
-            );
-            count = Math.max(1, newer.length);
-          }
-
-          setHasNewAlert(true);
-          setUnreadCount(count);
-          setActiveAlertItem(latest);
-
-          const dismissed = sessionStorage.getItem(`dismissed_notif_${latest._id}`);
-          if (!dismissed) {
-            setShowToastAlert(true);
-          }
-        } else {
-          setHasNewAlert(false);
-          setUnreadCount(0);
-          setShowToastAlert(false);
+  // Fetch notifications and initialize auto-popup
+  useEffect(() => {
+    let isMounted = true;
+    const fetchNotifications = async () => {
+      try {
+        const res = await API.get("/notifications");
+        const list = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.notifications)
+          ? res.data.notifications
+          : [];
+        if (list.length > 0 && isMounted) {
+          setUnreadCount(list.length);
+          setLatestAlert(list[0]);
+        } else if (isMounted) {
+          setLatestAlert({
+            title: "B.Tech R20/R23 Semester Exam Notifications Released",
+            category: "EXAM",
+          });
+        }
+      } catch {
+        if (isMounted) {
+          setUnreadCount(1);
+          setLatestAlert({
+            title: "B.Tech R20/R23 Semester Exam Notifications Released",
+            category: "EXAM",
+          });
         }
       }
-    } catch {
-      // Fallback
-    }
-  };
+    };
+    fetchNotifications();
 
-  useEffect(() => {
-    checkNotifications();
-    const interval = setInterval(checkNotifications, 20000); // 20s polling for new notifications
+    // Automatically trigger notification popup under the tab after 1.2s as previously implemented
+    const timer = setTimeout(() => {
+      if (isMounted) {
+        setShowNotifDropdown(true);
+      }
+    }, 1200);
 
     return () => {
-      clearInterval(interval);
-      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+      isMounted = false;
+      clearTimeout(timer);
+      if (notifHoverTimeoutRef.current) clearTimeout(notifHoverTimeoutRef.current);
     };
   }, []);
 
-  // Auto-dismiss toast alert after 9 seconds so it is unobtrusive
-  useEffect(() => {
-    if (showToastAlert) {
-      const timer = setTimeout(() => {
-        setShowToastAlert(false);
-      }, 9000);
-      return () => clearTimeout(timer);
-    }
-  }, [showToastAlert]);
-
-  const handleOpenNotifications = () => {
-    if (notificationsList && notificationsList.length > 0) {
-      const latest = notificationsList[0];
-      localStorage.setItem("jntu_last_viewed_notif_id", latest._id);
-      localStorage.setItem("jntu_last_viewed_notif_time", new Date().toISOString());
-    }
-    setHasNewAlert(false);
-    setUnreadCount(0);
-    setShowToastAlert(false);
-  };
-
-  const handleDismissToast = (e) => {
-    e.stopPropagation();
-    setShowToastAlert(false);
-    if (activeAlertItem) {
-      sessionStorage.setItem(`dismissed_notif_${activeAlertItem._id}`, "true");
-    }
-  };
-
   // Hover handlers for smooth hover dropdown behavior
   const handleNotifMouseEnter = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
+    if (notifHoverTimeoutRef.current) {
+      clearTimeout(notifHoverTimeoutRef.current);
+      notifHoverTimeoutRef.current = null;
     }
-    setShowDropdown(true);
+    setShowNotifDropdown(true);
   };
 
   const handleNotifMouseLeave = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
+    if (notifHoverTimeoutRef.current) {
+      clearTimeout(notifHoverTimeoutRef.current);
     }
-    hoverTimeoutRef.current = setTimeout(() => {
-      setShowDropdown(false);
-    }, 160);
+    notifHoverTimeoutRef.current = setTimeout(() => {
+      setShowNotifDropdown(false);
+    }, 200);
   };
 
-  // Close notification dropdown when tapping outside (for touch/mobile)
+  // Close popup when clicking outside
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (notifContainerRef.current && !notifContainerRef.current.contains(e.target)) {
-        setShowDropdown(false);
+        setShowNotifDropdown(false);
       }
     };
     document.addEventListener("mousedown", handleOutsideClick);
@@ -180,48 +92,33 @@ function Navbar() {
     };
   }, []);
 
-  const formatTimeAgo = (dateStr) => {
-    if (!dateStr) return "Recent";
-    const diffMin = Math.floor((new Date() - new Date(dateStr)) / 60000);
-    if (diffMin < 1) return "Just now";
-    if (diffMin < 60) return `${diffMin}m ago`;
-    const diffHours = Math.floor(diffMin / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${Math.floor(diffHours / 24)}d ago`;
+  const handleProfileClick = () => {
+    if (onOpenProfile) {
+      onOpenProfile();
+    } else {
+      navigate("/profile");
+    }
   };
 
-  const latestAlert = notificationsList[0] || FALLBACK_NOTICES[0];
-
-  const navigationLinks = [
+  const navLinks = [
     {
-      name: "Home",
+      name: "HOME",
       path: "/",
       icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-4 h-4 shrink-0 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
           <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
           <polyline points="9 22 9 12 15 12 15 22" />
         </svg>
       ),
     },
     {
-      name: "Notes",
-      path: "/notes",
+      name: "CGPA",
+      path: "/cgpa-calculator",
       icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
-          <path d="M6 6h10" />
-          <path d="M6 10h10" />
-        </svg>
-      ),
-    },
-    {
-      name: "CGPA & SGPA Calculator",
-      path: "/calculator",
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-4 h-4 shrink-0 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
           <rect width="16" height="20" x="4" y="2" rx="2" />
           <line x1="8" x2="16" y1="6" y2="6" />
-          <line x1="16" x2="16" y1="14" y2="18" />
+          <line x1="16" x2="16" y1="14" />
           <path d="M16 10h.01" />
           <path d="M12 10h.01" />
           <path d="M8 10h.01" />
@@ -233,132 +130,125 @@ function Navbar() {
       ),
     },
     {
-      name: "Upload Materials",
+      name: "SGPA",
+      path: "/sgpa-calculator",
+      icon: (
+        <svg className="w-4 h-4 shrink-0 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+    },
+    {
+      name: "UPLOAD",
       path: "/upload-materials",
       icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="17 8 12 3 7 8" />
-          <line x1="12" x2="12" y1="3" y2="15" />
+        <svg className="w-4 h-4 shrink-0 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+          <path d="M12 12v9" />
+          <path d="m16 16-4-4-4 4" />
         </svg>
       ),
     },
     {
-      name: "Student Profile",
-      path: "/profile",
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-          <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-        </svg>
-      ),
-    },
-    {
-      name: "Notifications",
+      name: "NOTIFICATIONS",
       path: "/notifications",
+      hasBadge: true,
+      icon: (
+        <svg className="w-4 h-4 shrink-0 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+        </svg>
+      ),
     },
   ];
 
   return (
-    <header className="navbar">
+    <header className="sticky top-0 left-0 w-full z-50 bg-[#12131B]/95 backdrop-blur-xl border-b border-[#292733] shadow-md">
+      <div className="h-16 max-w-[1440px] mx-auto px-margin-mobile md:px-margin flex items-center justify-between gap-space-md">
+        
+        {/* Brand Crest & Logo */}
+        <div className="flex items-center gap-space-md shrink-0">
+          <Link to="/" className="flex items-center gap-3">
+            <img
+              alt="JNTU Circle Crest"
+              className="h-9 w-9 rounded-full object-cover shadow-sm select-none"
+              src={brandLogo}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/jntu-brand-logo-v2.png";
+              }}
+            />
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center gap-2">
+                <span className="font-brand-serif text-[22px] font-bold tracking-tight text-[#F5F5FA] flex items-center">
+                  JNTU&nbsp;
+                  <span
+                    className="jntu-logo-circle font-bold"
+                    style={{
+                      backgroundImage: "linear-gradient(135deg, #C4B5FD 0%, #A78BFA 50%, #8B5CF6 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                      color: "#C4B5FD",
+                      display: "inline-block",
+                    }}
+                  >
+                    Circle
+                  </span>
+                </span>
+              </div>
+              <span className="font-label-mono-sm text-[11px] font-medium tracking-wider uppercase text-[#A3A3B5]">
+                Academic Resource hub
+              </span>
+            </div>
+          </Link>
+        </div>
 
-      {/* ==========================================
-          LOGO
-      ========================================== */}
+        {/* Desktop Navigation & Actions */}
+        <div className="flex items-center gap-2.5 sm:gap-space-sm shrink-0">
+          <nav className="hidden lg:flex items-center gap-2 xl:gap-3 text-[12px] font-semibold text-[#A3A3B5] mr-2">
+            {navLinks.map((link) => {
+              const isActive =
+                location.pathname === link.path ||
+                (link.path === "/cgpa-calculator" && (location.pathname === "/cgpa-calculator" || (location.pathname === "/calculator" && location.search.includes("cgpa")))) ||
+                (link.path === "/sgpa-calculator" && (location.pathname === "/sgpa-calculator" || (location.pathname === "/calculator" && !location.search.includes("cgpa"))));
 
-      <div className="logo">
-        <Link to="/">
-          <img
-            src="/jntu-circle-logo.png"
-            alt="JNTU Circle Logo"
-            className="logo-image"
-          />
-
-          <div className="logo-text">
-            <h2><span className="font-deltha">JNTU</span> Circle</h2>
-            <span>Academic Resource Hub</span>
-          </div>
-        </Link>
-      </div>
-
-      {/* ==========================================
-          NAVIGATION
-      ========================================== */}
-
-      <nav>
-        <ul className="nav-links">
-
-          {navigationLinks.map((item) => {
-            if (item.name === "Notifications") {
-              return (
-                <li 
-                  key={item.path} 
-                  className="nav-item-notif" 
-                  ref={notifContainerRef}
-                  onMouseEnter={handleNotifMouseEnter}
-                  onMouseLeave={handleNotifMouseLeave}
-                >
-                  <div className="nav-notif-link-container">
-                    <NavLink
-                      to={item.path}
-                      className={({ isActive }) =>
+              if (link.name === "NOTIFICATIONS") {
+                return (
+                  <div
+                    key={link.path}
+                    ref={notifContainerRef}
+                    className="relative nav-item-notif flex items-center"
+                    onMouseEnter={handleNotifMouseEnter}
+                    onMouseLeave={handleNotifMouseLeave}
+                  >
+                    <Link
+                      to={link.path}
+                      onClick={() => setShowNotifDropdown(false)}
+                      className={`flex items-center gap-1.5 transition-all py-1 px-3 rounded-full uppercase tracking-wider font-semibold relative ${
                         isActive
-                          ? "nav-link active nav-notif-btn"
-                          : "nav-link nav-notif-btn"
-                      }
-                      title="Notifications"
-                      aria-label="Notifications"
-                      onClick={() => {
-                        handleOpenNotifications();
-                        if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
-                          setShowDropdown((prev) => !prev);
-                        }
-                      }}
+                          ? "text-[#C4B5FD] bg-[#27213B] border border-[#8B5CF6]/30 shadow-sm"
+                          : "hover:text-[#F5F5FA] hover:bg-[#27213B]/40"
+                      }`}
                     >
-                      <span className="nav-notif-bell-icon-wrapper" aria-hidden="true">
-                        <svg
-                          className={`nav-notif-svg-bell ${hasNewAlert ? "is-ringing" : ""}`}
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                        </svg>
-                      </span>
-
-                      {hasNewAlert ? (
-                        <span 
-                          className="nav-notif-alert-badge" 
-                          title={`${unreadCount} New Notification${unreadCount > 1 ? "s" : ""} Available`}
-                        >
-                          <span className="pulse-beacon-ring" />
-                          <span className="pulse-beacon-dot" />
-                          <span>{unreadCount > 1 ? `${unreadCount} NEW` : "NEW"}</span>
-                        </span>
-                      ) : (
-                        <span className="nav-notif-new-tag">new</span>
+                      {link.icon}
+                      <span>{link.name}</span>
+                      {link.hasBadge && unreadCount > 0 && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B8F268] absolute top-1 right-1 shadow-[0_0_6px_#B8F268]" />
                       )}
-                    </NavLink>
+                    </Link>
 
-                    {/* Small Black Glass Notification Strip Tooltip */}
+                    {/* Notification Popup Tooltip Strip */}
                     {latestAlert && (
-                      <div 
-                        className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`} 
-                        role="tooltip" 
+                      <div
+                        className={`nav-notif-dropdown ${showNotifDropdown ? "is-open" : ""}`}
+                        role="tooltip"
                         aria-label="Notification Preview"
-                        onMouseEnter={handleNotifMouseEnter}
-                        onMouseLeave={handleNotifMouseLeave}
                         onClick={() => {
-                          handleOpenNotifications();
-                          setShowDropdown(false);
-                          if (latestAlert._id) {
-                            navigate(`/notifications?view=${encodeURIComponent(latestAlert._id)}`);
+                          setShowNotifDropdown(false);
+                          if (latestAlert.link && latestAlert.link.startsWith("http")) {
+                            window.open(latestAlert.link, "_blank");
                           } else {
                             navigate("/notifications");
                           }
@@ -366,98 +256,114 @@ function Navbar() {
                         title={latestAlert.title}
                       >
                         <div className="notif-dropdown-arrow" />
-                        <span className="notif-strip-title">
-                          {latestAlert.title}
-                        </span>
+                        <span className="notif-strip-title">{latestAlert.title}</span>
                       </div>
                     )}
                   </div>
-                </li>
-              );
-            }
+                );
+              }
 
-            return (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`flex items-center gap-1.5 transition-all py-1 px-3 rounded-full uppercase tracking-wider font-semibold relative ${
                     isActive
-                      ? "nav-link active nav-link-with-icon"
-                      : "nav-link nav-link-with-icon"
-                  }
+                      ? "text-[#C4B5FD] bg-[#27213B] border border-[#8B5CF6]/30 shadow-sm"
+                      : "hover:text-[#F5F5FA] hover:bg-[#27213B]/40"
+                  }`}
                 >
-                  {item.icon && <span className="nav-item-icon">{item.icon}</span>}
-                  <span>{item.name}</span>
-                </NavLink>
-              </li>
-            );
-          })}
+                  {link.icon}
+                  <span>{link.name}</span>
+                  {link.hasBadge && unreadCount > 0 && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B8F268] absolute top-1 right-1 shadow-[0_0_6px_#B8F268]" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
 
-          {/* ==========================================
-              LOGIN BUTTON
-          ========================================== */}
-
-          <li>
-            <Link
-              to="/login"
-              className="nav-login-button"
-            >
-              <span>Login</span>
-              <span className="login-arrow">→</span>
-            </Link>
-          </li>
-
-        </ul>
-      </nav>
-
-      {/* ==========================================
-          REAL-TIME NEW B.TECH NOTIFICATION TOAST ALERT
-      ========================================== */}
-      {showToastAlert && activeAlertItem && (
-        <div 
-          className="notif-toast-alert"
-          onClick={() => {
-            handleOpenNotifications();
-            if (activeAlertItem._id) {
-              navigate(`/notifications?view=${encodeURIComponent(activeAlertItem._id)}`);
-            } else {
-              navigate("/notifications");
-            }
-          }}
-          role="alert"
-          aria-live="polite"
-        >
-          <div className="notif-toast-icon">
-            🔔
-          </div>
-          <div className="notif-toast-body">
-            <div className="notif-toast-header">
-              <span className="notif-toast-tag">
-                B.TECH {activeAlertItem.category || "EXAM"}
-              </span>
-              <span className="notif-toast-time">
-                {formatTimeAgo(activeAlertItem.publishedDate || activeAlertItem.createdAt)}
-              </span>
-            </div>
-            <div className="notif-toast-title">
-              {activeAlertItem.title}
-            </div>
-            <div className="notif-toast-action">
-              View Notice Details →
-            </div>
-          </div>
-          <button 
-            type="button" 
-            className="notif-toast-close"
-            onClick={handleDismissToast}
-            title="Dismiss alert"
-            aria-label="Dismiss alert"
+          {/* Student Portal Button (Header Order: Left, Behind Action: Opens Student Profile / Portal Modal) */}
+          <button
+            type="button"
+            onClick={handleProfileClick}
+            className="px-4 py-1.5 rounded-full bg-[#d0bcff] text-[#23005c] font-body-sm text-[13px] font-bold hover:bg-[#c4b5fd] transition-all shadow-[0_0_16px_rgba(208,188,255,0.3)] cursor-pointer"
+            title="Student Portal Profile"
+            aria-label="Student Portal"
           >
-            ✕
+            Student Portal
+          </button>
+
+          {/* User Account / Login Avatar Button (Header Order: Right, Behind Action: Normal Sign In / Account) */}
+          <Link
+            to="/login"
+            className="w-8 h-8 rounded-full bg-[#12131B] border border-[#8B5CF6]/50 flex items-center justify-center cursor-pointer hover:bg-[#27213B] hover:border-[#8B5CF6] transition-all shadow-sm"
+            title="Sign In / Account"
+            aria-label="Sign In / Account"
+          >
+            <svg
+              className="w-4 h-4 text-[#C4B5FD] stroke-current fill-none stroke-[2]"
+              viewBox="0 0 24 24"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </Link>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            type="button"
+            className="lg:hidden p-2 text-[#A3A3B5] hover:text-[#F5F5FA] focus:outline-none ml-1"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
           </button>
         </div>
-      )}
+      </div>
 
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-[#12131B] border-b border-[#292733] px-6 py-4 flex flex-col gap-3">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2.5 py-2 text-[#A3A3B5] hover:text-[#C4B5FD] font-medium"
+            >
+              {link.icon}
+              <span>{link.name}</span>
+            </Link>
+          ))}
+          <div className="pt-2 border-t border-[#292733] flex items-center justify-between">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleProfileClick();
+              }}
+              className="text-[#C4B5FD] text-sm font-semibold"
+            >
+              Student Portal →
+            </button>
+            <Link
+              to="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xs text-[#A3A3B5] hover:text-[#F5F5FA]"
+            >
+              Sign In
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
