@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const Notification = require("../models/Notification");
 
 // Official JNTUA Examinations API Endpoint
@@ -81,11 +80,6 @@ async function syncJntuaNotifications(force = false) {
   lastSyncTimestamp = now;
 
   try {
-    if (mongoose.connection.readyState !== 1) {
-      console.log("ℹ️ [JNTUA Sync] MongoDB not connected yet. Waiting for connection before syncing...");
-      return { synced: 0, message: "Database not connected" };
-    }
-
     console.log("🔄 [JNTUA Sync] Checking official JNTUA for B.Tech examination updates...");
 
     // Clean up non-B.Tech notices from database to keep notifications pure
@@ -208,24 +202,16 @@ async function syncJntuaNotifications(force = false) {
  * Background auto-sync scheduler: runs on startup and every 10 minutes
  */
 function startJntuaAutoSync() {
-  const runSync = () => {
+  setTimeout(() => {
     syncJntuaNotifications(true).catch((err) =>
       console.error("Initial JNTUA B.Tech sync error:", err)
     );
-  };
-
-  if (mongoose.connection.readyState === 1) {
-    runSync();
-  } else {
-    mongoose.connection.once("connected", runSync);
-  }
+  }, 2000);
 
   setInterval(() => {
-    if (mongoose.connection.readyState === 1) {
-      syncJntuaNotifications().catch((err) =>
-        console.error("Periodic JNTUA B.Tech sync error:", err)
-      );
-    }
+    syncJntuaNotifications().catch((err) =>
+      console.error("Periodic JNTUA B.Tech sync error:", err)
+    );
   }, 10 * 60 * 1000);
 }
 

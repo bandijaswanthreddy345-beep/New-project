@@ -21,8 +21,6 @@ export default defineConfig({
     include: ['react', 'react-dom', 'border-beam', 'bot-avatars'],
   },
   server: {
-    port: 5173,
-    strictPort: false,
     watch: {
       usePolling: true,
       interval: 1000,
