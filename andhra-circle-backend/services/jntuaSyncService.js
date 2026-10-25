@@ -71,6 +71,11 @@ let lastSyncTimestamp = 0;
  * Synchronizes strictly B.Tech Examination notifications from official JNTUA website
  */
 async function syncJntuaNotifications(force = false) {
+  const mongoose = require("mongoose");
+  if (mongoose.connection.readyState !== 1) {
+    return { synced: 0, message: "MongoDB not connected, skipping background sync" };
+  }
+
   const now = Date.now();
   // Rate-limit background sync to at most once every 3 minutes unless forced
   if (!force && now - lastSyncTimestamp < 3 * 60 * 1000) {
