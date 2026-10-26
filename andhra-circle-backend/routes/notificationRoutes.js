@@ -11,8 +11,10 @@ const {
   increaseViews,
   increaseDownloads,
   syncJntua,
+  proxyPdf,
 } = require("../controllers/notificationController");
 
+router.get("/proxy-pdf", proxyPdf);
 router.get("/sync", syncJntua);
 router.post("/sync", syncJntua);
 

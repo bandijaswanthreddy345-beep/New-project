@@ -1,7 +1,7 @@
-const User = require("../models/User");
+const User = require("../models/user");
 const Note = require("../models/note");
-const Paper = require("../models/Paper");
-const Syllabus = require("../models/Syllabus");
+const Paper = require("../models/paper");
+const Syllabus = require("../models/syllabus");
 const Notification = require("../models/Notification");
 const LabProgram = require("../models/LabProgram");
 

@@ -372,8 +372,8 @@ exports.getBranchStats = async (req, res) => {
       });
     }
 
-    const Paper = require("../models/Paper");
-    const Syllabus = require("../models/Syllabus");
+    const Paper = require("../models/paper");
+    const Syllabus = require("../models/syllabus");
     const LabProgram = require("../models/LabProgram");
 
     const [notes, papers, syllabus, labs] = await Promise.all([
