@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import profileImg from "../assets/jaswanth.png.png";
 import "./StudentProfileModal.css";
@@ -7,6 +7,7 @@ import { getStoredStudentData, saveStoredStudentData } from "../data/studentData
 
 function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   const [student, setStudent] = useState(getStoredStudentData());
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "grades" | "notes" | "edit"
   const [editForm, setEditForm] = useState(student);
@@ -20,6 +21,54 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
       setSaveSuccess(false);
     }
   }, [isOpen]);
+
+  const modalAvatar = student.profilePhoto && student.profilePhoto !== "none"
+    ? student.profilePhoto
+    : (student.profilePhoto === "none" ? null : profileImg);
+
+  const editAvatarPreview = editForm.profilePhoto && editForm.profilePhoto !== "none"
+    ? editForm.profilePhoto
+    : (editForm.profilePhoto === "none" ? null : modalAvatar);
+
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file (PNG, JPG, WEBP).");
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      alert("Photo file is too large (maximum 4MB).");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Data = reader.result;
+      setEditForm((prev) => ({ ...prev, profilePhoto: base64Data }));
+      const updated = {
+        ...student,
+        ...editForm,
+        profilePhoto: base64Data,
+      };
+      saveStoredStudentData(updated);
+      setStudent(updated);
+      if (onProfileUpdated) onProfileUpdated(updated);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePhoto = () => {
+    setEditForm((prev) => ({ ...prev, profilePhoto: "none" }));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    const updated = {
+      ...student,
+      ...editForm,
+      profilePhoto: "none",
+    };
+    saveStoredStudentData(updated);
+    setStudent(updated);
+    if (onProfileUpdated) onProfileUpdated(updated);
+  };
 
   // Close on Escape key press
   useEffect(() => {
@@ -101,7 +150,21 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
         {/* Student Identity Card Bar */}
         <div className="sp-identity-card">
           <div className="sp-avatar-wrapper">
-            <img src={profileImg} alt={student.name} className="sp-avatar-img" />
+            {modalAvatar ? (
+              <img 
+                src={modalAvatar} 
+                alt={student.name || "Student Profile"} 
+                className="sp-avatar-img"
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+              />
+            ) : (
+              <div className="sp-avatar-placeholder-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+            )}
             <span className="sp-status-indicator" title="Active Student Status" />
           </div>
 
@@ -352,6 +415,55 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
                     ✓ Profile updated successfully! Changes saved locally.
                   </div>
                 )}
+
+                {/* Profile Photo Edit Strip */}
+                <div className="sp-modal-photo-strip">
+                  <div className="sp-modal-photo-preview-wrap">
+                    {editAvatarPreview ? (
+                      <img
+                        src={editAvatarPreview}
+                        alt="Preview"
+                        className="sp-modal-photo-thumb"
+                      />
+                    ) : (
+                      <div className="sp-modal-photo-placeholder-thumb">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="sp-modal-photo-cta">
+                    <span className="sp-modal-photo-title">Profile Picture</span>
+                    <span className="sp-modal-photo-desc">Upload a custom photo or remove to use the default icon.</span>
+                    <div className="sp-modal-photo-btn-row">
+                      <button
+                        type="button"
+                        className="sp-btn-upload-photo"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        📷 Upload Photo
+                      </button>
+                      {editAvatarPreview && (
+                        <button
+                          type="button"
+                          className="sp-btn-remove-photo"
+                          onClick={handleRemovePhoto}
+                        >
+                          🗑️ Remove Photo
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={handlePhotoUpload}
+                    />
+                  </div>
+                </div>
 
                 <div className="sp-form-grid">
                   <div className="sp-field">

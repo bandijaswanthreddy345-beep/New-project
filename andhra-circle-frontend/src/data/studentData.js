@@ -1,101 +1,127 @@
-export const DEFAULT_STUDENT_DATA = {
-  name: "Chinnu",
-  shortName: "Chinnu",
+// Initial 8-Semester Grade Matrix
+export const INITIAL_SEMESTERS = [
+  { sem: "Sem 1", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 2", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 3", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 4", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 5", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 6", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 7", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 8", sgpa: "", credits: 20, status: "Not Started" },
+];
+
+export const EMPTY_STUDENT_DATA = {
+  name: "",
+  shortName: "",
   role: "Student",
-  hallTicket: "22B91A4201",
-  college: "JNTU College of Engineering (Autonomous)",
-  university: "Jawaharlal Nehru Technological University",
-  branch: "Artificial Intelligence & Machine Learning",
-  branchCode: "AIML",
-  year: "3rd Year",
-  semester: "6th Semester",
-  regulation: "R20 Regulation",
-  cgpa: "8.85",
-  credits: "132 / 160",
-  attendance: "89.4%",
-  email: "chinnu@student.jntu.ac.in",
-  phone: "+91 98765 43210",
-  batch: "2022 - 2026",
-  mentor: "Dr. K. S. Rao, Professor (Dept. of AIML)",
-  savedNotes: [
-    {
-      id: "aiml-601",
-      title: "Deep Learning & Neural Networks",
-      code: "AIML601",
-      branch: "AIML",
-      sem: "6th Sem",
-      units: "5 Units Complete",
-      faculty: "Prof. K. S. Rao",
-      downloads: "1.4k",
-    },
-    {
-      id: "aiml-602",
-      title: "Natural Language Processing (NLP)",
-      code: "AIML602",
-      branch: "AIML",
-      sem: "6th Sem",
-      units: "4 Units + Labs",
-      faculty: "Dr. M. V. Sharma",
-      downloads: "980",
-    },
-    {
-      id: "aiml-501",
-      title: "Machine Learning Fundamentals",
-      code: "AIML501",
-      branch: "AIML",
-      sem: "5th Sem",
-      units: "Complete Handwritten Notes",
-      faculty: "Prof. A. Lakshmi",
-      downloads: "2.1k",
-    },
-    {
-      id: "aiml-403",
-      title: "Big Data Analytics & Cloud Storage",
-      code: "AIML403",
-      branch: "AIML",
-      sem: "4th Sem",
-      units: "Exam Question Bank Included",
-      faculty: "Dr. P. Suresh",
-      downloads: "1.1k",
-    },
-  ],
-  semesterGrades: [
-    { sem: "Sem 1", sgpa: "8.60", credits: 21, status: "Distinction" },
-    { sem: "Sem 2", sgpa: "8.90", credits: 21, status: "Distinction" },
-    { sem: "Sem 3", sgpa: "9.10", credits: 22, status: "Top 3 Rank" },
-    { sem: "Sem 4", sgpa: "8.75", credits: 22, status: "Distinction" },
-    { sem: "Sem 5", sgpa: "9.05", credits: 23, status: "Top 5 Rank" },
-    { sem: "Sem 6", sgpa: "In Progress", credits: 23, status: "Active Sem" },
-  ],
+  hallTicket: "", // USN / Roll No
+  college: "",
+  university: "JNTU (Autonomous & Affiliated Colleges)",
+  branch: "",
+  branchCode: "",
+  year: "1st Year",
+  semester: "1st Semester",
+  regulation: "R23 Regulation",
+  cgpa: "",
+  credits: "0 / 160",
+  attendance: "75%",
+  attendancePercentage: 75,
+  email: "",
+  phone: "",
+  batch: "2023 - 2027",
+  mentor: "",
+  profilePhoto: null, // Base64 data URL or image path
+  isConfigured: false,
+  savedNotes: [],
+  semesterGrades: INITIAL_SEMESTERS,
 };
 
+export const DEFAULT_STUDENT_DATA = EMPTY_STUDENT_DATA;
+
+// Calculate automatic CGPA from valid semester SGPAs
+export function calculateCgpaFromGrades(grades = []) {
+  const validScores = grades
+    .map((g) => parseFloat(g.sgpa))
+    .filter((score) => !isNaN(score) && score > 0 && score <= 10);
+  
+  if (validScores.length === 0) return "";
+  const sum = validScores.reduce((acc, curr) => acc + curr, 0);
+  return (sum / validScores.length).toFixed(2);
+}
+
+// Check if a profile is already configured in this browser
+export function hasStoredStudentProfile() {
+  try {
+    const raw = localStorage.getItem("jntu_student_profile");
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    return Boolean(parsed && parsed.isConfigured && parsed.name?.trim());
+  } catch (e) {
+    return false;
+  }
+}
+
+// Retrieve stored student data, or return clean template if not configured
 export function getStoredStudentData() {
   try {
     const raw = localStorage.getItem("jntu_student_profile");
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Automatically migrate any previous default names to Chinnu
-      if (parsed.name === "Bandi Jaswanth Reddy" || parsed.shortName === "Jaswanth") {
-        parsed.name = "Chinnu";
-        parsed.shortName = "Chinnu";
-        if (parsed.email === "jaswanth.bandi@student.jntu.ac.in") {
-          parsed.email = "chinnu@student.jntu.ac.in";
-        }
-        localStorage.setItem("jntu_student_profile", JSON.stringify(parsed));
-      }
-      return { ...DEFAULT_STUDENT_DATA, ...parsed };
+      // Ensure all 8 semesters exist
+      const mergedGrades = INITIAL_SEMESTERS.map((initSem, idx) => {
+        const found = parsed.semesterGrades?.[idx];
+        return found ? { ...initSem, ...found } : initSem;
+      });
+
+      return {
+        ...EMPTY_STUDENT_DATA,
+        ...parsed,
+        semesterGrades: mergedGrades,
+        isConfigured: Boolean(parsed.name?.trim()),
+      };
     }
   } catch (e) {
     console.error("Error reading student profile from localStorage:", e);
   }
-  return DEFAULT_STUDENT_DATA;
+  return { ...EMPTY_STUDENT_DATA, isConfigured: false };
 }
 
+// Persist student profile data to local storage
 export function saveStoredStudentData(data) {
   try {
-    localStorage.setItem("jntu_student_profile", JSON.stringify(data));
+    const updated = {
+      ...data,
+      isConfigured: true,
+      shortName: data.name ? data.name.trim().split(" ")[0] : "Student",
+    };
+
+    // Auto-update CGPA if semester grades are provided and not manually overridden
+    if (Array.isArray(updated.semesterGrades) && updated.semesterGrades.length > 0) {
+      const calculated = calculateCgpaFromGrades(updated.semesterGrades);
+      if (calculated && (!updated.cgpa || updated.cgpa === "0.00" || updated.cgpa === "")) {
+        updated.cgpa = calculated;
+      }
+    }
+
+    localStorage.setItem("jntu_student_profile", JSON.stringify(updated));
     window.dispatchEvent(new Event("studentProfileUpdated"));
+    return updated;
   } catch (e) {
     console.error("Error saving student profile to localStorage:", e);
+    return data;
   }
 }
+
+// Clear / Logout student profile from this device
+export function clearStoredStudentData() {
+  try {
+    localStorage.removeItem("jntu_student_profile");
+    window.dispatchEvent(new Event("studentProfileUpdated"));
+  } catch (e) {
+    console.error("Error logging out student profile:", e);
+  }
+}
+
+// Alias for convenience
+export const logoutStudentProfile = clearStoredStudentData;
+
