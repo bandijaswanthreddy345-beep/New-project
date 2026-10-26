@@ -198,7 +198,18 @@ async function syncJntuaNotifications(force = false) {
 
     return { synced: newlyAdded };
   } catch (error) {
-    console.error("⚠️ [JNTUA Sync Error]:", error.message);
+    if (
+      error.name === "AbortError" ||
+      error.message?.includes("fetch failed") ||
+      error.code === "ENOTFOUND" ||
+      error.code === "ETIMEDOUT"
+    ) {
+      console.warn(
+        "ℹ️ [JNTUA Sync Notice]: Official JNTUA portal temporarily unreachable (network blip). Will retry automatically."
+      );
+    } else {
+      console.error("⚠️ [JNTUA Sync Error]:", error.message);
+    }
     return { synced: 0, error: error.message };
   }
 }

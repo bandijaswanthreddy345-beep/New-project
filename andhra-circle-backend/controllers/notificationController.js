@@ -279,3 +279,50 @@ exports.increaseDownloads = async (req, res) => {
     });
   }
 };
+
+// ==========================================
+// STREAM / PROXY PDF FROM GOOGLE DRIVE / DIRECT URLS
+// ==========================================
+
+exports.proxyPdf = async (req, res) => {
+  const { url } = req.query;
+  if (!url) {
+    return res.status(400).send("No document URL provided");
+  }
+
+  try {
+    let targetUrl = url;
+
+    // Handle Google Drive links
+    const driveMatch =
+      url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+      url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+
+    if (driveMatch) {
+      const fileId = driveMatch[1];
+      targetUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    }
+
+    const response = await fetch(targetUrl, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).send("Failed to stream document");
+    }
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'inline; filename="document.pdf"');
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const arrayBuffer = await response.arrayBuffer();
+    res.send(Buffer.from(arrayBuffer));
+  } catch (error) {
+    console.error("Proxy PDF Error:", error);
+    res.status(500).send("Error streaming PDF document");
+  }
+};
+

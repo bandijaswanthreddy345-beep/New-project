@@ -609,6 +609,18 @@ function NoteDetails() {
   // BACK TO TOP
   // =========================================================
 
+  // =========================================================
+  // BACK NAVIGATION TO ALL NOTES
+  // =========================================================
+
+  const handleBackToNotes = () => {
+    if (note?.branch) {
+      navigate(`/notes?branch=${encodeURIComponent(note.branch)}`);
+    } else {
+      navigate("/notes");
+    }
+  };
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -660,10 +672,10 @@ function NoteDetails() {
 
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={handleBackToNotes}
             className="green-button"
           >
-            ← Go Back
+            ← Back to Notes
           </button>
         </div>
       </div>
@@ -760,6 +772,58 @@ function NoteDetails() {
         </div>
       )}
 
+      {/* =========================================================
+          TOP NAVIGATION BAR (MATCHING NOTIFICATIONS)
+          Anchored Logo Left + Close (✕) Button Right
+          ========================================================= */}
+      <header className="notif-page-header">
+        <div className="notif-page-header-inner">
+          <div
+            className="notif-header-left"
+            onClick={() => navigate("/")}
+            title="Return to Homepage"
+          >
+            <img
+              src="/jntu-circle-logo.png"
+              alt="JNTU Circle"
+              className="notif-page-logo"
+            />
+            <div>
+              <h2 className="notif-brand-title">
+                <span className="font-deltha">JNTU</span> Circle
+              </h2>
+              <span className="notif-brand-subtitle">
+                Official University Study Materials & Notes
+              </span>
+            </div>
+          </div>
+
+          <div className="notif-header-right">
+            <button
+              type="button"
+              className="notif-header-close-btn"
+              onClick={handleBackToNotes}
+              title="Close and Return to All Notes"
+              aria-label="Close and Return to All Notes"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
       {/* =====================================================
           TWO-COLUMN PAGE LAYOUT (DESKTOP) / STACKED (MOBILE)
       ====================================================== */}
@@ -770,24 +834,6 @@ function NoteDetails() {
           ====================================================== */}
           <section className="note-hero">
         <div className="note-hero-content">
-          <div className="note-hero-topbar">
-            <button
-              type="button"
-              className="hero-back-button"
-              onClick={() => navigate(-1)}
-            >
-              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H16" />
-              </svg>
-              <span>Back</span>
-            </button>
-
-            <span className="hero-topbar-label">
-              <span aria-hidden="true"></span>
-              JNTU CIRCLE · STUDY RESOURCE
-            </span>
-          </div>
-
           <div className="hero-main">
             <div className="hero-heading-layout">
               <div className="hero-title-block">
@@ -841,9 +887,8 @@ function NoteDetails() {
 
               <div className="hero-credits-integrated" aria-label="Course credits">
                 <div className="hero-credits-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M12 3.5 14.4 8.4l5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8L12 3.5Z" />
-                    <path d="M8.2 19.4v2.1l3.8-1.8 3.8 1.8v-2.1" />
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                   </svg>
                 </div>
                 <div className="hero-credits-copy">

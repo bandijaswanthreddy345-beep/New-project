@@ -1,4 +1,4 @@
-const Syllabus = require("../models/Syllabus");
+const Syllabus = require("../models/syllabus");
 
 // Create Syllabus
 exports.createSyllabus = async (req, res) => {
