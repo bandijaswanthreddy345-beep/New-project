@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "./LikeReactionButton";
+import Footer from "./Footer";
+import AuthorProfile from "./AuthorProfile";
 
 // Curated official JNTU academic notices as standard fallback
 const CURATED_NOTICES = [
@@ -73,6 +75,7 @@ function Notifications({ search = "" }) {
     }
   });
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [toastMessage, setToastMessage] = useState("");
 
   useEffect(() => {
     fetchNotifications();
@@ -262,6 +265,21 @@ function Notifications({ search = "" }) {
     return `${Math.floor(diff / 60)}h ago`;
   };
 
+  // Helper to convert links into embeddable format
+  const getEmbedUrl = (link) => {
+    if (!link) return "";
+    if (link.includes("drive.google.com")) {
+      return link.replace(/\/view(\?.*)?$/, "/preview").replace(/\/edit(\?.*)?$/, "/preview");
+    }
+    if (link.includes("docs.google.com/viewer")) {
+      return link;
+    }
+    if (link.startsWith("http") && !link.includes("localhost:5000")) {
+      return `https://docs.google.com/viewer?url=${encodeURIComponent(link)}&embedded=true`;
+    }
+    return link;
+  };
+
   const handleDownload = async (notification) => {
     try {
       if (notification._id && !notification._id.startsWith("notice-")) {
@@ -281,7 +299,32 @@ function Notifications({ search = "" }) {
         return;
       }
 
-      window.open(notification.link, "_blank");
+      const downloadName = `${(notification.title || "circular").slice(0, 45).replace(/[^a-zA-Z0-9_-]/g, "_")}.pdf`;
+
+      // 1. Try seamless download via fetch blob so the student remains in the project
+      try {
+        const resp = await fetch(notification.link, { mode: "cors" });
+        if (resp.ok) {
+          const blob = await resp.blob();
+          const blobUrl = window.URL.createObjectURL(blob);
+          const tempA = document.createElement("a");
+          tempA.href = blobUrl;
+          tempA.download = downloadName;
+          document.body.appendChild(tempA);
+          tempA.click();
+          document.body.removeChild(tempA);
+          window.URL.revokeObjectURL(blobUrl);
+
+          setToastMessage(`Downloaded "${notification.title.slice(0, 32)}..." You are safely in the project.`);
+          setTimeout(() => setToastMessage(""), 4000);
+          return;
+        }
+      } catch {
+        // Fallback if CORS prevents blob download
+      }
+
+      // 2. Fallback: Open in our dedicated Project PDF Reader with prominent "Back to Project" topbar
+      navigate(`/pdf/circular.pdf?url=${encodeURIComponent(notification.link)}&title=${encodeURIComponent(notification.title)}&source=notifications`);
     } catch (error) {
       console.error(error);
     }
@@ -400,50 +443,63 @@ function Notifications({ search = "" }) {
   ];
 
   return (
-    <section id="notifications-section" className="notification-section">
-      {/* Top Page Navigation Bar with Back Button in the Left Corner */}
-      <div className="notif-page-topbar">
-        <button
-          type="button"
-          className="notif-back-btn"
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate("/");
-            }
-          }}
-          title="Go back to previous page"
-        >
-          <span className="notif-back-icon-wrap" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-          </span>
-          <span>Back</span>
-        </button>
-
-        <div className="notif-topbar-breadcrumb">
-          <button type="button" onClick={() => navigate("/")} className="notif-breadcrumb-link">
-            Home
-          </button>
-          <span className="notif-breadcrumb-slash">/</span>
-          <span className="notif-breadcrumb-current">
-            <span className="notif-breadcrumb-dot" aria-hidden="true" />
-            B.Tech Notifications
-          </span>
+    <div className="notif-page-wrapper">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="pdf-floating-toast">
+          <span className="toast-dot" />
+          <span>{toastMessage}</span>
         </div>
-      </div>
+      )}
 
-      {/* Enhanced Section Heading */}
-      <div className="section-heading notif-section-heading">
-        <span className="section-tag">
-          <span className="notif-tag-pulse" aria-hidden="true" />
-          B.TECH UNIVERSITY ANNOUNCEMENTS
-        </span>
-        <h2>B.Tech Notifications & Circulars</h2>
-      </div>
+      {/* =========================================================
+          TOP NAVIGATION BAR (MATCHING STUDENT PROFILE FOREST GREEN)
+          Anchored Logo Left + Close (✕) Button Right
+          ========================================================= */}
+      <header className="notif-page-header">
+        <div className="notif-page-header-inner">
+          <div className="notif-header-left" onClick={() => navigate("/")} title="Return to Homepage">
+            <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="notif-page-logo" />
+            <div>
+              <h2 className="notif-brand-title">
+                <span className="font-deltha">JNTU</span> Circle
+              </h2>
+              <span className="notif-brand-subtitle">Official University Announcements & Circulars</span>
+            </div>
+          </div>
+
+          <div className="notif-header-right">
+            <button
+              type="button"
+              className="notif-header-close-btn"
+              onClick={() => navigate(-1)}
+              title="Close and Return"
+              aria-label="Close and Return"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Two-column layout: left = notifications, right = Developers sidebar */}
+      <div className="notif-page-layout">
+
+        {/* ===== LEFT COLUMN: Main notifications content ===== */}
+        <main className="notif-left-column">
+
+      <section id="notifications-section" className="notification-section">
+        {/* Enhanced Section Heading */}
+        <div className="section-heading notif-section-heading">
+          <span className="section-tag">
+            <span className="notif-tag-pulse" aria-hidden="true" />
+            B.TECH UNIVERSITY ANNOUNCEMENTS
+          </span>
+          <h2>B.Tech Notifications & Circulars</h2>
+        </div>
 
       {/* =========================================================
           NEW PORTION: QUICK NOTICE SUMMARY / LIVE UPDATES COUNTER
@@ -730,31 +786,19 @@ function Notifications({ search = "" }) {
             className="notif-modal-card" 
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Top Header with Prominent Back Option */}
+            {/* Modal Top Header */}
             <div className="notif-modal-header">
-              <button
-                type="button"
-                className="notif-modal-back-btn"
-                onClick={handleCloseNotice}
-                title="Back to notifications"
-                autoFocus
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="19" y1="12" x2="5" y2="12" />
-                  <polyline points="12 19 5 12 12 5" />
-                </svg>
-                <span>← Back to Notifications</span>
-              </button>
-
-              <span className="notif-modal-badge">
-                JNTUA B.Tech Official
-              </span>
+              <div className="notif-modal-header-left">
+                <span className="notif-modal-badge">
+                  Official JNTU University Circular
+                </span>
+              </div>
 
               <button
                 type="button"
                 className="notif-modal-close-btn"
                 onClick={handleCloseNotice}
-                title="Close (Esc)"
+                title="Close"
                 aria-label="Close modal"
               >
                 ✕
@@ -806,6 +850,38 @@ function Notifications({ search = "" }) {
                 </p>
               </div>
 
+              {/* Embedded Document Preview with Direct Full-Screen in Project Reader */}
+              {viewingNotice.link && (
+                <div className="notif-modal-doc-preview-container">
+                  <div className="notif-preview-toolbar">
+                    <span className="notif-preview-title">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                      </svg>
+                      Official Attached Circular Document
+                    </span>
+                    <button
+                      type="button"
+                      className="notif-preview-fullscreen-btn"
+                      onClick={() => {
+                        navigate(`/pdf/circular.pdf?url=${encodeURIComponent(viewingNotice.link)}&title=${encodeURIComponent(viewingNotice.title)}&source=notifications`);
+                      }}
+                      title="Open full-screen in Project PDF Reader with Back to Project button"
+                    >
+                      <span>Open Full-Screen in Project Viewer →</span>
+                    </button>
+                  </div>
+                  <iframe
+                    src={getEmbedUrl(viewingNotice.link)}
+                    title={viewingNotice.title}
+                    className="notif-preview-iframe"
+                  />
+                </div>
+              )}
+
               {/* Notice Live Metrics & Like Reactions */}
               <div className="notif-modal-stats-row">
                 <div className="modal-stats-group">
@@ -853,20 +929,20 @@ function Notifications({ search = "" }) {
 
               <div className="notif-modal-footer-right">
                 {viewingNotice.link && (
-                  <a
-                    href={viewingNotice.link}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
                     className="notif-btn-external"
-                    title="Open on official university portal"
+                    onClick={() => {
+                      navigate(`/pdf/circular.pdf?url=${encodeURIComponent(viewingNotice.link)}&title=${encodeURIComponent(viewingNotice.title)}&source=notifications`);
+                    }}
+                    title="Read in Project PDF Reader with Back Option"
                   >
-                    <span>Open Official Portal / PDF</span>
+                    <span>Read in Project PDF Reader</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
                     </svg>
-                  </a>
+                  </button>
                 )}
 
                 <button
@@ -888,6 +964,18 @@ function Notifications({ search = "" }) {
         </div>
       )}
     </section>
+
+        </main>{/* end notif-left-column */}
+
+        {/* ===== RIGHT COLUMN: Developers sticky sidebar ===== */}
+        <aside className="notif-right-column">
+          <AuthorProfile />
+        </aside>
+
+      </div>{/* end notif-page-layout */}
+
+      <Footer />
+    </div>
   );
 }
 

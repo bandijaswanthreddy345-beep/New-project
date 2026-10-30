@@ -15,6 +15,7 @@ const BRANCH_FILTERS = [
   { key: "ME", codeBadge: "ME", label: "Mechanical Engineering", matchTerms: ["me", "mech", "mechanical"] },
   { key: "CE", codeBadge: "CE", label: "Civil Engineering", matchTerms: ["ce", "civil"] },
   { key: "AIML", codeBadge: "AIML", label: "AI & Machine Learning", matchTerms: ["aiml", "artificial intelligence", "machine learning"] },
+  { key: "EEE", codeBadge: "EEE", label: "Electrical & Electronics", matchTerms: ["eee", "electrical", "ee"] },
 ];
 
 const SEMESTER_OPTIONS = [

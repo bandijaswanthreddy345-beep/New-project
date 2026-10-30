@@ -52,6 +52,15 @@ const BRANCHES = [
     accent: "#00d4ff",
     filterQuery: "Civil",
   },
+  {
+    id: "06",
+    name: "Electrical & Electronics",
+    code: "EEE",
+    tag: "POWER SYSTEMS & CIRCUITS",
+    image: "/branches/eee.jpg",
+    accent: "#00d4ff",
+    filterQuery: "Electrical",
+  },
 ];
 
 function BranchSection({ selectedBranch = "", onSelectBranch = null }) {

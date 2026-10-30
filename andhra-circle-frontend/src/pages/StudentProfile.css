@@ -1,37 +1,44 @@
 /* =========================================================
-   JNTU CIRCLE — STUDENT PROFILE PAGE STYLES
-   Executive University Identity Card Design
+   JNTU CIRCLE — STUDENT ACADEMIC PROFILE & IDENTITY CARD
+   Bot Reference Colors: Deep Obsidian Forest (#01221e, #013a33, #052621),
+   Sunbeam Gold (#ffefb3, #fed866), Luminous Emerald (#34d399)
+   Single-Screen Compact Layout (No Forced Scrollbar)
    ========================================================= */
 
 .student-profile-page {
   min-height: 100vh;
-  background: #f3f8f6;
+  background: #f1f7f5;
   display: flex;
   flex-direction: column;
   font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #012622;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* =========================================================
-   TOP NAVIGATION BAR (STICKY MIDNIGHT EMERALD)
+   TOP NAVIGATION BAR (ANCHORED LOGO AT FAR LEFT CORNER)
    ========================================================= */
 
 .sp-page-header {
-  background: #002420;
-  border-bottom: 1px solid rgba(255, 239, 179, 0.15);
+  background: #013a33;
+  border-bottom: 1px solid rgba(255, 239, 179, 0.2);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+  width: 100%;
 }
 
 .sp-page-header-inner {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 13px 24px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-sizing: border-box;
 }
 
 .sp-header-left {
@@ -43,30 +50,28 @@
 }
 
 .sp-header-left:hover {
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 .sp-page-logo {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 239, 179, 0.4);
-  background: #013e37;
+  border: 1.5px solid rgba(255, 239, 179, 0.5);
+  background: #0d453c;
   padding: 2px;
-  box-shadow: 0 0 14px rgba(217, 167, 38, 0.25);
+  box-shadow: 0 0 14px rgba(255, 239, 179, 0.3);
 }
 
 .sp-brand-title {
   color: #ffffff;
-  font-size: 17px;
+  font-size: 17.5px;
   font-weight: 800;
   margin: 0;
   line-height: 1.15;
-  letter-spacing: -0.2px;
 }
 
 .sp-brand-title .font-deltha {
-  font-family: 'Deltha', 'Deltha Font', sans-serif;
   color: #ffefb3;
 }
 
@@ -80,79 +85,117 @@
 .sp-header-right {
   display: flex;
   align-items: center;
-  gap: 12px;
 }
 
-.sp-header-nav-btn {
+/* Close / Wrong Symbol (✕) Back Button */
+.sp-header-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 239, 179, 0.25);
+  border: 1.5px solid rgba(255, 239, 179, 0.35);
   color: #ffefb3;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.sp-header-nav-btn:hover {
-  background: rgba(217, 167, 38, 0.25);
-  color: #ffffff;
-  border-color: #d9a726;
-  transform: translateX(-2px);
-}
-
-.sp-header-home-btn {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sp-header-home-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+.sp-header-close-btn:hover {
+  background: #ffefb3;
+  color: #013a33;
+  border-color: #ffefb3;
+  transform: scale(1.08) rotate(90deg);
+  box-shadow: 0 0 16px rgba(255, 239, 179, 0.45);
 }
 
 /* =========================================================
-   MAIN CREDENTIAL CARD CONTAINER
+   FLOATING TOAST
+   ========================================================= */
+
+.sp-floating-toast {
+  position: fixed;
+  top: 70px;
+  right: 28px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #013a33;
+  color: #ffffff;
+  border: 1.5px solid #ffefb3;
+  padding: 10px 22px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  font-size: 13.5px;
+  font-weight: 700;
+  animation: spSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sp-toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffefb3;
+  color: #013a33;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+@keyframes spSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   MAIN CONTAINER (ONE-PAGE COMPACT EXECUTIVE LAYOUT)
    ========================================================= */
 
 .sp-page-main {
   flex: 1;
-  max-width: 1080px;
-  width: 100%;
-  margin: 32px auto 48px;
+  max-width: 1440px;
+  width: 96%;
+  margin: 12px auto 20px;
   padding: 0 20px;
   box-sizing: border-box;
 }
 
-.sp-page-card {
-  background: #ffffff;
-  border-radius: 24px;
-  box-shadow: 
-    0 16px 42px rgba(1, 62, 55, 0.08),
-    0 2px 6px rgba(0, 0, 0, 0.03);
-  border: 1px solid #dbeae4;
-  overflow: hidden;
-}
-
 /* =========================================================
-   ACADEMIC BANNER (DEEP EMERALD WITH GOLD SEAL)
+   AUTHENTICATED CARD STYLES (SINGLE-SCREEN FIT)
    ========================================================= */
 
-.sp-page-banner {
-  height: 130px;
-  background: radial-gradient(ellipse at 85% 20%, #07574c 0%, #013e37 55%, #002420 100%);
-  position: relative;
+.sp-page-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 
+    0 12px 36px rgba(1, 58, 51, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.03);
+  border: 1px solid #cfe2dc;
   overflow: hidden;
-  padding: 20px 32px;
+  animation: spFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
   box-sizing: border-box;
-  border-bottom: 1px solid rgba(255, 239, 179, 0.15);
+}
+
+/* Academic Banner with Three Dots Menu */
+.sp-page-banner {
+  height: 92px;
+  background: radial-gradient(ellipse at 85% 20%, #154e43 0%, #0d453c 50%, #013a33 100%);
+  position: relative;
+  overflow: visible;
+  padding: 14px 28px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255, 239, 179, 0.2);
 }
 
 .sp-page-banner-glow {
@@ -162,7 +205,7 @@
   width: 320px;
   height: 320px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(217, 167, 38, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 239, 179, 0.22) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -171,134 +214,268 @@
   align-items: center;
   justify-content: flex-end;
   position: relative;
-  z-index: 1;
+  z-index: 20;
 }
 
-.sp-academic-year {
-  background: rgba(255, 239, 179, 0.14);
-  border: 1px solid rgba(255, 239, 179, 0.35);
+/* Three Dots (Kebab) Button & Dropdown */
+.sp-kebab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1.5px solid rgba(255, 239, 179, 0.4);
   color: #ffefb3;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0.3px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+
+.sp-kebab-btn:hover {
+  background: #ffefb3;
+  color: #013a33;
+  border-color: #ffefb3;
+  transform: scale(1.06);
+}
+
+.sp-kebab-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  min-width: 175px;
+  background: #02201c;
+  border: 1.5px solid rgba(255, 239, 179, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 16px rgba(1, 58, 51, 0.3);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  animation: spFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sp-kebab-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: #f1f5f9;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  text-align: left;
+}
+
+.sp-kebab-item:hover {
+  background: rgba(255, 239, 179, 0.15);
+  color: #ffefb3;
+}
+
+.sp-kebab-item-logout {
+  color: #fca5a5;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 3px;
+  padding-top: 8px;
+}
+
+.sp-kebab-item-logout:hover {
+  background: rgba(239, 68, 68, 0.22);
+  color: #ffffff;
 }
 
 /* =========================================================
-   IDENTITY BAR (FIXED: NO NAME OVERLAPPING, 100% CLEAN CONTRAST)
+   IDENTITY BAR (COMPACT & CLEAN, NO REDUNDANT BUTTONS)
    ========================================================= */
 
 .sp-page-identity {
   position: relative;
-  padding: 0 32px 24px;
+  padding: 0 32px 12px;
   display: flex;
-  align-items: flex-start; /* Aligns items cleanly from top edge */
-  gap: 24px;
-  margin-top: 0; /* Container stays on the white card below the banner */
+  align-items: flex-start;
+  gap: 20px;
   border-bottom: 1px solid #eef4f1;
   background: #ffffff;
+  box-sizing: border-box;
 }
 
-/* Elevated Profile Avatar (Only the circular photo overlaps the banner boundary) */
 .sp-avatar-holder {
   position: relative;
-  width: 108px;
-  height: 108px;
+  width: 96px;
+  height: 96px;
   flex-shrink: 0;
-  margin-top: -54px; /* Exactly half of 108px avatar crosses into the banner */
+  margin-top: -48px;
   z-index: 5;
 }
 
 .sp-profile-photo {
-  width: 108px;
-  height: 108px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4.5px solid #ffffff;
+  border: 4px solid #ffffff;
   box-shadow: 
-    0 10px 28px rgba(1, 62, 55, 0.22),
+    0 8px 24px rgba(1, 58, 51, 0.2),
     0 2px 6px rgba(0, 0, 0, 0.08);
-  background: #013e37;
+  background: #013a33;
   display: block;
+}
+
+.sp-profile-photo-placeholder {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  box-shadow: 
+    0 8px 24px rgba(1, 58, 51, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  background: #013a33;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffefb3;
+}
+
+.sp-profile-photo-placeholder svg {
+  width: 44px;
+  height: 44px;
+}
+
+.sp-avatar-placeholder-mini {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #013a33;
+  border: 2px solid #ffefb3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffefb3;
+}
+
+.sp-avatar-placeholder-mini svg {
+  width: 28px;
+  height: 28px;
+}
+
+.sp-btn-remove-photo {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #dc2626;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sp-btn-remove-photo:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  transform: translateY(-1px);
 }
 
 .sp-online-dot {
   position: absolute;
   bottom: 4px;
   right: 4px;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #10b981;
-  border: 3.5px solid #ffffff;
+  border: 3px solid #ffffff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
-/* Identity Details (Starts 14px below the banner, 100% on the crisp white background) */
 .sp-identity-details {
   flex: 1;
   min-width: 0;
-  padding-top: 14px;
+  padding-top: 10px;
 }
 
 .sp-name-badge-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .sp-main-name {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 850;
-  color: #002420;
+  color: #013a33;
   margin: 0;
   line-height: 1.2;
-  letter-spacing: -0.4px;
+  letter-spacing: -0.3px;
 }
 
 .sp-verified-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: #ecfdf5;
   border: 1px solid #a7f3d0;
   color: #065f46;
-  padding: 4px 13px;
+  padding: 3px 11px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 750;
   letter-spacing: 0.2px;
-  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1);
 }
 
 .sp-verified-pill svg {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   color: #059669;
 }
 
 .sp-main-subtext {
-  margin: 0;
+  margin: 0 0 5px 0;
   font-size: 13.5px;
   color: #2d544f;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   flex-wrap: wrap;
-  font-weight: 500;
+  font-weight: 550;
+}
+
+/* College Name: Professional Without Emoji */
+.sp-college-subtext {
+  margin: 0;
+  font-size: 13px;
+  color: #4b6f68;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sp-inst-icon {
+  color: #013a33;
+  flex-shrink: 0;
 }
 
 .sp-main-roll {
   font-family: monospace;
   background: #eef6f3;
-  color: #013e37;
-  padding: 2.5px 9px;
+  color: #013a33;
+  padding: 2px 8px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
   border: 1px solid #d0e7df;
   letter-spacing: 0.5px;
@@ -314,63 +491,38 @@
   font-weight: 750;
 }
 
-/* Action Button */
-.sp-identity-actions {
-  padding-top: 14px;
-  flex-shrink: 0;
-}
-
-.sp-btn-action-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #ffffff;
-  border: 1.5px solid #013e37;
-  color: #013e37;
-  padding: 9px 20px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 750;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 6px rgba(1, 62, 55, 0.05);
-  letter-spacing: 0.2px;
-}
-
-.sp-btn-action-primary:hover,
-.sp-btn-action-primary.active {
-  background: #013e37;
-  color: #ffffff;
-  box-shadow: 0 6px 18px rgba(1, 62, 55, 0.2);
-  transform: translateY(-1.5px);
-}
-
 /* =========================================================
-   ACADEMIC METRICS KPI CARDS (4 EXECUTIVE TILES)
+   4 KPI METRIC TILES (STYLED WITH BOT REFERENCE PALETTE)
+   Compact Height to prevent vertical scrollbar
    ========================================================= */
 
 .sp-page-metrics {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  padding: 22px 32px;
-  background: #fbfdfc;
-  border-bottom: 1px solid #eef4f1;
+  gap: 14px;
+  padding: 14px 32px;
+  background: #021a17; /* Bot Reference Dark Obsidian Forest */
+  border-bottom: 1px solid rgba(255, 239, 179, 0.15);
+  box-sizing: border-box;
 }
 
-.sp-p-metric {
-  background: #ffffff;
-  border: 1px solid #e0efe9;
+.sp-p-metric.sp-metric-bot-theme {
+  background: linear-gradient(145deg, #01221e 0%, #013a33 55%, #052621 100%);
+  border: 1.5px solid rgba(255, 239, 179, 0.3);
   border-radius: 14px;
-  padding: 16px 18px;
-  box-shadow: 0 2px 8px rgba(1, 62, 55, 0.03);
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 14px 18px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 239, 179, 0.18);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.sp-p-metric:hover {
+.sp-p-metric.sp-metric-bot-theme:hover {
   transform: translateY(-2px);
-  border-color: #013e37;
-  box-shadow: 0 8px 20px rgba(1, 62, 55, 0.08);
+  border-color: #ffefb3;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.42), 0 0 18px rgba(255, 239, 179, 0.15);
 }
 
 .sp-metric-header {
@@ -381,76 +533,144 @@
 }
 
 .sp-pm-label {
-  font-size: 11px;
-  font-weight: 800;
-  color: #597b76;
-  letter-spacing: 0.6px;
+  font-size: 10.5px;
+  font-weight: 850;
+  color: #ffefb3;
+  letter-spacing: 0.7px;
   text-transform: uppercase;
 }
 
-.sp-metric-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
+.sp-pm-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 239, 179, 0.25);
 }
 
-.sp-icon-gold { color: #d9a726; }
-.sp-icon-emerald { color: #059669; }
-.sp-icon-blue { color: #0284c7; }
-.sp-icon-purple { color: #9333ea; }
+.sp-metric-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.sp-icon-gold { color: #fed866; }
+.sp-icon-emerald { color: #34d399; }
+.sp-icon-blue { color: #60a5fa; }
+.sp-icon-purple { color: #c084fc; }
 
 .sp-pm-val {
-  font-size: 23px;
-  font-weight: 850;
-  color: #012622;
-  margin-bottom: 4px;
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 2px;
   line-height: 1.15;
+  letter-spacing: -0.3px;
 }
 
 .sp-pm-val.sp-gold {
-  color: #b5830a;
+  color: #fed866;
+  text-shadow: 0 0 16px rgba(254, 216, 102, 0.35);
 }
 
-.sp-pm-val.sp-emerald {
-  color: #059669;
+.sp-pm-val.sp-att-val {
+  color: #34d399;
+  text-shadow: 0 0 16px rgba(52, 211, 153, 0.35);
 }
 
-.sp-pm-val.sp-reg {
+.sp-pm-val.sp-credits-val {
+  color: #ffffff;
+}
+
+.sp-pm-val.sp-reg-val {
   font-size: 18px;
-  color: #013e37;
+  color: #ffefb3;
 }
 
 .sp-pm-max {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
-  color: #597b76;
+  color: #a8d5cf;
 }
 
 .sp-pm-desc {
-  font-size: 11.5px;
-  color: #597b76;
-  font-weight: 550;
+  font-size: 11px;
+  color: #cbd5e1;
+  font-weight: 600;
+  display: block;
+}
+
+.sp-pm-desc.sp-gold-sub {
+  color: #ffefb3;
+}
+
+.sp-pm-desc.sp-credits-sub,
+.sp-pm-desc.sp-reg-sub {
+  color: #94a3b8;
+}
+
+.sp-pm-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2.5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+  margin-top: 3px;
+  width: fit-content;
+}
+
+.sp-pm-badge-pill.sp-att-safe {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  color: #34d399;
+}
+
+.sp-pm-badge-pill.sp-att-warn {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  color: #fbbf24;
+}
+
+.sp-pm-badge-pill.sp-att-danger {
+  background: rgba(239, 68, 68, 0.22);
+  border: 1px solid rgba(248, 113, 113, 0.55);
+  color: #fca5a5;
 }
 
 /* =========================================================
-   TABS NAVIGATION
+   TABS NAVIGATION (PROFESSIONAL MINIMALIST, NO EMOJIS, NO SCROLLBAR)
    ========================================================= */
 
 .sp-page-tabs {
   display: flex;
-  gap: 12px;
-  padding: 14px 32px 0;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 32px 0;
   background: #ffffff;
   border-bottom: 1px solid #e2efe9;
-  overflow-x: auto;
+  overflow-x: hidden;
+  flex-wrap: wrap;
+  scrollbar-width: none;
+  box-sizing: border-box;
+}
+
+.sp-page-tabs::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .sp-page-tab {
-  padding: 11px 20px;
+  padding: 10px 18px;
   background: transparent;
   border: none;
-  border-bottom: 3.5px solid transparent;
-  font-size: 14px;
+  border-bottom: 3px solid transparent;
+  font-size: 13.5px;
   font-weight: 650;
   color: #597b76;
   cursor: pointer;
@@ -459,32 +679,34 @@
 }
 
 .sp-page-tab:hover {
-  color: #013e37;
+  color: #013a33;
 }
 
 .sp-page-tab.active {
-  color: #013e37;
-  border-bottom-color: #d9a726;
+  color: #013a33;
+  border-bottom-color: #013a33;
   font-weight: 800;
 }
 
 /* =========================================================
-   CONTENT AREA & DETAILS GRID
+   CONTENT AREA & 4-COLUMN COMPACT DETAILS GRID
    ========================================================= */
 
 .sp-page-content {
-  padding: 28px 32px 36px;
+  padding: 18px 32px 22px;
   background: #fbfdfc;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .sp-tab-fade {
-  animation: spFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: spFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes spFadeIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -492,33 +714,33 @@
   }
 }
 
-/* Details Grid: 2-Column Cards */
+/* Info Grid: 4-Column Compact Grid (fits on one page) */
 .sp-info-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 14px;
 }
 
 .sp-info-card {
   background: #ffffff;
   border: 1px solid #e0efe9;
-  border-radius: 14px;
-  padding: 16px 20px;
+  border-radius: 12px;
+  padding: 11px 14px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  box-shadow: 0 2px 6px rgba(1, 62, 55, 0.02);
+  gap: 4px;
+  box-shadow: 0 1px 4px rgba(1, 58, 51, 0.02);
   transition: all 0.2s ease;
 }
 
 .sp-info-card:hover {
-  border-color: #02594f;
+  border-color: #013a33;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.06);
+  box-shadow: 0 4px 12px rgba(1, 58, 51, 0.05);
 }
 
 .sp-info-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 750;
   color: #597b76;
   text-transform: uppercase;
@@ -526,53 +748,40 @@
 }
 
 .sp-info-data {
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 650;
   color: #012622;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sp-info-data.font-mono {
   font-family: monospace;
   font-weight: 800;
-  color: #013e37;
-  letter-spacing: 0.5px;
+  color: #013a33;
 }
 
 .sp-info-data.sp-text-link {
-  color: #013e37;
+  color: #013a33;
   text-decoration: underline;
 }
 
-.sp-info-data.sp-text-success {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: #059669;
-  font-weight: 750;
-}
+.sp-info-data.sp-att-safe { color: #059669; font-weight: 750; }
+.sp-info-data.sp-att-warn { color: #d97706; font-weight: 750; }
+.sp-info-data.sp-att-danger { color: #dc2626; font-weight: 750; }
 
-.sp-status-active-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
-}
-
-/* =========================================================
-   SEMESTER GRADE CARD TABLE (TAB 2)
-   ========================================================= */
-
+/* Grade Table */
 .sp-card-box {
   background: #ffffff;
   border: 1px solid #e0efe9;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(1, 62, 55, 0.03);
+  box-shadow: 0 2px 8px rgba(1, 58, 51, 0.03);
 }
 
 .sp-card-box-header {
-  padding: 20px 24px;
+  padding: 14px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -581,14 +790,14 @@
 }
 
 .sp-box-title {
-  font-size: 16.5px;
+  font-size: 15.5px;
   font-weight: 800;
   color: #012622;
-  margin: 0 0 4px 0;
+  margin: 0 0 2px 0;
 }
 
 .sp-box-subtitle {
-  font-size: 13px;
+  font-size: 12.5px;
   color: #597b76;
   margin: 0;
 }
@@ -597,20 +806,20 @@
   text-align: right;
   background: #fff8e6;
   border: 1px solid #f3dc98;
-  padding: 8px 18px;
-  border-radius: 12px;
+  padding: 6px 16px;
+  border-radius: 10px;
 }
 
 .sp-cgpa-display span {
   display: block;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   color: #b3861b;
   letter-spacing: 0.5px;
 }
 
 .sp-cgpa-display strong {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 850;
   color: #b3861b;
 }
@@ -622,54 +831,70 @@
 
 .sp-full-table th {
   background: #f4faf7;
-  padding: 13px 22px;
+  padding: 10px 20px;
   text-align: left;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 750;
-  color: #013e37;
+  color: #013a33;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 1px solid #e0efe9;
 }
 
 .sp-full-table td {
-  padding: 14px 22px;
+  padding: 10px 20px;
   border-bottom: 1px solid #eef4f1;
   color: #2d544f;
-  font-size: 14px;
+  font-size: 13.5px;
 }
 
 .sp-full-table tr:last-child td {
   border-bottom: none;
 }
 
-.sp-full-table tr.row-highlight {
-  background: #fffdf5;
+.sp-progress-bar-track {
+  width: 120px;
+  height: 7px;
+  background: #e6f0ec;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.sp-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0d453c, #154e43);
+  border-radius: 999px;
+  transition: width 0.4s ease;
 }
 
 .sp-score-num {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 850;
-  color: #013e37;
+  color: #013a33;
 }
 
 .sp-score-tag {
   background: #eef6f3;
-  color: #013e37;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 12px;
+  color: #729690;
+  padding: 2.5px 7px;
+  border-radius: 5px;
+  font-size: 11.5px;
   font-weight: 700;
 }
 
 .sp-badge-status {
   display: inline-block;
-  padding: 3px 12px;
+  padding: 2.5px 10px;
   border-radius: 999px;
-  background: #eef8f5;
-  color: #059669;
-  font-size: 12px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 11.5px;
   font-weight: 700;
+}
+
+.sp-badge-status.completed {
+  background: #ecfdf5;
+  color: #059669;
 }
 
 .sp-badge-status.gold {
@@ -679,47 +904,171 @@
 }
 
 /* =========================================================
-   SAVED NOTES STACK (TAB 3)
+   ATTENDANCE TAB (BOT REFERENCE DARK LUXURY THEME)
    ========================================================= */
 
+.sp-att-analytics-card {
+  background: linear-gradient(145deg, #01221e 0%, #013a33 60%, #052621 100%);
+  border: 1.5px solid rgba(255, 239, 179, 0.35);
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 239, 179, 0.2);
+  color: #ffffff;
+}
+
+.sp-att-top-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 22px;
+}
+
+.sp-att-dial {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: conic-gradient(#34d399 calc(var(--att, 75) * 1%), #0d453c 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.sp-att-dial-inner {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #021a17;
+  border: 1px solid rgba(255, 239, 179, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp-att-dial-val {
+  font-size: 25px;
+  font-weight: 900;
+  color: #fed866;
+  text-shadow: 0 0 12px rgba(254, 216, 102, 0.4);
+}
+
+.sp-att-dial-lbl {
+  font-size: 9.5px;
+  font-weight: 750;
+  color: #a8d5cf;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sp-att-dial-details {
+  flex: 1;
+}
+
+.sp-att-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 750;
+  margin-bottom: 6px;
+}
+
+.sp-att-pill.sp-att-safe { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.5); }
+.sp-att-pill.sp-att-warn { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.5); }
+.sp-att-pill.sp-att-danger { background: rgba(239, 68, 68, 0.22); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.5); }
+
+.sp-att-rule-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffefb3;
+  margin: 0 0 4px 0;
+}
+
+.sp-att-rule-desc {
+  font-size: 13px;
+  color: #cbd5e1;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.sp-att-benchmarks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  border-top: 1px solid rgba(255, 239, 179, 0.18);
+  padding-top: 18px;
+}
+
+.sp-benchmark-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 239, 179, 0.2);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.sp-benchmark-item strong {
+  display: block;
+  font-size: 12.5px;
+  color: #ffefb3;
+  margin-bottom: 2px;
+}
+
+.sp-benchmark-item p {
+  margin: 0;
+  font-size: 11.5px;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.sp-bm-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.sp-bm-dot.safe { background: #34d399; box-shadow: 0 0 8px rgba(52, 211, 153, 0.6); }
+.sp-bm-dot.warn { background: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+.sp-bm-dot.danger { background: #f87171; box-shadow: 0 0 8px rgba(248, 113, 113, 0.6); }
+
+/* Saved Notes */
 .sp-notes-stack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .sp-saved-note-row {
   background: #ffffff;
   border: 1px solid #e0efe9;
-  border-radius: 14px;
-  padding: 16px 20px;
+  border-radius: 12px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(1, 62, 55, 0.03);
-  transition: all 0.2s ease;
-}
-
-.sp-saved-note-row:hover {
-  border-color: #013e37;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(1, 62, 55, 0.08);
+  box-shadow: 0 1px 6px rgba(1, 58, 51, 0.03);
 }
 
 .sp-note-meta-col {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .sp-note-badge-branch {
-  background: #013e37;
+  background: #013a33;
   color: #ffffff;
   font-weight: 750;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 10.5px;
 }
 
 .sp-note-badge-sem {
@@ -727,30 +1076,30 @@
   color: #b3861b;
   border: 1px solid #f3dc98;
   font-weight: 750;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 10.5px;
 }
 
 .sp-note-h {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 750;
   color: #012622;
   margin: 0;
 }
 
 .sp-note-subdetails {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #597b76;
 }
 
 .sp-btn-view-material {
-  background: #013e37;
+  background: #013a33;
   color: #ffffff;
   border: 1px solid rgba(255, 239, 179, 0.25);
-  padding: 9px 20px;
+  padding: 8px 16px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 750;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -758,55 +1107,90 @@
 }
 
 .sp-btn-view-material:hover {
-  background: #02594f;
+  background: #0d453c;
   transform: translateY(-1px);
 }
 
 .sp-empty-notice {
   text-align: center;
   color: #597b76;
-  padding: 30px;
+  padding: 30px 20px;
   font-size: 14px;
 }
 
-/* =========================================================
-   EDIT PROFILE FORM (TAB 4)
-   ========================================================= */
+.sp-empty-notice p {
+  margin-bottom: 12px;
+}
 
+/* Edit Form */
 .sp-form-container {
   background: #ffffff;
   border: 1px solid #e0efe9;
-  border-radius: 16px;
-  padding: 26px 30px;
+  border-radius: 14px;
+  padding: 22px 28px;
 }
 
-.sp-alert-success {
-  background: #eefaf6;
-  border: 1px solid #a3dfcb;
-  color: #059669;
-  padding: 12px 18px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 20px;
+.sp-edit-section-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #013a33;
+  margin: 0 0 16px 0;
+}
+
+.sp-edit-photo-strip {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #f7faf8;
+  border: 1.5px solid #dcece6;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+
+.sp-avatar-holder-mini {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.sp-edit-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #013a33;
+}
+
+.sp-edit-photo-cta strong {
+  display: block;
+  font-size: 13.5px;
+  color: #013a33;
+  margin-bottom: 2px;
+}
+
+.sp-edit-photo-cta p {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #597b76;
 }
 
 .sp-form-row-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  margin-bottom: 18px;
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
 .sp-input-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 18px;
+  gap: 5px;
+  margin-bottom: 14px;
 }
 
 .sp-input-group label {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 750;
   color: #2d544f;
   text-transform: uppercase;
@@ -814,36 +1198,67 @@
 }
 
 .sp-input-group input {
-  padding: 10px 14px;
+  padding: 9px 12px;
   border: 1px solid #d4e5df;
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13.5px;
   color: #012622;
   outline: none;
   background: #ffffff;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .sp-input-group input:focus {
-  border-color: #013e37;
-  box-shadow: 0 0 0 3px rgba(1, 62, 55, 0.12);
+  border-color: #013a33;
+  box-shadow: 0 0 0 3px rgba(1, 58, 51, 0.12);
+}
+
+.sp-edit-sem-section {
+  border-top: 1px solid #eef4f1;
+  padding-top: 16px;
+  margin-top: 10px;
+}
+
+.sp-edit-sem-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.sp-edit-sem-header h4 {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #013a33;
+}
+
+.sp-live-cgpa-badge {
+  background: #fff8e6;
+  border: 1px solid #f3dc98;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 750;
+  color: #946800;
 }
 
 .sp-form-footer-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 14px;
-  margin-top: 24px;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .sp-btn-text {
   background: transparent;
   border: 1px solid #d4e5df;
   color: #597b76;
-  padding: 10px 22px;
-  border-radius: 10px;
-  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -855,20 +1270,108 @@
 }
 
 .sp-btn-submit {
-  background: linear-gradient(135deg, #013e37 0%, #02594f 100%);
+  background: linear-gradient(135deg, #013a33 0%, #0d453c 100%);
   color: #ffffff;
   border: 1px solid rgba(255, 239, 179, 0.3);
-  padding: 10px 28px;
-  border-radius: 10px;
-  font-size: 14px;
+  padding: 8px 24px;
+  border-radius: 8px;
+  font-size: 13.5px;
   font-weight: 750;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.2);
+  box-shadow: 0 4px 14px rgba(1, 58, 51, 0.2);
 }
 
 .sp-btn-submit:hover {
-  background: #02594f;
+  background: #0d453c;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   LOGOUT CONFIRMATION MODAL DIALOG
+   ========================================================= */
+
+.sp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: spFadeIn 0.2s ease;
+}
+
+.sp-confirm-dialog {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  border: 1px solid #e0efe9;
+  text-align: center;
+}
+
+.sp-confirm-icon {
+  font-size: 34px;
+  margin-bottom: 10px;
+}
+
+.sp-confirm-title {
+  margin: 0 0 6px 0;
+  font-size: 19px;
+  font-weight: 850;
+  color: #013a33;
+}
+
+.sp-confirm-text {
+  margin: 0 0 20px 0;
+  font-size: 13.5px;
+  color: #557973;
+  line-height: 1.5;
+}
+
+.sp-confirm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sp-btn-confirm-cancel {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sp-btn-confirm-cancel:hover {
+  background: #e2e8f0;
+}
+
+.sp-btn-confirm-logout {
+  background: #dc2626;
+  border: 1px solid #b91c1c;
+  color: #ffffff;
+  padding: 9px 22px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+  transition: all 0.2s ease;
+}
+
+.sp-btn-confirm-logout:hover {
+  background: #b91c1c;
   transform: translateY(-1px);
 }
 
@@ -876,31 +1379,47 @@
    RESPONSIVE DESIGN (MOBILE & TABLET)
    ========================================================= */
 
-@media (max-width: 860px) {
-  .sp-page-identity {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0 20px 20px;
-    gap: 16px;
+@media (max-width: 1100px) {
+  .sp-info-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
+}
 
-  .sp-identity-details {
-    padding-top: 0;
-  }
-
-  .sp-identity-actions {
-    padding-top: 0;
-    width: 100%;
-  }
-
-  .sp-btn-action-primary {
-    width: 100%;
-    justify-content: center;
+@media (max-width: 900px) {
+  .sp-page-header-inner {
+    padding: 10px 20px;
   }
 
   .sp-page-metrics {
     grid-template-columns: repeat(2, 1fr);
+    padding: 14px 20px;
+  }
+
+  .sp-page-identity {
+    padding: 0 20px 12px;
+  }
+
+  .sp-page-tabs {
+    padding: 6px 20px 0;
+  }
+
+  .sp-page-content {
     padding: 16px 20px;
+  }
+
+  .sp-att-top-row {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .sp-att-benchmarks {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .sp-page-metrics {
+    grid-template-columns: 1fr;
   }
 
   .sp-info-grid {
@@ -909,19 +1428,5 @@
 
   .sp-form-row-2 {
     grid-template-columns: 1fr;
-  }
-
-  .sp-page-content {
-    padding: 20px;
-  }
-}
-
-@media (max-width: 520px) {
-  .sp-page-metrics {
-    grid-template-columns: 1fr;
-  }
-  
-  .sp-header-nav-btn {
-    display: none;
   }
 }

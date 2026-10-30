@@ -73,6 +73,18 @@ const BRANCH_TABS = [
       "ml",
     ],
   },
+  {
+    code: "EEE",
+    name: "Electrical & Electronics",
+    aliases: [
+      "electrical and electronics",
+      "electrical and electronics engineering",
+      "electrical & electronics engineering",
+      "electrical",
+      "eee",
+      "ee",
+    ],
+  },
 ];
 
 const normalizeBranch = (branch) =>
@@ -819,6 +831,7 @@ function Notes({ initialType }) {
                 <option value="ME">ME — Mechanical Eng.</option>
                 <option value="CE">CE — Civil Eng.</option>
                 <option value="AIML">AIML — AI & Data Science</option>
+                <option value="EEE">EEE — Electrical & Electronics</option>
               </select>
 
               {/* Semester Dropdown */}

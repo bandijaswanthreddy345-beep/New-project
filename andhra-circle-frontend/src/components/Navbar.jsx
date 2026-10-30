@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import API from "../api/api";
+import profileImgDefault from "../assets/jaswanth.png.png";
+import { getStoredStudentData } from "../data/studentData";
 
 // Standard fallback notices for the pop-up preview
 const FALLBACK_NOTICES = [
@@ -41,6 +43,15 @@ function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showToastAlert, setShowToastAlert] = useState(false);
   const [activeAlertItem, setActiveAlertItem] = useState(null);
+  const [student, setStudent] = useState(getStoredStudentData());
+
+  useEffect(() => {
+    const handleProfileSync = () => {
+      setStudent(getStoredStudentData());
+    };
+    window.addEventListener("studentProfileUpdated", handleProfileSync);
+    return () => window.removeEventListener("studentProfileUpdated", handleProfileSync);
+  }, []);
 
   const isBTechNotice = (n) => {
     if (!n) return false;
@@ -244,18 +255,13 @@ function Navbar() {
       ),
     },
     {
-      name: "Student Profile",
-      path: "/profile",
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-          <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-        </svg>
-      ),
-    },
-    {
       name: "Notifications",
       path: "/notifications",
+    },
+    {
+      name: "Student Profile",
+      path: "/profile",
+      isProfile: true,
     },
   ];
 
@@ -285,7 +291,7 @@ function Navbar() {
           NAVIGATION
       ========================================== */}
 
-      <nav>
+      <nav className="nav-container">
         <ul className="nav-links">
 
           {navigationLinks.map((item) => {
@@ -376,6 +382,64 @@ function Navbar() {
               );
             }
 
+            if (item.isProfile || item.name === "Student Profile") {
+              const studentName = student?.name || "Jaswanth Reddy Bandi";
+              const photoSrc =
+                student?.profilePhoto && student.profilePhoto !== "none"
+                  ? student.profilePhoto
+                  : (student?.profilePhoto === "none" ? null : profileImgDefault);
+
+              return (
+                <li key={item.path} className="nav-item-profile">
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      isActive
+                        ? "nav-link active nav-profile-btn"
+                        : "nav-link nav-profile-btn"
+                    }
+                    title={`Student Profile • ${studentName}`}
+                    aria-label={`Student Profile (${studentName})`}
+                  >
+                    <div className="nav-profile-avatar-wrapper">
+                      {photoSrc ? (
+                        <img
+                          src={photoSrc}
+                          alt={studentName}
+                          className="nav-profile-avatar-img"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            if (e.currentTarget.nextElementSibling) {
+                              e.currentTarget.nextElementSibling.style.display = "flex";
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <span
+                        className="nav-profile-fallback-icon"
+                        style={{ display: photoSrc ? "none" : "flex" }}
+                      >
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      </span>
+                      <span className="nav-profile-status-dot" title="Active Student" />
+                    </div>
+                  </NavLink>
+                </li>
+              );
+            }
+
             return (
               <li key={item.path}>
                 <NavLink
@@ -392,20 +456,6 @@ function Navbar() {
               </li>
             );
           })}
-
-          {/* ==========================================
-              LOGIN BUTTON
-          ========================================== */}
-
-          <li>
-            <Link
-              to="/login"
-              className="nav-login-button"
-            >
-              <span>Login</span>
-              <span className="login-arrow">→</span>
-            </Link>
-          </li>
 
         </ul>
       </nav>

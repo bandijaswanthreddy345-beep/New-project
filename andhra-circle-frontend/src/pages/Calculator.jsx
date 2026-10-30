@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 import {
   R23_SUBJECTS_BY_BRANCH_SEM,
@@ -7,7 +7,6 @@ import {
   detectSubjectCredits,
   getR23PresetSubjects,
 } from "../data/r23Subjects";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "./Calculator.css";
 
@@ -27,23 +26,36 @@ const GRADE_POINTS = {
 // JNTU 10-Point Absolute Grading Scale: Marks to Grade & Points Converter
 export function getGradeInfoFromMarks(marks) {
   if (marks === "" || marks === null || marks === undefined) {
-    return { grade: "", points: 0, hasMarks: false, desc: "Awaiting Marks", color: "#94a3b8" };
+    return { grade: "", points: 0, hasMarks: false, desc: "Awaiting Marks", color: "#8fa39c" };
   }
   const m = parseFloat(marks);
   if (isNaN(m) || m < 0) {
-    return { grade: "", points: 0, hasMarks: false, desc: "Invalid Marks", color: "#94a3b8" };
+    return { grade: "", points: 0, hasMarks: false, desc: "Invalid Marks", color: "#8fa39c" };
   }
   if (m >= 90) return { grade: "O", points: 10, hasMarks: true, desc: "Outstanding", color: "#10b981" };
-  if (m >= 80) return { grade: "A+", points: 9, hasMarks: true, desc: "Excellent", color: "#06b6d4" };
-  if (m >= 70) return { grade: "A", points: 8, hasMarks: true, desc: "Very Good", color: "#3b82f6" };
-  if (m >= 60) return { grade: "B+", points: 7, hasMarks: true, desc: "Good", color: "#8b5cf6" };
-  if (m >= 50) return { grade: "B", points: 6, hasMarks: true, desc: "Above Average", color: "#f59e0b" };
+  if (m >= 80) return { grade: "A+", points: 9, hasMarks: true, desc: "Excellent", color: "#0d9488" };
+  if (m >= 70) return { grade: "A", points: 8, hasMarks: true, desc: "Very Good", color: "#0284c7" };
+  if (m >= 60) return { grade: "B+", points: 7, hasMarks: true, desc: "Good", color: "#6366f1" };
+  if (m >= 50) return { grade: "B", points: 6, hasMarks: true, desc: "Above Average", color: "#d97706" };
   if (m >= 40) return { grade: "C", points: 5, hasMarks: true, desc: "Pass", color: "#ea580c" };
-  return { grade: "F", points: 0, hasMarks: true, desc: "Fail / Arrear", color: "#ef4444" };
+  return { grade: "F", points: 0, hasMarks: true, desc: "Fail / Arrear", color: "#dc2626" };
 }
 
 export default function Calculator() {
-  const [activeTab, setActiveTab] = useState("sgpa"); // "sgpa" | "cgpa"
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(() => {
+    if (location.pathname.includes("cgpa")) return "cgpa";
+    return "sgpa";
+  });
+
+  useEffect(() => {
+    if (location.pathname.includes("cgpa")) {
+      setActiveTab("cgpa");
+    } else if (location.pathname.includes("sgpa")) {
+      setActiveTab("sgpa");
+    }
+  }, [location.pathname]);
   
   // Student Profile Data
   const [studentData, setStudentData] = useState(getStoredStudentData());
@@ -149,7 +161,7 @@ export default function Calculator() {
     ]);
     setTaskCompleted(false);
     setCompletedReport(null);
-    setSaveSuccessMsg("✨ Portal ready for next student! All fields and marks reset fresh.");
+    setSaveSuccessMsg("Portal ready for next student! All fields and marks reset fresh.");
     setTimeout(() => setSaveSuccessMsg(""), 5000);
   };
 
@@ -314,24 +326,51 @@ export default function Calculator() {
 
   return (
     <div className="calc-page-wrapper">
-      <Navbar />
+      {/* =========================================================
+          TOP NAVIGATION BAR (MATCHING STUDENT PROFILE FOREST GREEN)
+          ========================================================= */}
+      <header className="calc-page-header">
+        <div className="calc-page-header-inner">
+          <div className="calc-header-left" onClick={() => navigate("/")} title="Return to Homepage">
+            <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="calc-page-logo" />
+            <div>
+              <h2 className="calc-brand-title">
+                <span className="font-deltha">JNTU</span> Circle
+              </h2>
+              <span className="calc-brand-subtitle">Official Academic Evaluation Portal</span>
+            </div>
+          </div>
+
+          <div className="calc-header-right">
+            <button
+              type="button"
+              className="calc-header-close-btn"
+              onClick={() => navigate(-1)}
+              title="Close and Return"
+              aria-label="Close and Return"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
 
       <main className="calc-main-container">
-        {/* Top Header Hero */}
+        {/* Top Tab Switcher */}
         <section className="calc-header-hero">
-          <h1 className="calc-hero-title">CGPA & SGPA Calculator</h1>
-          <p className="calc-hero-subtitle">
-            Fast, accurate grade point calculator and graduation honors planner tailored for JNTU R23, R20, R19 & R16 syllabus regulations.
-          </p>
-
-          {/* Quick Tab Switcher */}
           <div className="calc-tab-nav" role="tablist">
             <button
               type="button"
               className={`calc-tab-btn ${activeTab === "sgpa" ? "active" : ""}`}
               onClick={() => setActiveTab("sgpa")}
             >
-              <span className="tab-icon">🎯</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="tab-svg">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
               <span>SGPA Calculator</span>
             </button>
             <button
@@ -339,7 +378,11 @@ export default function Calculator() {
               className={`calc-tab-btn ${activeTab === "cgpa" ? "active" : ""}`}
               onClick={() => setActiveTab("cgpa")}
             >
-              <span className="tab-icon">📊</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="tab-svg">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
               <span>CGPA Calculator</span>
             </button>
           </div>
@@ -433,6 +476,7 @@ export default function Calculator() {
                 <option value="AIML">AI & Machine Learning (AIML)</option>
                 <option value="CSE">Computer Science (CSE)</option>
                 <option value="ECE">Electronics & Comm (ECE)</option>
+                <option value="EEE">Electrical & Electronics (EEE)</option>
                 <option value="ME">Mechanical Engg (ME)</option>
                 <option value="CE">Civil Engg (CE)</option>
               </select>
@@ -709,12 +753,6 @@ export default function Calculator() {
                     <span>Equivalent Percentage:</span>
                     <strong className="text-accent">{sgpaResult.percentage}%</strong>
                   </div>
-                </div>
-
-                <div className="calc-formula-note">
-                  <p><strong>Marks Scale:</strong> ≥90: O (10), ≥80: A+ (9), ≥70: A (8), ≥60: B+ (7), ≥50: B (6), ≥40: C (5), &lt;40: F (0)</p>
-                  <p><strong>Official Evaluation:</strong> SGPA = Σ(Grade Points × Credits) / Σ(Credits)</p>
-                  <p><strong>JNTU Percentage:</strong> (SGPA - 0.75) × 10%</p>
                 </div>
 
                 <button
