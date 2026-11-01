@@ -23,6 +23,7 @@
 ========================================================= */
 
 .note-bubbles-container {
+  display: none !important;
   position: fixed;
   inset: 0;
   z-index: 1;
@@ -1943,12 +1944,9 @@
 
 .back-to-top {
   position: fixed;
-
-  right: 24px;
-
-  bottom: 24px;
-
-  z-index: 20;
+  right: 26px;
+  bottom: 224px;
+  z-index: 999;
 
   width: 44px;
   height: 44px;
@@ -2445,8 +2443,8 @@
   }
 
   .back-to-top {
-    right: 15px;
-    bottom: 15px;
+    right: 20px;
+    bottom: 196px;
   }
 }
 
@@ -3112,3 +3110,15 @@
 
 
 
+
+
+/* HIDE ALL DOTS AND WATERMARKS IN NOTE DETAILS */
+.study-badge > span,
+.hero-topbar-label > span,
+.modules-header .modules-eyebrow::before,
+.modules-eyebrow::before,
+.footer-books {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+}

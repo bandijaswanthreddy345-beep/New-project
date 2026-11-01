@@ -447,8 +447,7 @@ function Notifications({ search = "" }) {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="pdf-floating-toast">
-          <span className="toast-dot" />
-          <span>{toastMessage}</span>
+                    <span>{toastMessage}</span>
         </div>
       )}
 
@@ -508,8 +507,7 @@ function Notifications({ search = "" }) {
         <div className="summary-hub-header">
           <div className="summary-hub-title-group">
             <span className="live-status-pill">
-              <span className="live-pulse-dot" />
-              LIVE JNTU B.TECH CIRCULARS
+                            LIVE JNTU B.TECH CIRCULARS
             </span>
             <h3 className="summary-hub-heading">B.Tech Notice Summary & Live Updates Counter</h3>
             <p className="summary-hub-sub">
@@ -610,7 +608,7 @@ function Notifications({ search = "" }) {
             </div>
             <div className="ticker-content">
               <span className="ticker-title">{latestNotice.title}</span>
-              <span className="ticker-date">• Published {formatDate(latestNotice.publishedDate)}</span>
+              <span className="ticker-date">Published {formatDate(latestNotice.publishedDate)}</span>
             </div>
             <button
               type="button"
@@ -670,8 +668,7 @@ function Notifications({ search = "" }) {
               <div className="resource-content">
                 <div className="resource-badge-row">
                   <span className="resource-badge">
-                    <span className="resource-badge-dot" />
-                    {notification.category || "GENERAL"}
+                                        {notification.category || "GENERAL"}
                   </span>
                 </div>
 
@@ -809,8 +806,7 @@ function Notifications({ search = "" }) {
             <div className="notif-modal-body">
               <div className="notif-modal-meta-row">
                 <span className="notif-modal-category-chip">
-                  <span className="category-chip-dot" />
-                  {viewingNotice.category || "GENERAL"}
+                                    {viewingNotice.category || "GENERAL"}
                 </span>
 
                 <span className="notif-modal-date-chip">

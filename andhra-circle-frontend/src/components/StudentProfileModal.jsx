@@ -181,9 +181,9 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
             
             <p className="sp-sub-info">
               <span className="sp-roll-pill">{student.hallTicket}</span>
-              <span className="sp-dot-sep">•</span>
+              
               <span className="sp-degree">{student.branch} ({student.branchCode})</span>
-              <span className="sp-dot-sep">•</span>
+              
               <span className="sp-year-badge">{student.year} ({student.semester})</span>
             </p>
           </div>
@@ -283,7 +283,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
                 </div>
                 <div className="sp-detail-row">
                   <span className="sp-label">Current Academic Level:</span>
-                  <span className="sp-value">{student.year} • {student.semester}</span>
+                  <span className="sp-value">{student.year} | {student.semester}</span>
                 </div>
                 <div className="sp-detail-row">
                   <span className="sp-label">Curriculum Regulation:</span>
@@ -303,7 +303,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
                 </div>
                 <div className="sp-detail-row">
                   <span className="sp-label">Academic Status:</span>
-                  <span className="sp-value sp-status-ok">● Active Enrolled Student in Good Standing</span>
+                  <span className="sp-value sp-status-ok">Active Enrolled Student in Good Standing</span>
                 </div>
               </div>
             </div>

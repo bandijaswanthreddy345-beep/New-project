@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BotAvatar } from "bot-avatars";
-import { MetalFx, useMetalBend } from "metal-fx";
 import { ThinkingOrb } from "thinking-orbs";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 import {
@@ -272,14 +271,9 @@ function JntuChatbot() {
   const resultsBodyRef = useRef(null);
   const inputRef = useRef(null);
   const modalInputRef = useRef(null);
-  const sendMetalRef = useRef(null);
-  const modalSendMetalRef = useRef(null);
-  const navigate = useNavigate();
+      const navigate = useNavigate();
 
-  useMetalBend(sendMetalRef);
-  useMetalBend(modalSendMetalRef);
-
-  // Auto-scroll ONLY the internal chatbot messages container without scrolling the window/page
+      // Auto-scroll ONLY the internal chatbot messages container without scrolling the window/page
   useEffect(() => {
     if (resultsBodyRef.current) {
       resultsBodyRef.current.scrollTop = resultsBodyRef.current.scrollHeight;
@@ -758,20 +752,11 @@ function JntuChatbot() {
               </button>
             )}
 
-            <MetalFx
-              ref={sendMetalRef}
-              preset="chromatic"
-              variant="circle"
-              theme="dark"
-              strength={1}
-              innerShadow
-              className="hero-ai-metal-send-wrapper"
-            >
-              <button
+            <button
                 type="submit"
                 className="hero-ai-send-btn"
                 aria-label="Send query and open overlay"
-                disabled={!hasHeroInput}
+                // always enabled for immediate interaction
                 title="Send query"
               >
                 <svg
@@ -780,7 +765,7 @@ function JntuChatbot() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2.5"
+                  strokeWidth="2.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
@@ -788,7 +773,6 @@ function JntuChatbot() {
                   <polyline points="12 5 19 12 12 19" />
                 </svg>
               </button>
-            </MetalFx>
           </div>
         </form>
 
@@ -1229,19 +1213,10 @@ function JntuChatbot() {
                   </button>
                 )}
 
-                <MetalFx
-                  ref={modalSendMetalRef}
-                  preset="chromatic"
-                  variant="circle"
-                  theme="dark"
-                  strength={1}
-                  innerShadow
-                  className="chat-modal-metal-wrapper"
-                >
-                  <button
+                <button
                     type="submit"
                     className="chat-modal-send-btn"
-                    disabled={!hasModalInput}
+                    // always enabled for immediate interaction
                     title="Send message"
                     aria-label="Send message"
                   >
@@ -1251,7 +1226,7 @@ function JntuChatbot() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="2.5"
+                      strokeWidth="2.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
@@ -1259,7 +1234,6 @@ function JntuChatbot() {
                       <polyline points="12 5 19 12 12 19" />
                     </svg>
                   </button>
-                </MetalFx>
               </form>
             </div>
           </div>

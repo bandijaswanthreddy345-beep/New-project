@@ -621,6 +621,14 @@ function NoteDetails() {
     }
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -688,19 +696,7 @@ function NoteDetails() {
 
   return (
     <div className="note-details-page">
-      {/* =====================================================
-          FLOATING BUBBLES ANIMATION BACKDROP (MATCHING REFERENCE)
-      ====================================================== */}
-      <div className="note-bubbles-container" aria-hidden="true">
-        <span className="note-bubble note-bubble-1"></span>
-        <span className="note-bubble note-bubble-2"></span>
-        <span className="note-bubble note-bubble-3"></span>
-        <span className="note-bubble note-bubble-4"></span>
-        <span className="note-bubble note-bubble-5"></span>
-        <span className="note-bubble note-bubble-6"></span>
-        <span className="note-bubble note-bubble-7"></span>
-        <span className="note-bubble note-bubble-8"></span>
-      </div>
+      
 
       {/* =====================================================
           ❤️ BIG HEART POP OVERLAY
@@ -838,7 +834,6 @@ function NoteDetails() {
             <div className="hero-heading-layout">
               <div className="hero-title-block">
                 <div className="study-badge">
-                  <span aria-hidden="true"></span>
                   STUDY MATERIAL
                 </div>
 
@@ -1480,10 +1475,6 @@ function NoteDetails() {
 
           </div>
 
-          <div className="footer-books">
-            📚
-          </div>
-
         </section>
 
       </main>
@@ -1501,14 +1492,16 @@ function NoteDetails() {
           BACK TO TOP
       ====================================================== */}
 
-      <button
-        type="button"
-        className="back-to-top"
-        onClick={scrollToTop}
-        aria-label="Back to top"
-      >
-        ↑
-      </button>
+      {showBackToTop && (
+        <button
+          type="button"
+          className="back-to-top"
+          onClick={scrollToTop}
+          aria-label="Back to top"
+        >
+          ↑
+        </button>
+      )}
 
     </div>
   );

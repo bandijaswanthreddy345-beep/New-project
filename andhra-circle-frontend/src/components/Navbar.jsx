@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import profileImgDefault from "../assets/jaswanth.png.png";
 import { getStoredStudentData } from "../data/studentData";
@@ -34,6 +34,12 @@ const FALLBACK_NOTICES = [
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
   const notifContainerRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
 
@@ -288,10 +294,50 @@ function Navbar() {
       </div>
 
       {/* ==========================================
-          NAVIGATION
+          MOBILE ACTIONS (VISIBLE <= 768px)
+      ========================================== */}
+      <div className="nav-mobile-actions">
+        <Link
+          to="/notifications"
+          className="nav-mobile-action-btn"
+          title="Notifications"
+          aria-label="View notifications"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          {hasNewAlert && <span className="nav-mobile-notif-ping" />}
+        </Link>
+
+        <button
+          type="button"
+          className={`nav-mobile-toggle ${mobileMenuOpen ? "is-open" : ""}`}
+          onClick={() => setMobileMenuOpen((prev) => !prev)}
+          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      {/* ==========================================
+          NAVIGATION (DESKTOP & MOBILE DRAWER)
       ========================================== */}
 
-      <nav className="nav-container">
+      <nav className={`nav-container ${mobileMenuOpen ? "is-mobile-open" : ""}`}>
         <ul className="nav-links">
 
           {navigationLinks.map((item) => {
@@ -444,6 +490,7 @@ function Navbar() {
               <li key={item.path}>
                 <NavLink
                   to={item.path}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) =>
                     isActive
                       ? "nav-link active nav-link-with-icon"
@@ -460,54 +507,13 @@ function Navbar() {
         </ul>
       </nav>
 
-      {/* ==========================================
-          REAL-TIME NEW B.TECH NOTIFICATION TOAST ALERT
-      ========================================== */}
-      {showToastAlert && activeAlertItem && (
-        <div 
-          className="notif-toast-alert"
-          onClick={() => {
-            handleOpenNotifications();
-            if (activeAlertItem._id) {
-              navigate(`/notifications?view=${encodeURIComponent(activeAlertItem._id)}`);
-            } else {
-              navigate("/notifications");
-            }
-          }}
-          role="alert"
-          aria-live="polite"
-        >
-          <div className="notif-toast-icon">
-            🔔
-          </div>
-          <div className="notif-toast-body">
-            <div className="notif-toast-header">
-              <span className="notif-toast-tag">
-                B.TECH {activeAlertItem.category || "EXAM"}
-              </span>
-              <span className="notif-toast-time">
-                {formatTimeAgo(activeAlertItem.publishedDate || activeAlertItem.createdAt)}
-              </span>
-            </div>
-            <div className="notif-toast-title">
-              {activeAlertItem.title}
-            </div>
-            <div className="notif-toast-action">
-              View Notice Details →
-            </div>
-          </div>
-          <button 
-            type="button" 
-            className="notif-toast-close"
-            onClick={handleDismissToast}
-            title="Dismiss alert"
-            aria-label="Dismiss alert"
-          >
-            ✕
-          </button>
-        </div>
+      {mobileMenuOpen && (
+        <div
+          className="nav-mobile-backdrop"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
       )}
-
     </header>
   );
 }

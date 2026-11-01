@@ -825,9 +825,9 @@ function StudentProfile() {
                 </div>
                 <p className="sp-main-subtext">
                   <strong className="sp-main-roll">{student.hallTicket}</strong>
-                  <span className="sp-dot-separator">•</span>
+                   
                   <span>{student.branch} ({student.branchCode})</span>
-                  <span className="sp-dot-separator">•</span>
+                   
                   <span className="sp-highlight-gold">{student.year} ({student.semester})</span>
                 </p>
                 <p className="sp-college-subtext">
@@ -979,7 +979,7 @@ function StudentProfile() {
                     </div>
                     <div className="sp-info-card">
                       <span className="sp-info-label">Academic Level</span>
-                      <span className="sp-info-data">{student.year} • {student.semester}</span>
+                      <span className="sp-info-data">{student.year} | {student.semester}</span>
                     </div>
                     <div className="sp-info-card">
                       <span className="sp-info-label">Curriculum Regulation</span>
@@ -1111,21 +1111,21 @@ function StudentProfile() {
 
                     <div className="sp-att-benchmarks">
                       <div className="sp-benchmark-item safe">
-                        <span className="sp-bm-dot safe" />
+                        
                         <div>
                           <strong>75% – 100%: Normal Eligibility</strong>
                           <p>Issued official examination hall ticket without penalty.</p>
                         </div>
                       </div>
                       <div className="sp-benchmark-item warn">
-                        <span className="sp-bm-dot warn" />
+                        
                         <div>
                           <strong>65% – 74%: Condonation Allowed</strong>
                           <p>Eligible upon payment of university condonation fee with medical proof.</p>
                         </div>
                       </div>
                       <div className="sp-benchmark-item danger">
-                        <span className="sp-bm-dot danger" />
+                        
                         <div>
                           <strong>Below 65%: Detained</strong>
                           <p>Not eligible for semester examinations; must repeat course.</p>
@@ -1148,7 +1148,7 @@ function StudentProfile() {
                             <span className="sp-note-badge-sem">{note.sem}</span>
                             <h4 className="sp-note-h">{note.title}</h4>
                             <span className="sp-note-subdetails">
-                              {note.units} • Instructor: {note.faculty}
+                              {note.units} | Instructor: {note.faculty}
                             </span>
                           </div>
                           <button
