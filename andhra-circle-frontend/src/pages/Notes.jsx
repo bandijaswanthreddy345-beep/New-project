@@ -11,6 +11,11 @@ import "./Notes.css";
 // Branch definitions matching homepage engineering departments
 const BRANCH_TABS = [
   {
+    code: "ALL",
+    name: "All Departments",
+    aliases: ["all", "all departments", "all branches"],
+  },
+  {
     code: "CSE",
     name: "Computer Science Engineering",
     aliases: [
@@ -91,6 +96,7 @@ const normalizeBranch = (branch) =>
   String(branch || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 const noteMatchesBranch = (noteBranch, tab) => {
+  if (!tab || tab.code === "ALL") return true;
   const normalizedBranch = normalizeBranch(noteBranch);
   return [tab.code, tab.name, ...tab.aliases].some(
     (branch) => normalizeBranch(branch) === normalizedBranch
@@ -175,12 +181,12 @@ function Notes({ initialType }) {
   }, [getResourceFromPath]);
 
   // Initial branch from URL param or default to "CSE"
-  const urlBranch = (searchParams.get("branch") || searchParams.get("search") || "CSE").toUpperCase();
+  const urlBranch = (searchParams.get("branch") || searchParams.get("search") || "ALL").toUpperCase();
   const matchedTab = BRANCH_TABS.find((tab) =>
     noteMatchesBranch(urlBranch, tab)
   );
 
-  const [activeBranch, setActiveBranch] = useState(matchedTab ? matchedTab.code : "CSE");
+  const [activeBranch, setActiveBranch] = useState(matchedTab ? matchedTab.code : "ALL");
   const [selectedSemester, setSelectedSemester] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -362,7 +368,7 @@ function Notes({ initialType }) {
           id: n._id,
           title: formatTitle(title),
           semester: sem,
-          branchCode: activeBranch,
+          branchCode: n.branch || activeBranch,
           extraBadge: n.subjectCode || "",
           pdfUrl: n.pdfUrl || "",
           resourceType: "notes",
@@ -803,6 +809,7 @@ function Notes({ initialType }) {
                 value={activeBranch}
                 onChange={(e) => handleSelectBranch(e.target.value)}
               >
+                <option value="ALL">All Departments</option>
                 <option value="CSE">CSE — Computer Science</option>
                 <option value="ECE">ECE — Electronics & Comm.</option>
                 <option value="ME">ME — Mechanical Eng.</option>
