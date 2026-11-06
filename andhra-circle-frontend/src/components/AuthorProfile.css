@@ -23,16 +23,17 @@
 .section-tag {
   display: inline-flex;
   align-items: center;
-  padding: 5px 13px;
-  margin-bottom: 8px;
+  padding: 6px 14px;
+  margin-bottom: 12px;
   border-radius: 999px;
-  background: rgba(255, 239, 179, 0.15);
-  border: 1px solid rgba(255, 239, 179, 0.38);
-  color: #ffefb3;
+  background: #ffefb3;
+  border: 1px solid #d9a726;
+  color: #002420;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 850;
   letter-spacing: 1.2px;
   text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .author-section-heading h2 {

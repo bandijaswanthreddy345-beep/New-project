@@ -177,7 +177,7 @@ function AuthorProfile() {
       <section className="author-section" aria-labelledby="developers-heading">
         <div className="author-section-heading">
           <span className="section-tag">THE TEAM</span>
-          <h2 id="developers-heading">Developers</h2>
+          
         </div>
 
         <div className="team-card">
@@ -216,9 +216,6 @@ function AuthorProfile() {
                     : "author-role-tag--dev"
                 }`}
               >
-                <span className="author-role-bullet" aria-hidden="true">
-                  {developer.title === "PLATFORM CREATOR" ? "★" : "✦"}
-                </span>
                 {developer.title}
               </span>
               <h3>{developer.name}</h3>

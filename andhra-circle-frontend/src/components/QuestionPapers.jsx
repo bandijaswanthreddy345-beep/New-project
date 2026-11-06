@@ -4,6 +4,16 @@ import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "./LikeReactionButton";
 
+const getPaperSnippet = (paper) => {
+  if (paper.description && paper.description.trim().length > 10) {
+    return paper.description.trim();
+  }
+  const branchText = paper.branch ? `${paper.branch} · ` : "";
+  const semText = paper.semester ? `Sem ${paper.semester} · ` : "";
+  const subName = paper.subject || paper.title || "University Subject";
+  return `Previous university examination question papers, mid-term tests & solution keys for ${subName} (${branchText}${semText}JNTU Exams).`;
+};
+
 function QuestionPapers({ search = "" }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -11,6 +21,7 @@ function QuestionPapers({ search = "" }) {
   const isStandalonePage = location.pathname.startsWith("/papers") || location.pathname !== "/";
 
   const [papers, setPapers] = useState([]);
+  const [blinkingPaperId, setBlinkingPaperId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -59,8 +70,7 @@ function QuestionPapers({ search = "" }) {
 
   const filteredPapers = papers.filter((paper) => {
     if (!searchText) return true;
-
-    return (
+return (
       String(paper.title || "").toLowerCase().includes(searchText) ||
       String(paper.branch || "").toLowerCase().includes(searchText) ||
       String(paper.semester || "").toLowerCase().includes(searchText) ||
@@ -248,7 +258,11 @@ function QuestionPapers({ search = "" }) {
       console.error("View error:", error);
     }
 
-    navigate(`/pdf/${encodeURIComponent(fileName)}`);
+    setBlinkingPaperId(paper._id);
+    setTimeout(() => {
+      navigate(`/pdf/${encodeURIComponent(fileName)}`);
+      setBlinkingPaperId(null);
+    }, 600);
   };
 
   // ==========================================
@@ -318,8 +332,7 @@ function QuestionPapers({ search = "" }) {
           </button>
           <span className="papers-breadcrumb-slash">/</span>
           <span className="papers-breadcrumb-current">
-            <span className="papers-breadcrumb-dot" aria-hidden="true" />
-            Question Papers
+                        Question Papers
           </span>
         </div>
       </div>
@@ -409,65 +422,31 @@ function QuestionPapers({ search = "" }) {
 
               {/* Content Body */}
               <div className="resource-content">
-                <div className="resource-badge-row">
-                  <span className="resource-badge">
-                    <span className="resource-badge-dot" />
-                    {paper.branch || "University Exam"}
-                  </span>
-                </div>
-
-                <h3 className="resource-title" title={getPaperDisplayTitle(paper)}>
-                  {getPaperDisplayTitle(paper)}
-                </h3>
-
-                {getPaperContext(paper) ? (
-                  <p className="resource-desc">
-                    {getPaperContext(paper)}
-                  </p>
-                ) : null}
-
-                {/* Metadata Chips */}
-                <div className="resource-meta-chips">
-                  {paper.subject && (
-                    <span className="meta-chip meta-chip-subject" title={`Subject: ${paper.subject}`}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                      </svg>
-                      {paper.subject}
-                    </span>
-                  )}
-
-                  {paper.semester && (
-                    <span className="meta-chip meta-chip-semester" title="Academic Semester">
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                      </svg>
-                      {paper.semester}
-                    </span>
-                  )}
-
-                  {paper.subjectCode && (
-                    <span className="meta-chip meta-chip-code" title={`Subject Code: ${paper.subjectCode}`}>
+                {/* Subject Code Badge */}
+                {paper.subjectCode && (
+                  <div className="card-code-row">
+                    <span className="card-code-badge" title={`Subject Code: ${paper.subjectCode}`}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
                         <line x1="7" y1="7" x2="7.01" y2="7" />
                       </svg>
                       {paper.subjectCode}
                     </span>
-                  )}
+                  </div>
+                )}
 
-                  <span className="meta-chip meta-chip-date" title="Upload Date">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
-                    </svg>
-                    {formatDate(paper.createdAt) || "Recently Added"}
-                  </span>
-                </div>
+                {/* Subject Name */}
+                <h3 className="resource-title" title={getPaperDisplayTitle(paper)}>
+                  {getPaperDisplayTitle(paper)}
+                </h3>
+
+                {/* Subject Description in the gap */}
+                <p className="card-subject-snippet" title={getPaperSnippet(paper)}>
+                  {getPaperSnippet(paper)}
+                </p>
+
+                {/* Spacer */}
+                <div className="resource-content-spacer" />
 
                 {/* Professional Metrics Bar & Like Section */}
                 <div className="resource-stats">
@@ -507,7 +486,7 @@ function QuestionPapers({ search = "" }) {
                     className="view-pdf-button"
                     onClick={() => handleView(paper)}
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={blinkingPaperId === paper._id ? "eye-blink-anim" : ""}>
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
