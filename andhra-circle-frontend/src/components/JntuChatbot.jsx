@@ -378,6 +378,93 @@ function formatBotText(text) {
   );
 }
 
+/**
+ * Automatically computes academic Year and Semester from student's semester input.
+ * Supports JNTU notation ("3-2", "2-1", "1-1"), numerical sem ("Sem 6", "6th sem", "6"),
+ * and descriptive input ("3rd Year, 6th Sem").
+ */
+function detectYearAndSemester(rawQuery) {
+  const str = (rawQuery || "").toLowerCase().trim();
+
+  // 1. Direct JNTU year-sem notation: e.g. "3-2", "2-1", "1-1", "4-2"
+  const jntuMatch = str.match(/\b([1-4])\s*[-–]\s*([1-2])\b/);
+  if (jntuMatch) {
+    const yr = parseInt(jntuMatch[1]);
+    const sm = parseInt(jntuMatch[2]);
+    const semNum = (yr - 1) * 2 + sm;
+    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+    return {
+      year: yearLabels[yr - 1],
+      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
+      semCode: `${yr}-${sm}`,
+      semIndex: semNum,
+    };
+  }
+
+  // 2. Semester keywords: e.g. "sem 6", "6th sem", "semester 4", "4th semester"
+  const semWordMatch = str.match(/(?:sem|semester)\s*([1-8])\b|\b([1-8])(?:st|nd|rd|th)?\s*(?:sem|semester)\b/);
+  if (semWordMatch) {
+    const semNum = parseInt(semWordMatch[1] || semWordMatch[2]);
+    const yr = Math.ceil(semNum / 2);
+    const sm = ((semNum - 1) % 2) + 1;
+    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+    return {
+      year: yearLabels[yr - 1],
+      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
+      semCode: `${yr}-${sm}`,
+      semIndex: semNum,
+    };
+  }
+
+  // 3. Comma-separated or compound input: e.g. "3rd Year, 6th Sem"
+  if (str.includes(",")) {
+    const parts = str.split(",");
+    const yrPart = parts[0]?.trim();
+    const semPart = parts[1]?.trim();
+    const detectedYrMatch = yrPart.match(/\b([1-4])\b/);
+    const detectedSemMatch = semPart.match(/\b([1-8])\b/);
+    if (detectedYrMatch && detectedSemMatch) {
+      const yr = parseInt(detectedYrMatch[1]);
+      const semNum = parseInt(detectedSemMatch[1]);
+      const sm = ((semNum - 1) % 2) + 1;
+      const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+      const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+      return {
+        year: yearLabels[yr - 1],
+        semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
+        semCode: `${yr}-${sm}`,
+        semIndex: semNum,
+      };
+    }
+  }
+
+  // 4. Single digit 1 to 8: e.g. "6", "4", "2"
+  const digitMatch = str.match(/\b([1-8])\b/);
+  if (digitMatch) {
+    const semNum = parseInt(digitMatch[1]);
+    const yr = Math.ceil(semNum / 2);
+    const sm = ((semNum - 1) % 2) + 1;
+    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+    return {
+      year: yearLabels[yr - 1],
+      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
+      semCode: `${yr}-${sm}`,
+      semIndex: semNum,
+    };
+  }
+
+  // Fallback defaults
+  return {
+    year: "3rd Year",
+    semester: "6th Semester (3-2)",
+    semCode: "3-2",
+    semIndex: 6,
+  };
+}
+
 function JntuChatbot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -395,7 +482,7 @@ function JntuChatbot() {
   // Profile Wizard Session State
   const [profileSession, setProfileSession] = useState({
     active: false,
-    step: null, // "NAME" | "HALLTICKET" | "BRANCH" | "YEAR_SEM" | "REGULATION" | "CGPA" | "ATTENDANCE"
+    step: null, // "NAME" | "HALLTICKET" | "BRANCH" | "SEMESTER" | "REGULATION" | "CGPA" | "ATTENDANCE"
     draft: {},
   });
 
@@ -590,21 +677,22 @@ function JntuChatbot() {
           CE: "Civil Engineering",
         };
         draft.branch = branchNames[branchCode] || `${branchCode} Engineering`;
-        setProfileSession({ active: true, step: "YEAR_SEM", draft });
+        setProfileSession({ active: true, step: "SEMESTER", draft });
         return {
-          text: `Great, ${draft.branch}! Which Year & Semester are you in? (e.g. 3rd Year, 6th Semester)`,
-          suggestions: ["3rd Year, 6th Sem", "2nd Year, 4th Sem", "4th Year, 8th Sem", "1st Year, 2nd Sem"],
+          text: `Great, ${draft.branch}! Which Semester are you currently in?`,
+          suggestions: ["1-1", "1-2", "2-1", "2-2", "3-1", "3-2", "4-1", "4-2"],
           wizardActive: true,
         };
       }
 
-      if (step === "YEAR_SEM") {
-        const parts = rawQuery.trim().split(",");
-        draft.year = parts[0]?.trim() || "3rd Year";
-        draft.semester = parts[1]?.trim() || "6th Semester";
+      if (step === "SEMESTER" || step === "YEAR_SEM") {
+        const detected = detectYearAndSemester(rawQuery);
+        draft.year = detected.year;
+        draft.semester = detected.semester;
+        draft.semCode = detected.semCode;
         setProfileSession({ active: true, step: "REGULATION", draft });
         return {
-          text: `Which Academic Regulation applies to you?`,
+          text: `Got it, ${detected.year} (${detected.semCode})! Which Academic Regulation applies to you?`,
           suggestions: ["R23 Regulation", "R20 Regulation", "R19 Regulation", "R16 Regulation"],
           wizardActive: true,
         };
@@ -1566,8 +1654,8 @@ function JntuChatbot() {
                             ? "Type your Hall Ticket / USN Roll Number..."
                             : profileSession.step === "BRANCH"
                               ? "Type or select your branch..."
-                              : profileSession.step === "YEAR_SEM"
-                                ? "Type or select Year & Semester..."
+                              : profileSession.step === "SEMESTER" || profileSession.step === "YEAR_SEM"
+                                ? "Select or type semester (e.g. 3-2, 2-1)..."
                                 : profileSession.step === "REGULATION"
                                   ? "Type or select regulation..."
                                   : profileSession.step === "CGPA"
