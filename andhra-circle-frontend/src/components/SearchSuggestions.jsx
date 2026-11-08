@@ -201,7 +201,7 @@ function NoteDetails() {
   // BACKEND FILE URL
   // =========================================================
 
-  const BACKEND_URL = "http://localhost:5000";
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
   const getFileUrl = (url) => {
     if (!url || typeof url !== "string") {

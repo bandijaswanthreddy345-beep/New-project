@@ -195,7 +195,7 @@ return (
       return imageUrl;
     }
 
-    return `http://localhost:5000${imageUrl}`;
+    return `${import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`}${imageUrl}`;
   };
 
   // ==========================================
@@ -266,7 +266,7 @@ return (
         pdfPath.startsWith("http://") ||
         pdfPath.startsWith("https://")
           ? pdfPath
-          : `http://localhost:5000${pdfPath}`;
+          : `${import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`}${pdfPath}`;
 
       const response = await fetch(pdfUrl);
 

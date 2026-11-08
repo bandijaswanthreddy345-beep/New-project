@@ -83,12 +83,13 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Synchronize if selectedBranch prop changes externally
+  // Synchronize if selectedBranch prop changes externally or via select-branch event
   useEffect(() => {
-    if (selectedBranch) {
+    const handleSelect = (branchCode) => {
+      if (!branchCode) return;
       const idx = BRANCHES.findIndex((b) => {
         const bCode = b.code.toLowerCase();
-        const sCode = selectedBranch.toLowerCase();
+        const sCode = branchCode.toLowerCase();
         return (
           bCode === sCode ||
           (sCode === "me" && bCode === "mech") ||
@@ -100,15 +101,36 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
       if (idx !== -1) {
         setActiveIndex(idx);
       }
+    };
+
+    if (selectedBranch) {
+      handleSelect(selectedBranch);
     }
+
+    const onCustomSelect = (e) => {
+      if (e?.detail) handleSelect(e.detail);
+    };
+    window.addEventListener("select-branch", onCustomSelect);
+    return () => window.removeEventListener("select-branch", onCustomSelect);
   }, [selectedBranch]);
 
-  // Smooth continuous auto-rotation: ALWAYS keeps moving smoothly even in view or out of view, never paused on hover
+  // Smooth continuous auto-rotation: paused on touch/interaction
   useEffect(() => {
+    let pauseUntil = 0;
+    const onSelectEvent = (e) => {
+      if (e?.detail) {
+        pauseUntil = Date.now() + 8000;
+      }
+    };
+    window.addEventListener('select-branch', onSelectEvent);
     const timer = setInterval(() => {
+      if (Date.now() < pauseUntil) return;
       setActiveIndex((prev) => (prev + 1) % BRANCHES.length);
-    }, 2800);
-    return () => clearInterval(timer);
+    }, 3600);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('select-branch', onSelectEvent);
+    };
   }, []);
 
   const prevBranch = () => {
@@ -119,7 +141,12 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
     setActiveIndex((prev) => (prev + 1) % BRANCHES.length);
   };
 
-  const handleBranchClick = (branch, isCenter) => {
+  const handleBranchClick = (branch, isCenter, index) => {
+    // If user clicks a side card on mobile, smoothly bring it to the center first!
+    if (!isCenter && windowWidth < 768) {
+      setActiveIndex(index);
+      return;
+    }
     if (onSelectBranch) {
       onSelectBranch(branch.code);
     }
@@ -162,28 +189,68 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
       };
     }
 
-    // 1. Mobile screen (< 768px)
+    // 1. Mobile screen (< 768px) - High-fidelity 3D Coverflow geometry with smooth, natural shadows
     if (windowWidth < 768) {
       if (offset === 0) {
         return {
-          transform: "translate3d(0, 0, 30px) rotateY(0deg) scale(1)",
+          transform: "translateX(0) translateZ(40px) scale(1.02) rotateY(0deg)",
           zIndex: 30,
           opacity: 1,
-          filter: "brightness(1) drop-shadow(0 15px 30px rgba(1, 42, 35, 0.2))",
+          filter: "none",
+          boxShadow:
+            "0 14px 28px -6px rgba(15, 23, 42, 0.18), 0 6px 14px -4px rgba(15, 23, 42, 0.12)",
           pointerEvents: "auto",
         };
       }
-      const isTiny = windowWidth < 480;
-      const xDistance = isTiny ? 95 : 135;
-      const xMobile = offset < 0 ? -xDistance : xDistance;
-      const rotMobile = offset < 0 ? 18 : -18;
-      const scaleMobile = isTiny ? 0.78 : 0.82;
+      if (offset === -1) {
+        return {
+          transform:
+            "translateX(-64%) translateZ(-30px) scale(0.85) rotateY(20deg)",
+          zIndex: 20,
+          opacity: 1,
+          filter: "brightness(0.65)",
+          boxShadow:
+            "0 10px 22px -6px rgba(15, 23, 42, 0.15)",
+          pointerEvents: "auto",
+        };
+      }
+      if (offset < -1) {
+        return {
+          transform:
+            "translateX(-110%) translateZ(-80px) scale(0.72) rotateY(28deg)",
+          zIndex: 10,
+          opacity: 0,
+          filter: "brightness(0.4)",
+          pointerEvents: "none",
+        };
+      }
+      if (offset === 1) {
+        return {
+          transform:
+            "translateX(64%) translateZ(-30px) scale(0.85) rotateY(-20deg)",
+          zIndex: 20,
+          opacity: 1,
+          filter: "brightness(0.65)",
+          boxShadow:
+            "0 10px 22px -6px rgba(15, 23, 42, 0.15)",
+          pointerEvents: "auto",
+        };
+      }
+      if (offset > 1) {
+        return {
+          transform:
+            "translateX(110%) translateZ(-80px) scale(0.72) rotateY(-28deg)",
+          zIndex: 10,
+          opacity: 0,
+          filter: "brightness(0.4)",
+          pointerEvents: "none",
+        };
+      }
       return {
-        transform: `translate3d(${xMobile}px, 0, -30px) rotateY(${rotMobile}deg) scale(${scaleMobile})`,
-        zIndex: 20 - absOffset,
-        opacity: isTiny ? 0.7 : 0.9,
-        filter: "brightness(0.8)",
-        pointerEvents: "auto",
+        transform: "translateX(0) translateZ(-160px) scale(0.6)",
+        zIndex: 0,
+        opacity: 0,
+        pointerEvents: "none",
       };
     }
 
@@ -297,10 +364,13 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
             return (
               <div
                 key={branch.code}
-                onClick={() => handleBranchClick(branch, isCenter)}
+                onClick={() => handleBranchClick(branch, isCenter, index)}
                 style={{
                   ...style3D,
-                  transition: "all 0.85s cubic-bezier(0.25, 1, 0.45, 1)",
+                  transition:
+                    windowWidth < 768
+                      ? "transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease, filter 0.45s ease"
+                      : "all 0.85s cubic-bezier(0.25, 1, 0.45, 1)",
                 }}
                 className={`branch-3d-card ${isCenter ? "is-center" : ""}`}
                 title={`Explore ${branch.name}`}
@@ -315,6 +385,9 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
 
                 {/* Dark Gradient Overlay for optimal legibility */}
                 <div className="branch-card-overlay" />
+
+                {/* Curved Mobile Ground Ambient Reflection / Pod */}
+                <div className="branch-card-mobile-ground-shadow" aria-hidden="true" />
 
                 {/* Card Content */}
                 <div className="branch-card-inner">

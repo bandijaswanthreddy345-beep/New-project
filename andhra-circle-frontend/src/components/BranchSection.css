@@ -360,24 +360,31 @@
   background: #d9a726;
 }
 
-/* Mobile Responsive */
+/* Mobile Responsive - 3D Coverflow geometry strictly under @media (max-width: 768px) */
 @media (max-width: 768px) {
   .branch-3d-card {
-    width: 290px;
+    width: 240px;
     height: 300px;
+    border-radius: 24px;
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    transform-origin: center center;
+    backface-visibility: hidden;
+    will-change: transform, opacity, z-index;
   }
   .branch-carousel-stage {
-    min-height: 380px;
+    min-height: 330px;
+    perspective: 1200px;
+    transform-style: preserve-3d;
   }
   .branch-carousel-world {
-    height: 320px;
+    height: 310px;
   }
 }
 
 @media (min-width: 640px) and (max-width: 768px) {
   .branch-3d-card {
-    width: 340px;
-    height: 300px;
+    width: 250px;
+    height: 310px;
   }
 }
 
@@ -401,34 +408,33 @@
     line-height: 1.25;
   }
   .branch-3d-card {
-    width: min(84vw, 255px);
-    height: 265px;
-    border-radius: 18px;
+    width: 230px;
+    height: 290px;
+    border-radius: 20px;
   }
-  .branch-card-content {
-    padding: 14px 12px;
+  .branch-card-inner {
+    padding: 16px 16px;
   }
-  .branch-card-title {
-    font-size: 16px;
+  .branch-card-name {
+    font-size: 18px;
   }
-  .branch-card-category {
+  .branch-card-tag {
     font-size: 9.5px;
-    margin-bottom: 2px;
   }
-  .branch-card-explore {
+  .branch-explore-link {
     font-size: 11px;
   }
   .branch-carousel-stage {
-    min-height: 300px;
+    min-height: 320px;
   }
   .branch-carousel-world {
-    height: 275px;
+    height: 295px;
   }
   .branch-carousel-controls {
     margin-top: 16px;
     gap: 12px;
   }
-  .branch-carousel-btn {
+  .branch-nav-btn {
     width: 38px;
     height: 38px;
   }
@@ -436,16 +442,38 @@
 
 @media (max-width: 360px) {
   .branch-3d-card {
-    width: min(86vw, 225px);
-    height: 240px;
+    width: 215px;
+    height: 270px;
   }
   .branch-carousel-title {
     font-size: 18px;
   }
   .branch-carousel-stage {
-    min-height: 265px;
+    min-height: 290px;
   }
   .branch-carousel-world {
-    height: 245px;
+    height: 275px;
+  }
+}
+
+/* =========================================================
+   MOBILE-ONLY FIXES — Branch Section
+   Floating buttons are on the RIGHT side, so only add right-side padding
+   to prevent card content from being clipped behind them.
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .branch-carousel-header {
+    padding: 0 16px;
+    max-width: 100%;
+  }
+
+  .branch-carousel-title {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+
+  .branch-carousel-stage {
+    overflow: visible;
   }
 }

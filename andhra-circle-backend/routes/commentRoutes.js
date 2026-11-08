@@ -2,54 +2,49 @@ const express = require("express");
 
 const router = express.Router();
 
+const auth = require("../middleware/auth");
+const { rateLimit } = require("../middleware/rateLimit");
+
 const {
-createComment,
-getComments,
-likeComment,
-dislikeComment,
-deleteComment,
+  createComment,
+  getComments,
+  likeComment,
+  dislikeComment,
+  deleteComment,
 } = require("../controllers/commentController");
 
 // ==========================================
-// CREATE COMMENT
+// CREATE COMMENT (public, rate limited against spam)
 // ==========================================
 
-router.post("/", createComment);
+router.post(
+  "/",
+  rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 10,
+    message: "You are commenting too fast. Please wait a few minutes.",
+  }),
+  createComment
+);
 
 // ==========================================
 // GET COMMENTS FOR NOTE
 // ==========================================
 
-router.get(
-"/note/:noteId",
-getComments
-);
+router.get("/note/:noteId", getComments);
 
 // ==========================================
-// LIKE COMMENT
+// LIKE / DISLIKE COMMENT
 // ==========================================
 
-router.put(
-"/:id/like",
-likeComment
-);
+router.put("/:id/like", likeComment);
+
+router.put("/:id/dislike", dislikeComment);
 
 // ==========================================
-// DISLIKE COMMENT
+// DELETE COMMENT (admin only)
 // ==========================================
 
-router.put(
-"/:id/dislike",
-dislikeComment
-);
-
-// ==========================================
-// DELETE COMMENT
-// ==========================================
-
-router.delete(
-"/:id",
-deleteComment
-);
+router.delete("/:id", auth, deleteComment);
 
 module.exports = router;

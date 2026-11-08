@@ -119,7 +119,7 @@ return (
     if (!value.startsWith("/")) {
       value = `/${value}`;
     }
-    return `http://localhost:5000${value}`;
+    return `${import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`}${value}`;
   };
 
   const getPdfFileName = (pdfUrl) => {

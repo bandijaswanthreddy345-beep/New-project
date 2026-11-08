@@ -4,12 +4,41 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const emailjs = require("@emailjs/nodejs");
 
+const MIN_PASSWORD_LENGTH = 8;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// SECURITY: request fields must be plain strings. If someone sends
+// {"email": {"$ne": null}} MongoDB would treat it as a query operator
+// (NoSQL injection), so everything is coerced/validated first.
+const asString = (value) => (typeof value === "string" ? value.trim() : "");
+
 // ==========================================
 // Register User
 // ==========================================
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const name = asString(req.body?.name);
+    const email = asString(req.body?.email);
+    const password =
+      typeof req.body?.password === "string" ? req.body.password : "";
+
+    if (!name || name.length > 100) {
+      return res.status(400).json({
+        message: "Please enter a valid name",
+      });
+    }
+
+    if (!EMAIL_PATTERN.test(email) || email.length > 254) {
+      return res.status(400).json({
+        message: "Please enter a valid email address",
+      });
+    }
+
+    if (password.length < MIN_PASSWORD_LENGTH || password.length > 128) {
+      return res.status(400).json({
+        message: `Password must be ${MIN_PASSWORD_LENGTH}-128 characters long`,
+      });
+    }
 
     const userExists = await User.findOne({ email });
 
@@ -20,26 +49,30 @@ exports.registerUser = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(
-      password,
-      salt
-    );
+    const hashedPassword = await bcrypt.hash(password, salt);
 
+    // role is NOT taken from the request: everyone registers as a student
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
     });
 
+    // SECURITY: never send the password hash back to the browser
     res.status(201).json({
       message: "Registration Successful",
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error("Register Error:", error);
 
     res.status(500).json({
-      message: error.message,
+      message: "Registration failed. Please try again.",
     });
   }
 };
@@ -49,25 +82,31 @@ exports.registerUser = async (req, res) => {
 // ==========================================
 exports.loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = asString(req.body?.email);
+    const password =
+      typeof req.body?.password === "string" ? req.body.password : "";
+
+    // SECURITY: one generic answer for "no such user" and "wrong password"
+    // so attackers cannot discover which emails are registered.
+    const invalid = () =>
+      res.status(401).json({
+        message: "Invalid email or password",
+      });
+
+    if (!email || !password) {
+      return invalid();
+    }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return invalid();
     }
 
-    const match = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
-      return res.status(400).json({
-        message: "Invalid Credentials",
-      });
+      return invalid();
     }
 
     // Generate JWT Token with Role
@@ -96,7 +135,7 @@ exports.loginUser = async (req, res) => {
     console.error("Login Error:", error);
 
     res.status(500).json({
-      message: error.message,
+      message: "Login failed. Please try again.",
     });
   }
 };
@@ -105,22 +144,28 @@ exports.loginUser = async (req, res) => {
 // Forgot Password
 // ==========================================
 exports.forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
+  // Same answer whether or not the email exists (no account enumeration)
+  const genericResponse = () =>
+    res.status(200).json({
+      message:
+        "If this email is registered, a password reset link has been sent to it",
+    });
 
-    // Find user
+  try {
+    const email = asString(req.body?.email);
+
+    if (!email) {
+      return genericResponse();
+    }
+
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return genericResponse();
     }
 
     // Generate random reset token
-    const resetToken = crypto
-      .randomBytes(32)
-      .toString("hex");
+    const resetToken = crypto.randomBytes(32).toString("hex");
 
     // Hash token before storing in database
     const hashedToken = crypto
@@ -128,34 +173,18 @@ exports.forgotPassword = async (req, res) => {
       .update(resetToken)
       .digest("hex");
 
-    // Save hashed token
     user.resetPasswordToken = hashedToken;
 
     // Token expires after 15 minutes
-    user.resetPasswordExpire =
-      new Date(Date.now() + 15 * 60 * 1000);
+    user.resetPasswordExpire = new Date(Date.now() + 15 * 60 * 1000);
 
     await user.save();
 
-    // Create frontend reset URL
-    const resetUrl =
-      `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-    console.log("-----------------------------------");
-    console.log("PASSWORD RESET REQUEST");
-    console.log("User Email:", user.email);
-    console.log("Reset URL:", resetUrl);
-    console.log("Token:", resetToken);
-    console.log("Hashed Token:", hashedToken);
-    console.log(
-      "Token Expiry:",
-      user.resetPasswordExpire
-    );
-    console.log("-----------------------------------");
+    // SECURITY: the reset link/token is deliberately NOT logged anymore.
+    // Anyone who can read the server logs could otherwise take over accounts.
 
-    // ==========================================
-    // Send Email using EmailJS
-    // ==========================================
     await emailjs.send(
       process.env.EMAILJS_SERVICE_ID,
       process.env.EMAILJS_TEMPLATE_ID,
@@ -169,24 +198,12 @@ exports.forgotPassword = async (req, res) => {
       }
     );
 
-    console.log(
-      "Password reset email sent to:",
-      user.email
-    );
-
-    res.status(200).json({
-      message:
-        "Password reset link has been sent to your email",
-    });
+    return genericResponse();
   } catch (error) {
-    console.error(
-      "Forgot Password Error:",
-      error
-    );
+    console.error("Forgot Password Error:", error);
 
     res.status(500).json({
-      message:
-        "Unable to send password reset email",
+      message: "Unable to send password reset email",
     });
   }
 };
@@ -196,135 +213,62 @@ exports.forgotPassword = async (req, res) => {
 // ==========================================
 exports.resetPassword = async (req, res) => {
   try {
-    const { token } = req.params;
-    const { password } = req.body;
+    const token = asString(req.params?.token);
+    const password =
+      typeof req.body?.password === "string" ? req.body.password : "";
 
-    console.log("-----------------------------------");
-    console.log("RESET PASSWORD REQUEST");
-    console.log("Token received:", token);
-    console.log(
-      "Password received:",
-      password ? "YES" : "NO"
-    );
-
-    // Check token
     if (!token) {
-      console.log("❌ Token is missing");
-
       return res.status(400).json({
         message: "Reset token is missing",
       });
     }
 
-    // Check password
     if (!password) {
-      console.log("❌ Password is missing");
-
       return res.status(400).json({
         message: "Please enter a new password",
       });
     }
 
-    // Hash received token
+    if (password.length < MIN_PASSWORD_LENGTH || password.length > 128) {
+      return res.status(400).json({
+        message: `Password must be ${MIN_PASSWORD_LENGTH}-128 characters long`,
+      });
+    }
+
     const hashedToken = crypto
       .createHash("sha256")
       .update(token)
       .digest("hex");
 
-    console.log(
-      "Hashed token received:",
-      hashedToken
-    );
-
-    // ==========================================
-    // Find user using reset token
-    // ==========================================
+    // Token must match AND still be inside its 15 minute window
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: new Date() },
     });
 
-    // User not found
     if (!user) {
-      console.log(
-        "❌ No user found with this reset token"
-      );
-
       return res.status(400).json({
-        message: "Invalid reset token",
+        message: "Invalid or expired reset token",
       });
     }
 
-    console.log(
-      "✅ User found:",
-      user.email
-    );
-
-    console.log(
-      "Token expiry:",
-      user.resetPasswordExpire
-    );
-
-    console.log(
-      "Current time:",
-      new Date()
-    );
-
-    // ==========================================
-    // Check Token Expiry
-    // ==========================================
-    if (
-      !user.resetPasswordExpire ||
-      user.resetPasswordExpire.getTime() <
-        Date.now()
-    ) {
-      console.log("❌ Reset token has expired");
-
-      return res.status(400).json({
-        message: "Reset token has expired",
-      });
-    }
-
-    console.log("✅ Reset token is valid");
-
-    // ==========================================
-    // Hash New Password
-    // ==========================================
     const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      salt
-    );
-
-    // ==========================================
-    // Update Password
-    // ==========================================
-    user.password = hashedPassword;
-
-    // Clear reset token
+    // One-time use: clear the reset token
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
     await user.save();
 
-    console.log(
-      "✅ Password reset successful for:",
-      user.email
-    );
-
-    console.log("-----------------------------------");
-
     res.status(200).json({
       message: "Password Reset Successful",
     });
   } catch (error) {
-    console.error(
-      "Reset Password Error:",
-      error
-    );
+    console.error("Reset Password Error:", error);
 
     res.status(500).json({
-      message: error.message,
+      message: "Unable to reset password. Please try again.",
     });
   }
 };

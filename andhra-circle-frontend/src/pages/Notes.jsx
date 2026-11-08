@@ -11,11 +11,6 @@ import "./Notes.css";
 // Branch definitions matching homepage engineering departments
 const BRANCH_TABS = [
   {
-    code: "ALL",
-    name: "All Departments",
-    aliases: ["all", "all departments", "all branches"],
-  },
-  {
     code: "CSE",
     name: "Computer Science Engineering",
     aliases: [
@@ -181,12 +176,12 @@ function Notes({ initialType }) {
   }, [getResourceFromPath]);
 
   // Initial branch from URL param or default to "CSE"
-  const urlBranch = (searchParams.get("branch") || searchParams.get("search") || "ALL").toUpperCase();
+  const urlBranch = (searchParams.get("branch") || searchParams.get("search") || "CSE").toUpperCase();
   const matchedTab = BRANCH_TABS.find((tab) =>
     noteMatchesBranch(urlBranch, tab)
   );
 
-  const [activeBranch, setActiveBranch] = useState(matchedTab ? matchedTab.code : "ALL");
+  const [activeBranch, setActiveBranch] = useState(matchedTab ? matchedTab.code : "CSE");
   const [selectedSemester, setSelectedSemester] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 

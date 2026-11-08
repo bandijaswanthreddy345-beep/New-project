@@ -51,6 +51,11 @@ function Navbar() {
   const [activeAlertItem, setActiveAlertItem] = useState(null);
   const [student, setStudent] = useState(getStoredStudentData());
 
+  // Mobile auto-popping notification states
+  const [mobileNotifIndex, setMobileNotifIndex] = useState(0);
+  const [showMobileNotifPopup, setShowMobileNotifPopup] = useState(false);
+  const mobileNotifRef = useRef(null);
+
   useEffect(() => {
     const handleProfileSync = () => {
       setStudent(getStoredStudentData());
@@ -188,6 +193,9 @@ function Navbar() {
       if (notifContainerRef.current && !notifContainerRef.current.contains(e.target)) {
         setShowDropdown(false);
       }
+      if (mobileNotifRef.current && !mobileNotifRef.current.contains(e.target)) {
+        setShowMobileNotifPopup(false);
+      }
     };
     document.addEventListener("mousedown", handleOutsideClick);
     document.addEventListener("touchstart", handleOutsideClick);
@@ -196,6 +204,51 @@ function Navbar() {
       document.removeEventListener("touchstart", handleOutsideClick);
     };
   }, []);
+
+  // Automatic mobile notification pop-up every 5 seconds (touch screen fallback for no cursor hover)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let initialTimeout = null;
+    let cycleInterval = null;
+
+    const runMobileCycle = () => {
+      if (window.innerWidth <= 768 && notificationsList && notificationsList.length > 0) {
+        // Initial popup after brief delay
+        initialTimeout = setTimeout(() => {
+          setShowMobileNotifPopup(true);
+        }, 1200);
+
+        // Continuous 5-second automatic popup cycle
+        cycleInterval = setInterval(() => {
+          if (window.innerWidth <= 768 && notificationsList.length > 0) {
+            setShowMobileNotifPopup(false);
+            setTimeout(() => {
+              setMobileNotifIndex((prev) => (prev + 1) % notificationsList.length);
+              setShowMobileNotifPopup(true);
+            }, 300);
+          }
+        }, 5000);
+      }
+    };
+
+    runMobileCycle();
+
+    const handleMobileResize = () => {
+      if (window.innerWidth > 768) {
+        setShowMobileNotifPopup(false);
+        if (initialTimeout) clearTimeout(initialTimeout);
+        if (cycleInterval) clearInterval(cycleInterval);
+      }
+    };
+
+    window.addEventListener("resize", handleMobileResize);
+    return () => {
+      if (initialTimeout) clearTimeout(initialTimeout);
+      if (cycleInterval) clearInterval(cycleInterval);
+      window.removeEventListener("resize", handleMobileResize);
+    };
+  }, [notificationsList]);
 
   const formatTimeAgo = (dateStr) => {
     if (!dateStr) return "Recent";
@@ -261,10 +314,6 @@ function Navbar() {
       ),
     },
     {
-      name: "Notifications",
-      path: "/notifications",
-    },
-    {
       name: "Student Profile",
       path: "/profile",
       isProfile: true,
@@ -297,18 +346,98 @@ function Navbar() {
           MOBILE ACTIONS (VISIBLE <= 768px)
       ========================================== */}
       <div className="nav-mobile-actions">
+        <div className="nav-mobile-notif-wrapper" ref={mobileNotifRef}>
+          <Link
+            to="/notifications"
+            className="nav-mobile-action-btn"
+            title="Notifications"
+            aria-label="View notifications"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setShowMobileNotifPopup(false);
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            {hasNewAlert && <span className="nav-mobile-notif-ping" />}
+          </Link>
+
+          {/* Auto-popping mobile notification preview strip (pops up every 5 seconds) */}
+          {notificationsList && notificationsList.length > 0 && (
+            <div
+              className={`nav-mobile-notif-popup ${showMobileNotifPopup ? "is-visible" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMobileNotifPopup(false);
+                handleOpenNotifications();
+                const activeNotice = notificationsList[mobileNotifIndex] || latestAlert;
+                if (activeNotice?._id) {
+                  navigate(`/notifications?view=${encodeURIComponent(activeNotice._id)}`);
+                } else {
+                  navigate("/notifications");
+                }
+              }}
+              role="alert"
+              aria-live="polite"
+              title="Click to view full notification"
+            >
+              <div className="nav-mobile-notif-arrow" />
+              <div className="nav-mobile-notif-body">
+                <span className="nav-mobile-notif-text">
+                  {(notificationsList[mobileNotifIndex] || latestAlert)?.title}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="nav-mobile-notif-dismiss"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMobileNotifPopup(false);
+                }}
+                aria-label="Dismiss notification popup"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Student Profile Quick Avatar */}
         <Link
-          to="/notifications"
-          className="nav-mobile-action-btn"
-          title="Notifications"
-          aria-label="View notifications"
-          onClick={() => setMobileMenuOpen(false)}
+          to="/student-profile"
+          className="nav-mobile-action-btn nav-mobile-profile-btn"
+          title={`Student Profile • ${student?.name || "Student"}`}
+          aria-label="Student Profile"
+          onClick={() => {
+            setMobileMenuOpen(false);
+            setShowMobileNotifPopup(false);
+          }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-          {hasNewAlert && <span className="nav-mobile-notif-ping" />}
+          <div className="nav-profile-avatar-wrapper nav-mobile-profile-avatar-wrapper">
+            {student?.profilePhoto && student.profilePhoto !== "none" ? (
+              <img
+                src={student.profilePhoto}
+                alt={student.name || "Student"}
+                className="nav-profile-avatar-img nav-mobile-avatar-img"
+              />
+            ) : student?.profilePhoto === "none" ? (
+              <span className="nav-profile-fallback-icon nav-mobile-fallback-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
+            ) : (
+              <img
+                src={profileImgDefault}
+                alt={student?.name || "Student"}
+                className="nav-profile-avatar-img nav-mobile-avatar-img"
+              />
+            )}
+            <span className="nav-profile-status-dot" />
+          </div>
         </Link>
 
         <button

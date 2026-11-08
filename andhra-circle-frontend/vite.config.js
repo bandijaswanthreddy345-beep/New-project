@@ -21,6 +21,7 @@ export default defineConfig({
     include: ['react', 'react-dom', 'border-beam', 'bot-avatars'],
   },
   server: {
+    host: true, // lets a phone on the same Wi-Fi open the dev site
     watch: {
       usePolling: true,
       interval: 1000,

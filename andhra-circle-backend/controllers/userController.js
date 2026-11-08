@@ -26,6 +26,14 @@ exports.updateUserRole = async (req, res) => {
   try {
     const { role } = req.body;
 
+    // Safety: an admin cannot change their own role (prevents locking
+    // the site out of its last admin by accident)
+    if (String(req.params.id) === String(req.user._id)) {
+      return res.status(400).json({
+        message: "You cannot change your own role.",
+      });
+    }
+
     // Check valid role
     if (!["student", "admin"].includes(role)) {
       return res.status(400).json({
@@ -72,6 +80,13 @@ exports.updateUserRole = async (req, res) => {
 // ==========================================
 exports.deleteUser = async (req, res) => {
   try {
+    // Safety: an admin cannot delete their own account
+    if (String(req.params.id) === String(req.user._id)) {
+      return res.status(400).json({
+        message: "You cannot delete your own account.",
+      });
+    }
+
     const user = await User.findById(
       req.params.id
     );
