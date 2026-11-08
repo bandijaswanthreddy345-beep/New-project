@@ -789,14 +789,14 @@
     width: 28px !important;
     height: 28px !important;
     border-radius: 9999px !important;
-    background: linear-gradient(135deg, #fbbf24 0%, #fde68a 100%) !important;
+    background: #fbbf24 !important;
     border: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
     flex-shrink: 0 !important;
-    color: #0f172a !important;
+    color: #020617 !important;
     padding: 0 !important;
   }
 
@@ -827,7 +827,7 @@
     width: 32px !important;
     height: 32px !important;
     border-radius: 9999px !important;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+    background: #fbbf24 !important;
     border: none !important;
     color: #020617 !important;
     display: flex !important;

@@ -606,13 +606,13 @@ ul {
   width: 36px;
   height: 36px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #fbbf24 0%, #fde68a 100%);
+  background: #fbbf24 !important;
   border: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   flex-shrink: 0;
   padding: 0;
-  color: #0f172a;
+  color: #020617 !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -745,7 +745,7 @@ ul {
   width: 36px;
   height: 36px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+  background: #fbbf24 !important;
   color: #020617 !important;
   border: none !important;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4) !important;
