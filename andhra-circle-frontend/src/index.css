@@ -828,9 +828,9 @@ ul {
   box-sizing: border-box;
 }
 
-.hero-ai-pill-icon {
-  font-size: 13px;
-  line-height: 1;
+.hero-ai-pill-icon,
+.starter-pill-sparkle {
+  display: none !important;
 }
 
 .hero-ai-quick-pill:hover {
