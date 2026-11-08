@@ -806,6 +806,9 @@
     font-size: 12px !important;
     color: #ffffff !important;
     font-weight: 450 !important;
+    line-height: normal !important;
+    display: flex !important;
+    align-items: center !important;
   }
 
   .hero-ai-input::placeholder {
