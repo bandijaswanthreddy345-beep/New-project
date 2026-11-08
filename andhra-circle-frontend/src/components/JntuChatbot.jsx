@@ -679,8 +679,7 @@ function JntuChatbot() {
         draft.branch = branchNames[branchCode] || `${branchCode} Engineering`;
         setProfileSession({ active: true, step: "SEMESTER", draft });
         return {
-          text: `Great, ${draft.branch}! Which Semester are you currently in?`,
-          suggestions: ["1-1", "1-2", "2-1", "2-2", "3-1", "3-2", "4-1", "4-2"],
+          text: `Great, ${draft.branch}! Which Semester are you currently in? (e.g. 3-2, 2-1, 1st Sem)`,
           wizardActive: true,
         };
       }
@@ -1655,7 +1654,7 @@ function JntuChatbot() {
                             : profileSession.step === "BRANCH"
                               ? "Type or select your branch..."
                               : profileSession.step === "SEMESTER" || profileSession.step === "YEAR_SEM"
-                                ? "Select or type semester (e.g. 3-2, 2-1)..."
+                                ? "Type your semester (e.g. 3-2, 2-1)..."
                                 : profileSession.step === "REGULATION"
                                   ? "Type or select regulation..."
                                   : profileSession.step === "CGPA"
