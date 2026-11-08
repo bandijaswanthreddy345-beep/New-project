@@ -561,8 +561,7 @@ function JntuChatbot() {
         draft.shortName = rawQuery.trim().split(" ")[0];
         setProfileSession({ active: true, step: "HALLTICKET", draft });
         return {
-          text: `Awesome, ${draft.name}! What is your JNTU Hall Ticket / Roll Number? (e.g. 22B91A4201)`,
-          suggestions: ["22B91A4201", "21B91A0501", "23B91A0501"],
+          text: `Awesome, ${draft.name}! What is your JNTU Hall Ticket / USN Roll Number? (e.g. 22B91A4201)`,
           wizardActive: true,
         };
       }
@@ -616,7 +615,6 @@ function JntuChatbot() {
         setProfileSession({ active: true, step: "CGPA", draft });
         return {
           text: `What is your current Cumulative CGPA? (e.g. 8.85)`,
-          suggestions: ["8.85", "9.10", "8.50", "9.40"],
           wizardActive: true,
         };
       }
@@ -627,7 +625,6 @@ function JntuChatbot() {
         setProfileSession({ active: true, step: "ATTENDANCE", draft });
         return {
           text: `What is your current Attendance Percentage? (e.g. 89.4%)`,
-          suggestions: ["90%", "89.4%", "85%", "95%"],
           wizardActive: true,
         };
       }
@@ -675,7 +672,6 @@ function JntuChatbot() {
       setProfileSession({ active: true, step: "NAME", draft: {} });
       return {
         text: `🎓 Let's build your verified JNTU Student Profile together! First, what is your Full Name?`,
-        suggestions: ["Chinnu", "Jaswanth Reddy", "K. Suresh"],
         wizardActive: true,
       };
     }
@@ -1564,7 +1560,21 @@ function JntuChatbot() {
                     isListening && listeningTarget === "modal"
                       ? "🎙️ Listening... speak your message now..."
                       : profileSession.active
-                        ? "Type your response here..."
+                        ? profileSession.step === "NAME"
+                          ? "Type your full name..."
+                          : profileSession.step === "HALLTICKET"
+                            ? "Type your Hall Ticket / USN Roll Number..."
+                            : profileSession.step === "BRANCH"
+                              ? "Type or select your branch..."
+                              : profileSession.step === "YEAR_SEM"
+                                ? "Type or select Year & Semester..."
+                                : profileSession.step === "REGULATION"
+                                  ? "Type or select regulation..."
+                                  : profileSession.step === "CGPA"
+                                    ? "Type your CGPA (e.g. 8.85)..."
+                                    : profileSession.step === "ATTENDANCE"
+                                      ? "Type your attendance % (e.g. 89%)..."
+                                      : "Type your response here..."
                         : "Type your message or answer..."
                   }
                   value={modalInput}
