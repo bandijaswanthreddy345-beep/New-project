@@ -314,6 +314,10 @@ function Navbar() {
       ),
     },
     {
+      name: "Notifications",
+      path: "/notifications",
+    },
+    {
       name: "Student Profile",
       path: "/profile",
       isProfile: true,
