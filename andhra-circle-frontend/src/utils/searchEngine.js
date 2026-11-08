@@ -1388,8 +1388,30 @@ export function getAcademicKnowledgeAnswer(rawQuery) {
     };
   }
 
-  // 3. INTERNAL (CIE) & EXTERNAL (SEE) MARKS SPLIT & PASSING CRITERIA
-  if (/pass mark|passing mark|internal mark|external mark|cie|see|mid exam|minimum mark|how many mark to pass|exam pattern|marks split/.test(q)) {
+  // 3. MID-TERM EXAMS (CIE) EVALUATION & 80:20 WEIGHTAGE RULE
+  if (/80[:\s]*20|mid.*(?:mark|exam|rule|split|weight|calc|internal)|how.*mid.*calculated|mid 1.*mid 2/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Mid-Term Examination 80:20 Calculation Rule",
+      formula: "Internal Marks = (0.80 × Best Mid) + (0.20 × Other Mid) + Assignment/Quiz (10M)",
+      text:
+        `Under official JNTUA academic regulations (R23 & R20), Continuous Internal Evaluation (CIE) for theory courses is awarded based on two mid-term examinations with an **80:20 weightage rule**:\n\n` +
+        `• **Weightage Scheme:** **80% weightage** is awarded to the best-performing mid examination, and **20% weightage** is given to the other mid examination.\n` +
+        `• **Component Breakdown:**\n` +
+        `  - Each Mid exam has descriptive questions (20 marks) + objective/quiz (10 marks).\n` +
+        `  - Total Scaled Mid Weightage: **20 Marks** (80% best mid + 20% second mid).\n` +
+        `  - Continuous assessment (assignments, seminar/quiz, micro-projects, active participation): **10 Marks**.\n` +
+        `  - **Total Internal Marks (CIE):** **30 Marks**.\n\n` +
+        `🎯 **Example Calculation:**\n` +
+        `• Mid-1 score: **28 / 30**, Mid-2 score: **20 / 30**\n` +
+        `• Calculation: \`(0.8 × 28) + (0.2 × 20) = 22.4 + 4.0 = 26.4\` → **27 Marks** out of 30!`,
+      action: { label: "Open CGPA & SGPA Calculator →", path: "/calculator" },
+      suggestions: ["📝 Passing Marks Criteria", "📊 10-Point Grade Scale", "📋 Attendance Rules"],
+    };
+  }
+
+  // 4. INTERNAL (CIE) & EXTERNAL (SEE) MARKS SPLIT & PASSING CRITERIA
+  if (/pass mark|passing mark|internal mark|external mark|cie|see|minimum mark|how many mark to pass|exam pattern|marks split/.test(q)) {
     return {
       isKnowledge: true,
       title: "JNTUA Internal & External Evaluation System",
@@ -1449,7 +1471,7 @@ export function getAcademicKnowledgeAnswer(rawQuery) {
     };
   }
 
-  // 6. REVALUATION, RECOUNTING & CHALLENGE VALUATION
+  // 7. REVALUATION, RECOUNTING & CHALLENGE VALUATION
   if (/revaluation|recounting|challenge valuation|result verification|paper recheck/.test(q)) {
     return {
       isKnowledge: true,
@@ -1463,6 +1485,144 @@ export function getAcademicKnowledgeAnswer(rawQuery) {
         `• Notifications with fee details and deadlines are published on the college and university examination portals.`,
       action: { label: "View Latest Exam Circulars →", path: "/notifications" },
       suggestions: ["📝 Question Papers", "📊 CGPA Calculator", "📚 Syllabus"],
+    };
+  }
+
+  // 8. BACKLOG & SUPPLEMENTARY EXAMINATION REGULATIONS
+  if (/backlog|supplementary|supply exam|clear backlog|clearing backlog|arrears|failed in subject|supplementary rule|supply attempt/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Backlog & Supplementary Examination Rules",
+      formula: "Passing Threshold: Min 35% in SEE (25/70) & 40% Aggregate | CIE Internals Carried Forward",
+      text:
+        `Official rules regarding backlog clearance and supplementary examinations under JNTUA regulations:\n\n` +
+        `• **Concurrent Examinations:** Supplementary exams are conducted alongside regular semester-end examinations twice a year.\n` +
+        `• **Internal Marks Retention:** Continuous Internal Evaluation (CIE) marks secured during regular semester attendance are **permanently carried forward**; students do not need to rewrite internal or mid-term examinations.\n` +
+        `• **Passing Threshold in Supply:** Student must score at least **25 marks out of 70 (35%)** in the semester external examination, and the total of (CIE + SEE) must be at least **40 marks out of 100 (40%)**.\n` +
+        `• **Grade Award:** Grade points for cleared backlogs are calculated based on the new total without penalty, and the backlog flag is cleared on subsequent grade sheets.\n` +
+        `• **No Attempt Limit:** There is no restriction on the number of attempts within the maximum permitted duration (N+2 rule).`,
+      action: { label: "Browse Question Papers for Practice →", path: "/papers" },
+      suggestions: ["📝 Internal Marks Criteria", "📊 SGPA Calculator", "📜 Promotion Rules"],
+    };
+  }
+
+  // 9. GRACE MARKS & SUBJECT EXEMPTION (0.15% RULE)
+  if (/grace mark|subject exemption|exemption rule|0\.15%?|can i drop subject|leave two subjects|grace marks rule|exemption in r20|exemption in r23/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Grace Marks & Subject Exemption Guidelines",
+      formula: "R23/R20: All 160 Credits Mandatory (Zero Exemption) | Grace Marks: Up to 0.15% Aggregate",
+      text:
+        `Official policy regarding grace marks and subject exemptions across JNTUA regulations:\n\n` +
+        `• **R23 and R20 Regulations (Mandatory 160 Credits):**\n` +
+        `  - **Subject Exemption is DISCONTINUED.** A student must pass all prescribed subjects and secure all **160 credits** (120 credits for Lateral Entry) to receive the B.Tech Degree.\n` +
+        `  - Students cannot drop or leave any core, elective, or lab courses.\n` +
+        `• **Grace Marks (0.15% University Provision):**\n` +
+        `  - JNTUA permits granting up to **0.15% of total maximum marks** of the course (typically 8 to 10 marks total) to enable a candidate to pass in one or two subjects, provided the student has passed all remaining subjects.\n` +
+        `• **R16 & Earlier Regulations (Legacy):**\n` +
+        `  - Allowed exemption of up to 2 theory subjects with a maximum of 8 credits, provided the candidate secured at least 172 out of 180 credits.`,
+      action: { label: "View Official Notifications →", path: "/notifications" },
+      suggestions: ["📊 CGPA Calculator", "📝 80:20 Mid Marks Rule", "📚 R23 Curriculum"],
+    };
+  }
+
+  // 10. MAXIMUM DURATION FOR DEGREE COMPLETION (N+2 RULE)
+  if (/maximum duration|maximum year|n\+2|n \+ 2|time limit to complete|how many years to complete btech|course completion limit|double duration/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Maximum Time Limit for Degree Completion (N+2 Rule)",
+      formula: "Regular 4-Year B.Tech: Max 8 Academic Years | Lateral Entry: Max 6 Academic Years",
+      text:
+        `Under official UGC and JNTUA academic guidelines, students must complete all academic requirements within a double duration limit:\n\n` +
+        `• **Regular 4-Year B.Tech Students:** Must complete all 8 semesters, clear all backlogs, and secure 160 credits within a maximum period of **8 consecutive academic years** from the year of initial admission.\n` +
+        `• **Lateral Entry (FDH) Students:** Must complete all 6 semesters and secure 120 credits within a maximum of **6 consecutive academic years** from admission into the 2nd year.\n` +
+        `• **Consequences of Expiry:** A student failing to fulfill all requirements within the stipulated timeframe forfeits their seat, and registration is automatically cancelled.`,
+      action: { label: "Open Student Profile →", path: "/profile" },
+      suggestions: ["📜 Promotion Rules", "📊 CGPA Calculator", "📝 Backlog Rules"],
+    };
+  }
+
+  // 11. JNTUA RESULTS CHECKING & OFFICIAL DEGREE CERTIFICATES
+  if (/check result|results portal|how to check result|jntuaresults|result link|marks memo|provisional certificate|pc and cmm|original degree|od application|tatkal/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Results Portal & Degree Certificates (PC / CMM / OD)",
+      formula: "Results: jntuaresults.ac.in | Student Services: jntuassp.ac.in",
+      text:
+        `Procedures for checking semester results and applying for official degree credentials:\n\n` +
+        `• **Official Results Web Portal:** Results are announced online at **\`jntuaresults.ac.in\`** and **\`jntua.ac.in\`**. Enter your 10-digit Hall Ticket Number (e.g. \`22B91A4201\`) to view grade cards.\n` +
+        `• **Recounting / Revaluation Window:** Open within **10 to 15 days** of the result publication date.\n` +
+        `• **Provisional Certificate (PC) & Consolidated Marks Memo (CMM):** Issued automatically through your college examination branch upon passing all 8 semesters.\n` +
+        `• **Original Degree (OD):** Applied via the JNTUA Student Services Portal (**\`jntuassp.ac.in\`**) for Convocation or under Tatkal mode for urgent dispatch.`,
+      action: { label: "Check University Circulars →", path: "/notifications" },
+      suggestions: ["📊 CGPA Calculator", "📝 Revaluation Procedure", "🚀 Build Student Profile"],
+    };
+  }
+
+  // 12. CAMPUS PLACEMENT ELIGIBILITY & CGPA CUTOFFS
+  if (/placement|campus drive|placement criteria|minimum cgpa for placement|placement eligibility|can backlog student sit for placement|company cutoff|tcs criteria|infosys criteria/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "Campus Placements Eligibility & Industry CGPA Benchmarks",
+      formula: "Product Tier: 7.5+ CGPA | IT Services (TCS, Infosys, Wipro): 60% / 6.5 CGPA with 0 Standing Arrears",
+      text:
+        `General industry recruitment criteria for engineering graduates at JNTU affiliated colleges:\n\n` +
+        `• **Top Tech / Product Companies (Google, Microsoft, Amazon, Cisco):**\n` +
+        `  - Minimum CGPA: **7.5 to 8.5+** with zero active backlogs.\n` +
+        `  - High emphasis on Data Structures & Algorithms (DSA), System Design, and projects.\n` +
+        `• **Mass IT Recruiters (TCS, Infosys, Wipro, Cognizant, Accenture, Capgemini):**\n` +
+        `  - Minimum **60% or 6.5 CGPA** across 10th, 12th/Diploma, and B.Tech.\n` +
+        `  - Strictly **0 active / standing backlogs** at the time of the recruitment drive.\n` +
+        `• **Standing vs. Cleared Backlogs:** History of cleared backlogs is accepted by most companies, provided all arrears are cleared before commencement of the final year (4-1).`,
+      action: { label: "Open CGPA & SGPA Calculator →", path: "/calculator" },
+      suggestions: ["📊 Target CGPA Planner", "📘 Data Structures Notes", "📝 10-Point Grade Scale"],
+    };
+  }
+
+  // 13. B.TECH FIRST YEAR (1-1 & 1-2) COMMON CURRICULUM
+  if (/1st year subject|first year subject|1-1 subject|1-2 subject|common subjects|first year syllabus|btech 1st year/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA B.Tech 1st Year (1-1 & 1-2) Common Core Curriculum",
+      formula: "Common Group-A & Group-B Foundation across All Engineering Disciplines",
+      text:
+        `Under official R23 regulations, the 1st year B.Tech curriculum is structured into core foundational groups:\n\n` +
+        `**Semester 1-1 Common Courses:**\n` +
+        `• Linear Algebra & Calculus (Mathematics-1)\n` +
+        `• Engineering Chemistry / Engineering Physics\n` +
+        `• Basic Electrical & Electronics Engineering (BEEE)\n` +
+        `• Introduction to Programming with Python / C\n` +
+        `• Communicative English\n` +
+        `• Respective Laboratories & IT Workshop\n\n` +
+        `**Semester 1-2 Common Courses:**\n` +
+        `• Differential Equations & Vector Calculus (Mathematics-2)\n` +
+        `• Engineering Physics / Engineering Chemistry\n` +
+        `• Basic Civil & Mechanical Engineering (BCME)\n` +
+        `• Data Structures / Engineering Graphics & CAD\n` +
+        `• Health & Wellness / Community Service Project`,
+      action: { label: "Browse 1st Year Curriculum in Syllabus →", path: "/syllabus" },
+      suggestions: ["📘 Linear Algebra Notes", "📘 Differential Equations Notes", "📊 CGPA Calculator"],
+    };
+  }
+
+  // 14. LABORATORY EVALUATION & PRACTICAL EXAM PATTERN
+  if (/lab mark|lab exam|practical exam|internal lab|external lab|viva|how lab marks are calculated/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Practical & Laboratory Examination Evaluation Scheme",
+      formula: "Total: 100M | Day-to-Day Continuous (CIE): 30M | Semester End Practical (SEE): 70M",
+      text:
+        `Evaluation scheme for laboratory courses under JNTUA R23 and R20 regulations:\n\n` +
+        `• **Continuous Day-to-Day Internal Work (30 Marks):**\n` +
+        `  - Regular observation record, execution of programs, and viva: **15 Marks**.\n` +
+        `  - Internal practical test conducted by subject faculty: **15 Marks**.\n` +
+        `• **Semester End Laboratory Examination (70 Marks):**\n` +
+        `  - Conducted jointly by an internal teacher and an appointed external examiner.\n` +
+        `  - Experiment write-up & procedure: **20 Marks**.\n` +
+        `  - Program execution, output verification & viva-voce: **50 Marks**.\n` +
+        `• **Passing Minimum:** Minimum **35% (25/70)** in the external lab exam and **40% (40/100)** in aggregate.`,
+      action: { label: "Browse Lab Programs Catalog →", path: "/search?query=lab" },
+      suggestions: ["💻 Python Lab Programs", "💻 DS Lab Programs", "📊 Grade Scale"],
     };
   }
 

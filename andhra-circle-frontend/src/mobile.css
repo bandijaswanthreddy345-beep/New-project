@@ -1304,6 +1304,34 @@
     stroke: #020617 !important;
   }
 
+  .chat-modal-mic-btn {
+    width: 34px !important;
+    height: 34px !important;
+    background: rgba(251, 191, 36, 0.15) !important;
+    border: 1px solid rgba(251, 191, 36, 0.4) !important;
+    color: #fbbf24 !important;
+  }
+
+  .chat-modal-mic-btn svg {
+    stroke: #fbbf24 !important;
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .hero-ai-mic-btn {
+    width: 32px !important;
+    height: 32px !important;
+    background: rgba(251, 191, 36, 0.15) !important;
+    border: 1px solid rgba(251, 191, 36, 0.4) !important;
+    color: #fbbf24 !important;
+  }
+
+  .hero-ai-mic-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+    stroke: #fbbf24 !important;
+  }
+
   .chat-modal-empty-state {
     padding: 16px 8px !important;
   }

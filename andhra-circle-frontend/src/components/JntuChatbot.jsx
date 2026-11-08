@@ -381,6 +381,11 @@ function JntuChatbot() {
   const [thinkingState, setThinkingState] = useState("searching");
   const [thinkingLabel, setThinkingLabel] = useState("Searching verified resources...");
 
+  // Speech Recognition (Voice Input / Mic) State
+  const [isListening, setIsListening] = useState(false);
+  const [listeningTarget, setListeningTarget] = useState(null); // "hero" | "modal"
+  const recognitionRef = useRef(null);
+
   // Profile Wizard Session State
   const [profileSession, setProfileSession] = useState({
     active: false,
@@ -392,6 +397,101 @@ function JntuChatbot() {
   const inputRef = useRef(null);
   const modalInputRef = useRef(null);
   const navigate = useNavigate();
+
+  // Cleanup speech recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch (_) {}
+      }
+    };
+  }, []);
+
+  // Web Speech API Voice-to-Text Recognition Toggle
+  const toggleSpeechRecognition = (target = "hero") => {
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition ||
+      window.mozSpeechRecognition ||
+      window.msSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Voice search is not supported in this browser. Please try Google Chrome, Microsoft Edge, or Safari.");
+      return;
+    }
+
+    // If currently listening, stop immediately
+    if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (_) {}
+      }
+      setIsListening(false);
+      setListeningTarget(null);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = "en-IN"; // English (India) with seamless engineering academic term detection
+
+      let speechTranscript = "";
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setListeningTarget(target);
+      };
+
+      recognition.onresult = (event) => {
+        let interimText = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const chunk = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            speechTranscript += chunk;
+          } else {
+            interimText += chunk;
+          }
+        }
+        const currentSpokenText = speechTranscript || interimText;
+        if (target === "hero") {
+          setInput(currentSpokenText);
+        } else {
+          setModalInput(currentSpokenText);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.warn("Speech recognition warning/error:", event.error);
+        setIsListening(false);
+        setListeningTarget(null);
+        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+          alert("Microphone access was denied. Please allow microphone permissions in your browser address bar.");
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        setListeningTarget(null);
+        const textToQuery = speechTranscript.trim();
+        if (textToQuery) {
+          // Immediately process the transcribed question in the chatbot
+          handleSend(textToQuery);
+        }
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.error("Speech recognition startup error:", err);
+      setIsListening(false);
+      setListeningTarget(null);
+    }
+  };
 
   // Auto-scroll ONLY the internal chatbot messages container without scrolling the window/page
   useEffect(() => {
@@ -565,19 +665,53 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 3. SINGLE-SHOT PROFILE NLP FIELD UPDATES
+    // 3. JNTUA ACADEMIC REGULATIONS KNOWLEDGE ENGINE (100% Precision Q&A)
+    // Instant authoritative answers for CGPA formulas, attendance rules,
+    // internal/external pass marks, grading scales, credits, 80:20 mid split, etc.
+    // Must execute BEFORE profile field updates so questions aren't misinterpreted!
     // =========================================================
-    // CGPA Update: e.g. "update cgpa to 9.2", "cgpa 8.9", "set cgpa 9.0"
-    const cgpaMatch = q.match(/(?:cgpa|gpa)\s*(?:is|to|:|=)?\s*([0-9]+\.?[0-9]*)/i);
-    if (cgpaMatch && (q.includes("cgpa") || q.includes("gpa"))) {
-      const newCgpa = parseFloat(cgpaMatch[1]).toFixed(2);
-      const updated = handleQuickProfileUpdate({ cgpa: newCgpa });
+    const knowledgeAnswer = getAcademicKnowledgeAnswer(rawQuery);
+    if (knowledgeAnswer) {
+      return knowledgeAnswer;
+    }
+
+    // =========================================================
+    // 4. JNTUA SEMESTER CURRICULUM ENQUIRY (e.g. "CSE 2-1 subjects")
+    // =========================================================
+    const curriculumAnswer = getSemesterCurriculumAnswer(rawQuery);
+    if (curriculumAnswer) {
       return {
-        text: `✅ Updated your Cumulative CGPA to ${newCgpa}! This reflects in your Student Profile and Calculator.`,
-        profilePreview: updated,
-        action: { label: "Open CGPA Calculator →", path: "/calculator" },
-        suggestions: ["📊 CGPA Calculator", "🎓 View Student Profile"],
+        text: curriculumAnswer.text,
+        isSemesterCurriculum: true,
+        curriculumData: curriculumAnswer,
+        action: curriculumAnswer.action,
+        suggestions: curriculumAnswer.suggestions,
       };
+    }
+
+    // =========================================================
+    // 5. SINGLE-SHOT PROFILE NLP FIELD UPDATES
+    // Only runs when user explicitly commands to set or update profile data
+    // =========================================================
+    const isAcademicQuestion = /percentage|formula|convert|rule|scale|how|what|split|weight|why|when|where/i.test(q);
+
+    // CGPA Update: e.g. "update cgpa to 9.2", "set cgpa 9.0", "my cgpa is 8.9"
+    const cgpaExplicitMatch = !isAcademicQuestion && (
+      q.match(/(?:my\s+(?:cgpa|gpa)\s*(?:is|=|:)|(?:set|update|change)\s+(?:my\s+)?(?:cgpa|gpa)\s*(?:is|to|=|:)?)\s*([0-9]+\.?[0-9]*)/i) ||
+      (q.startsWith("cgpa ") && /^[0-9]+\.?[0-9]*$/.test(q.replace("cgpa ", "").trim()))
+    );
+    if (cgpaExplicitMatch) {
+      const numVal = parseFloat(cgpaExplicitMatch[1]);
+      if (numVal >= 0 && numVal <= 10) {
+        const newCgpa = numVal.toFixed(2);
+        const updated = handleQuickProfileUpdate({ cgpa: newCgpa });
+        return {
+          text: `✅ Updated your Cumulative CGPA to ${newCgpa}! This reflects in your Student Profile and Calculator.`,
+          profilePreview: updated,
+          action: { label: "Open CGPA Calculator →", path: "/calculator" },
+          suggestions: ["📊 CGPA Calculator", "🎓 View Student Profile"],
+        };
+      }
     }
 
     // Name Update: e.g. "my name is Alex", "change name to Priya"
@@ -604,40 +738,24 @@ function JntuChatbot() {
       };
     }
 
-    // Attendance Update: e.g. "attendance 92%"
-    const attMatch = q.match(/attendance\s*(?:is|to|:|=)?\s*([0-9]+(?:\.[0-9]+)?%?)/i);
-    if (attMatch) {
-      const newAtt = attMatch[1].includes("%") ? attMatch[1] : `${attMatch[1]}%`;
-      const updated = handleQuickProfileUpdate({ attendance: newAtt });
-      return {
-        text: `✅ Updated your Attendance Rate to ${newAtt}.`,
-        profilePreview: updated,
-        action: { label: "Open Student Profile →", path: "/profile" },
-      };
-    }
-
-    // =========================================================
-    // 4. JNTUA ACADEMIC REGULATIONS KNOWLEDGE ENGINE (100% Precision Q&A)
-    // Instant authoritative answers for CGPA formulas, attendance rules,
-    // internal/external pass marks, grading scales, credits, etc.
-    // =========================================================
-    const knowledgeAnswer = getAcademicKnowledgeAnswer(rawQuery);
-    if (knowledgeAnswer) {
-      return knowledgeAnswer;
-    }
-
-    // =========================================================
-    // 5. JNTUA SEMESTER CURRICULUM ENQUIRY (e.g. "CSE 2-1 subjects")
-    // =========================================================
-    const curriculumAnswer = getSemesterCurriculumAnswer(rawQuery);
-    if (curriculumAnswer) {
-      return {
-        text: curriculumAnswer.text,
-        isSemesterCurriculum: true,
-        curriculumData: curriculumAnswer,
-        action: curriculumAnswer.action,
-        suggestions: curriculumAnswer.suggestions,
-      };
+    // Attendance Update: e.g. "my attendance is 92%", "set attendance to 85%"
+    const isAttRuleQuestion = /rule|condonation|detention|medical|shortage|minimum|eligibility|percentage/i.test(q);
+    const attExplicitMatch = !isAttRuleQuestion && (
+      q.match(/(?:my\s+attendance\s*(?:is|=|:)|(?:set|update|change)\s+(?:my\s+)?attendance\s*(?:is|to|=|:)?)\s*([0-9]+(?:\.[0-9]+)?%?)/i) ||
+      (q.startsWith("attendance ") && /^[0-9]+(?:\.[0-9]+)?%?$/.test(q.replace("attendance ", "").trim()))
+    );
+    if (attExplicitMatch) {
+      const rawPct = attExplicitMatch[1].replace("%", "").trim();
+      const numPct = parseFloat(rawPct);
+      if (numPct >= 0 && numPct <= 100) {
+        const newAtt = `${numPct}%`;
+        const updated = handleQuickProfileUpdate({ attendance: newAtt });
+        return {
+          text: `✅ Updated your Attendance Rate to ${newAtt}.`,
+          profilePreview: updated,
+          action: { label: "Open Student Profile →", path: "/profile" },
+        };
+      }
     }
 
     // =========================================================
@@ -899,13 +1017,15 @@ function JntuChatbot() {
       <div className="hero-ai-bar-anchor">
         <form className="hero-ai-bar" onSubmit={handleHeroSubmit}>
           <div
-            className="hero-ai-avatar-badge"
-            title="Click to open JNTU AI Chatbot"
-            onClick={() => {
-              setIsModalOpen(true);
-              if (messages.length === 0) {
-                handleSend("Hi");
-              }
+            className={`hero-ai-avatar-badge ${isListening && listeningTarget === "hero" ? "is-listening" : ""}`}
+            title={
+              isListening && listeningTarget === "hero"
+                ? "🎙️ Listening... click to stop"
+                : "Click for Voice Search / Ask AI"
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSpeechRecognition("hero");
             }}
           >
             <div className="hero-ai-avatar-desktop">
@@ -933,7 +1053,11 @@ function JntuChatbot() {
             ref={inputRef}
             type="text"
             className="hero-ai-input"
-            placeholder="Ask JNTU AI or enter branch (CSE, AIML)..."
+            placeholder={
+              isListening && listeningTarget === "hero"
+                ? "🎙️ Listening... speak your question now..."
+                : "Ask JNTU AI or enter branch (CSE, AIML)..."
+            }
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleHeroKeyDown}
@@ -944,6 +1068,37 @@ function JntuChatbot() {
 
           {/* ACTION CONTROLS */}
           <div className="hero-ai-send-wrapper">
+            {/* Desktop & Tablet Voice Microphone Button */}
+            <button
+              type="button"
+              className={`hero-ai-mic-btn ${isListening && listeningTarget === "hero" ? "is-listening" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleSpeechRecognition("hero");
+              }}
+              aria-label="Voice Search"
+              title={
+                isListening && listeningTarget === "hero"
+                  ? "Listening... Click to stop"
+                  : "Voice Search / Ask AI"
+              }
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="22" />
+              </svg>
+            </button>
+
             <button
               type="submit"
               className="hero-ai-send-btn"
@@ -1416,9 +1571,11 @@ function JntuChatbot() {
                   type="text"
                   className="chat-modal-input-field"
                   placeholder={
-                    profileSession.active
-                      ? "Type your response here..."
-                      : "Type your message or answer..."
+                    isListening && listeningTarget === "modal"
+                      ? "🎙️ Listening... speak your message now..."
+                      : profileSession.active
+                        ? "Type your response here..."
+                        : "Type your message or answer..."
                   }
                   value={modalInput}
                   onChange={(e) => setModalInput(e.target.value)}
@@ -1436,6 +1593,34 @@ function JntuChatbot() {
                     ✕
                   </button>
                 )}
+
+                {/* Voice Input Microphone Button */}
+                <button
+                  type="button"
+                  className={`chat-modal-mic-btn ${isListening && listeningTarget === "modal" ? "is-listening" : ""}`}
+                  onClick={() => toggleSpeechRecognition("modal")}
+                  title={
+                    isListening && listeningTarget === "modal"
+                      ? "Listening... click to stop"
+                      : "Voice input / Speak question"
+                  }
+                  aria-label="Voice input"
+                >
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="22" />
+                  </svg>
+                </button>
 
                 <button
                   type="submit"
