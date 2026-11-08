@@ -116,14 +116,13 @@
     height: 44px !important;
   }
 
-  .nav-item-notif,
-  .nav-item-profile {
+  .nav-item-profile,
+  .nav-mobile-profile-btn {
     display: none !important;
   }
 
-  .nav-mobile-notif-wrapper,
-  .nav-mobile-profile-btn {
-    display: none !important;
+  .nav-mobile-actions {
+    gap: 8px !important;
   }
 
   /* Long drawer menus scroll instead of running off-screen */

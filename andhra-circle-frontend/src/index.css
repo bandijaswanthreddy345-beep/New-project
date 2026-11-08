@@ -7680,12 +7680,7 @@ html, body {
     font-size: 11px !important;
   }
 
-  .nav-item-notif,
-  .nav-item-profile {
-    display: none !important;
-  }
-
-  .nav-mobile-notif-wrapper,
+  .nav-item-profile,
   .nav-mobile-profile-btn {
     display: none !important;
   }
