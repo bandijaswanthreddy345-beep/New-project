@@ -274,19 +274,8 @@ function Navbar() {
       ),
     },
     {
-      name: "Notes",
-      path: "/notes",
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
-          <path d="M6 6h10" />
-          <path d="M6 10h10" />
-        </svg>
-      ),
-    },
-    {
-      name: "CGPA & SGPA Calculator",
-      path: "/calculator",
+      name: "CGPA Calculator",
+      path: "/cgpa-calculator",
       icon: (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect width="16" height="20" x="4" y="2" rx="2" />
@@ -299,6 +288,15 @@ function Navbar() {
           <path d="M8 14h.01" />
           <path d="M12 18h.01" />
           <path d="M8 18h.01" />
+        </svg>
+      ),
+    },
+    {
+      name: "SGPA Calculator",
+      path: "/sgpa-calculator",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
         </svg>
       ),
     },
