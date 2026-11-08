@@ -674,9 +674,11 @@ ul {
   letter-spacing: -0.15px;
   padding: 0;
   min-width: 0;
-  line-height: normal;
-  display: flex;
-  align-items: center;
+  display: block;
+  line-height: 52px;
+  height: 52px;
+  margin: 0;
+  vertical-align: middle;
 }
 
 .hero-ai-input::placeholder {
