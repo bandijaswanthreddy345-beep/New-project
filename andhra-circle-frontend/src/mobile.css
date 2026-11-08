@@ -811,6 +811,7 @@
     display: block !important;
     margin: 0 !important;
     vertical-align: middle !important;
+    text-align: center !important;
   }
 
   .hero-ai-input::placeholder {
