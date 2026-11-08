@@ -72,7 +72,6 @@ function StudentProfileModal({ isOpen, onClose }) {
           <div className="sp-preview-user-meta">
             <div className="sp-preview-name-row">
               <h3 className="sp-preview-name">{displayName}</h3>
-              <span className="sp-preview-verified">✓ Verified</span>
             </div>
             <p className="sp-preview-branch">{displayBranch}</p>
             <p className="sp-preview-academic-meta">
