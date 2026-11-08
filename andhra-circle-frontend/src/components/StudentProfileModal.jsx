@@ -35,7 +35,7 @@ function StudentProfileModal({ isOpen, onClose }) {
   return (
     <div className="sp-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="sp-preview-card" onClick={(e) => e.stopPropagation()}>
-        {/* Card Header with Close Icon */}
+        {/* Card Header */}
         <div className="sp-preview-header">
           <div className="sp-preview-brand">
             <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sp-preview-logo" />
@@ -44,15 +44,6 @@ function StudentProfileModal({ isOpen, onClose }) {
               <span className="sp-preview-badge">Student Profile</span>
             </div>
           </div>
-          <button
-            type="button"
-            className="sp-preview-close"
-            onClick={onClose}
-            aria-label="Close Profile Preview"
-            title="Close (Esc)"
-          >
-            ✕
-          </button>
         </div>
 
         {/* Student Profile Info Section */}
