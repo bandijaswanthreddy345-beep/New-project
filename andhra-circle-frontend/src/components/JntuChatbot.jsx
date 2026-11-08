@@ -1639,6 +1639,34 @@ function JntuChatbot() {
             {/* Modal Input Footer (Interactive Chat Control) */}
             <div className="chat-modal-footer">
               <form className="chat-modal-input-bar" onSubmit={handleModalSubmit}>
+                {/* Voice Input Microphone Button on the LEFT */}
+                <button
+                  type="button"
+                  className={`chat-modal-mic-btn ${isListening && listeningTarget === "modal" ? "is-listening" : ""}`}
+                  onClick={() => toggleSpeechRecognition("modal")}
+                  title={
+                    isListening && listeningTarget === "modal"
+                      ? "Listening... click to stop"
+                      : "Voice input / Speak question"
+                  }
+                  aria-label="Voice input"
+                >
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="22" />
+                  </svg>
+                </button>
+
                 <input
                   ref={modalInputRef}
                   type="text"
@@ -1680,34 +1708,6 @@ function JntuChatbot() {
                     ✕
                   </button>
                 )}
-
-                {/* Voice Input Microphone Button */}
-                <button
-                  type="button"
-                  className={`chat-modal-mic-btn ${isListening && listeningTarget === "modal" ? "is-listening" : ""}`}
-                  onClick={() => toggleSpeechRecognition("modal")}
-                  title={
-                    isListening && listeningTarget === "modal"
-                      ? "Listening... click to stop"
-                      : "Voice input / Speak question"
-                  }
-                  aria-label="Voice input"
-                >
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                    <line x1="12" y1="19" x2="12" y2="22" />
-                  </svg>
-                </button>
 
                 <button
                   type="submit"
