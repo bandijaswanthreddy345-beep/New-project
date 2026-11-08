@@ -13,6 +13,12 @@ import {
   getSemesterCurriculumAnswer,
   BRANCH_DIRECTORY,
 } from "../utils/searchEngine";
+import {
+  getConversationalAnswer,
+  getSubjectConceptAnswer,
+  getStudyAdviceAnswer,
+  synthesizeDynamicAcademicResponse,
+} from "../utils/aiReasoningEngine";
 
 /**
  * Interactive Branch Showcase component rendered inside chatbot messages.
@@ -645,7 +651,17 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 2. TRIGGER PROFILE BUILDER COMMAND
+    // 2. CONVERSATIONAL & ASSISTANT IDENTITY HANDLER
+    // Instant friendly responses to greetings, questions about JNTU Circle,
+    // gratitude, assistance, and guidance.
+    // =========================================================
+    const conversationalAnswer = getConversationalAnswer(rawQuery);
+    if (conversationalAnswer) {
+      return conversationalAnswer;
+    }
+
+    // =========================================================
+    // 3. TRIGGER PROFILE BUILDER COMMAND
     // =========================================================
     if (
       q.includes("build") && q.includes("profile") ||
@@ -665,10 +681,9 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 3. JNTUA ACADEMIC REGULATIONS KNOWLEDGE ENGINE (100% Precision Q&A)
-    // Instant authoritative answers for CGPA formulas, attendance rules,
+    // 4. JNTUA ACADEMIC REGULATIONS KNOWLEDGE ENGINE (100% Precision Q&A)
+    // Authoritative answers for CGPA formulas, attendance rules,
     // internal/external pass marks, grading scales, credits, 80:20 mid split, etc.
-    // Must execute BEFORE profile field updates so questions aren't misinterpreted!
     // =========================================================
     const knowledgeAnswer = getAcademicKnowledgeAnswer(rawQuery);
     if (knowledgeAnswer) {
@@ -676,7 +691,7 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 4. JNTUA SEMESTER CURRICULUM ENQUIRY (e.g. "CSE 2-1 subjects")
+    // 5. JNTUA SEMESTER CURRICULUM ENQUIRY (e.g. "CSE 2-1 subjects")
     // =========================================================
     const curriculumAnswer = getSemesterCurriculumAnswer(rawQuery);
     if (curriculumAnswer) {
@@ -690,7 +705,25 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 5. SINGLE-SHOT PROFILE NLP FIELD UPDATES
+    // 6. CORE ENGINEERING CONCEPTS & SUBJECT EXPLAINERS
+    // Explains OS, DBMS, DSA, AI/ML, Networks, OOP, DLD, EDC, BEEE, etc.
+    // =========================================================
+    const conceptAnswer = getSubjectConceptAnswer(rawQuery);
+    if (conceptAnswer) {
+      return conceptAnswer;
+    }
+
+    // =========================================================
+    // 7. STUDY STRATEGIES, EXAM PREPARATION & CAREER GUIDANCE
+    // Answers how to score 9 CGPA, prepare for exams, clear backlogs, placements.
+    // =========================================================
+    const adviceAnswer = getStudyAdviceAnswer(rawQuery);
+    if (adviceAnswer) {
+      return adviceAnswer;
+    }
+
+    // =========================================================
+    // 8. SINGLE-SHOT PROFILE NLP FIELD UPDATES
     // Only runs when user explicitly commands to set or update profile data
     // =========================================================
     const isAcademicQuestion = /percentage|formula|convert|rule|scale|how|what|split|weight|why|when|where/i.test(q);
@@ -789,16 +822,8 @@ function JntuChatbot() {
       };
     }
 
-    // Greetings
-    if (q.startsWith("hi") || q.startsWith("hello") || q.startsWith("hey") || q.includes("good morning") || q.includes("good evening") || q === "help") {
-      return {
-        text: "Hello! I am your JNTU AI Academic Assistant. Ask me to find lecture notes, previous question papers, syllabus, or lab programs for any subject, or ask about university regulations.",
-        suggestions: ["🚀 Build Student Profile", "Data Structures Notes", "Python Lab Programs", "R23 AIML Syllabus", "📊 CGPA Calculator"],
-      };
-    }
-
     // =========================================================
-    // 7. ACCURATE ACADEMIC SEARCH & BRANCH HUB CONTENT
+    // 10. ACCURATE ACADEMIC SEARCH & BRANCH HUB CONTENT
     // =========================================================
     // Check if the query is asking about a specific engineering branch alone (e.g. "CSE", "AIML", "ECE", "ME", "Civil", "EEE")
     const detectedBranch = detectBranchFromQuery(rawQuery);
@@ -844,16 +869,12 @@ function JntuChatbot() {
       };
     }
 
-    // Fallback if no matching item found
-    return {
-      text: `No exact records found for "${rawQuery}". Here are related curriculum subjects and syllabus topics you can check:`,
-      relatedSubjects: searchRes.relatedSubjects,
-      action: {
-        label: `Search "${rawQuery}" in Full Catalog →`,
-        path: `/search?query=${encodeURIComponent(rawQuery)}`,
-      },
-      suggestions: searchRes.suggestedQueries.length > 0 ? searchRes.suggestedQueries : ["Data Structures Notes", "Python Programming", "Operating Systems", "R23 Syllabus"],
-    };
+    // =========================================================
+    // 11. DYNAMIC INTELLIGENT ACADEMIC SYNTHESIZER
+    // Guarantees an authoritative, helpful response for EVERY query from the user,
+    // completely eliminating "No exact records found"!
+    // =========================================================
+    return synthesizeDynamicAcademicResponse(rawQuery, searchRes);
   };
 
   const handleSend = async (textToSend) => {
@@ -1068,37 +1089,6 @@ function JntuChatbot() {
 
           {/* ACTION CONTROLS */}
           <div className="hero-ai-send-wrapper">
-            {/* Desktop & Tablet Voice Microphone Button */}
-            <button
-              type="button"
-              className={`hero-ai-mic-btn ${isListening && listeningTarget === "hero" ? "is-listening" : ""}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleSpeechRecognition("hero");
-              }}
-              aria-label="Voice Search"
-              title={
-                isListening && listeningTarget === "hero"
-                  ? "Listening... Click to stop"
-                  : "Voice Search / Ask AI"
-              }
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                <line x1="12" y1="19" x2="12" y2="22" />
-              </svg>
-            </button>
-
             <button
               type="submit"
               className="hero-ai-send-btn"
