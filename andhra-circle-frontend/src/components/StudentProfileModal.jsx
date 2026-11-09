@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import profileImg from "../assets/jaswanth.png.png";
 import "./StudentProfileModal.css";
-import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
+import { getStoredStudentData, saveStoredStudentData, getStudentAvatarUrl } from "../data/studentData";
 
 function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
   const navigate = useNavigate();
@@ -24,12 +23,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
 
   if (!isOpen) return null;
 
-  const avatar =
-    student?.profilePhoto && student.profilePhoto !== "none"
-      ? student.profilePhoto
-      : student?.profilePhoto === "none"
-      ? null
-      : profileImg;
+  const avatar = getStudentAvatarUrl(student?.profilePhoto);
 
   const handleRemovePhotoModal = () => {
     const updated = {

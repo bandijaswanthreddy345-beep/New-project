@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import profileImgDefault from "../assets/jaswanth.png.png";
 import {
   EMPTY_STUDENT_DATA,
   INITIAL_SEMESTERS,
@@ -13,6 +12,7 @@ import {
   calculateEquivalentPercentage,
   getAcademicClassification,
   getGradeLetter,
+  getStudentAvatarUrl,
 } from "../data/studentData";
 import "./StudentProfile.css";
 
@@ -235,7 +235,7 @@ function StudentProfile() {
       semester: "1-1",
       regulation: "R23 Regulation",
       attendancePercentage: 82,
-      profilePhoto: profileImgDefault,
+      profilePhoto: null,
       semesterGrades: [
         { sem: "1-1", sgpa: "8.75", credits: 20, status: "Completed" },
         { sem: "1-2", sgpa: "", credits: 20, status: "Not Started" },
@@ -432,12 +432,7 @@ function StudentProfile() {
   const isConfigured = Boolean(student && student.isConfigured && student.name?.trim());
   const currentAttendance = Number(student?.attendancePercentage || 75);
   const attendanceStatus = getAttendanceStatus(currentAttendance);
-  const activeAvatar =
-    student?.profilePhoto && student.profilePhoto !== "none"
-      ? student.profilePhoto
-      : student?.profilePhoto === "none"
-      ? null
-      : profileImgDefault;
+  const activeAvatar = getStudentAvatarUrl(student?.profilePhoto);
 
   // Memoized live calculations for create form to ensure instantaneous slider & input response
   const liveCreateCgpa = useMemo(
@@ -1692,13 +1687,13 @@ function StudentProfile() {
                     {/* Photo Edit */}
                     <div className="sp-edit-photo-strip">
                       <div className="sp-avatar-holder-mini">
-                        {editForm.profilePhoto && editForm.profilePhoto !== "none" ? (
+                        {getStudentAvatarUrl(editForm.profilePhoto) ? (
                           <img
-                            src={editForm.profilePhoto}
+                            src={getStudentAvatarUrl(editForm.profilePhoto)}
                             alt="Edit Preview"
                             className="sp-edit-avatar-img"
                           />
-                        ) : editForm.profilePhoto !== "none" && activeAvatar ? (
+                        ) : activeAvatar ? (
                           <img
                             src={activeAvatar}
                             alt="Edit Preview"
@@ -1724,7 +1719,7 @@ function StudentProfile() {
                           >
                             📷 Select New Photo
                           </button>
-                          {editForm.profilePhoto !== "none" && (editForm.profilePhoto || activeAvatar) && (
+                          {(getStudentAvatarUrl(editForm.profilePhoto) || activeAvatar) && (
                             <button
                               type="button"
                               className="sp-btn-remove-photo"

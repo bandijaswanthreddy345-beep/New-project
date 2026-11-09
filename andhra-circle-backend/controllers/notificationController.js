@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs");
 const Notification = require("../models/Notification");
 const { syncJntuaNotifications, isBTechNotification } = require("../services/jntuaSyncService");
 const { safeFetch } = require("../services/safeFetch");
@@ -268,6 +270,22 @@ exports.proxyPdf = async (req, res) => {
 
   if (!url || typeof url !== "string") {
     return res.status(400).send("No document URL provided");
+  }
+
+  // Handle local uploaded files directly without triggering SSRF safeFetch checks
+  if (url.includes("/uploads/")) {
+    try {
+      const cleanFileName = path.basename(url.split("?")[0]);
+      const localFilePath = path.join(__dirname, "../uploads", cleanFileName);
+      if (fs.existsSync(localFilePath)) {
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="${cleanFileName}"`);
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        return fs.createReadStream(localFilePath).pipe(res);
+      }
+    } catch (localErr) {
+      console.warn("Failed to stream local upload file:", localErr.message);
+    }
   }
 
   try {

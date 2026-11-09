@@ -41,8 +41,10 @@ function PdfViewer() {
   const embedUrl = useMemo(() => {
     if (!rawPdfUrl) return "";
 
-    // Direct proxy streaming gives 100% full-screen Chrome PDF reader with zero letterboxing
-    if (rawPdfUrl.startsWith("http") && !rawPdfUrl.includes(":5000/api")) {
+    const isLocalUpload = rawPdfUrl.includes("/uploads/");
+
+    // Direct proxy streaming gives 100% full-screen Chrome PDF reader with zero letterboxing for external links
+    if (rawPdfUrl.startsWith("http") && !rawPdfUrl.includes(":5000/api") && !isLocalUpload) {
       return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`;
     }
 
@@ -95,9 +97,11 @@ function PdfViewer() {
 
       // 1. Try direct fetch blob download
       try {
-        const streamUrl = rawPdfUrl.startsWith("http") && !rawPdfUrl.includes(":5000/api")
-          ? `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`
-          : rawPdfUrl;
+        const isLocalUpload = rawPdfUrl.includes("/uploads/");
+        const streamUrl =
+          rawPdfUrl.startsWith("http") && !rawPdfUrl.includes(":5000/api") && !isLocalUpload
+            ? `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`
+            : rawPdfUrl;
 
         const response = await fetch(streamUrl);
         if (response.ok) {

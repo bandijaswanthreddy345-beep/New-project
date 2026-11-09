@@ -1,8 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
-import profileImgDefault from "../assets/jaswanth.png.png";
-import { getStoredStudentData } from "../data/studentData";
+import { getStoredStudentData, getStudentAvatarUrl } from "../data/studentData";
 
 // Standard fallback notices for the pop-up preview
 const FALLBACK_NOTICES = [
@@ -418,25 +417,19 @@ function Navbar() {
           }}
         >
           <div className="nav-profile-avatar-wrapper nav-mobile-profile-avatar-wrapper">
-            {student?.profilePhoto && student.profilePhoto !== "none" ? (
+            {getStudentAvatarUrl(student?.profilePhoto) ? (
               <img
-                src={student.profilePhoto}
+                src={getStudentAvatarUrl(student?.profilePhoto)}
                 alt={student.name || "Student"}
                 className="nav-profile-avatar-img nav-mobile-avatar-img"
               />
-            ) : student?.profilePhoto === "none" ? (
+            ) : (
               <span className="nav-profile-fallback-icon nav-mobile-fallback-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
               </span>
-            ) : (
-              <img
-                src={profileImgDefault}
-                alt={student?.name || "Student"}
-                className="nav-profile-avatar-img nav-mobile-avatar-img"
-              />
             )}
             <span className="nav-profile-status-dot" />
           </div>
@@ -561,10 +554,7 @@ function Navbar() {
 
             if (item.isProfile || item.name === "Student Profile") {
               const studentName = student?.name || "Jaswanth Reddy Bandi";
-              const photoSrc =
-                student?.profilePhoto && student.profilePhoto !== "none"
-                  ? student.profilePhoto
-                  : (student?.profilePhoto === "none" ? null : profileImgDefault);
+              const photoSrc = getStudentAvatarUrl(student?.profilePhoto);
 
               return (
                 <li key={item.path} className="nav-item-profile">

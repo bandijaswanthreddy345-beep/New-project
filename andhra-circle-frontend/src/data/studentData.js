@@ -79,6 +79,22 @@ export function getGradeLetter(sgpa) {
   return { grade: "F", label: "Fail / Backlog", color: "#dc2626" };
 }
 
+// Safely resolve the student's avatar URL. Returns null if removed, empty, or unset so that the clean SVG fallback is rendered.
+export function getStudentAvatarUrl(photo) {
+  if (!photo || typeof photo !== "string") return null;
+  const trimmed = photo.trim();
+  if (
+    trimmed === "" ||
+    trimmed === "none" ||
+    trimmed === "null" ||
+    trimmed === "undefined" ||
+    trimmed.includes("jaswanth.png")
+  ) {
+    return null;
+  }
+  return trimmed;
+}
+
 // Sample Student Profile matching official JNTU prompt values
 export const SAMPLE_STUDENT_PROFILE = {
   name: "Jaswanth",
@@ -100,7 +116,7 @@ export const SAMPLE_STUDENT_PROFILE = {
   phone: "+91 98765 43210",
   batch: "2023 - 2027",
   mentor: "Head of Dept (CSE)",
-  profilePhoto: null, // Resolves to jaswanth.png.png default asset
+  profilePhoto: null, // No photo by default; shows clean SVG fallback
   isConfigured: true,
   savedNotes: [
     {
@@ -182,9 +198,17 @@ export function getStoredStudentData() {
         return found ? { ...initSem, ...found } : initSem;
       });
 
+      const normalizedPhoto =
+        parsed.profilePhoto === "none"
+          ? "none"
+          : getStudentAvatarUrl(parsed.profilePhoto)
+          ? parsed.profilePhoto
+          : null;
+
       return {
         ...SAMPLE_STUDENT_PROFILE,
         ...parsed,
+        profilePhoto: normalizedPhoto,
         semesterGrades: mergedGrades,
         isConfigured: parsed.isConfigured !== false && Boolean(parsed.name?.trim()),
       };
@@ -199,9 +223,17 @@ export function getStoredStudentData() {
 // Persist student profile data to local storage
 export function saveStoredStudentData(data) {
   try {
+    const normalizedPhoto =
+      data.profilePhoto === "none"
+        ? "none"
+        : getStudentAvatarUrl(data.profilePhoto)
+        ? data.profilePhoto
+        : null;
+
     const updated = {
       ...data,
       isConfigured: true,
+      profilePhoto: normalizedPhoto,
       shortName: data.name ? data.name.trim().split(" ")[0] : "Jaswanth",
     };
 

@@ -1,9 +1,8 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
-import profile from "../assets/jaswanth.png.png";
 import StudentProfileModal from "../components/StudentProfileModal";
-import { getStoredStudentData } from "../data/studentData";
+import { getStoredStudentData, getStudentAvatarUrl } from "../data/studentData";
 import AuthorProfile from "../components/AuthorProfile";
 import { normalizeSemester, normalizeScheme } from "../utils/semester";
 import "./Notes.css";
@@ -202,12 +201,7 @@ function Notes({ initialType }) {
   const [studentData, setStudentData] = useState(getStoredStudentData());
   const [pulsingBranch, setPulsingBranch] = useState(null);
 
-  const studentAvatar =
-    studentData?.profilePhoto && studentData.profilePhoto !== "none"
-      ? studentData.profilePhoto
-      : studentData?.profilePhoto === "none"
-      ? null
-      : profile;
+  const studentAvatar = getStudentAvatarUrl(studentData?.profilePhoto);
 
   const searchInputRef = useRef(null);
 
