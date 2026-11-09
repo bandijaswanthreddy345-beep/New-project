@@ -600,38 +600,17 @@ ul {
   text-align: center;
   overflow: hidden;
 
-  /* Exact color palette & concentric curved arcs sampled from reference image */
-  background:
-    radial-gradient(circle at 50% 28%, rgba(255, 239, 179, 0.16) 0%, transparent 55%),
-    radial-gradient(ellipse 980px 720px at 15% 115%, transparent 66%, rgba(21, 78, 67, 0.5) 67%, rgba(26, 92, 80, 0.28) 72%, transparent 73%),
-    radial-gradient(ellipse 1200px 900px at 15% 115%, transparent 73%, rgba(21, 78, 67, 0.45) 74%, rgba(26, 92, 80, 0.22) 78%, transparent 79%),
-    radial-gradient(ellipse 1450px 1100px at 15% 115%, transparent 79%, rgba(21, 78, 67, 0.35) 80%, rgba(26, 92, 80, 0.18) 84%, transparent 85%),
-    radial-gradient(circle at 92% 12%, #154E43 0%, #0D453C 42%, #0E3F37 70%, #013A33 100%);
+  /* Clean, solid midnight emerald background without concentric curved arcs or patterns */
+  background: #013a33;
 }
 
-/* Subtle atmospheric grid & soft ambient glow */
+/* Subtle atmospheric grid & soft ambient glow disabled */
 .hero-grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 239, 179, 0.08) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at 50% 50%, #000000 45%, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000000 45%, transparent 80%);
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .hero-ambient-glow {
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 620px;
-  height: 280px;
-  background: radial-gradient(ellipse at center, rgba(21, 78, 67, 0.35), rgba(13, 69, 60, 0.18) 50%, transparent 75%);
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(45px);
+  display: none;
 }
 
 .hero-content {

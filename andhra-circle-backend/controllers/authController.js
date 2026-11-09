@@ -4,6 +4,11 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const emailjs = require("@emailjs/nodejs");
 const { createCaptcha, verifyCaptcha } = require("../services/captchaService");
+const {
+  isCaptchaRequired,
+  recordFailedAttempt,
+  clearFailedAttempts,
+} = require("../services/loginAttemptService");
 
 const MIN_PASSWORD_LENGTH = 8;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -115,41 +120,72 @@ exports.loginUser = async (req, res) => {
     const email = asString(req.body?.email);
     const password =
       typeof req.body?.password === "string" ? req.body.password : "";
+    const captchaToken = asString(req.body?.captchaToken);
+    const captchaAnswer = asString(req.body?.captchaAnswer);
+
+    const clientIp = req.ip || req.socket?.remoteAddress || "unknown";
 
     // SECURITY: one generic answer for "no such user" and "wrong password"
     // so attackers cannot discover which emails are registered.
-    const invalid = () =>
+    const invalid = (requireCaptcha = false) =>
       res.status(401).json({
         message: "Invalid email or password",
+        requireCaptcha,
       });
 
+    // Determine if CAPTCHA challenge is currently required for this client or email
+    const captchaRequired = isCaptchaRequired(clientIp, email);
+
+    if (captchaRequired) {
+      // Must submit both captcha token and answer
+      if (!captchaToken || !captchaAnswer) {
+        return invalid(true);
+      }
+
+      // Verify CAPTCHA
+      const captchaCheck = verifyCaptcha(captchaToken, captchaAnswer);
+      if (!captchaCheck.ok) {
+        return res.status(400).json({
+          message: captchaCheck.message,
+          requireCaptcha: true,
+        });
+      }
+    }
+
     if (!email || !password) {
-      return invalid();
+      const nowRequired = recordFailedAttempt(clientIp, email);
+      return invalid(nowRequired);
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return invalid();
+      const nowRequired = recordFailedAttempt(clientIp, email);
+      return invalid(nowRequired);
     }
 
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
-      return invalid();
+      const nowRequired = recordFailedAttempt(clientIp, email);
+      return invalid(nowRequired);
     }
 
-    // Generate JWT Token with Role
-    const token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
+    // Login successful: reset failed attempt counters for this client and email
+    clearFailedAttempts(clientIp, email);
+
+    // Generate JWT Token with Role and passwordChangedAt
+    const tokenPayload = {
+      id: user._id,
+      role: user.role,
+    };
+    if (user.passwordChangedAt) {
+      tokenPayload.passwordChangedAt = user.passwordChangedAt.getTime();
+    }
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.status(200).json({
       message: "Login Successful",
@@ -285,11 +321,17 @@ exports.resetPassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
 
+    // Invalidate previously issued login tokens
+    user.passwordChangedAt = new Date();
+
     // One-time use: clear the reset token
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
     await user.save();
+
+    // Reset failed login attempt counter for this user's email
+    clearFailedAttempts("", user.email);
 
     res.status(200).json({
       message: "Password Reset Successful",

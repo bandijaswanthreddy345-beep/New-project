@@ -1329,9 +1329,7 @@ function JntuChatbot() {
                 <div className="chat-modal-header-info">
                   <div className="chat-modal-title-row">
                     <h3 className="chat-modal-title">JNTU Circle AI Assistant</h3>
-                    <span className="chat-modal-role-badge">
-                      {profileSession.active ? "Profile Wizard" : "Online"}
-                    </span>
+                    <span className="chat-modal-role-badge">Online</span>
                   </div>
                   <p className="chat-modal-subtitle">
                     Live academic guidance
@@ -1362,91 +1360,6 @@ function JntuChatbot() {
                   <p>
                     Verified lecture notes, previous question papers, syllabus, or authoritative guidance on university academic regulations.
                   </p>
-
-                  <div className="chat-modal-starter-categories">
-                    <div className="chat-modal-starter-group">
-                      <span className="chat-modal-group-title">🎓 Engineering Branches</span>
-                      <div className="chat-modal-quick-suggestions">
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("CSE")}>
-                          💻 CSE Hub
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("AIML")}>
-                          🤖 AIML Hub
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("ECE")}>
-                          📡 ECE Hub
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Mechanical")}>
-                          ⚙️ ME Hub
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Civil")}>
-                          🏗️ Civil Hub
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("EEE")}>
-                          ⚡ EEE Hub
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="chat-modal-starter-group">
-                      <span className="chat-modal-group-title">💡 Academic Regulations & FAQs</span>
-                      <div className="chat-modal-quick-suggestions">
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("CGPA to Percentage formula")}>
-                          📐 CGPA to % Formula
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Attendance & Condonation Rules")}>
-                          📋 Attendance Rules
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Internal Marks System & Passing Marks")}>
-                          📝 Passing & Mid Marks
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("10-Point Grade Scale & SGPA Calculation")}>
-                          📜 10-Point Grade Scale
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="chat-modal-starter-group">
-                      <span className="chat-modal-group-title">📚 Popular Study Materials</span>
-                      <div className="chat-modal-quick-suggestions">
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Data Structures Notes")}>
-                          📘 Data Structures Notes
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Python Lab Programs")}>
-                          🧪 Python Lab Programs
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Operating Systems Question Papers")}>
-                          📄 Operating Systems Papers
-                        </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Linear Algebra Calculus M1")}>
-                          📘 M1 Calculus Notes
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="chat-modal-starter-group">
-                      <span className="chat-modal-group-title">🚀 Tools & Profiles</span>
-                      <div className="chat-modal-quick-suggestions">
-                        <button
-                          type="button"
-                          className="chat-modal-sugg-pill chat-modal-sugg-pill-accent"
-                          onClick={handleStartProfileBuilder}
-                        >
-                          ✨ Build Student Profile
-                        </button>
-                        <button
-                          type="button"
-                          className="chat-modal-sugg-pill"
-                          onClick={() => {
-                            setIsModalOpen(false);
-                            navigate("/calculator");
-                          }}
-                        >
-                          📊 CGPA & SGPA Calculator
-                        </button>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               ) : (
                 messages.map((msg) => (
