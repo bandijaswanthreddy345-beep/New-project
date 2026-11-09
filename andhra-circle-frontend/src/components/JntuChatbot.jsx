@@ -1212,7 +1212,7 @@ function JntuChatbot() {
         <div className="hero-ai-starter-chips">
           <button
             type="button"
-            className="hero-ai-starter-pill starter-pill-highlight"
+            className="hero-ai-quick-pill"
             onClick={handleStartProfileBuilder}
           >
             <span>Build Student Profile</span>
@@ -1391,7 +1391,7 @@ function JntuChatbot() {
                       <div className="chat-modal-quick-suggestions">
                         <button
                           type="button"
-                          className="chat-modal-sugg-pill chat-modal-sugg-pill-accent"
+                          className="chat-modal-sugg-pill"
                           onClick={() => handleSend("Build your student profile using chatbot")}
                         >
                           ✨ Build Student Profile

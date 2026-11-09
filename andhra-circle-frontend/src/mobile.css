@@ -869,34 +869,8 @@
     display: none !important;
   }
 
-  .hero-ai-starter-pill {
-    flex-shrink: 0 !important;
-    height: 32px !important;
-    padding: 0 14px !important;
-    border-radius: 9999px !important;
-    font-size: 11px !important;
-    font-weight: 750 !important;
-    letter-spacing: 0.02em !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-  }
-
-  .starter-pill-highlight {
-    background: #000000 !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
-  }
-
-  .starter-pill-highlight:active {
-    transform: scale(0.95) !important;
-  }
-
-  .starter-pill-sparkle {
-    display: none !important;
-  }
-
+  .hero-ai-starter-pill,
+  .starter-pill-highlight,
   .hero-ai-quick-pill {
     flex-shrink: 0 !important;
     height: 32px !important;
@@ -913,10 +887,18 @@
     gap: 0 !important;
   }
 
+  .starter-pill-sparkle {
+    display: none !important;
+  }
+
   .hero-ai-quick-pill .hero-ai-pill-icon {
     display: none !important;
   }
 
+  .hero-ai-starter-pill:hover,
+  .hero-ai-starter-pill:active,
+  .starter-pill-highlight:hover,
+  .starter-pill-highlight:active,
   .hero-ai-quick-pill:hover,
   .hero-ai-quick-pill:active {
     background: rgba(0, 0, 0, 0.65) !important;

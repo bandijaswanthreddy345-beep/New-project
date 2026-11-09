@@ -969,39 +969,38 @@ ul {
   animation: heroAiFadeIn 0.3s ease;
 }
 
-.hero-ai-starter-pill {
+.hero-ai-starter-pill,
+.starter-pill-highlight {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 6px 13px;
+  background: #000000;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #ffefb366 !important;
   border-radius: 9999px;
+  color: #ffefb3 !important;
   font-size: 12.5px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  font-weight: 550;
   white-space: nowrap;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px #00000030;
   height: 32px;
   box-sizing: border-box;
 }
 
-.starter-pill-highlight {
-  background: #000000 !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
-}
-
+.hero-ai-starter-pill:hover,
 .starter-pill-highlight:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  color: #ffffff !important;
+  background: #ffefb3 !important;
+  border-color: #ffefb3 !important;
+  color: #000000 !important;
   transform: translateY(-1.5px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 4px 14px #ffefb355;
 }
 
+.hero-ai-starter-pill:active,
 .starter-pill-highlight:active {
   transform: scale(0.97);
 }
