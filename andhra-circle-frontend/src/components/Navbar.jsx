@@ -49,6 +49,14 @@ function Navbar() {
   const [showToastAlert, setShowToastAlert] = useState(false);
   const [activeAlertItem, setActiveAlertItem] = useState(null);
   const [student, setStudent] = useState(getStoredStudentData());
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
 
   // Mobile auto-popping notification states
   const [mobileNotifIndex, setMobileNotifIndex] = useState(0);
@@ -59,11 +67,23 @@ function Navbar() {
     const handleProfileSync = () => {
       setStudent(getStoredStudentData());
     };
+    const handleAuthSync = () => {
+      try {
+        const raw = localStorage.getItem("user");
+        setCurrentUser(raw ? JSON.parse(raw) : null);
+      } catch {
+        setCurrentUser(null);
+      }
+    };
     window.addEventListener("studentProfileUpdated", handleProfileSync);
     window.addEventListener("storage", handleProfileSync);
+    window.addEventListener("storage", handleAuthSync);
+    window.addEventListener("authChanged", handleAuthSync);
     return () => {
       window.removeEventListener("studentProfileUpdated", handleProfileSync);
       window.removeEventListener("storage", handleProfileSync);
+      window.removeEventListener("storage", handleAuthSync);
+      window.removeEventListener("authChanged", handleAuthSync);
     };
   }, []);
 
@@ -351,6 +371,22 @@ function Navbar() {
           MOBILE ACTIONS (VISIBLE <= 768px)
       ========================================== */}
       <div className="nav-mobile-actions">
+        {/* Mobile Quick Sign In / Portal Link */}
+        {!currentUser ? (
+          <Link
+            to="/login"
+            className="nav-mobile-action-btn nav-mobile-auth-quick-btn"
+            title="Sign In to JNTU Circle"
+            aria-label="Sign In"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setShowMobileNotifPopup(false);
+            }}
+          >
+            <span>Sign In</span>
+          </Link>
+        ) : null}
+
         <div className="nav-mobile-notif-wrapper" ref={mobileNotifRef}>
           <Link
             to="/notifications"
@@ -629,6 +665,102 @@ function Navbar() {
               </li>
             );
           })}
+
+          {/* ==========================================
+              AUTHENTICATION ACTIONS (SIGN IN / SIGN UP)
+          ========================================== */}
+          {!currentUser ? (
+            <>
+              <li className="nav-item-auth-signin">
+                <NavLink
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active nav-auth-signin-link" : "nav-link nav-auth-signin-link"
+                  }
+                  title="Sign In to your JNTU Circle account"
+                >
+                  <span>Sign In</span>
+                </NavLink>
+              </li>
+              <li className="nav-item-auth-signup">
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="nav-auth-signup-btn"
+                  title="Create free student account"
+                >
+                  <span>Sign Up</span>
+                  <span className="nav-auth-arrow">→</span>
+                </Link>
+              </li>
+            </>
+          ) : (
+            <li className="nav-item-auth-logged">
+              <div className="nav-auth-user-chip" title={`Signed in as ${currentUser.name} (${currentUser.email})`}>
+                <span className="nav-auth-user-dot" />
+                <span className="nav-auth-user-name">{currentUser.name.split(" ")[0]}</span>
+              </div>
+              <button
+                type="button"
+                className="nav-auth-signout-text-btn"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("user");
+                  setCurrentUser(null);
+                  window.dispatchEvent(new Event("authChanged"));
+                  setMobileMenuOpen(false);
+                  navigate("/login");
+                }}
+                title="Sign out of account"
+              >
+                Sign Out
+              </button>
+            </li>
+          )}
+
+          {/* Mobile Drawer Quick Auth Footprint (Visible only when mobile drawer open) */}
+          <li className="nav-mobile-drawer-auth-container">
+            <div className="nav-mobile-drawer-divider" />
+            {!currentUser ? (
+              <div className="nav-mobile-drawer-btn-grid">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="nav-drawer-signin-btn"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="nav-drawer-signup-btn"
+                >
+                  Create Account →
+                </Link>
+              </div>
+            ) : (
+              <div className="nav-mobile-drawer-user-box">
+                <span className="nav-drawer-user-label">
+                  Signed in as <strong>{currentUser.name}</strong>
+                </span>
+                <button
+                  type="button"
+                  className="nav-drawer-logout-btn"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    setCurrentUser(null);
+                    window.dispatchEvent(new Event("authChanged"));
+                    setMobileMenuOpen(false);
+                    navigate("/login");
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </li>
 
         </ul>
       </nav>

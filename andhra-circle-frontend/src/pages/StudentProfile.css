@@ -2356,6 +2356,170 @@ select[aria-invalid="true"] {
 
 
 /* =========================================================
+   CLOUD ACCOUNT PORTAL BRIDGE CARD (DESKTOP & MOBILE)
+   ========================================================= */
+
+.sp-auth-bridge-card {
+  background: linear-gradient(135deg, #052017 0%, #09241b 100%);
+  border: 1px solid rgba(160, 209, 184, 0.25);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+}
+
+.sp-auth-bridge-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.sp-auth-bridge-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(160, 209, 184, 0.12);
+  border: 1px solid rgba(160, 209, 184, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffb95f;
+  flex-shrink: 0;
+}
+
+.sp-auth-bridge-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sp-auth-bridge-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sp-auth-bridge-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.sp-auth-status-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.sp-auth-status-pill.is-signed-in {
+  background: rgba(160, 209, 184, 0.2);
+  color: #a0d1b8;
+  border: 1px solid rgba(160, 209, 184, 0.4);
+}
+
+.sp-auth-status-pill.is-guest {
+  background: rgba(255, 185, 95, 0.15);
+  color: #ffb95f;
+  border: 1px solid rgba(255, 185, 95, 0.3);
+}
+
+.sp-auth-bridge-sub {
+  font-size: 12.5px;
+  color: #c0c9c2;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.sp-auth-bridge-sub strong {
+  color: #ffffff;
+}
+
+.sp-auth-bridge-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.sp-auth-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.sp-auth-signin {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbe9da;
+}
+
+.sp-auth-signin:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.sp-auth-signup {
+  background: #ffb95f;
+  border: none;
+  color: #2a1700;
+  box-shadow: 0 2px 10px rgba(255, 185, 95, 0.25);
+}
+
+.sp-auth-signup:hover {
+  background: #ffc67a;
+  transform: translateY(-1px);
+}
+
+.sp-auth-signout {
+  background: transparent;
+  border: 1px solid rgba(255, 180, 171, 0.4);
+  color: #ffb4ab;
+  cursor: pointer;
+}
+
+.sp-auth-signout:hover {
+  background: rgba(147, 0, 10, 0.25);
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .sp-auth-bridge-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 16px;
+    gap: 14px;
+  }
+
+  .sp-auth-bridge-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .sp-auth-link-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* =========================================================
    CREATE PROFILE VIEW & FORM STYLING (DESKTOP & MOBILE)
    ========================================================= */
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import profileImgDefault from "../assets/jaswanth.png.png";
 import {
   EMPTY_STUDENT_DATA,
@@ -45,6 +45,31 @@ function StudentProfile() {
   const mobileEditFileInputRef = useRef(null);
 
   const [student, setStudent] = useState(getStoredStudentData());
+  const [authUser, setAuthUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    const handleAuth = () => {
+      try {
+        const raw = localStorage.getItem("user");
+        setAuthUser(raw ? JSON.parse(raw) : null);
+      } catch {
+        setAuthUser(null);
+      }
+    };
+    window.addEventListener("storage", handleAuth);
+    window.addEventListener("authChanged", handleAuth);
+    return () => {
+      window.removeEventListener("storage", handleAuth);
+      window.removeEventListener("authChanged", handleAuth);
+    };
+  }, []);
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "grades" | "attendance" | "notes" | "edit"
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -944,6 +969,60 @@ function StudentProfile() {
             --------------------------------------------------------- */}
         {!isConfigured ? (
           <div className="sp-create-wrapper">
+            {/* Account Portal Bridge Callout */}
+            <div className="sp-auth-bridge-card">
+              <div className="sp-auth-bridge-content">
+                <div className="sp-auth-bridge-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                </div>
+                <div className="sp-auth-bridge-text">
+                  <div className="sp-auth-bridge-heading">
+                    <span className="sp-auth-bridge-title">JNTU Circle Cloud Account Portal</span>
+                    {authUser ? (
+                      <span className="sp-auth-status-pill is-signed-in">● Connected</span>
+                    ) : (
+                      <span className="sp-auth-status-pill is-guest">Guest Device</span>
+                    )}
+                  </div>
+                  <p className="sp-auth-bridge-sub">
+                    {authUser ? (
+                      <>Signed in as <strong>{authUser.name}</strong> ({authUser.email}). Cloud account synced.</>
+                    ) : (
+                      <>Looking to sign in or register for an official student account? Access the cloud login & signup portal.</>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="sp-auth-bridge-actions">
+                {authUser ? (
+                  <button
+                    type="button"
+                    className="sp-auth-link-btn sp-auth-signout"
+                    onClick={() => {
+                      localStorage.removeItem("token");
+                      localStorage.removeItem("user");
+                      setAuthUser(null);
+                      window.dispatchEvent(new Event("authChanged"));
+                      navigate("/login");
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                ) : (
+                  <>
+                    <Link to="/login" className="sp-auth-link-btn sp-auth-signin">
+                      Sign In
+                    </Link>
+                    <Link to="/signup" className="sp-auth-link-btn sp-auth-signup">
+                      Create Account →
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+
             <div className="sp-create-hero">
               <div className="sp-create-hero-badge">🎓 JNTU Student Portal</div>
               <h1 className="sp-create-title">Create Your Student Academic Profile</h1>
