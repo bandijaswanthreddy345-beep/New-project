@@ -157,6 +157,34 @@ const noteSchema = new mongoose.Schema(
   }
 );
 
+noteSchema.index(
+  {
+    title: "text",
+    subject: "text",
+    subjectCode: "text",
+    description: "text",
+    module1: "text",
+    module2: "text",
+    module3: "text",
+    module4: "text",
+    module5: "text",
+  },
+  {
+    weights: {
+      subjectCode: 10,
+      subject: 8,
+      title: 6,
+      description: 4,
+      module1: 2,
+      module2: 2,
+      module3: 2,
+      module4: 2,
+      module5: 2,
+    },
+    name: "NoteTextIndex",
+  }
+);
+
 module.exports =
   mongoose.models.Note ||
   mongoose.model("Note", noteSchema);

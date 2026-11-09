@@ -62,4 +62,24 @@ const syllabusSchema = new mongoose.Schema(
   }
 );
 
+syllabusSchema.index(
+  {
+    title: "text",
+    subject: "text",
+    subjectCode: "text",
+    description: "text",
+    regulation: "text",
+  },
+  {
+    weights: {
+      subjectCode: 10,
+      subject: 8,
+      title: 6,
+      description: 4,
+      regulation: 2,
+    },
+    name: "SyllabusTextIndex",
+  }
+);
+
 module.exports = mongoose.model("Syllabus", syllabusSchema);

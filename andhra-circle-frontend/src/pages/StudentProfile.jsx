@@ -26,19 +26,25 @@ function StudentProfile() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
+  const mobileEditFileInputRef = useRef(null);
 
   const [student, setStudent] = useState(getStoredStudentData());
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "grades" | "attendance" | "notes" | "edit"
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const menuRef = useRef(null);
+  const mobileMenuRef = useRef(null);
 
   // Close kebab dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setShowMenu(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+        setShowMobileMenu(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -318,16 +324,25 @@ function StudentProfile() {
   const isConfigured = Boolean(student && student.isConfigured && student.name?.trim());
   const currentAttendance = Number(student?.attendancePercentage || 75);
   const attendanceStatus = getAttendanceStatus(currentAttendance);
+  const chinnuDefaultAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuCh_iva9jSPl2iJE9piEPkD6YvBd1alVmSmd2txJmVJ7yoJ1rUW5snm5XgftETiPm_z30siDrBEWaKjZ4pjsp3jGKfADJvokenmu3nU4y6eRpiyaxYebDy9CcFf55JDQbzjmgAnlXU9hJ9Lcip89XFkvYkXTn-OSsOd3Ti5p04ubIqf605k3vfPL85LRZhvLns80AuBaGzk9bLpD_1xziJyUc_wXagz4D5tryCRCRE";
   const activeAvatar = student?.profilePhoto && student.profilePhoto !== "none"
     ? student.profilePhoto
-    : (student?.profilePhoto === "none" ? null : profileImgDefault);
+    : (student?.profilePhoto === "none" ? null : (student?.name === "Chinnu" || !student?.profilePhoto ? chinnuDefaultAvatar : profileImgDefault));
+
+  const handleDownloadPdf = () => {
+    window.print();
+  };
 
   return (
     <div className="student-profile-page">
       {/* =========================================================
-          TOP NAVIGATION BAR (ANCHORED LOGO AT LEFT CORNER)
+          DESKTOP VIEW (SCREEN WIDTH > 768px)
           ========================================================= */}
-      <header className="sp-page-header">
+      <div className="sp-desktop-only">
+        {/* =========================================================
+            TOP NAVIGATION BAR (ANCHORED LOGO AT LEFT CORNER)
+            ========================================================= */}
+        <header className="sp-page-header">
         <div className="sp-page-header-inner">
           <div className="sp-header-left" onClick={() => navigate("/")} title="Return to Homepage">
             <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sp-page-logo" />
@@ -1419,6 +1434,577 @@ function StudentProfile() {
           </div>
         )}
       </main>
+      </div>
+
+      {/* =========================================================
+          STITCH MOBILE VIEW (SCREEN WIDTH <= 768px)
+          Exact match to Stitch Screen: ef9d9d11bcc84239961a51c2ba1fa1e6
+          ========================================================= */}
+      <div className="sp-mobile-stitch-container">
+        {/* BEGIN: MainHeader */}
+        <header className="sp-m-header">
+          {/* Top Action Row */}
+          <div className="sp-m-topbar">
+            <div className="sp-m-portal-badge" onClick={() => navigate("/")} title="JNTU Portal Home">
+              <div className="sp-m-portal-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                  <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                </svg>
+              </div>
+              <div className="sp-m-portal-text">
+                <span className="sp-m-portal-name">JNTU PORTAL</span>
+                <span className="sp-m-portal-sub">Student Academic System</span>
+              </div>
+            </div>
+
+            <div className="sp-m-top-actions">
+              <button
+                type="button"
+                className="sp-m-action-btn"
+                aria-label="Notifications"
+                onClick={() => navigate("/notifications")}
+                title="Notifications"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </button>
+
+              <div className="sp-m-kebab-wrap" ref={mobileMenuRef}>
+                <button
+                  type="button"
+                  className="sp-m-action-btn"
+                  aria-label="Menu options"
+                  onClick={() => setShowMobileMenu((prev) => !prev)}
+                  title="Profile Menu"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2.2" />
+                    <circle cx="12" cy="12" r="2.2" />
+                    <circle cx="12" cy="19" r="2.2" />
+                  </svg>
+                </button>
+
+                {showMobileMenu && (
+                  <div className="sp-m-menu-dropdown">
+                    <button
+                      type="button"
+                      className="sp-m-menu-item"
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        setActiveTab("edit");
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                      </svg>
+                      Edit Profile
+                    </button>
+                    <button
+                      type="button"
+                      className="sp-m-menu-item"
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        mobileEditFileInputRef.current?.click();
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <polyline points="21 15 16 10 5 21" />
+                      </svg>
+                      Change Photo
+                    </button>
+                    <button
+                      type="button"
+                      className="sp-m-menu-item sp-m-menu-logout"
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        setShowLogoutModal(true);
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                      Log Out / Switch
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Student Identification Overview */}
+          <div className="sp-m-identity">
+            <div className="sp-m-avatar-container">
+              <div className="sp-m-avatar-ring">
+                <img
+                  src={activeAvatar || chinnuDefaultAvatar}
+                  alt={`Student Avatar - ${student.name || "Chinnu"}`}
+                  className="sp-m-avatar-img"
+                  onError={(e) => {
+                    e.currentTarget.src = profileImgDefault;
+                  }}
+                />
+                <span className="sp-m-status-dot" title="Active Enrolled" />
+              </div>
+            </div>
+
+            <div className="sp-m-identity-details">
+              <h1 className="sp-m-name">{student.name || "Chinnu"}</h1>
+              <div className="sp-m-meta-row">
+                <span className="sp-m-roll-pill">{student.hallTicket || "STGHJTY"}</span>
+                <span className="sp-m-branch-text">{student.branch || "Electrical & Electronics Engineering (EEE)"}</span>
+              </div>
+              <div className="sp-m-tag-row">
+                <span className="sp-m-sem-badge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  {student.year || "3rd Year"} ({student.semester || "6th Semester"})
+                </span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* BEGIN: MainContent */}
+        <main className="sp-m-content">
+          {/* 4 High Impact Dark Emerald Stat Cards (2x2 grid) */}
+          <section className="sp-m-metrics-grid" aria-label="Key Academic Metrics">
+            {/* Card 1: CGPA */}
+            <article className="sp-m-metric-card">
+              <div className="sp-m-card-top">
+                <span className="sp-m-card-label">CUMULATIVE CGPA</span>
+                <div className="sp-m-icon-box sp-m-icon-gold">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                </div>
+              </div>
+              <div className="sp-m-card-value-row">
+                <span className="sp-m-card-val-gold">{student.cgpa || "8.88"}</span>
+                <span className="sp-m-card-val-sub">/ 10.0</span>
+              </div>
+              <div className="sp-m-card-badge-wrap">
+                <span className="sp-m-standing-badge">
+                  ★ Distinction Standing
+                </span>
+              </div>
+            </article>
+
+            {/* Card 2: Attendance */}
+            <article className="sp-m-metric-card">
+              <div className="sp-m-card-top">
+                <span className="sp-m-card-label">TOTAL ATTENDANCE</span>
+                <div className="sp-m-icon-box sp-m-icon-emerald">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="9 11 12 14 22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                  </svg>
+                </div>
+              </div>
+              <div className="sp-m-card-value-row">
+                <span className="sp-m-card-val-white">{student.attendancePercentage || 75}%</span>
+                <span className="sp-m-card-sub-emerald">Threshold met</span>
+              </div>
+              <div className="sp-m-progress-track">
+                <div
+                  className="sp-m-progress-fill"
+                  style={{ width: `${Math.min(100, Number(student.attendancePercentage) || 75)}%` }}
+                />
+              </div>
+              <div className="sp-m-card-badge-wrap">
+                <span className="sp-m-eligible-badge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Hall Ticket Eligible
+                </span>
+              </div>
+            </article>
+
+            {/* Card 3: Credits */}
+            <article className="sp-m-metric-card">
+              <div className="sp-m-card-top">
+                <span className="sp-m-card-label">CREDITS COMPLETED</span>
+                <div className="sp-m-icon-box sp-m-icon-emerald">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                </div>
+              </div>
+              <div className="sp-m-card-value-row">
+                <span className="sp-m-card-val-white">
+                  {(student.credits || "100 / 160").split("/")[0]?.trim() || "100"}
+                </span>
+                <span className="sp-m-card-val-sub">/ 160 Total</span>
+              </div>
+              <div className="sp-m-progress-track">
+                <div
+                  className="sp-m-progress-fill sp-m-progress-fill-emerald"
+                  style={{ width: "62.5%" }}
+                />
+              </div>
+              <div className="sp-m-card-desc">62.5% Degree Requirement</div>
+            </article>
+
+            {/* Card 4: Regulation */}
+            <article className="sp-m-metric-card">
+              <div className="sp-m-card-top">
+                <span className="sp-m-card-label">CURRICULUM & BATCH</span>
+                <div className="sp-m-icon-box sp-m-icon-emerald">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="sp-m-card-value-row">
+                <span className="sp-m-card-val-gold-reg">{student.regulation || "R16 Regulation"}</span>
+              </div>
+              <div className="sp-m-card-batch-row">
+                <span>{student.branchCode || "EEE"} Dept</span>
+                <span className="sp-m-dot-sep">•</span>
+                <span>Batch {student.batch || "2021–25"}</span>
+              </div>
+            </article>
+          </section>
+
+          {/* Horizontally Scrollable Tabs Navigation */}
+          <nav className="sp-m-tabs-nav" aria-label="Profile Tabs">
+            <div className="sp-m-tabs-row">
+              <button
+                type="button"
+                className={`sp-m-tab-btn ${activeTab === "overview" ? "active" : ""}`}
+                onClick={() => setActiveTab("overview")}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <polyline points="17 11 19 13 23 9" />
+                </svg>
+                <span>Academic Details</span>
+              </button>
+              <button
+                type="button"
+                className={`sp-m-tab-btn ${activeTab === "grades" ? "active" : ""}`}
+                onClick={() => setActiveTab("grades")}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                <span>Semester SGPA</span>
+              </button>
+              <button
+                type="button"
+                className={`sp-m-tab-btn ${activeTab === "attendance" ? "active" : ""}`}
+                onClick={() => setActiveTab("attendance")}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                  <path d="m9 16 2 2 4-4" />
+                </svg>
+                <span>Attendance ({student.attendancePercentage || 75}%)</span>
+              </button>
+              <button
+                type="button"
+                className={`sp-m-tab-btn ${activeTab === "notes" ? "active" : ""}`}
+                onClick={() => setActiveTab("notes")}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
+                </svg>
+                <span>Notes ({student.savedNotes?.length || 4})</span>
+              </button>
+            </div>
+          </nav>
+
+          {/* Tab Content Area */}
+          {activeTab === "overview" && (
+            <div className="sp-m-tab-pane">
+              {/* Group 1: Academic Identification Card */}
+              <div className="sp-m-white-card">
+                <div className="sp-m-card-group-header">
+                  <div className="sp-m-group-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                    </svg>
+                  </div>
+                  <h2 className="sp-m-group-title">ACADEMIC IDENTIFICATION</h2>
+                </div>
+
+                <div className="sp-m-detail-items">
+                  <div className="sp-m-detail-box">
+                    <p className="sp-m-detail-lbl">FULL STUDENT NAME</p>
+                    <p className="sp-m-detail-val font-bold">{student.name || "Chinnu"}</p>
+                  </div>
+                  <div className="sp-m-detail-box">
+                    <p className="sp-m-detail-lbl">HALL TICKET / USN</p>
+                    <p className="sp-m-detail-val font-mono font-bold tracking-wide">{student.hallTicket || "STGHJTY"}</p>
+                  </div>
+                  <div className="sp-m-detail-box">
+                    <p className="sp-m-detail-lbl">DEPARTMENT & BRANCH</p>
+                    <p className="sp-m-detail-val font-bold">{student.branch || "Electrical & Electronics Engineering (EEE)"}</p>
+                  </div>
+                  <div className="sp-m-detail-box">
+                    <p className="sp-m-detail-lbl">ACADEMIC LEVEL</p>
+                    <p className="sp-m-detail-val font-bold">{student.year || "3rd Year"} | {student.semester || "6th Semester"}</p>
+                  </div>
+                  <div className="sp-m-detail-box">
+                    <p className="sp-m-detail-lbl">COLLEGE / INSTITUTION</p>
+                    <p className="sp-m-detail-val font-semibold">{student.college || "JNTU College of Engineering"}</p>
+                  </div>
+                  <div className="sp-m-detail-box">
+                    <p className="sp-m-detail-lbl">AFFILIATED UNIVERSITY & REGULATION</p>
+                    <p className="sp-m-detail-val font-semibold">{student.university || "JNT University"} • {student.regulation || "R16 Regulation"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 2: Contact & Clearance Status Card */}
+              <div className="sp-m-white-card">
+                <div className="sp-m-detail-items">
+                  <div className="sp-m-detail-box">
+                    <p className="sp-m-detail-lbl">OFFICIAL EMAIL</p>
+                    <a className="sp-m-contact-link sp-m-link-green" href={`mailto:${student.email || "chinnu@gmail.com"}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22,6 12,13 2,6" />
+                      </svg>
+                      <span>{student.email || "chinnu@gmail.com"}</span>
+                    </a>
+                  </div>
+
+                  <div className="sp-m-detail-box">
+                    <p className="sp-m-detail-lbl">CONTACT PHONE</p>
+                    <a className="sp-m-contact-link" href={`tel:${student.phone || "+919876543210"}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                      </svg>
+                      <span>{student.phone || "+91 98765 43210"}</span>
+                    </a>
+                  </div>
+
+                  <div className="sp-m-detail-box sp-m-clearance-box">
+                    <div>
+                      <p className="sp-m-detail-lbl">ATTENDANCE CLEARANCE</p>
+                      <p className="sp-m-clearance-text">Eligible for mid & semester end examinations without condonation</p>
+                    </div>
+                    <span className="sp-m-clearance-pill">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <polyline points="9 12 11 14 15 10" />
+                      </svg>
+                      75% Clearance (Safe Standing)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: Semester SGPA */}
+          {activeTab === "grades" && (
+            <div className="sp-m-tab-pane">
+              <div className="sp-m-white-card">
+                <div className="sp-m-card-group-header">
+                  <div className="sp-m-group-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="20" x2="18" y2="10" />
+                      <line x1="12" y1="20" x2="12" y2="4" />
+                      <line x1="6" y1="20" x2="6" y2="14" />
+                    </svg>
+                  </div>
+                  <h2 className="sp-m-group-title">SEMESTER PERFORMANCE MATRIX</h2>
+                </div>
+
+                <div className="sp-m-grades-list">
+                  {(student.semesterGrades || []).map((grade, idx) => {
+                    const sgpaNum = parseFloat(grade.sgpa);
+                    const hasScore = !isNaN(sgpaNum) && sgpaNum > 0;
+                    return (
+                      <div key={idx} className="sp-m-grade-row">
+                        <div className="sp-m-grade-left">
+                          <strong>{grade.sem}</strong>
+                          <span className="sp-m-grade-credits">{grade.credits || 20} Credits</span>
+                        </div>
+                        <div className="sp-m-grade-middle">
+                          {hasScore ? (
+                            <>
+                              <div className="sp-m-score-val">{sgpaNum.toFixed(2)}</div>
+                              <div className="sp-m-progress-track">
+                                <div className="sp-m-progress-fill" style={{ width: `${(sgpaNum / 10) * 100}%` }} />
+                              </div>
+                            </>
+                          ) : (
+                            <span className="sp-m-score-pending">{grade.status || "Pending"}</span>
+                          )}
+                        </div>
+                        <div className="sp-m-grade-right">
+                          <span className={`sp-m-grade-badge ${hasScore && sgpaNum >= 8.5 ? "gold" : hasScore ? "green" : "gray"}`}>
+                            {hasScore ? (sgpaNum >= 9.0 ? "Outstanding" : sgpaNum >= 8.0 ? "Distinction" : "Pass") : "Upcoming"}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: Attendance Details */}
+          {activeTab === "attendance" && (
+            <div className="sp-m-tab-pane">
+              <div className="sp-m-white-card">
+                <div className="sp-m-att-stat-box">
+                  <div className="sp-m-att-big-circle">
+                    <span className="sp-m-att-circle-val">{student.attendancePercentage || 75}%</span>
+                    <span className="sp-m-att-circle-lbl">Attendance</span>
+                  </div>
+                  <div className="sp-m-att-status-info">
+                    <span className="sp-m-clearance-pill">✓ Hall Ticket Eligible</span>
+                    <h3 className="sp-m-att-h3">University Attendance Norms</h3>
+                    <p className="sp-m-att-p">JNTU regulations require a minimum aggregate of 75% across all semester coursework.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: Notes */}
+          {activeTab === "notes" && (
+            <div className="sp-m-tab-pane">
+              <div className="sp-m-white-card">
+                <div className="sp-m-notes-list">
+                  {(student.savedNotes || []).map((note) => (
+                    <div key={note.id} className="sp-m-note-item" onClick={() => navigate(`/notes?branch=${note.branch}`)}>
+                      <div className="sp-m-note-header">
+                        <span className="sp-m-note-branch">{note.branch}</span>
+                        <span className="sp-m-note-sem">{note.sem}</span>
+                      </div>
+                      <h4 className="sp-m-note-title">{note.title}</h4>
+                      <p className="sp-m-note-faculty">{note.units} • {note.faculty}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: Edit Profile (Mobile) */}
+          {activeTab === "edit" && (
+            <div className="sp-m-tab-pane">
+              <div className="sp-m-white-card">
+                <h3 className="sp-m-edit-title">Edit Profile Details</h3>
+                <form onSubmit={handleSaveProfile} className="sp-m-edit-form">
+                  <div className="sp-m-input-item">
+                    <label>Student Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={editForm.name || ""}
+                      onChange={handleEditChange}
+                      required
+                    />
+                  </div>
+                  <div className="sp-m-input-item">
+                    <label>Hall Ticket / Roll No.</label>
+                    <input
+                      type="text"
+                      name="hallTicket"
+                      value={editForm.hallTicket || ""}
+                      onChange={handleEditChange}
+                      required
+                    />
+                  </div>
+                  <div className="sp-m-input-item">
+                    <label>Department / Branch</label>
+                    <input
+                      type="text"
+                      name="branch"
+                      value={editForm.branch || ""}
+                      onChange={handleEditChange}
+                      required
+                    />
+                  </div>
+                  <div className="sp-m-input-item">
+                    <label>Email Address</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={editForm.email || ""}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div className="sp-m-input-item">
+                    <label>Contact Phone</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={editForm.phone || ""}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div className="sp-m-edit-actions">
+                    <button type="button" className="sp-m-btn-cancel" onClick={() => setActiveTab("overview")}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="sp-m-btn-save">
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Footer CTA Button */}
+          <div className="sp-m-footer-cta">
+            <button
+              type="button"
+              className="sp-m-btn-download"
+              onClick={handleDownloadPdf}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>Download Academic Summary (PDF)</span>
+            </button>
+          </div>
+        </main>
+      </div>
+
+      <input
+        type="file"
+        ref={mobileEditFileInputRef}
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={(e) => handlePhotoUpload(e, "edit")}
+      />
     </div>
   );
 }

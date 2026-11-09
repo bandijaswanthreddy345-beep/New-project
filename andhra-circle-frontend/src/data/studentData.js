@@ -1,11 +1,11 @@
 // Initial 8-Semester Grade Matrix
 export const INITIAL_SEMESTERS = [
-  { sem: "Sem 1", sgpa: "", credits: 20, status: "Not Started" },
-  { sem: "Sem 2", sgpa: "", credits: 20, status: "Not Started" },
-  { sem: "Sem 3", sgpa: "", credits: 20, status: "Not Started" },
-  { sem: "Sem 4", sgpa: "", credits: 20, status: "Not Started" },
-  { sem: "Sem 5", sgpa: "", credits: 20, status: "Not Started" },
-  { sem: "Sem 6", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 1", sgpa: "8.65", credits: 20, status: "Completed" },
+  { sem: "Sem 2", sgpa: "8.90", credits: 20, status: "Completed" },
+  { sem: "Sem 3", sgpa: "8.75", credits: 20, status: "Completed" },
+  { sem: "Sem 4", sgpa: "9.10", credits: 20, status: "Completed" },
+  { sem: "Sem 5", sgpa: "9.00", credits: 20, status: "Completed" },
+  { sem: "Sem 6", sgpa: "", credits: 20, status: "In Progress" },
   { sem: "Sem 7", sgpa: "", credits: 20, status: "Not Started" },
   { sem: "Sem 8", sgpa: "", credits: 20, status: "Not Started" },
 ];
@@ -36,7 +36,39 @@ export const EMPTY_STUDENT_DATA = {
   semesterGrades: INITIAL_SEMESTERS,
 };
 
-export const DEFAULT_STUDENT_DATA = EMPTY_STUDENT_DATA;
+// Stitch verified student profile default (Executive Edition)
+export const DEFAULT_CHINNU_DATA = {
+  name: "Chinnu",
+  shortName: "Chinnu",
+  role: "Student",
+  hallTicket: "STGHJTY",
+  college: "JNTU College of Engineering",
+  university: "JNT University",
+  branch: "Electrical & Electronics Engineering (EEE)",
+  branchCode: "EEE",
+  year: "3rd Year",
+  semester: "6th Semester",
+  regulation: "R16 Regulation",
+  cgpa: "8.88",
+  credits: "100 / 160",
+  attendance: "75%",
+  attendancePercentage: 75,
+  email: "chinnu@gmail.com",
+  phone: "+91 98765 43210",
+  batch: "2021–25",
+  mentor: "Dr. K. Ramesh (HOD - EEE)",
+  profilePhoto: "https://lh3.googleusercontent.com/aida-public/AB6AXuCh_iva9jSPl2iJE9piEPkD6YvBd1alVmSmd2txJmVJ7yoJ1rUW5snm5XgftETiPm_z30siDrBEWaKjZ4pjsp3jGKfADJvokenmu3nU4y6eRpiyaxYebDy9CcFf55JDQbzjmgAnlXU9hJ9Lcip89XFkvYkXTn-OSsOd3Ti5p04ubIqf605k3vfPL85LRZhvLns80AuBaGzk9bLpD_1xziJyUc_wXagz4D5tryCRCRE",
+  isConfigured: true,
+  savedNotes: [
+    { id: 1, branch: "EEE", sem: "Sem 6", title: "Power Systems Operation & Control", units: "Unit 1 - 5 Full Notes", faculty: "Dr. K. Ramesh" },
+    { id: 2, branch: "EEE", sem: "Sem 6", title: "Microprocessors & Microcontrollers", units: "Unit 1 - 4 Lecture Notes", faculty: "Prof. S. Rao" },
+    { id: 3, branch: "EEE", sem: "Sem 5", title: "Power Electronics", units: "Complete Formula Sheet", faculty: "Dr. M. Lakshmi" },
+    { id: 4, branch: "EEE", sem: "Sem 5", title: "Control Systems Engineering", units: "Previous Question Papers", faculty: "Prof. V. Sharma" },
+  ],
+  semesterGrades: INITIAL_SEMESTERS,
+};
+
+export const DEFAULT_STUDENT_DATA = DEFAULT_CHINNU_DATA;
 
 // Calculate automatic CGPA from valid semester SGPAs
 export function calculateCgpaFromGrades(grades = []) {
@@ -53,11 +85,11 @@ export function calculateCgpaFromGrades(grades = []) {
 export function hasStoredStudentProfile() {
   try {
     const raw = localStorage.getItem("jntu_student_profile");
-    if (!raw) return false;
+    if (!raw) return true;
     const parsed = JSON.parse(raw);
     return Boolean(parsed && parsed.isConfigured && parsed.name?.trim());
   } catch (e) {
-    return false;
+    return true;
   }
 }
 
@@ -74,16 +106,16 @@ export function getStoredStudentData() {
       });
 
       return {
-        ...EMPTY_STUDENT_DATA,
+        ...DEFAULT_CHINNU_DATA,
         ...parsed,
         semesterGrades: mergedGrades,
-        isConfigured: Boolean(parsed.name?.trim()),
+        isConfigured: true,
       };
     }
   } catch (e) {
     console.error("Error reading student profile from localStorage:", e);
   }
-  return { ...EMPTY_STUDENT_DATA, isConfigured: false };
+  return { ...DEFAULT_CHINNU_DATA, isConfigured: true };
 }
 
 // Persist student profile data to local storage
@@ -124,4 +156,3 @@ export function clearStoredStudentData() {
 
 // Alias for convenience
 export const logoutStudentProfile = clearStoredStudentData;
-

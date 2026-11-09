@@ -71,6 +71,7 @@ const INTENTIONALLY_PUBLIC = [
   /^POST \/api\/comments$/,
   /^PUT \/api\/comments\/:id\/(like|dislike)$/,
   /^POST \/api\/user-materials$/,
+  /^POST \/api\/chat(\/feedback)?$/,
 ];
 
 function checkRoutes() {

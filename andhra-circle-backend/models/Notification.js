@@ -64,6 +64,22 @@ const notificationSchema = new mongoose.Schema(
   }
 );
 
+notificationSchema.index(
+  {
+    title: "text",
+    description: "text",
+    category: "text",
+  },
+  {
+    weights: {
+      title: 10,
+      description: 5,
+      category: 3,
+    },
+    name: "NotificationTextIndex",
+  }
+);
+
 module.exports = mongoose.model(
   "Notification",
   notificationSchema

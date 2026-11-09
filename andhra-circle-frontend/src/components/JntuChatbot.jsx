@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
+import API from "../api/api";
 import JntuBotAvatar from "./JntuBotAvatar";
 import { ThinkingOrb } from "thinking-orbs";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
@@ -486,6 +487,22 @@ function JntuChatbot() {
     draft: {},
   });
 
+  // User feedback on AI answers (msgId -> 'up' | 'down')
+  const [feedbackState, setFeedbackState] = useState({});
+
+  const handleFeedback = async (msgId, rating, userQuery) => {
+    if (feedbackState[msgId]) return;
+    setFeedbackState((prev) => ({ ...prev, [msgId]: rating }));
+    try {
+      await API.post("/chat/feedback", {
+        rating,
+        question: userQuery || "general inquiry",
+      });
+    } catch (err) {
+      console.warn("Feedback submission notice:", err?.message);
+    }
+  };
+
   const resultsBodyRef = useRef(null);
   const inputRef = useRef(null);
   const modalInputRef = useRef(null);
@@ -497,7 +514,7 @@ function JntuChatbot() {
       if (recognitionRef.current) {
         try {
           recognitionRef.current.abort();
-        } catch (_) {}
+        } catch (_) { }
       }
     };
   }, []);
@@ -520,7 +537,7 @@ function JntuChatbot() {
       if (recognitionRef.current) {
         try {
           recognitionRef.current.stop();
-        } catch (_) {}
+        } catch (_) { }
       }
       setIsListening(false);
       setListeningTarget(null);
@@ -633,7 +650,7 @@ function JntuChatbot() {
     return updated;
   };
 
-  const generateResponse = async (rawQuery, currentSession) => {
+  const generateResponse = async (rawQuery, currentSession, conversationHistory = []) => {
     const q = rawQuery.toLowerCase().trim();
 
     // =========================================================
@@ -788,25 +805,7 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 6. CORE ENGINEERING CONCEPTS & SUBJECT EXPLAINERS
-    // Explains OS, DBMS, DSA, AI/ML, Networks, OOP, DLD, EDC, BEEE, etc.
-    // =========================================================
-    const conceptAnswer = getSubjectConceptAnswer(rawQuery);
-    if (conceptAnswer) {
-      return conceptAnswer;
-    }
-
-    // =========================================================
-    // 7. STUDY STRATEGIES, EXAM PREPARATION & CAREER GUIDANCE
-    // Answers how to score 9 CGPA, prepare for exams, clear backlogs, placements.
-    // =========================================================
-    const adviceAnswer = getStudyAdviceAnswer(rawQuery);
-    if (adviceAnswer) {
-      return adviceAnswer;
-    }
-
-    // =========================================================
-    // 8. SINGLE-SHOT PROFILE NLP FIELD UPDATES
+    // 6. SINGLE-SHOT PROFILE NLP FIELD UPDATES
     // Only runs when user explicitly commands to set or update profile data
     // =========================================================
     const isAcademicQuestion = /percentage|formula|convert|rule|scale|how|what|split|weight|why|when|where/i.test(q);
@@ -926,10 +925,48 @@ function JntuChatbot() {
       };
     }
 
+    // =========================================================
+    // 8. CALL AI ASSISTANT (/api/chat) WITH RAG RETRIEVAL & FOLLOW-UP MEMORY
+    // Answers general, academic, syllabus, and subject questions from real portal data.
+    // =========================================================
+    try {
+      // Send the last 6 turns, each trimmed to max 600 characters
+      const recentTurns = (conversationHistory || [])
+        .slice(-6)
+        .map((m) => ({
+          role: m.sender === "user" ? "user" : "model",
+          text: (m.text || "").slice(0, 600),
+        }));
+
+      const aiRes = await API.post(
+        "/chat",
+        {
+          message: rawQuery.slice(0, 1000),
+          history: recentTurns,
+        },
+        { timeout: 12000 }
+      );
+
+      if (aiRes.data && aiRes.data.success && aiRes.data.reply) {
+        return {
+          text: aiRes.data.reply,
+          sources: aiRes.data.sources || [],
+          suggestions: aiRes.data.suggestedQuestions || [],
+          isAI: true,
+          userQuery: rawQuery,
+        };
+      }
+    } catch (aiErr) {
+      console.warn("AI service busy or unavailable, falling back to local portal search:", aiErr?.message);
+    }
+
+    // =========================================================
+    // 9. LOCAL SEARCH & FALLBACK BEHAVIOR (When AI is busy or limit reached)
+    // Prepend notice: "AI is busy, showing portal results." Never show a broken screen.
+    // =========================================================
     const searchRes = await performSearch(rawQuery);
 
     if (searchRes.results && searchRes.results.length > 0) {
-      // Display matched items for comprehensive query coverage
       const allItems = searchRes.results.map((item) => {
         const action = formatResourceAction(item);
         return {
@@ -940,7 +977,7 @@ function JntuChatbot() {
       });
 
       return {
-        text: `Found ${searchRes.results.length} verified academic resource${searchRes.results.length > 1 ? "s" : ""} matching "${rawQuery}":`,
+        text: `AI is busy, showing portal results.\n\nFound ${searchRes.results.length} verified academic resource${searchRes.results.length > 1 ? "s" : ""} matching "${rawQuery}":`,
         matchedResources: allItems,
         relatedResources: searchRes.relatedResources,
         relatedSubjects: searchRes.relatedSubjects,
@@ -949,15 +986,37 @@ function JntuChatbot() {
           path: `/search?query=${encodeURIComponent(rawQuery)}`,
         },
         suggestions: searchRes.suggestedQueries.length > 0 ? searchRes.suggestedQueries : ["Notes", "Question Papers", "Syllabus"],
+        userQuery: rawQuery,
       };
     }
 
-    // =========================================================
-    // 11. DYNAMIC INTELLIGENT ACADEMIC SYNTHESIZER
-    // Guarantees an authoritative, helpful response for EVERY query from the user,
-    // completely eliminating "No exact records found"!
-    // =========================================================
-    return synthesizeDynamicAcademicResponse(rawQuery, searchRes);
+    // Check offline concept explanations
+    const conceptAnswer = getSubjectConceptAnswer(rawQuery);
+    if (conceptAnswer) {
+      return {
+        ...conceptAnswer,
+        text: `AI is busy, showing portal results.\n\n${conceptAnswer.text}`,
+        userQuery: rawQuery,
+      };
+    }
+
+    // Check offline study advice
+    const adviceAnswer = getStudyAdviceAnswer(rawQuery);
+    if (adviceAnswer) {
+      return {
+        ...adviceAnswer,
+        text: `AI is busy, showing portal results.\n\n${adviceAnswer.text}`,
+        userQuery: rawQuery,
+      };
+    }
+
+    // Dynamic Intelligent Academic Synthesizer Fallback
+    const synResponse = synthesizeDynamicAcademicResponse(rawQuery, searchRes);
+    return {
+      ...synResponse,
+      text: `AI is busy, showing portal results.\n\n${synResponse.text}`,
+      userQuery: rawQuery,
+    };
   };
 
   const handleSend = async (textToSend) => {
@@ -1008,11 +1067,14 @@ function JntuChatbot() {
     setIsTyping(true);
 
     try {
-      const responseData = await generateResponse(query, profileSession);
+      const responseData = await generateResponse(query, profileSession, messages);
       const botMessage = {
         id: "bot-" + Date.now(),
         sender: "assistant",
         text: responseData.text,
+        sources: responseData.sources,
+        userQuery: query,
+        isAI: responseData.isAI,
         action: responseData.action,
         suggestions: responseData.suggestions,
         profilePreview: responseData.profilePreview,
@@ -1035,7 +1097,7 @@ function JntuChatbot() {
         {
           id: "bot-" + Date.now(),
           sender: "assistant",
-          text: `Here are resources matching "${query}":`,
+          text: `AI is busy, showing portal results.\n\nHere are resources matching "${query}":`,
           action: { label: `Search in Portal →`, path: `/search?query=${encodeURIComponent(query)}` },
           suggestions: ["Data Structures Notes", "Python Programming", "Syllabus"],
         },
@@ -1589,6 +1651,38 @@ function JntuChatbot() {
                             </div>
                           )}
 
+                          {/* RAG Retrieved Portal Sources */}
+                          {msg.sources && msg.sources.length > 0 && (
+                            <div className="chat-sources-container">
+                              <div className="chat-sources-header">
+                                <span className="chat-sources-icon">📌</span>
+                                <span>Verified Portal Materials:</span>
+                              </div>
+                              <div className="chat-sources-chips">
+                                {msg.sources.map((src, sIdx) => {
+                                  const action = formatResourceAction(src);
+                                  return (
+                                    <button
+                                      key={src._id || sIdx}
+                                      type="button"
+                                      className="chat-source-chip"
+                                      onClick={() => {
+                                        handleCloseModal();
+                                        navigate(action.path);
+                                      }}
+                                      title={src.snippet || src.title}
+                                    >
+                                      <span className="chat-source-badge">{src.type}</span>
+                                      <span className="chat-source-title">{src.subject || src.title}</span>
+                                      {src.branch && <span className="chat-source-meta">{src.branch}</span>}
+                                      <span className="chat-source-arrow">→</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
                           {msg.action && (
                             <button
                               type="button"
@@ -1614,6 +1708,34 @@ function JntuChatbot() {
                                   {item}
                                 </button>
                               ))}
+                            </div>
+                          )}
+
+                          {/* AI Answer Quality Feedback */}
+                          {!msg.profilePreview && (
+                            <div className="chat-msg-feedback-row">
+                              <span className="chat-msg-feedback-label">Helpful?</span>
+                              <button
+                                type="button"
+                                className={`chat-feedback-btn ${feedbackState[msg.id] === "up" ? "is-active" : ""}`}
+                                onClick={() => handleFeedback(msg.id, "up", msg.userQuery)}
+                                title="Accurate and helpful"
+                                aria-label="Thumbs up"
+                              >
+                                👍
+                              </button>
+                              <button
+                                type="button"
+                                className={`chat-feedback-btn ${feedbackState[msg.id] === "down" ? "is-active" : ""}`}
+                                onClick={() => handleFeedback(msg.id, "down", msg.userQuery)}
+                                title="Needs improvement"
+                                aria-label="Thumbs down"
+                              >
+                                👎
+                              </button>
+                              {feedbackState[msg.id] && (
+                                <span className="chat-feedback-thanks">Thanks for the feedback!</span>
+                              )}
                             </div>
                           )}
                         </div>

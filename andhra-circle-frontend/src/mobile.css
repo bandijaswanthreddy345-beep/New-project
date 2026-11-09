@@ -1359,3 +1359,21 @@
     animation: none !important;
   }
 }
+/* ---------- Student Profile Stitch Mobile Layout (<= 768px) ---------- */
+@media (max-width: 768px) {
+  .sp-desktop-only {
+    display: none !important;
+  }
+  .sp-mobile-stitch-container {
+    display: block !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .sp-mobile-stitch-container {
+    display: none !important;
+  }
+  .sp-desktop-only {
+    display: block !important;
+  }
+}

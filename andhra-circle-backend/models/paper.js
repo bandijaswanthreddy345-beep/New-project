@@ -68,6 +68,22 @@ const paperSchema = new mongoose.Schema(
   }
 );
 
+paperSchema.index(
+  {
+    title: "text",
+    subject: "text",
+    examType: "text",
+  },
+  {
+    weights: {
+      subject: 10,
+      title: 8,
+      examType: 3,
+    },
+    name: "PaperTextIndex",
+  }
+);
+
 module.exports = mongoose.model(
   "Paper",
   paperSchema
