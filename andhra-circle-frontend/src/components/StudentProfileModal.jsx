@@ -104,7 +104,7 @@ function StudentProfileModal({ isOpen, onClose }) {
                 </div>
                 <p className="sp-preview-branch">{displayBranch}</p>
                 <p className="sp-preview-academic-meta">
-                  <span>{displayYear} • {displaySemester}</span>
+                  <span>{displaySemester}</span>
                   <span className="sp-meta-sep">•</span>
                   <span className="sp-meta-ht">{displayHallTicket}</span>
                 </p>

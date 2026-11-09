@@ -470,7 +470,6 @@ return (
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                       <span className="stat-count">{program.views || 0}</span>
-                      <span className="stat-unit">views</span>
                     </span>
 
                     <span className="stat-chip stat-chip-downloads" title={`${program.downloads || 0} Total Downloads`}>
@@ -480,7 +479,6 @@ return (
                         <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                       <span className="stat-count">{program.downloads || 0}</span>
-                      <span className="stat-unit">dls</span>
                     </span>
                   </div>
 

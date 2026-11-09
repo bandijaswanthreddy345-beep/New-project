@@ -976,28 +976,6 @@ function StudentProfile() {
             Shows interactive '+ Add Details' prompts when fields are empty
             ========================================================= */}
         <div className="sp-page-card">
-          {/* Setup Invitation Banner for fresh/unconfigured profiles */}
-          {!isConfigured && activeTab !== "edit" && (
-            <div className="sp-unconfigured-setup-banner">
-              <div className="sp-unconfigured-setup-icon">🎓</div>
-              <div className="sp-unconfigured-setup-info">
-                <div className="sp-unconfigured-badge">Academic Profile Pending</div>
-                <h3 className="sp-unconfigured-title">Complete Your Academic Profile</h3>
-                <p className="sp-unconfigured-desc">
-                  Your university dashboard is active. Add your official Hall Ticket, branch, and semester grades to unlock real-time CGPA tracking and university examination attendance monitoring.
-                </p>
-              </div>
-              <button
-                type="button"
-                className="sp-unconfigured-add-btn"
-                onClick={() => setActiveTab("edit")}
-              >
-                <span>+ Add Profile Details</span>
-                <span className="sp-arrow">→</span>
-              </button>
-            </div>
-          )}
-
           {/* Academic Cover Banner with Three Dots Kebab Menu */}
           <div className="sp-page-banner">
             <div className="sp-page-banner-glow" />
@@ -2063,23 +2041,6 @@ function StudentProfile() {
               </div>
             </div>
           </div>
-
-          {/* Unconfigured Mobile Setup Alert */}
-          {!isConfigured && activeTab !== "edit" && (
-            <div className="sp-m-setup-alert">
-              <div className="sp-m-setup-info">
-                <strong>Academic Profile Incomplete</strong>
-                <p>Add your details to activate live CGPA and attendance tracking.</p>
-              </div>
-              <button
-                type="button"
-                className="sp-m-setup-btn"
-                onClick={() => setActiveTab("edit")}
-              >
-                + Add Details
-              </button>
-            </div>
-          )}
 
           {/* Student Identification Overview */}
           <div className="sp-m-identity">

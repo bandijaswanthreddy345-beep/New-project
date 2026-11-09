@@ -8,8 +8,47 @@ const CAPTCHA_TTL_MS = 5 * 60 * 1000; // 5 minutes
 // In-memory replay prevention (nonces)
 const usedNonces = new Set();
 
-function getSecret() {
-  return process.env.JWT_SECRET || "andhra_circle_secure_captcha_fallback_secret_key";
+// Development ephemeral secret generated at startup if CAPTCHA_SECRET is absent
+let devEphemeralSecret = null;
+
+/**
+ * Derives a 32-byte key for AES-256-GCM from CAPTCHA_SECRET.
+ * In production: refuses to start if CAPTCHA_SECRET is missing.
+ * In development: generates a random 32-byte secret at startup and warns.
+ */
+function getCaptchaKey() {
+  const secret = process.env.CAPTCHA_SECRET;
+
+  if (!secret || typeof secret !== "string" || !secret.trim()) {
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "FATAL: CAPTCHA_SECRET is not set in production. The server cannot start securely."
+      );
+      process.exit(1);
+    }
+
+    if (!devEphemeralSecret) {
+      devEphemeralSecret = crypto.randomBytes(32).toString("hex");
+      console.warn(
+        "WARNING: CAPTCHA_SECRET is not set in environment. Generated an ephemeral development secret for this process session."
+      );
+    }
+
+    return crypto.createHash("sha256").update(devEphemeralSecret).digest();
+  }
+
+  return crypto.createHash("sha256").update(secret.trim()).digest();
+}
+
+// Immediate startup validation check for production environment
+if (
+  process.env.NODE_ENV === "production" &&
+  (!process.env.CAPTCHA_SECRET || !process.env.CAPTCHA_SECRET.trim())
+) {
+  console.error(
+    "FATAL: CAPTCHA_SECRET is not set in production. The server refuses to start."
+  );
+  process.exit(1);
 }
 
 /**
@@ -94,24 +133,33 @@ function buildCaptchaSvg(text) {
 }
 
 /**
- * Creates a new CAPTCHA challenge with signed token
+ * Creates a new CAPTCHA challenge with AES-256-GCM encrypted token.
+ * The answer is completely concealed within ciphertext and cannot be read
+ * by base64-decoding the client token.
  */
 function createCaptcha() {
   const text = getRandomText();
   const svg = buildCaptchaSvg(text);
 
-  const nonce = crypto.randomBytes(12).toString("hex");
+  const nonce = crypto.randomBytes(16).toString("hex");
   const exp = Date.now() + CAPTCHA_TTL_MS;
 
-  const payload = JSON.stringify({
+  const plaintext = JSON.stringify({
     text: text.toLowerCase(),
     exp,
     nonce,
   });
 
-  const secret = getSecret();
-  const sig = crypto.createHmac("sha256", secret).update(payload).digest("hex");
-  const captchaToken = Buffer.from(JSON.stringify({ p: payload, s: sig })).toString("base64");
+  const key = getCaptchaKey();
+  const iv = crypto.randomBytes(12); // 96-bit random IV for AES-GCM
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+
+  const encrypted = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag(); // 128-bit authentication tag
+
+  // Format: [12 bytes IV][16 bytes Auth Tag][Ciphertext] -> base64
+  const tokenBuffer = Buffer.concat([iv, tag, encrypted]);
+  const captchaToken = tokenBuffer.toString("base64");
 
   return {
     captchaToken,
@@ -120,7 +168,7 @@ function createCaptcha() {
 }
 
 /**
- * Verifies user input against the signed CAPTCHA token
+ * Verifies user input against the AES-256-GCM encrypted CAPTCHA token
  */
 function verifyCaptcha(captchaToken, userInput) {
   if (typeof captchaToken !== "string" || !captchaToken.trim()) {
@@ -132,24 +180,31 @@ function verifyCaptcha(captchaToken, userInput) {
   }
 
   try {
-    const raw = Buffer.from(captchaToken.trim(), "base64").toString("utf8");
-    const { p, s } = JSON.parse(raw);
+    const rawBuffer = Buffer.from(captchaToken.trim(), "base64");
 
-    if (!p || !s) {
+    // Minimum payload: 12 (IV) + 16 (Tag) + 1 (Ciphertext) = 29 bytes
+    if (rawBuffer.length < 29) {
       return { ok: false, message: "Malformed security CAPTCHA token." };
     }
 
-    const secret = getSecret();
-    const expectedSig = crypto.createHmac("sha256", secret).update(p).digest("hex");
+    const iv = rawBuffer.subarray(0, 12);
+    const tag = rawBuffer.subarray(12, 28);
+    const ciphertext = rawBuffer.subarray(28);
 
-    // Constant-time signature verification
-    const sigBuf = Buffer.from(s, "hex");
-    const expectedBuf = Buffer.from(expectedSig, "hex");
-    if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
-      return { ok: false, message: "Invalid security CAPTCHA signature. Please reload." };
+    const key = getCaptchaKey();
+    const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+    decipher.setAuthTag(tag);
+
+    const decrypted = Buffer.concat([
+      decipher.update(ciphertext),
+      decipher.final(),
+    ]).toString("utf8");
+
+    const payload = JSON.parse(decrypted);
+
+    if (!payload || !payload.text || !payload.exp || !payload.nonce) {
+      return { ok: false, message: "Invalid security CAPTCHA challenge format." };
     }
-
-    const payload = JSON.parse(p);
 
     if (Date.now() > payload.exp) {
       return { ok: false, message: "Security CAPTCHA code has expired. Please refresh for a new code." };
@@ -160,23 +215,28 @@ function verifyCaptcha(captchaToken, userInput) {
     }
 
     const normalizedInput = userInput.trim().toLowerCase().replace(/[\s-_]+/g, "");
-    if (normalizedInput !== payload.text) {
+
+    // Constant-time answer comparison using SHA-256 hashes to prevent timing attacks
+    const inputHash = crypto.createHash("sha256").update(normalizedInput).digest();
+    const answerHash = crypto.createHash("sha256").update(payload.text).digest();
+    if (!crypto.timingSafeEqual(inputHash, answerHash)) {
       return { ok: false, message: "Incorrect security CAPTCHA code. Please check the image and try again." };
     }
 
-    // Invalidate nonce to prevent replay
+    // Invalidate nonce to prevent replay attacks
     usedNonces.add(payload.nonce);
     setTimeout(() => {
       usedNonces.delete(payload.nonce);
     }, CAPTCHA_TTL_MS + 60000);
 
-    // Safeguard cache growth
+    // Safeguard memory growth
     if (usedNonces.size > 10000) {
       usedNonces.clear();
     }
 
     return { ok: true };
   } catch (err) {
+    // decipher.final() throws an exception if the authentication tag fails (tampered token)
     return { ok: false, message: "Security CAPTCHA verification failed. Please try again." };
   }
 }
@@ -185,4 +245,3 @@ module.exports = {
   createCaptcha,
   verifyCaptcha,
 };
-

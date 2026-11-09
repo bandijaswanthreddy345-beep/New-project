@@ -72,31 +72,35 @@
 .sp-preview-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .sp-preview-logo {
-  width: 26px;
-  height: 26px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid rgba(255, 239, 179, 0.4);
+  object-fit: contain;
+  background: #ffffff;
+  padding: 2px;
+  border: 1.5px solid rgba(255, 239, 179, 0.55);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
 }
 
 .sp-preview-portal {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: #ffefb3;
   display: block;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .sp-preview-badge {
-  font-size: 10px;
-  font-weight: 500;
-  color: #94a3b8;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  font-weight: 600;
+  color: #cbd5e1;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 

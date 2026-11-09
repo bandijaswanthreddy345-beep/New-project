@@ -471,7 +471,6 @@ const getDisplayTitle = (note) => {
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                       <span className="stat-count">{note.views || 0}</span>
-                      <span className="stat-unit">views</span>
                     </span>
 
                     <span className="stat-chip stat-chip-downloads" title={`${note.downloads || 0} Total Downloads`}>
@@ -481,7 +480,6 @@ const getDisplayTitle = (note) => {
                         <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                       <span className="stat-count">{note.downloads || 0}</span>
-                      <span className="stat-unit">dls</span>
                     </span>
                   </div>
 

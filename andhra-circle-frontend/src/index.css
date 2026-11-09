@@ -3892,13 +3892,13 @@ mark {
   line-height: 1;
 }
 
+.stat-unit {
+  display: none !important;
+}
+
 .stat-chip-views .stat-unit,
 .stat-item:first-child .stat-unit {
-  color: #55726e !important;
-  font-size: 9px !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
+  display: none !important;
 }
 
 .stat-chip-downloads,
@@ -3925,11 +3925,7 @@ mark {
 
 .stat-chip-downloads .stat-unit,
 .stat-item:nth-child(2) .stat-unit {
-  color: #55726e !important;
-  font-size: 9px !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
+  display: none !important;
 }
 
 /* ---------------------------------------------------------

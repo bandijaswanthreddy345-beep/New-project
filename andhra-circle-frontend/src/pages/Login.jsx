@@ -51,8 +51,8 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(user));
 
       console.log("Login successful");
-      console.log("User:", user);
-      console.log("Token saved:", token);
+      
+      
 
       // Role based redirection
       if (user.role === "admin") {
