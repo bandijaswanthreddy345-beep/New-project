@@ -579,12 +579,12 @@ ul {
   max-width: 600px;
   height: 52px;
   box-sizing: border-box;
-  background: rgba(6, 32, 27, 0.82);
+  background: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(16, 185, 129, 0.42);
+  border: 1px solid rgba(255, 239, 179, 0.36);
   border-radius: 9999px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 239, 179, 0.1);
   display: flex;
   align-items: center;
   padding: 0 8px 0 10px;
@@ -593,10 +593,15 @@ ul {
   transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
+.hero-ai-bar:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35), 0 0 20px rgba(251, 191, 36, 0.45);
+}
+
 .hero-ai-bar:focus-within {
   border-color: #fbbf24;
-  background: rgba(6, 36, 30, 0.95);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.35);
+  background: rgba(0, 0, 0, 0.92);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 22px rgba(251, 191, 36, 0.45);
 }
 
 /* Frosted Avatar Badge Pod */
@@ -1405,17 +1410,21 @@ body.chatbot-modal-open .floating-whatsapp-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #0f172a;
-  border: 1.5px solid #ffefb344;
+  background-color: rgba(0, 0, 0, 0.78);
+  border: 1px solid rgba(255, 239, 179, 0.36);
   border-radius: 16px;
   padding: 6px 8px;
-  box-shadow: inset 0 1px 0 #ffffff15;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 239, 179, 0.1);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-modal-input-bar:hover {
+  border-color: #fbbf24;
 }
 
 .chat-modal-input-bar:focus-within {
   border-color: #fbbf24;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.4), inset 0 1px 0 #ffffff22;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.4), inset 0 1px 0 rgba(255, 239, 179, 0.2);
 }
 
 .chat-modal-input-field,

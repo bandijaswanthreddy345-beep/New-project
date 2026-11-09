@@ -122,9 +122,9 @@
   font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: none;
   background: transparent;
   width: 100%;
   text-align: left;
@@ -132,18 +132,14 @@
 
 .sidebar-link:hover {
   color: #ffffff;
-  background: rgba(0, 0, 0, 0.78);
-  border: 1px solid rgba(255, 239, 179, 0.36);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 239, 179, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   transform: translateX(2px);
 }
 
 .sidebar-link.active {
-  background: rgba(0, 0, 0, 0.85) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 239, 179, 0.36) !important;
-  border-left: 3.5px solid #ffefb3 !important;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(90deg, rgba(217, 167, 38, 0.18), rgba(1, 62, 55, 0.4)) !important;
+  color: #ffefb3 !important;
+  border-left: 3px solid #d9a726;
   font-weight: 700;
 }
 
@@ -184,10 +180,10 @@
 }
 
 .sidebar-profile:hover {
-  background: rgba(0, 0, 0, 0.78);
-  border-color: rgba(255, 239, 179, 0.36);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(217, 167, 38, 0.45);
   transform: translateY(-1.5px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 239, 179, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 .sidebar-profile:active {
