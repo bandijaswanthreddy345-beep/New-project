@@ -96,6 +96,7 @@ const normalizeBranch = (branch) =>
   String(branch || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 const noteMatchesBranch = (noteBranch, tab) => {
+  if (!tab || tab.code === "ALL") return true;
   const normalizedBranch = normalizeBranch(noteBranch);
   return [tab.code, tab.name, ...tab.aliases].some(
     (branch) => normalizeBranch(branch) === normalizedBranch
@@ -364,7 +365,7 @@ function Notes({ initialType }) {
           title: formatTitle(title),
           semester: sem,
           scheme: normalizeScheme(n),
-          branchCode: activeBranch,
+          branchCode: n.branch || activeBranch,
           extraBadge: n.subjectCode || "",
           pdfUrl: n.pdfUrl || "",
           resourceType: "notes",
@@ -798,6 +799,7 @@ function Notes({ initialType }) {
                 value={activeBranch}
                 onChange={(e) => handleSelectBranch(e.target.value)}
               >
+                <option value="ALL">All Departments</option>
                 <option value="CSE">CSE — Computer Science</option>
                 <option value="AIML">AIML — AI & Machine Learning</option>
                 <option value="ME">ME — Mechanical Eng.</option>
@@ -931,29 +933,8 @@ function Notes({ initialType }) {
                       </div>
                     </div>
 
-                    {/* Action Buttons: Download & View */}
+                    {/* Action Buttons: View */}
                     <div className="folder-card-actions">
-                      {item.pdfUrl && (
-                        <button
-                          type="button"
-                          className={`folder-download-btn ${downloadingId === item.id ? "downloading" : ""}`}
-                          onClick={(e) => handleDownloadPdf(item, e)}
-                          disabled={downloadingId === item.id}
-                          title={`Download ${item.title} PDF`}
-                        >
-                          {downloadingId === item.id ? (
-                            <span className="download-spinner" />
-                          ) : (
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                              <polyline points="7 10 12 15 17 10" />
-                              <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
-                          )}
-                          <span>Download</span>
-                        </button>
-                      )}
-
                       <button
                         type="button"
                         className="folder-view-btn"

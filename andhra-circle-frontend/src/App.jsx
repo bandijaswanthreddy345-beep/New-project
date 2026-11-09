@@ -70,6 +70,13 @@ import PdfViewer from "./pages/PdfViewer";
 
 function App() {
   const location = useLocation();
+  const { pathname } = location;
+
+  // Every page change starts at the top; otherwise a short page opened from
+  // a long scrolled list shows up as a blank white screen.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   // Route Exit Protection:
   // When an admin leaves the restricted Admin Portal and navigates to ANY public page (e.g. /, /notes, etc.),

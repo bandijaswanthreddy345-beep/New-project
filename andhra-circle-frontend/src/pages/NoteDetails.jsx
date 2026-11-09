@@ -3,9 +3,55 @@ import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
 import { normalizeSemester } from "../utils/semester";
+import { getStoredStudentData } from "../data/studentData";
 import "./NoteDetails.css";
 
+function formatFriendlySemester(sem) {
+  if (!sem) return "";
+  const clean = String(sem).trim();
+  if (clean === "1-1") return "Semester 1";
+  if (clean === "1-2") return "Semester 2";
+  if (clean === "2-1") return "Semester 3";
+  if (clean === "2-2") return "Semester 4";
+  if (clean === "3-1") return "Semester 5";
+  if (clean === "3-2") return "Semester 6";
+  if (clean === "4-1") return "Semester 7";
+  if (clean === "4-2") return "Semester 8";
+  if (/^[1-8]$/.test(clean)) return "Semester " + clean;
+  return clean;
+}
+
+
+function getInitialCommentIdentity() {
+  try {
+    // 1. Check student profile first
+    const student = getStoredStudentData();
+    if (student?.name || student?.email) {
+      return {
+        name: student.name || "",
+        email: student.email || "",
+      };
+    }
+
+    // 2. Check logged-in user in localStorage
+    const rawUser = localStorage.getItem("user");
+    if (rawUser) {
+      const user = JSON.parse(rawUser);
+      if (user?.name || user?.email) {
+        return {
+          name: user.name || "",
+          email: user.email || "",
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Error reading identity for comment form:", e);
+  }
+  return { name: "", email: "" };
+}
+
 function NoteDetails() {
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -26,13 +72,44 @@ function NoteDetails() {
   // Heart pop animation state
   const [heartPop, setHeartPop] = useState(null);
 
-  const [commentForm, setCommentForm] = useState({
-    name: "",
-    email: "",
-    comment: "",
+  // Auto-fill student/user profile info if created, else allow manual entry
+  const [commentForm, setCommentForm] = useState(() => {
+    const identity = getInitialCommentIdentity();
+    return {
+      name: identity.name,
+      email: identity.email,
+      comment: "",
+    };
   });
 
-  const BACKEND_URL = "http://localhost:5000";
+  // Listen for profile creation or updates in real-time
+  useEffect(() => {
+    const syncIdentity = () => {
+      const identity = getInitialCommentIdentity();
+      if (identity.name || identity.email) {
+        setCommentForm((prev) => ({
+          ...prev,
+          name: identity.name || prev.name,
+          email: identity.email || prev.email,
+        }));
+      }
+    };
+
+    // Run on initial mount
+    syncIdentity();
+
+    window.addEventListener("studentProfileUpdated", syncIdentity);
+    window.addEventListener("storage", syncIdentity);
+    window.addEventListener("focus", syncIdentity);
+
+    return () => {
+      window.removeEventListener("studentProfileUpdated", syncIdentity);
+      window.removeEventListener("storage", syncIdentity);
+      window.removeEventListener("focus", syncIdentity);
+    };
+  }, []);
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
   // =========================================================
   // FETCH NOTE
@@ -471,10 +548,13 @@ function NoteDetails() {
         }
       }
 
-      setCommentForm({
-        name: "",
-        email: "",
-        comment: "",
+      setCommentForm((prev) => {
+        const identity = getInitialCommentIdentity();
+        return {
+          name: identity.name || prev.name || "",
+          email: identity.email || prev.email || "",
+          comment: "",
+        };
       });
     } catch (err) {
       console.error(
@@ -499,6 +579,11 @@ function NoteDetails() {
     commentId,
     event
   ) => {
+    const likedKey = `comment_liked_${commentId}`;
+    if (localStorage.getItem(likedKey)) {
+      return; // Already liked by this user
+    }
+
     const buttonRect =
       event.currentTarget.getBoundingClientRect();
 
@@ -523,6 +608,7 @@ function NoteDetails() {
     }, 1200);
 
     try {
+      localStorage.setItem(likedKey, "true");
       const response = await API.put(
         `/comments/${commentId}/like`
       );
@@ -538,6 +624,7 @@ function NoteDetails() {
         )
       );
     } catch (err) {
+      localStorage.removeItem(likedKey);
       console.error(
         "LIKE COMMENT ERROR:",
         err
@@ -552,7 +639,13 @@ function NoteDetails() {
   const handleDislikeComment = async (
     commentId
   ) => {
+    const dislikedKey = `comment_disliked_${commentId}`;
+    if (localStorage.getItem(dislikedKey)) {
+      return; // Already disliked
+    }
+
     try {
+      localStorage.setItem(dislikedKey, "true");
       const response = await API.put(
         `/comments/${commentId}/dislike`
       );
@@ -568,6 +661,7 @@ function NoteDetails() {
         )
       );
     } catch (err) {
+      localStorage.removeItem(dislikedKey);
       console.error(
         "DISLIKE COMMENT ERROR:",
         err
@@ -889,21 +983,21 @@ function NoteDetails() {
             <div className="hero-unified-footer">
               <div className="hero-tags">
                 {branch && (
-                  <div className="hero-tag">
+                  <div className="hero-tag hero-tag-card">
                     <span className="hero-tag-label">BRANCH</span>
-                    <strong>{branch}</strong>
+                    <strong className="hero-tag-value">{branch}</strong>
                   </div>
                 )}
                 {semester && (
-                  <div className="hero-tag">
+                  <div className="hero-tag hero-tag-card">
                     <span className="hero-tag-label">SEMESTER</span>
-                    <strong>{semester}</strong>
+                    <strong className="hero-tag-value">{formatFriendlySemester(semester)}</strong>
                   </div>
                 )}
                 {year && (
-                  <div className="hero-tag">
+                  <div className="hero-tag hero-tag-card">
                     <span className="hero-tag-label">ACADEMIC YEAR</span>
-                    <strong>{year}</strong>
+                    <strong className="hero-tag-value">{year}</strong>
                   </div>
                 )}
               </div>
@@ -1043,28 +1137,8 @@ function NoteDetails() {
 
                     <div className="module-inner">
 
-                      <div className={`module-resource-grid ${unit.notes && unit.notes.trim() ? "has-notes" : "pdf-only"}`}>
-
-                        {/* UNIT NOTES (Only displayed when real notes content exists) */}
-                        {Boolean(unit.notes && unit.notes.trim()) && (
-                          <div className="module-notes-box">
-                            <div className="resource-title">
-                              <div className="resource-icon">
-                                📝
-                              </div>
-                              <div>
-                                <span>UNIT NOTES</span>
-                                <small>Important concepts and summary</small>
-                              </div>
-                            </div>
-
-                            <div className="notes-text">
-                              <p>{unit.notes}</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* PDF */}
+                      <div className="module-resource-grid pdf-only">
+                        {/* PDF Box */}
                         <div className="module-pdf-box">
                           <div className="resource-title-row">
                             <div className="resource-title">
@@ -1087,14 +1161,7 @@ function NoteDetails() {
                               </div>
                             </div>
 
-                            {pdfUrl && (
-                              <span className="pdf-verified-chip">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                  <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                                Document Ready
-                              </span>
-                            )}
+                            
                           </div>
 
                           {pdfUrl ? (
@@ -1138,9 +1205,7 @@ function NoteDetails() {
                             </p>
                           )}
                         </div>
-
                       </div>
-
                       {/* PDF PREVIEW */}
 
                       {isOpen && pdfUrl && (
@@ -1213,11 +1278,8 @@ function NoteDetails() {
                         </div>
 
                       )}
-
                     </div>
-
                   </div>
-
                 </article>
               );
             })}
@@ -1244,9 +1306,7 @@ function NoteDetails() {
 
                 <div>
 
-                  <span className="eyebrow">
-                    COMMUNITY
-                  </span>
+                  <span className="comments-eyebrow-badge">COMMUNITY</span>
 
                   <h2>
                     Comments
@@ -1327,9 +1387,7 @@ function NoteDetails() {
 
               <div className="comment-submit-row">
 
-                <span className="comment-private-note">
-                  Your email will not be displayed publicly.
-                </span>
+                
 
                 <button
                   type="submit"

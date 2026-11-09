@@ -274,7 +274,7 @@ function Notifications({ search = "" }) {
     if (link.includes("docs.google.com/viewer")) {
       return link;
     }
-    if (link.startsWith("http") && !link.includes("localhost:5000")) {
+    if (link.startsWith("http") && !link.includes(":5000")) {
       return `https://docs.google.com/viewer?url=${encodeURIComponent(link)}&embedded=true`;
     }
     return link;

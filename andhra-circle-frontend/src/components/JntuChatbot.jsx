@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { BotAvatar } from "bot-avatars";
+import JntuBotAvatar from "./JntuBotAvatar";
 import { ThinkingOrb } from "thinking-orbs";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 import {
@@ -9,7 +9,16 @@ import {
   formatResourceAction,
   detectBranchFromQuery,
   getBranchHubData,
+  getAcademicKnowledgeAnswer,
+  getSemesterCurriculumAnswer,
+  BRANCH_DIRECTORY,
 } from "../utils/searchEngine";
+import {
+  getConversationalAnswer,
+  getSubjectConceptAnswer,
+  getStudyAdviceAnswer,
+  synthesizeDynamicAcademicResponse,
+} from "../utils/aiReasoningEngine";
 
 /**
  * Interactive Branch Showcase component rendered inside chatbot messages.
@@ -26,14 +35,14 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
     activeTab === "all"
       ? hub.allResources
       : activeTab === "notes"
-      ? hub.notes
-      : activeTab === "papers"
-      ? hub.papers
-      : activeTab === "syllabus"
-      ? hub.syllabus
-      : activeTab === "labs"
-      ? hub.labs
-      : [];
+        ? hub.notes
+        : activeTab === "papers"
+          ? hub.papers
+          : activeTab === "syllabus"
+            ? hub.syllabus
+            : activeTab === "labs"
+              ? hub.labs
+              : [];
 
   return (
     <div className="chat-branch-hub">
@@ -176,10 +185,10 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
               const action = formatResourceAction(resItem);
               const typeClass =
                 resItem.type === "Notes" ? "chat-tag-notes"
-                : resItem.type === "Question Paper" ? "chat-tag-paper"
-                : resItem.type === "Syllabus" ? "chat-tag-syllabus"
-                : resItem.type === "Lab Program" ? "chat-tag-lab"
-                : "chat-tag-notif";
+                  : resItem.type === "Question Paper" ? "chat-tag-paper"
+                    : resItem.type === "Syllabus" ? "chat-tag-syllabus"
+                      : resItem.type === "Lab Program" ? "chat-tag-lab"
+                        : "chat-tag-notif";
 
               return (
                 <div
@@ -252,6 +261,210 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
   );
 }
 
+/**
+ * Interactive Semester Curriculum Card
+ * Displays the R23/R20 course breakdown with credits and instant material links.
+ */
+function SemesterCurriculumCard({ data, onSelectQuery, onCloseModal }) {
+  const navigate = useNavigate();
+  if (!data) return null;
+  const { branchCode, semesterCode, semesterTitle, totalCredits, subjects } = data;
+
+  return (
+    <div className="chat-sem-curriculum-card">
+      <div className="chat-sem-curriculum-header">
+        <div className="chat-sem-curriculum-badge">R23 Regulation</div>
+        <h4>{semesterTitle}</h4>
+        <span className="chat-sem-curriculum-credits">
+          {totalCredits} Total Credits • {subjects.length} Courses
+        </span>
+      </div>
+
+      <div className="chat-sem-curriculum-grid">
+        {subjects.map((sub, sIdx) => (
+          <div key={sIdx} className="chat-sem-course-item">
+            <div className="chat-sem-course-info">
+              <span className="chat-sem-course-icon">{sub.isLab ? "💻" : "📚"}</span>
+              <div className="chat-sem-course-text">
+                <span className="chat-sem-course-name">{sub.name}</span>
+                <span className="chat-sem-course-type">
+                  {sub.isLab ? "Practical / Lab" : "Theory Course"} • {sub.credits} Credits
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="chat-sem-course-find-btn"
+              onClick={() => onSelectQuery(`${sub.name} notes`)}
+              title={`Find ${sub.name} notes & papers`}
+            >
+              Get Notes →
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div className="chat-sem-curriculum-footer">
+        <button
+          type="button"
+          className="chat-branch-link-btn"
+          onClick={() => {
+            onCloseModal();
+            navigate(`/syllabus?branch=${branchCode}`);
+          }}
+        >
+          📑 Open Official {branchCode} Syllabus copy →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Text Formatter for Assistant Messages
+ * Parses bold markdown (**text**), inline code (`code`), bullets (•), and line breaks.
+ */
+function formatBotText(text) {
+  if (!text) return null;
+  const lines = text.split("\n");
+
+  return (
+    <div className="hero-ai-formatted-text">
+      {lines.map((line, lIdx) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return <div key={lIdx} className="hero-ai-text-spacer" />;
+        }
+
+        const isBullet = trimmed.startsWith("•") || trimmed.startsWith("- ") || trimmed.startsWith("* ");
+        const content = isBullet ? trimmed.replace(/^[•\-\*]\s*/, "") : line;
+
+        // Split by bold (**text**) and code (`code`)
+        const parts = content.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+        const rendered = parts.map((part, pIdx) => {
+          if (part.startsWith("**") && part.endsWith("**")) {
+            return (
+              <strong key={pIdx} className="hero-ai-bold">
+                {part.slice(2, -2)}
+              </strong>
+            );
+          }
+          if (part.startsWith("`") && part.endsWith("`")) {
+            return (
+              <code key={pIdx} className="hero-ai-code">
+                {part.slice(1, -1)}
+              </code>
+            );
+          }
+          return part;
+        });
+
+        if (isBullet) {
+          return (
+            <div key={lIdx} className="hero-ai-bullet-item">
+              <span className="hero-ai-bullet-dot">•</span>
+              <span className="hero-ai-bullet-content">{rendered}</span>
+            </div>
+          );
+        }
+
+        return (
+          <p key={lIdx} className="hero-ai-text">
+            {rendered}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * Automatically computes academic Year and Semester from student's semester input.
+ * Supports JNTU notation ("3-2", "2-1", "1-1"), numerical sem ("Sem 6", "6th sem", "6"),
+ * and descriptive input ("3rd Year, 6th Sem").
+ */
+function detectYearAndSemester(rawQuery) {
+  const str = (rawQuery || "").toLowerCase().trim();
+
+  // 1. Direct JNTU year-sem notation: e.g. "3-2", "2-1", "1-1", "4-2"
+  const jntuMatch = str.match(/\b([1-4])\s*[-–]\s*([1-2])\b/);
+  if (jntuMatch) {
+    const yr = parseInt(jntuMatch[1]);
+    const sm = parseInt(jntuMatch[2]);
+    const semNum = (yr - 1) * 2 + sm;
+    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+    return {
+      year: yearLabels[yr - 1],
+      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
+      semCode: `${yr}-${sm}`,
+      semIndex: semNum,
+    };
+  }
+
+  // 2. Semester keywords: e.g. "sem 6", "6th sem", "semester 4", "4th semester"
+  const semWordMatch = str.match(/(?:sem|semester)\s*([1-8])\b|\b([1-8])(?:st|nd|rd|th)?\s*(?:sem|semester)\b/);
+  if (semWordMatch) {
+    const semNum = parseInt(semWordMatch[1] || semWordMatch[2]);
+    const yr = Math.ceil(semNum / 2);
+    const sm = ((semNum - 1) % 2) + 1;
+    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+    return {
+      year: yearLabels[yr - 1],
+      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
+      semCode: `${yr}-${sm}`,
+      semIndex: semNum,
+    };
+  }
+
+  // 3. Comma-separated or compound input: e.g. "3rd Year, 6th Sem"
+  if (str.includes(",")) {
+    const parts = str.split(",");
+    const yrPart = parts[0]?.trim();
+    const semPart = parts[1]?.trim();
+    const detectedYrMatch = yrPart.match(/\b([1-4])\b/);
+    const detectedSemMatch = semPart.match(/\b([1-8])\b/);
+    if (detectedYrMatch && detectedSemMatch) {
+      const yr = parseInt(detectedYrMatch[1]);
+      const semNum = parseInt(detectedSemMatch[1]);
+      const sm = ((semNum - 1) % 2) + 1;
+      const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+      const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+      return {
+        year: yearLabels[yr - 1],
+        semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
+        semCode: `${yr}-${sm}`,
+        semIndex: semNum,
+      };
+    }
+  }
+
+  // 4. Single digit 1 to 8: e.g. "6", "4", "2"
+  const digitMatch = str.match(/\b([1-8])\b/);
+  if (digitMatch) {
+    const semNum = parseInt(digitMatch[1]);
+    const yr = Math.ceil(semNum / 2);
+    const sm = ((semNum - 1) % 2) + 1;
+    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+    return {
+      year: yearLabels[yr - 1],
+      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
+      semCode: `${yr}-${sm}`,
+      semIndex: semNum,
+    };
+  }
+
+  // Fallback defaults
+  return {
+    year: "3rd Year",
+    semester: "6th Semester (3-2)",
+    semCode: "3-2",
+    semIndex: 6,
+  };
+}
+
 function JntuChatbot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -260,20 +473,120 @@ function JntuChatbot() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [thinkingState, setThinkingState] = useState("searching");
   const [thinkingLabel, setThinkingLabel] = useState("Searching verified resources...");
-  
+
+  // Speech Recognition (Voice Input / Mic) State
+  const [isListening, setIsListening] = useState(false);
+  const [listeningTarget, setListeningTarget] = useState(null); // "hero" | "modal"
+  const recognitionRef = useRef(null);
+
   // Profile Wizard Session State
   const [profileSession, setProfileSession] = useState({
     active: false,
-    step: null, // "NAME" | "HALLTICKET" | "BRANCH" | "YEAR_SEM" | "REGULATION" | "CGPA" | "ATTENDANCE"
+    step: null, // "NAME" | "HALLTICKET" | "BRANCH" | "SEMESTER" | "REGULATION" | "CGPA" | "ATTENDANCE"
     draft: {},
   });
 
   const resultsBodyRef = useRef(null);
   const inputRef = useRef(null);
   const modalInputRef = useRef(null);
-      const navigate = useNavigate();
+  const navigate = useNavigate();
 
-      // Auto-scroll ONLY the internal chatbot messages container without scrolling the window/page
+  // Cleanup speech recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch (_) {}
+      }
+    };
+  }, []);
+
+  // Web Speech API Voice-to-Text Recognition Toggle
+  const toggleSpeechRecognition = (target = "hero") => {
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition ||
+      window.mozSpeechRecognition ||
+      window.msSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Voice search is not supported in this browser. Please try Google Chrome, Microsoft Edge, or Safari.");
+      return;
+    }
+
+    // If currently listening, stop immediately
+    if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (_) {}
+      }
+      setIsListening(false);
+      setListeningTarget(null);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = "en-IN"; // English (India) with seamless engineering academic term detection
+
+      let speechTranscript = "";
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setListeningTarget(target);
+      };
+
+      recognition.onresult = (event) => {
+        let interimText = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const chunk = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            speechTranscript += chunk;
+          } else {
+            interimText += chunk;
+          }
+        }
+        const currentSpokenText = speechTranscript || interimText;
+        if (target === "hero") {
+          setInput(currentSpokenText);
+        } else {
+          setModalInput(currentSpokenText);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.warn("Speech recognition warning/error:", event.error);
+        setIsListening(false);
+        setListeningTarget(null);
+        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+          alert("Microphone access was denied. Please allow microphone permissions in your browser address bar.");
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        setListeningTarget(null);
+        const textToQuery = speechTranscript.trim();
+        if (textToQuery) {
+          // Immediately process the transcribed question in the chatbot
+          handleSend(textToQuery);
+        }
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.error("Speech recognition startup error:", err);
+      setIsListening(false);
+      setListeningTarget(null);
+    }
+  };
+
+  // Auto-scroll ONLY the internal chatbot messages container without scrolling the window/page
   useEffect(() => {
     if (resultsBodyRef.current) {
       resultsBodyRef.current.scrollTop = resultsBodyRef.current.scrollHeight;
@@ -313,6 +626,18 @@ function JntuChatbot() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen]);
 
+  // Lock body scroll and mark chat-modal-open on body when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.classList.add("chat-modal-open");
+    } else {
+      document.body.classList.remove("chat-modal-open");
+    }
+    return () => {
+      document.body.classList.remove("chat-modal-open");
+    };
+  }, [isModalOpen]);
+
   // Helper to apply quick profile field updates from NLP
   const handleQuickProfileUpdate = (patch) => {
     const current = getStoredStudentData();
@@ -336,8 +661,7 @@ function JntuChatbot() {
         draft.shortName = rawQuery.trim().split(" ")[0];
         setProfileSession({ active: true, step: "HALLTICKET", draft });
         return {
-          text: `Awesome, ${draft.name}! What is your JNTU Hall Ticket / Roll Number? (e.g. 22B91A4201)`,
-          suggestions: ["22B91A4201", "21B91A0501", "23B91A0501"],
+          text: `Awesome, ${draft.name}! What is your JNTU Hall Ticket / USN Roll Number? (e.g. 22B91A4201)`,
           wizardActive: true,
         };
       }
@@ -366,21 +690,21 @@ function JntuChatbot() {
           CE: "Civil Engineering",
         };
         draft.branch = branchNames[branchCode] || `${branchCode} Engineering`;
-        setProfileSession({ active: true, step: "YEAR_SEM", draft });
+        setProfileSession({ active: true, step: "SEMESTER", draft });
         return {
-          text: `Great, ${draft.branch}! Which Year & Semester are you in? (e.g. 3rd Year, 6th Semester)`,
-          suggestions: ["3rd Year, 6th Sem", "2nd Year, 4th Sem", "4th Year, 8th Sem", "1st Year, 2nd Sem"],
+          text: `Great, ${draft.branch}! Which Semester are you currently in? (e.g. 3-2, 2-1, 1st Sem)`,
           wizardActive: true,
         };
       }
 
-      if (step === "YEAR_SEM") {
-        const parts = rawQuery.trim().split(",");
-        draft.year = parts[0]?.trim() || "3rd Year";
-        draft.semester = parts[1]?.trim() || "6th Semester";
+      if (step === "SEMESTER" || step === "YEAR_SEM") {
+        const detected = detectYearAndSemester(rawQuery);
+        draft.year = detected.year;
+        draft.semester = detected.semester;
+        draft.semCode = detected.semCode;
         setProfileSession({ active: true, step: "REGULATION", draft });
         return {
-          text: `Which Academic Regulation applies to you?`,
+          text: `Got it, ${detected.year} (${detected.semCode})! Which Academic Regulation applies to you?`,
           suggestions: ["R23 Regulation", "R20 Regulation", "R19 Regulation", "R16 Regulation"],
           wizardActive: true,
         };
@@ -391,7 +715,6 @@ function JntuChatbot() {
         setProfileSession({ active: true, step: "CGPA", draft });
         return {
           text: `What is your current Cumulative CGPA? (e.g. 8.85)`,
-          suggestions: ["8.85", "9.10", "8.50", "9.40"],
           wizardActive: true,
         };
       }
@@ -402,7 +725,6 @@ function JntuChatbot() {
         setProfileSession({ active: true, step: "ATTENDANCE", draft });
         return {
           text: `What is your current Attendance Percentage? (e.g. 89.4%)`,
-          suggestions: ["90%", "89.4%", "85%", "95%"],
           wizardActive: true,
         };
       }
@@ -426,7 +748,17 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 2. TRIGGER PROFILE BUILDER COMMAND
+    // 2. CONVERSATIONAL & ASSISTANT IDENTITY HANDLER
+    // Instant friendly responses to greetings, questions about JNTU Circle,
+    // gratitude, assistance, and guidance.
+    // =========================================================
+    const conversationalAnswer = getConversationalAnswer(rawQuery);
+    if (conversationalAnswer) {
+      return conversationalAnswer;
+    }
+
+    // =========================================================
+    // 3. TRIGGER PROFILE BUILDER COMMAND
     // =========================================================
     if (
       q.includes("build") && q.includes("profile") ||
@@ -440,25 +772,75 @@ function JntuChatbot() {
       setProfileSession({ active: true, step: "NAME", draft: {} });
       return {
         text: `🎓 Let's build your verified JNTU Student Profile together! First, what is your Full Name?`,
-        suggestions: ["Jaswanth", "Jaswanth Reddy", "K. Suresh"],
         wizardActive: true,
       };
     }
 
     // =========================================================
-    // 3. SINGLE-SHOT PROFILE NLP FIELD UPDATES
+    // 4. JNTUA ACADEMIC REGULATIONS KNOWLEDGE ENGINE (100% Precision Q&A)
+    // Authoritative answers for CGPA formulas, attendance rules,
+    // internal/external pass marks, grading scales, credits, 80:20 mid split, etc.
     // =========================================================
-    // CGPA Update: e.g. "update cgpa to 9.2", "cgpa 8.9", "set cgpa 9.0"
-    const cgpaMatch = q.match(/(?:cgpa|gpa)\s*(?:is|to|:|=)?\s*([0-9]+\.?[0-9]*)/i);
-    if (cgpaMatch && (q.includes("cgpa") || q.includes("gpa"))) {
-      const newCgpa = parseFloat(cgpaMatch[1]).toFixed(2);
-      const updated = handleQuickProfileUpdate({ cgpa: newCgpa });
+    const knowledgeAnswer = getAcademicKnowledgeAnswer(rawQuery);
+    if (knowledgeAnswer) {
+      return knowledgeAnswer;
+    }
+
+    // =========================================================
+    // 5. JNTUA SEMESTER CURRICULUM ENQUIRY (e.g. "CSE 2-1 subjects")
+    // =========================================================
+    const curriculumAnswer = getSemesterCurriculumAnswer(rawQuery);
+    if (curriculumAnswer) {
       return {
-        text: `✅ Updated your Cumulative CGPA to ${newCgpa}! This reflects in your Student Profile and Calculator.`,
-        profilePreview: updated,
-        action: { label: "Open CGPA Calculator →", path: "/calculator" },
-        suggestions: ["📊 CGPA Calculator", "🎓 View Student Profile"],
+        text: curriculumAnswer.text,
+        isSemesterCurriculum: true,
+        curriculumData: curriculumAnswer,
+        action: curriculumAnswer.action,
+        suggestions: curriculumAnswer.suggestions,
       };
+    }
+
+    // =========================================================
+    // 6. CORE ENGINEERING CONCEPTS & SUBJECT EXPLAINERS
+    // Explains OS, DBMS, DSA, AI/ML, Networks, OOP, DLD, EDC, BEEE, etc.
+    // =========================================================
+    const conceptAnswer = getSubjectConceptAnswer(rawQuery);
+    if (conceptAnswer) {
+      return conceptAnswer;
+    }
+
+    // =========================================================
+    // 7. STUDY STRATEGIES, EXAM PREPARATION & CAREER GUIDANCE
+    // Answers how to score 9 CGPA, prepare for exams, clear backlogs, placements.
+    // =========================================================
+    const adviceAnswer = getStudyAdviceAnswer(rawQuery);
+    if (adviceAnswer) {
+      return adviceAnswer;
+    }
+
+    // =========================================================
+    // 8. SINGLE-SHOT PROFILE NLP FIELD UPDATES
+    // Only runs when user explicitly commands to set or update profile data
+    // =========================================================
+    const isAcademicQuestion = /percentage|formula|convert|rule|scale|how|what|split|weight|why|when|where/i.test(q);
+
+    // CGPA Update: e.g. "update cgpa to 9.2", "set cgpa 9.0", "my cgpa is 8.9"
+    const cgpaExplicitMatch = !isAcademicQuestion && (
+      q.match(/(?:my\s+(?:cgpa|gpa)\s*(?:is|=|:)|(?:set|update|change)\s+(?:my\s+)?(?:cgpa|gpa)\s*(?:is|to|=|:)?)\s*([0-9]+\.?[0-9]*)/i) ||
+      (q.startsWith("cgpa ") && /^[0-9]+\.?[0-9]*$/.test(q.replace("cgpa ", "").trim()))
+    );
+    if (cgpaExplicitMatch) {
+      const numVal = parseFloat(cgpaExplicitMatch[1]);
+      if (numVal >= 0 && numVal <= 10) {
+        const newCgpa = numVal.toFixed(2);
+        const updated = handleQuickProfileUpdate({ cgpa: newCgpa });
+        return {
+          text: `✅ Updated your Cumulative CGPA to ${newCgpa}! This reflects in your Student Profile and Calculator.`,
+          profilePreview: updated,
+          action: { label: "Open CGPA Calculator →", path: "/calculator" },
+          suggestions: ["📊 CGPA Calculator", "🎓 View Student Profile"],
+        };
+      }
     }
 
     // Name Update: e.g. "my name is Alex", "change name to Priya"
@@ -485,33 +867,41 @@ function JntuChatbot() {
       };
     }
 
-    // Attendance Update: e.g. "attendance 92%"
-    const attMatch = q.match(/attendance\s*(?:is|to|:|=)?\s*([0-9]+(?:\.[0-9]+)?%?)/i);
-    if (attMatch) {
-      const newAtt = attMatch[1].includes("%") ? attMatch[1] : `${attMatch[1]}%`;
-      const updated = handleQuickProfileUpdate({ attendance: newAtt });
-      return {
-        text: `✅ Updated your Attendance Rate to ${newAtt}.`,
-        profilePreview: updated,
-        action: { label: "Open Student Profile →", path: "/profile" },
-      };
+    // Attendance Update: e.g. "my attendance is 92%", "set attendance to 85%"
+    const isAttRuleQuestion = /rule|condonation|detention|medical|shortage|minimum|eligibility|percentage/i.test(q);
+    const attExplicitMatch = !isAttRuleQuestion && (
+      q.match(/(?:my\s+attendance\s*(?:is|=|:)|(?:set|update|change)\s+(?:my\s+)?attendance\s*(?:is|to|=|:)?)\s*([0-9]+(?:\.[0-9]+)?%?)/i) ||
+      (q.startsWith("attendance ") && /^[0-9]+(?:\.[0-9]+)?%?$/.test(q.replace("attendance ", "").trim()))
+    );
+    if (attExplicitMatch) {
+      const rawPct = attExplicitMatch[1].replace("%", "").trim();
+      const numPct = parseFloat(rawPct);
+      if (numPct >= 0 && numPct <= 100) {
+        const newAtt = `${numPct}%`;
+        const updated = handleQuickProfileUpdate({ attendance: newAtt });
+        return {
+          text: `✅ Updated your Attendance Rate to ${newAtt}.`,
+          profilePreview: updated,
+          action: { label: "Open Student Profile →", path: "/profile" },
+        };
+      }
     }
 
     // =========================================================
-    // 4. PLATFORM TOOLS & HELPERS
+    // 6. PLATFORM TOOLS & HELPERS
     // =========================================================
 
     // Calculator Query
-    if (q.includes("calculator") || q.includes("cgpa") || q.includes("sgpa") || q.includes("percentage") || q.includes("grade point")) {
+    if (q.includes("calculator") || q === "sgpa" || q === "cgpa") {
       return {
         text: "Interactive CGPA & SGPA Evaluation Engine for R23, R20, R19 regulations with real-time grade calculations.",
         action: { label: "Open CGPA & SGPA Calculator →", path: "/calculator" },
-        suggestions: ["SGPA Calculator", "Target CGPA Planner", "Grade Scale Reference"],
+        suggestions: ["📊 SGPA Calculator", "📜 Grade Scale Reference", "🎯 Target CGPA Planner"],
       };
     }
 
     // Student Academic Performance / Transcript Query
-    if (q.includes("transcript") || q.includes("marks") || q.includes("result card") || q.includes("progress")) {
+    if (q.includes("transcript") || q.includes("marks card") || q.includes("result card") || q.includes("my progress")) {
       return {
         text: "View your verified academic profile, semester progression, and CGPA trajectory in your Student Profile.",
         action: { label: "View Student Profile →", path: "/profile" },
@@ -528,20 +918,14 @@ function JntuChatbot() {
       };
     }
 
-    // Greetings
-    if (q.startsWith("hi") || q.startsWith("hello") || q.startsWith("hey") || q.includes("good morning") || q.includes("good evening") || q === "help") {
-      return {
-        text: "Hello! I am your JNTU AI Academic Assistant. Ask me to find notes, question papers, syllabus, or lab programs for any subject, or build your student profile.",
-        suggestions: ["🚀 Build Student Profile with AI", "Data Structures Notes", "Python Lab Programs", "R23 AIML Syllabus", "📊 CGPA Calculator"],
-      };
-    }
-
     // =========================================================
-    // 5. ACCURATE ACADEMIC SEARCH & BRANCH HUB CONTENT
+    // 10. ACCURATE ACADEMIC SEARCH & BRANCH HUB CONTENT
     // =========================================================
-    // Check if the query is asking about a specific engineering branch (CSE, AIML, ECE, ME, CE, EEE)
+    // Check if the query is asking about a specific engineering branch alone (e.g. "CSE", "AIML", "ECE", "ME", "Civil", "EEE")
     const detectedBranch = detectBranchFromQuery(rawQuery);
-    if (detectedBranch) {
+    const hasSpecificSubject = /note|paper|syllabus|lab|program|unit|module|code|question/i.test(rawQuery);
+
+    if (detectedBranch && !hasSpecificSubject) {
       const branchHub = await getBranchHubData(detectedBranch);
       return {
         text: `Here is all official academic content & verified curriculum for ${branchHub.branch.name} (${branchHub.branch.code}):`,
@@ -581,16 +965,12 @@ function JntuChatbot() {
       };
     }
 
-    // Fallback if no matching item found
-    return {
-      text: `No exact records found for "${rawQuery}". Here are related curriculum subjects and syllabus topics you can check:`,
-      relatedSubjects: searchRes.relatedSubjects,
-      action: {
-        label: `Search "${rawQuery}" in Full Catalog →`,
-        path: `/search?query=${encodeURIComponent(rawQuery)}`,
-      },
-      suggestions: searchRes.suggestedQueries.length > 0 ? searchRes.suggestedQueries : ["Data Structures Notes", "Python Programming", "Operating Systems", "R23 Syllabus"],
-    };
+    // =========================================================
+    // 11. DYNAMIC INTELLIGENT ACADEMIC SYNTHESIZER
+    // Guarantees an authoritative, helpful response for EVERY query from the user,
+    // completely eliminating "No exact records found"!
+    // =========================================================
+    return synthesizeDynamicAcademicResponse(rawQuery, searchRes);
   };
 
   const handleSend = async (textToSend) => {
@@ -613,9 +993,15 @@ function JntuChatbot() {
     if (q.includes("profile") || profileSession.active) {
       orbState = "weaving";
       orbLabel = "Structuring student profile attributes...";
-    } else if (q.includes("calculator") || q.includes("cgpa") || q.includes("sgpa")) {
+    } else if (q.includes("calculator") || q.includes("cgpa") || q.includes("sgpa") || q.includes("percentage")) {
       orbState = "solving";
       orbLabel = "Computing academic grade point metrics...";
+    } else if (q.includes("attendance") || q.includes("condonation") || q.includes("detention")) {
+      orbState = "connecting";
+      orbLabel = "Checking official JNTUA attendance regulations...";
+    } else if (q.includes("pass") || q.includes("mark") || q.includes("grade") || q.includes("credit")) {
+      orbState = "solving";
+      orbLabel = "Checking university examination evaluation standards...";
     } else if (q.includes("lab") || q.includes("program") || q.includes("code")) {
       orbState = "solving";
       orbLabel = "Locating verified lab manuals & code...";
@@ -648,6 +1034,10 @@ function JntuChatbot() {
         relatedSubjects: responseData.relatedSubjects,
         isBranch: responseData.isBranch,
         branchHub: responseData.branchHub,
+        isKnowledge: responseData.isKnowledge,
+        formula: responseData.formula,
+        isSemesterCurriculum: responseData.isSemesterCurriculum,
+        curriculumData: responseData.curriculumData,
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -710,6 +1100,29 @@ function JntuChatbot() {
     handleSend("Build your student profile using chatbot");
   };
 
+  const handleRedirectToBrowseByBranch = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const deptSection = document.getElementById("departments");
+    if (deptSection) {
+      deptSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      navigate("/#departments");
+    }
+  };
+
+  const handleBranchClick = (branchCode) => {
+    window.dispatchEvent(new CustomEvent("select-branch", { detail: branchCode }));
+    const deptSection = document.getElementById("departments");
+    if (deptSection) {
+      deptSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      navigate("/#departments");
+    }
+  };
+
   const hasHeroInput = input.trim().length > 0;
   const hasModalInput = modalInput.trim().length > 0;
 
@@ -721,28 +1134,47 @@ function JntuChatbot() {
       <div className="hero-ai-bar-anchor">
         <form className="hero-ai-bar" onSubmit={handleHeroSubmit}>
           <div
-            className="hero-ai-avatar-badge"
-            title="Click to open JNTU AI Chatbot"
-            onClick={() => {
-              setIsModalOpen(true);
-              if (messages.length === 0) {
-                handleSend("Hi");
-              }
+            className={`hero-ai-avatar-badge ${isListening && listeningTarget === "hero" ? "is-listening" : ""}`}
+            title={
+              isListening && listeningTarget === "hero"
+                ? "🎙️ Listening... click to stop"
+                : "Click for Voice Search / Ask AI"
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSpeechRecognition("hero");
             }}
           >
-            <BotAvatar
-              type="ghost"
-              color="#FFFFFF"
-              size={32}
-              state={isTyping ? "working" : "default"}
-            />
+            <div className="hero-ai-avatar-desktop">
+              <JntuBotAvatar size={34} state={isTyping ? "working" : "default"} />
+            </div>
+            <div className="hero-ai-avatar-mobile-mic" aria-label="Voice Search / Ask AI">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="22" />
+              </svg>
+            </div>
           </div>
 
           <input
             ref={inputRef}
             type="text"
             className="hero-ai-input"
-            placeholder="Ask JNTU AI or say 'Build my student profile' or enter branch (CSE, AIML, ECE)..."
+            placeholder={
+              isListening && listeningTarget === "hero"
+                ? "🎙️ Listening... speak your question now..."
+                : "Ask JNTU AI or enter branch (CSE, AIML)..."
+            }
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleHeroKeyDown}
@@ -753,39 +1185,26 @@ function JntuChatbot() {
 
           {/* ACTION CONTROLS */}
           <div className="hero-ai-send-wrapper">
-            {hasHeroInput && (
-              <button
-                type="button"
-                className="hero-ai-clear-btn"
-                onClick={() => setInput("")}
-                title="Clear input"
-                aria-label="Clear input"
-              >
-                ✕
-              </button>
-            )}
-
             <button
-                type="submit"
-                className="hero-ai-send-btn"
-                aria-label="Send query and open overlay"
-                // always enabled for immediate interaction
-                title="Send query"
+              type="submit"
+              className="hero-ai-send-btn"
+              aria-label="Submit Search / Ask AI"
+              title="Submit Search"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </button>
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
           </div>
         </form>
 
@@ -796,55 +1215,48 @@ function JntuChatbot() {
             className="hero-ai-starter-pill starter-pill-highlight"
             onClick={handleStartProfileBuilder}
           >
-            <span className="starter-pill-sparkle">✨</span>
             <span>Build Student Profile</span>
           </button>
           <button
             type="button"
             className="hero-ai-quick-pill"
-            onClick={() => handleSend("CSE")}
+            onClick={() => handleBranchClick("CSE")}
           >
-            <span className="hero-ai-pill-icon">💻</span>
             <span>CSE</span>
           </button>
           <button
             type="button"
             className="hero-ai-quick-pill"
-            onClick={() => handleSend("AIML")}
+            onClick={() => handleBranchClick("AIML")}
           >
-            <span className="hero-ai-pill-icon">🤖</span>
             <span>AIML</span>
           </button>
           <button
             type="button"
             className="hero-ai-quick-pill"
-            onClick={() => handleSend("ECE")}
+            onClick={() => handleBranchClick("ECE")}
           >
-            <span className="hero-ai-pill-icon">📡</span>
             <span>ECE</span>
           </button>
           <button
             type="button"
             className="hero-ai-quick-pill"
-            onClick={() => handleSend("Mechanical")}
+            onClick={() => handleBranchClick("ME")}
           >
-            <span className="hero-ai-pill-icon">⚙️</span>
             <span>ME</span>
           </button>
           <button
             type="button"
             className="hero-ai-quick-pill"
-            onClick={() => handleSend("Civil")}
+            onClick={() => handleBranchClick("Civil")}
           >
-            <span className="hero-ai-pill-icon">🏗️</span>
             <span>Civil</span>
           </button>
           <button
             type="button"
             className="hero-ai-quick-pill"
-            onClick={() => handleSend("EEE")}
+            onClick={() => handleBranchClick("EEE")}
           >
-            <span className="hero-ai-pill-icon">⚡</span>
             <span>EEE</span>
           </button>
         </div>
@@ -873,23 +1285,18 @@ function JntuChatbot() {
             <div className="chat-modal-header">
               <div className="chat-modal-header-left">
                 <div className="chat-modal-avatar-wrapper">
-                  <BotAvatar
-                    type="ghost"
-                    color="#FFFFFF"
-                    size={28}
-                    state={isTyping ? "working" : "default"}
-                  />
+                  <JntuBotAvatar size={38} state={isTyping ? "working" : "default"} />
                   <span className="chat-modal-status-dot" />
                 </div>
-                <div>
+                <div className="chat-modal-header-info">
                   <div className="chat-modal-title-row">
                     <h3 className="chat-modal-title">JNTU Circle AI Assistant</h3>
                     <span className="chat-modal-role-badge">
-                      {profileSession.active ? "Profile Wizard Active" : "Online"}
+                      {profileSession.active ? "Profile Wizard" : "Online"}
                     </span>
                   </div>
                   <p className="chat-modal-subtitle">
-                    Live academic guidance, profile manager & instant answers
+                    Live academic guidance & instant answers
                   </p>
                 </div>
               </div>
@@ -910,66 +1317,90 @@ function JntuChatbot() {
             <div className="chat-modal-body" ref={resultsBodyRef}>
               {messages.length === 0 ? (
                 <div className="chat-modal-empty-state">
-                  <BotAvatar type="ghost" color="#FFFFFF" size={48} state="default" />
-                  <h4>How can I help you today?</h4>
-                  <p>Ask about notes, syllabus, question papers, or build your student profile.</p>
-                  <div className="chat-modal-quick-suggestions">
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("Build your student profile using chatbot")}
-                    >
-                      ✨ Build Student Profile
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("CSE")}
-                    >
-                      💻 CSE Hub
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("AIML")}
-                    >
-                      🤖 AIML Hub
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("ECE")}
-                    >
-                      📡 ECE Hub
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("Mechanical")}
-                    >
-                      ⚙️ ME Hub
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("Civil")}
-                    >
-                      🏗️ Civil Hub
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("EEE")}
-                    >
-                      ⚡ EEE Hub
-                    </button>
-                    <button
-                      type="button"
-                      className="chat-modal-sugg-pill"
-                      onClick={() => handleSend("CGPA & SGPA Calculator")}
-                    >
-                      📊 CGPA Calculator
-                    </button>
+                  <div className="chat-modal-empty-avatar-wrap">
+                    <JntuBotAvatar size={64} />
+                  </div>
+                  <h4>JNTU Academic Assistant</h4>
+                  <p>
+                    Instant, verified lecture notes, previous question papers, syllabus, or authoritative guidance on university academic regulations.
+                  </p>
+
+                  <div className="chat-modal-starter-categories">
+                    <div className="chat-modal-starter-group">
+                      <span className="chat-modal-group-title">🎓 Engineering Branches</span>
+                      <div className="chat-modal-quick-suggestions">
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("CSE")}>
+                          💻 CSE Hub
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("AIML")}>
+                          🤖 AIML Hub
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("ECE")}>
+                          📡 ECE Hub
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Mechanical")}>
+                          ⚙️ ME Hub
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Civil")}>
+                          🏗️ Civil Hub
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("EEE")}>
+                          ⚡ EEE Hub
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="chat-modal-starter-group">
+                      <span className="chat-modal-group-title">💡 Academic Regulations & FAQs</span>
+                      <div className="chat-modal-quick-suggestions">
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("CGPA to Percentage formula")}>
+                          📐 CGPA to % Formula
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Attendance & Condonation Rules")}>
+                          📋 Attendance Rules
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Internal Marks System & Passing Marks")}>
+                          📝 Passing & Mid Marks
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("10-Point Grade Scale & SGPA Calculation")}>
+                          📜 10-Point Grade Scale
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="chat-modal-starter-group">
+                      <span className="chat-modal-group-title">📚 Popular Study Materials</span>
+                      <div className="chat-modal-quick-suggestions">
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Data Structures Notes")}>
+                          📘 Data Structures Notes
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Python Lab Programs")}>
+                          🧪 Python Lab Programs
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Operating Systems Question Papers")}>
+                          📄 Operating Systems Papers
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("Linear Algebra Calculus M1")}>
+                          📘 M1 Calculus Notes
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="chat-modal-starter-group">
+                      <span className="chat-modal-group-title">🚀 Tools & Profiles</span>
+                      <div className="chat-modal-quick-suggestions">
+                        <button
+                          type="button"
+                          className="chat-modal-sugg-pill chat-modal-sugg-pill-accent"
+                          onClick={() => handleSend("Build your student profile using chatbot")}
+                        >
+                          ✨ Build Student Profile
+                        </button>
+                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("CGPA & SGPA Calculator")}>
+                          📊 CGPA & SGPA Calculator
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -987,18 +1418,38 @@ function JntuChatbot() {
                       <div className="hero-ai-assistant-card">
                         <div className="hero-ai-assistant-header">
                           <div className="hero-ai-msg-avatar">
-                            <BotAvatar
-                              type="ghost"
-                              color="#FFFFFF"
-                              size={18}
-                              state="default"
-                            />
+                            <JntuBotAvatar size={24} />
                           </div>
                           <span className="hero-ai-tag hero-ai-tag-bot">JNTU AI</span>
+                          {msg.isKnowledge && (
+                            <span className="hero-ai-tag-badge">Official Standard</span>
+                          )}
+                          {msg.isSemesterCurriculum && (
+                            <span className="hero-ai-tag-badge">R23 Curriculum</span>
+                          )}
                         </div>
 
                         <div className="hero-ai-bot-content">
-                          <p className="hero-ai-text">{msg.text}</p>
+                          {formatBotText(msg.text)}
+
+                          {/* Highlighted Formula Card */}
+                          {msg.formula && (
+                            <div className="hero-ai-formula-card">
+                              <span className="hero-ai-formula-badge">Official Standard Formula</span>
+                              <div className="hero-ai-formula-text">{msg.formula}</div>
+                            </div>
+                          )}
+
+                          {/* Interactive Semester Curriculum Card */}
+                          {msg.isSemesterCurriculum && msg.curriculumData && (
+                            <SemesterCurriculumCard
+                              data={msg.curriculumData}
+                              onSelectQuery={(q) => handleSend(q)}
+                              onCloseModal={handleCloseModal}
+                            />
+                          )}
+
+                          {/* Interactive Profile Sync Card */}
 
                           {/* Interactive Profile Sync Card */}
                           {msg.profilePreview && (
@@ -1044,10 +1495,10 @@ function JntuChatbot() {
                               {msg.matchedResources.map((resItem, rIdx) => {
                                 const typeClass =
                                   resItem.type === "Notes" ? "chat-tag-notes"
-                                  : resItem.type === "Question Paper" ? "chat-tag-paper"
-                                  : resItem.type === "Syllabus" ? "chat-tag-syllabus"
-                                  : resItem.type === "Lab Program" ? "chat-tag-lab"
-                                  : "chat-tag-notif";
+                                    : resItem.type === "Question Paper" ? "chat-tag-paper"
+                                      : resItem.type === "Syllabus" ? "chat-tag-syllabus"
+                                        : resItem.type === "Lab Program" ? "chat-tag-lab"
+                                          : "chat-tag-notif";
 
                                 return (
                                   <div
@@ -1203,14 +1654,58 @@ function JntuChatbot() {
             {/* Modal Input Footer (Interactive Chat Control) */}
             <div className="chat-modal-footer">
               <form className="chat-modal-input-bar" onSubmit={handleModalSubmit}>
+                {/* Voice Input Microphone Button on the LEFT */}
+                <button
+                  type="button"
+                  className={`chat-modal-mic-btn ${isListening && listeningTarget === "modal" ? "is-listening" : ""}`}
+                  onClick={() => toggleSpeechRecognition("modal")}
+                  title={
+                    isListening && listeningTarget === "modal"
+                      ? "Listening... click to stop"
+                      : "Voice input / Speak question"
+                  }
+                  aria-label="Voice input"
+                >
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="22" />
+                  </svg>
+                </button>
+
                 <input
                   ref={modalInputRef}
                   type="text"
                   className="chat-modal-input-field"
                   placeholder={
-                    profileSession.active
-                      ? "Type your response here..."
-                      : "Type your message or answer..."
+                    isListening && listeningTarget === "modal"
+                      ? "🎙️ Listening... speak your message now..."
+                      : profileSession.active
+                        ? profileSession.step === "NAME"
+                          ? "Type your full name..."
+                          : profileSession.step === "HALLTICKET"
+                            ? "Type your Hall Ticket / USN Roll Number..."
+                            : profileSession.step === "BRANCH"
+                              ? "Type or select your branch..."
+                              : profileSession.step === "SEMESTER" || profileSession.step === "YEAR_SEM"
+                                ? "Type your semester (e.g. 3-2, 2-1)..."
+                                : profileSession.step === "REGULATION"
+                                  ? "Type or select regulation..."
+                                  : profileSession.step === "CGPA"
+                                    ? "Type your CGPA (e.g. 8.85)..."
+                                    : profileSession.step === "ATTENDANCE"
+                                      ? "Type your attendance % (e.g. 89%)..."
+                                      : "Type your response here..."
+                        : "Type your message or answer..."
                   }
                   value={modalInput}
                   onChange={(e) => setModalInput(e.target.value)}
@@ -1230,26 +1725,26 @@ function JntuChatbot() {
                 )}
 
                 <button
-                    type="submit"
-                    className="chat-modal-send-btn"
-                    // always enabled for immediate interaction
-                    title="Send message"
-                    aria-label="Send message"
+                  type="submit"
+                  className="chat-modal-send-btn"
+                  // always enabled for immediate interaction
+                  title="Send message"
+                  aria-label="Send message"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                      <polyline points="12 5 19 12 12 19" />
-                    </svg>
-                  </button>
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </button>
               </form>
             </div>
           </div>

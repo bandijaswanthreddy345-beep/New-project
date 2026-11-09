@@ -1,5 +1,5 @@
-import API from "../api/api";
-import { R23_SUBJECTS_BY_BRANCH_SEM } from "../data/r23Subjects";
+import API from "../api/api.js";
+import { R23_SUBJECTS_BY_BRANCH_SEM } from "../data/r23Subjects.js";
 
 // =========================================================================
 // SUBJECT ACRONYM & SYNONYM DICTIONARY
@@ -15,6 +15,11 @@ export const SUBJECT_ALIASES = {
   ml: "machine learning",
   dl: "deep learning",
   nlp: "natural language processing",
+  cv: "computer vision",
+  rl: "reinforcement learning",
+  genai: "generative ai",
+  llm: "large language models",
+  mlops: "mlops",
   cn: "computer networks",
   wt: "web technologies",
   flat: "formal languages and automata theory",
@@ -25,10 +30,19 @@ export const SUBJECT_ALIASES = {
   coa: "computer organization and architecture",
   dld: "digital logic design",
   m1: "linear algebra and calculus",
+  "maths 1": "linear algebra and calculus",
+  "math 1": "linear algebra and calculus",
   m2: "differential equations and vector calculus",
+  "maths 2": "differential equations and vector calculus",
+  "math 2": "differential equations and vector calculus",
   m3: "numerical methods and transforms",
+  "maths 3": "numerical methods and transforms",
+  "math 3": "numerical methods and transforms",
+  m4: "probability and statistics",
   ps: "probability and statistics",
+  "p&s": "probability and statistics",
   dms: "discrete mathematics",
+  mfcs: "mathematical foundations of computer science",
   beee: "basic electrical and electronics engineering",
   bee: "basic electrical and electronics",
   bcme: "basic civil and mechanical engineering",
@@ -37,6 +51,33 @@ export const SUBJECT_ALIASES = {
   eg: "engineering graphics and modeling",
   cp: "computer programming",
   py: "python programming",
+  python: "python programming",
+  c: "programming in c",
+  cpp: "c++ programming",
+  java: "java programming",
+  oops: "object oriented programming",
+  edc: "electronic devices and circuits",
+  ss: "signals and systems",
+  vlsi: "vlsi design",
+  dsp: "digital signal processing",
+  aec: "analog electronic circuits",
+  dec: "digital electronic circuits",
+  em: "engineering mechanics",
+  thermo: "engineering thermodynamics",
+  thermodynamics: "engineering thermodynamics",
+  fm: "fluid mechanics and hydraulic machinery",
+  fmm: "fluid mechanics and hydraulic machinery",
+  som: "strength of materials",
+  survey: "surveying and geomatics",
+  surveying: "surveying and geomatics",
+  eca: "electrical circuit analysis",
+  cs: "control systems",
+  pe: "power electronics",
+  dwdm: "data warehousing and data mining",
+  cns: "cryptography and network security",
+  iot: "internet of things",
+  cloud: "cloud computing",
+  cc: "cloud computing",
 };
 
 // =========================================================================
@@ -773,26 +814,45 @@ export async function getAllResources(forceRefresh = false) {
   return cachedResources;
 }
 
+// Conversational stop words that shouldn't pollute resource subject matching
+const CONVERSATIONAL_STOP_WORDS = new Set([
+  "can", "you", "give", "me", "i", "need", "want", "find", "show", "get", "please",
+  "help", "tell", "what", "is", "are", "the", "of", "in", "for", "to", "a", "an",
+  "some", "any", "where", "how", "do", "does", "with", "about", "provide", "share",
+  "all", "looking", "search", "material", "materials", "giveme", "ineed"
+]);
+
 /**
  * Intelligent Query Tokenizer & Intent Extractor
  */
 export function analyzeQuery(rawQuery) {
-  if (!rawQuery) return { cleanQuery: "", tokens: [], targetType: null, branch: null, semester: null, regulation: null };
+  if (!rawQuery) {
+    return {
+      cleanQuery: "",
+      coreSubject: "",
+      tokens: [],
+      rawTokens: [],
+      targetType: null,
+      branch: null,
+      semester: null,
+      regulation: null,
+    };
+  }
 
   let q = rawQuery.toLowerCase().trim();
 
   // Replace common punctuation with space
-  q = q.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, " ");
+  q = q.replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, " ");
   // Compress multiple spaces
   q = q.replace(/\s+/g, " ").trim();
 
   // Identify resource type intent
   let targetType = null;
-  if (/note|material|lecture|pdf|unit|module|textbook/i.test(q)) {
+  if (/note|lecture|pdf|unit|module|textbook/i.test(q)) {
     targetType = "Notes";
   } else if (/paper|pyq|question|mid|sem end|previous/i.test(q)) {
     targetType = "Question Paper";
-  } else if (/syllabus|curriculum|credit|regulation|course structure/i.test(q)) {
+  } else if (/syllabus|curriculum|credit|regulation|course structure|scheme/i.test(q)) {
     targetType = "Syllabus";
   } else if (/lab|program|code|manual|viva|practical/i.test(q)) {
     targetType = "Lab Program";
@@ -806,21 +866,42 @@ export function analyzeQuery(rawQuery) {
   else if (/\bcse\b|computer science/i.test(q)) branch = "CSE";
   else if (/\bece\b|electronics/i.test(q)) branch = "ECE";
   else if (/\beee\b|electrical/i.test(q)) branch = "EEE";
-  else if (/\bmech\b|\bme\b|mechanical/i.test(q)) branch = "ME";
   else if (/\bcivil\b|\bce\b/i.test(q)) branch = "CE";
+  else if (
+    /\bmech\b|\bmechanical\b|\bme branch\b|\bme dept\b|\bdept of me\b|\bme engineering\b|\bme\s+[1-4]-[1-2]\b/i.test(q) ||
+    q === "me"
+  ) {
+    branch = "ME";
+  }
 
   // Identify semester intent
   let semester = null;
   const semMatch = q.match(/\b([1-4])-([1-2])\b/);
   if (semMatch) {
     semester = `${semMatch[1]}-${semMatch[2]}`;
-  } else if (/1st year|first year|1-1|1-2/i.test(q)) {
+  } else if (/1st sem|sem 1|semester 1\b/i.test(q)) {
+    semester = "1-1";
+  } else if (/2nd sem|sem 2|semester 2\b/i.test(q)) {
+    semester = "1-2";
+  } else if (/3rd sem|sem 3|semester 3\b/i.test(q)) {
+    semester = "2-1";
+  } else if (/4th sem|sem 4|semester 4\b/i.test(q)) {
+    semester = "2-2";
+  } else if (/5th sem|sem 5|semester 5\b/i.test(q)) {
+    semester = "3-1";
+  } else if (/6th sem|sem 6|semester 6\b/i.test(q)) {
+    semester = "3-2";
+  } else if (/7th sem|sem 7|semester 7\b/i.test(q)) {
+    semester = "4-1";
+  } else if (/8th sem|sem 8|semester 8\b/i.test(q)) {
+    semester = "4-2";
+  } else if (/1st year|first year/i.test(q)) {
     semester = "1st Year";
-  } else if (/2nd year|second year|2-1|2-2/i.test(q)) {
+  } else if (/2nd year|second year/i.test(q)) {
     semester = "2nd Year";
-  } else if (/3rd year|third year|3-1|3-2/i.test(q)) {
+  } else if (/3rd year|third year/i.test(q)) {
     semester = "3rd Year";
-  } else if (/4th year|fourth year|4-1|4-2/i.test(q)) {
+  } else if (/4th year|fourth year/i.test(q)) {
     semester = "4th Year";
   }
 
@@ -829,9 +910,34 @@ export function analyzeQuery(rawQuery) {
   if (/r23/i.test(q)) regulation = "R23";
   else if (/r20/i.test(q)) regulation = "R20";
   else if (/r19/i.test(q)) regulation = "R19";
+  else if (/r16/i.test(q)) regulation = "R16";
 
-  // Expand aliases and acronyms
+  // Raw words from query
   const words = q.split(" ").filter(Boolean);
+
+  // Extract core subject words by removing conversational words, resource types, branch, semester & regulation
+  const typeWords = new Set(["note", "notes", "paper", "papers", "pyq", "pyqs", "question", "questions", "syllabus", "lab", "labs", "program", "programs", "manual", "manuals", "code", "material", "materials", "lecture"]);
+  const branchWords = new Set(["cse", "aiml", "ece", "eee", "me", "mech", "civil", "ce", "cs", "it"]);
+  const semWords = new Set(["1-1", "1-2", "2-1", "2-2", "3-1", "3-2", "4-1", "4-2", "1st", "2nd", "3rd", "4th", "sem", "semester", "year"]);
+  const regWords = new Set(["r23", "r20", "r19", "r16", "regulation"]);
+
+  const coreWords = words.filter(
+    (w) =>
+      !CONVERSATIONAL_STOP_WORDS.has(w) &&
+      !typeWords.has(w) &&
+      !branchWords.has(w) &&
+      !semWords.has(w) &&
+      !regWords.has(w)
+  );
+  let coreSubject = coreWords.join(" ").trim();
+
+  // If coreSubject is an acronym in SUBJECT_ALIASES, resolve it
+  let aliasExpanded = "";
+  if (coreSubject && SUBJECT_ALIASES[coreSubject]) {
+    aliasExpanded = SUBJECT_ALIASES[coreSubject];
+  }
+
+  // Expand aliases and acronyms into tokens
   const expandedTokens = new Set();
   words.forEach((w) => {
     expandedTokens.add(w);
@@ -840,8 +946,14 @@ export function analyzeQuery(rawQuery) {
     }
   });
 
+  if (aliasExpanded) {
+    aliasExpanded.split(" ").forEach((exp) => expandedTokens.add(exp));
+  }
+
   return {
     cleanQuery: q,
+    coreSubject,
+    aliasExpanded,
     tokens: Array.from(expandedTokens),
     rawTokens: words,
     targetType,
@@ -855,7 +967,7 @@ export function analyzeQuery(rawQuery) {
  * Score a single item against the query analysis
  */
 export function scoreItem(item, analysis) {
-  const { cleanQuery, tokens, targetType, branch, semester, regulation } = analysis;
+  const { cleanQuery, coreSubject, aliasExpanded, tokens, targetType, branch, semester, regulation } = analysis;
   if (!cleanQuery) return 0;
 
   let score = 0;
@@ -871,18 +983,32 @@ export function scoreItem(item, analysis) {
 
   const searchableText = `${title} ${subject} ${subjectCode} ${itemBranch} ${itemSem} ${itemReg} ${itemType} ${desc}`;
 
-  // 1. Exact phrase matches (highest priority)
+  // 1. Core Subject Matches (Highest precision)
+  if (coreSubject && coreSubject.length >= 2) {
+    if (subject.includes(coreSubject)) score += 160;
+    else if (title.includes(coreSubject)) score += 140;
+    else if (searchableText.includes(coreSubject)) score += 50;
+  }
+
+  // 2. Alias Expansion Matches (e.g. "os" -> "operating systems")
+  if (aliasExpanded) {
+    if (subject.includes(aliasExpanded)) score += 150;
+    else if (title.includes(aliasExpanded)) score += 130;
+  }
+
+  // 3. Exact clean query phrase matches
   if (title.includes(cleanQuery)) score += 120;
   if (subject.includes(cleanQuery)) score += 100;
-  if (cleanQuery.length > 2 && subjectCode.includes(cleanQuery)) score += 90;
+  if (cleanQuery.length > 2 && subjectCode.includes(cleanQuery)) score += 95;
 
-  // 2. Token Matching
+  // 4. Token Matching
   tokens.forEach((token) => {
     if (token.length < 2) return;
+    if (CONVERSATIONAL_STOP_WORDS.has(token)) return;
 
-    if (title.includes(token)) {
+    if (subject.includes(token)) {
       score += 25;
-    } else if (subject.includes(token)) {
+    } else if (title.includes(token)) {
       score += 20;
     } else if (subjectCode.includes(token)) {
       score += 25;
@@ -891,31 +1017,32 @@ export function scoreItem(item, analysis) {
     }
   });
 
-  // 3. All query words matched bonus
-  if (analysis.rawTokens.length > 1 && analysis.rawTokens.every((t) => searchableText.includes(t))) {
-    score += 60;
-  }
-
-  // 4. Target Type Boost
+  // 5. Target Resource Type Boost (Notes, Question Paper, Syllabus, Lab Program)
   if (targetType) {
-    if (item.type && item.type.toLowerCase() === targetType.toLowerCase()) {
-      score += 35;
+    if (itemType === targetType.toLowerCase()) {
+      score += 65;
+    } else {
+      score -= 15; // penalty for wrong type when explicit type was requested
     }
   }
 
-  // 5. Branch Match Boost
-  if (branch && itemBranch.includes(branch.toLowerCase())) {
-    score += 30;
+  // 6. Branch Match Boost
+  if (branch) {
+    if (itemBranch.includes(branch.toLowerCase()) || itemBranch === "common" || itemBranch === "all") {
+      score += 45;
+    }
   }
 
-  // 6. Semester Match Boost
-  if (semester && (itemSem.includes(semester.toLowerCase()) || (item.year && item.year.toLowerCase().includes(semester.toLowerCase())))) {
-    score += 25;
+  // 7. Semester Match Boost
+  if (semester) {
+    if (itemSem.includes(semester.toLowerCase()) || (item.year && item.year.toLowerCase().includes(semester.toLowerCase()))) {
+      score += 40;
+    }
   }
 
-  // 7. Regulation Match Boost
+  // 8. Regulation Match Boost
   if (regulation && itemReg.includes(regulation.toLowerCase())) {
-    score += 20;
+    score += 30;
   }
 
   return score;
@@ -1215,4 +1342,431 @@ export function formatResourceAction(item) {
   }
 
   return { path: `/search?query=${encodeURIComponent(item.title || "")}`, label: "View Resource →" };
+}
+
+// =========================================================================
+// JNTUA ACADEMIC REGULATIONS KNOWLEDGE ENGINE & FAQ HANDLER
+// Accurately answers university rules, CGPA formulas, attendance, passing marks,
+// credit systems, and promotion guidelines instantly without false misses.
+// =========================================================================
+
+export function getAcademicKnowledgeAnswer(rawQuery) {
+  if (!rawQuery || typeof rawQuery !== "string") return null;
+  const q = rawQuery.toLowerCase().trim();
+
+  // 1. CGPA TO PERCENTAGE FORMULA & NUMERIC CONVERTER
+  const hasCgpa = /cgpa|gpa/.test(q);
+  const hasPercent = /percent|percentage|%/.test(q);
+  const hasFormula = /formula|convert|conversion|calculate|how to/.test(q);
+
+  if ((hasCgpa && hasPercent) || (hasPercent && hasFormula) || (hasCgpa && /to percentage|in percentage/.test(q))) {
+    // Check if user gave an exact number like "8.5 cgpa to percentage"
+    const numMatch = q.match(/([0-9]+\.?[0-9]*)/);
+    let numericCalcText = "";
+    if (numMatch) {
+      const numVal = parseFloat(numMatch[1]);
+      if (numVal <= 10.0 && numVal >= 0.5) {
+        const calculatedPct = ((numVal - 0.5) * 10).toFixed(1);
+        numericCalcText = `\n\n🎯 **Calculation for ${numVal.toFixed(2)} CGPA:**\n• **Equivalent Percentage:** (${numVal.toFixed(2)} - 0.5) × 10 = **${calculatedPct}%**`;
+      }
+    }
+
+    return {
+      isKnowledge: true,
+      title: "JNTUA CGPA to Percentage Conversion",
+      formula: "Equivalent Percentage (%) = (CGPA - 0.5) × 10",
+      text:
+        `Under official JNTUA academic regulations (R23, R20, and R19), the standard formula for converting Cumulative Grade Point Average (CGPA) into equivalent percentage of marks is:\n\n` +
+        `**Formula:**\n` +
+        `• **R23 / R20 / R19 Regulations:** \`(CGPA - 0.5) × 10\`\n` +
+        `• **R16 & Earlier Regulations:** \`(CGPA - 0.75) × 10\`\n\n` +
+        `**Reference Grade Benchmarks:**\n` +
+        `• **9.00 CGPA** = **85.0%** (First Class with Distinction)\n` +
+        `• **8.50 CGPA** = **80.0%** (First Class with Distinction)\n` +
+        `• **8.00 CGPA** = **75.0%** (First Class with Distinction)\n` +
+        `• **7.50 CGPA** = **70.0%** (First Class)\n` +
+        `• **6.50 CGPA** = **60.0%** (First Class)\n` +
+        `• **5.50 CGPA** = **50.0%** (Second Class)` +
+        numericCalcText,
+      action: { label: "Open CGPA & SGPA Calculator →", path: "/calculator" },
+      suggestions: ["📊 SGPA Calculator", "📜 10-Point Grading Scale", "📋 Attendance Rules"],
+    };
+  }
+
+  // 2. CREDIT DETENTION & PROMOTION RULES (Must check before general attendance detention)
+  if (/credit detention|promotion rule|promotion criteria|year promotion|promoted to|how many credits to enter/.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Promotion & Credit Detention Guidelines",
+      formula: "Must secure minimum 40% prescribed credits for year-to-year promotion",
+      text:
+        `Official credit progression requirements for promotion to subsequent academic years:\n\n` +
+        `• **Promotion from 1st Year to 2nd Year:** A student must secure at least **40% of the total credits** prescribed for the 1st Year (semesters 1-1 and 1-2).\n` +
+        `• **Promotion from 2nd Year to 3rd Year:** A student must secure at least **40% of total credits** prescribed up to the end of semester 2-2.\n` +
+        `• **Promotion from 3rd Year to 4th Year:** A student must secure at least **40% of total credits** prescribed up to semester 3-2.\n` +
+        `• Students who do not meet the minimum credit threshold are detained until the requisite backlog credits are cleared.`,
+      action: { label: "Check Academic Notifications →", path: "/notifications" },
+      suggestions: ["📋 Attendance Rules", "📝 Internal Marks Criteria", "📊 CGPA Calculator"],
+    };
+  }
+
+  // 3. ATTENDANCE, CONDONATION & DETENTION POLICIES
+  if (/attendance|condonation|shortage of attendance|medical leave|detention|detained/.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Attendance & Condonation Rules",
+      formula: "Minimum Regular: 75% | Condonation: 65% - 74.9% | Detention: < 65%",
+      text:
+        `Official JNTUA attendance requirements and eligibility guidelines for semester end examinations:\n\n` +
+        `• **Regular Eligibility:** A student must secure a minimum aggregate attendance of **75%** across all theory and laboratory subjects.\n` +
+        `• **Condonation of Shortage:** Attendance between **65% and 74.9%** may be condoned by the Academic Committee on genuine medical grounds upon submission of an authorized hospital certificate and payment of the prescribed university condonation fee.\n` +
+        `• **Academic Detention:** Students securing **less than 65% aggregate attendance** are strictly detained. They are not permitted to appear for the semester end examinations and must re-register for that semester in the next academic year.`,
+      action: { label: "View Official Notifications →", path: "/notifications" },
+      suggestions: ["📝 Internal Marks Criteria", "📊 10-Point Grade Scale", "🚀 Build Student Profile"],
+    };
+  }
+
+  // 3. MID-TERM EXAMS (CIE) EVALUATION & 80:20 WEIGHTAGE RULE
+  if (/80[:\s]*20|mid.*(?:mark|exam|rule|split|weight|calc|internal)|how.*mid.*calculated|mid 1.*mid 2/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Mid-Term Examination 80:20 Calculation Rule",
+      formula: "Internal Marks = (0.80 × Best Mid) + (0.20 × Other Mid) + Assignment/Quiz (10M)",
+      text:
+        `Under official JNTUA academic regulations (R23 & R20), Continuous Internal Evaluation (CIE) for theory courses is awarded based on two mid-term examinations with an **80:20 weightage rule**:\n\n` +
+        `• **Weightage Scheme:** **80% weightage** is awarded to the best-performing mid examination, and **20% weightage** is given to the other mid examination.\n` +
+        `• **Component Breakdown:**\n` +
+        `  - Each Mid exam has descriptive questions (20 marks) + objective/quiz (10 marks).\n` +
+        `  - Total Scaled Mid Weightage: **20 Marks** (80% best mid + 20% second mid).\n` +
+        `  - Continuous assessment (assignments, seminar/quiz, micro-projects, active participation): **10 Marks**.\n` +
+        `  - **Total Internal Marks (CIE):** **30 Marks**.\n\n` +
+        `🎯 **Example Calculation:**\n` +
+        `• Mid-1 score: **28 / 30**, Mid-2 score: **20 / 30**\n` +
+        `• Calculation: \`(0.8 × 28) + (0.2 × 20) = 22.4 + 4.0 = 26.4\` → **27 Marks** out of 30!`,
+      action: { label: "Open CGPA & SGPA Calculator →", path: "/calculator" },
+      suggestions: ["📝 Passing Marks Criteria", "📊 10-Point Grade Scale", "📋 Attendance Rules"],
+    };
+  }
+
+  // 4. INTERNAL (CIE) & EXTERNAL (SEE) MARKS SPLIT & PASSING CRITERIA
+  if (/pass mark|passing mark|internal mark|external mark|cie|see|minimum mark|how many mark to pass|exam pattern|marks split/.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Internal & External Evaluation System",
+      formula: "Total: 100M | Internal (CIE): 30M | External (SEE): 70M | Min to Pass: 35% External & 40% Aggregate",
+      text:
+        `Official JNTUA examination scheme and minimum qualifying marks under R23 and R20 regulations:\n\n` +
+        `**Theory Courses (100 Marks Total):**\n` +
+        `• **Continuous Internal Evaluation (CIE):** **30 Marks** (conducted through 2 mid-term examinations of 20 marks each + 10 marks for assignments, quizzes, and continuous class assessment).\n` +
+        `• **Semester End Examination (SEE):** **70 Marks** (3-hour university external examination).\n` +
+        `• **Passing Minimum:** Minimum **35% (25 marks out of 70)** in the semester-end external exam, and minimum **40% (40 marks out of 100)** in aggregate (Internal + External combined).\n\n` +
+        `**Laboratory Courses (100 Marks Total):**\n` +
+        `• **30 Marks** Internal continuous day-to-day work & internal lab test.\n` +
+        `• **70 Marks** External laboratory examination and viva-voce.\n` +
+        `• Minimum 35% in external lab and 40% combined aggregate to pass.`,
+      action: { label: "Browse Question Papers →", path: "/papers" },
+      suggestions: ["📊 CGPA Calculator", "📜 10-Point Grade Scale", "📚 Official Syllabus"],
+    };
+  }
+
+  // 4. 10-POINT GRADING SYSTEM & SGPA / CGPA FORMULA
+  if (/grading system|grade scale|grade point|letter grade|how is sgpa calculated|how is cgpa calculated|sgpa formula|cgpa formula|o grade|a\+ grade/.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA 10-Point Letter Grading Scale",
+      formula: "SGPA = Σ(Credits × Grade Points) / Σ(Credits)",
+      text:
+        `JNTUA evaluates semester academic performance using a 10-point relative/absolute grading scale:\n\n` +
+        `• **O (Outstanding):** 90% to 100% → **Grade Point: 10**\n` +
+        `• **A+ (Excellent):** 80% to 89% → **Grade Point: 9**\n` +
+        `• **A (Very Good):** 70% to 79% → **Grade Point: 8**\n` +
+        `• **B (Good):** 60% to 69% → **Grade Point: 7**\n` +
+        `• **C (Fair / Above Average):** 50% to 59% → **Grade Point: 6**\n` +
+        `• **D (Pass / Satisfactory):** 40% to 49% → **Grade Point: 5**\n` +
+        `• **F (Fail):** Below 40% → **Grade Point: 0**\n` +
+        `• **Ab (Absent):** → **Grade Point: 0**\n\n` +
+        `**SGPA Calculation:** Sum of (Course Credits × Grade Points) divided by Total Semester Credits.\n` +
+        `**CGPA Calculation:** Cumulative sum of (Credits × Grade Points) across all completed semesters divided by Total Cumulative Credits.`,
+      action: { label: "Open CGPA & SGPA Calculator →", path: "/calculator" },
+      suggestions: ["📊 CGPA to Percentage", "📋 Attendance Rules", "📚 R23 Curriculum"],
+    };
+  }
+
+  // 5. CREDIT REQUIREMENTS, HONOURS & MINORS
+  if (/credit requirement|how many credit|total credit|graduation credit|honours|minor degree|lateral entry credit/.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Credit Requirements & Degree Eligibility",
+      formula: "Regular: 160 Credits | Lateral Entry: 120 Credits | Honours/Minors: +18-20 Credits",
+      text:
+        `Official degree credit requirements under APSCHE and JNTUA R23/R20 regulations:\n\n` +
+        `• **Regular 4-Year B.Tech:** A candidate must secure **160 Credits** across 8 semesters with zero backlogs to be awarded the B.Tech degree.\n` +
+        `• **Lateral Entry (FDH - 3 Years):** Students admitted directly into the 2nd year (3rd semester) must secure **120 Credits** across 6 semesters.\n` +
+        `• **B.Tech (Honours / Minor Degree):** Eligible students with CGPA ≥ 7.5/8.0 and no history of backlogs can earn an additional **18 to 20 Credits** via specialized SWAYAM/NPTEL MOOCs or university-approved tracks.\n` +
+        `• **Mandatory Non-Credit Courses:** Induction program, Environmental Science, Constitution of India, and Community Service Projects must be satisfactorily completed.`,
+      action: { label: "View R23 Course Structure →", path: "/syllabus" },
+      suggestions: ["📊 CGPA Calculator", "🚀 Build Student Profile", "📜 Promotion Rules"],
+    };
+  }
+
+  // 7. REVALUATION, RECOUNTING & CHALLENGE VALUATION
+  if (/revaluation|recounting|challenge valuation|result verification|paper recheck/.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Revaluation, Recounting & Challenge Valuation",
+      formula: "Apply via college exam branch within 10-15 days of online results",
+      text:
+        `Following the announcement of semester-end exam results on the JNTUA exam portal, students can apply for:\n\n` +
+        `• **Recounting:** Re-verifies that marks on all answer scripts are totaled and entered correctly without missing any answer.\n` +
+        `• **Revaluation:** Complete reassessment of the answer book by an independent second examiner.\n` +
+        `• **Challenge Valuation:** For students confident in a significant grade increase. If the marks increase by the prescribed threshold (typically ≥ 15%), the challenge fee is refunded.\n` +
+        `• Notifications with fee details and deadlines are published on the college and university examination portals.`,
+      action: { label: "View Latest Exam Circulars →", path: "/notifications" },
+      suggestions: ["📝 Question Papers", "📊 CGPA Calculator", "📚 Syllabus"],
+    };
+  }
+
+  // 8. BACKLOG & SUPPLEMENTARY EXAMINATION REGULATIONS
+  if (/backlog|supplementary|supply exam|clear backlog|clearing backlog|arrears|failed in subject|supplementary rule|supply attempt/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Backlog & Supplementary Examination Rules",
+      formula: "Passing Threshold: Min 35% in SEE (25/70) & 40% Aggregate | CIE Internals Carried Forward",
+      text:
+        `Official rules regarding backlog clearance and supplementary examinations under JNTUA regulations:\n\n` +
+        `• **Concurrent Examinations:** Supplementary exams are conducted alongside regular semester-end examinations twice a year.\n` +
+        `• **Internal Marks Retention:** Continuous Internal Evaluation (CIE) marks secured during regular semester attendance are **permanently carried forward**; students do not need to rewrite internal or mid-term examinations.\n` +
+        `• **Passing Threshold in Supply:** Student must score at least **25 marks out of 70 (35%)** in the semester external examination, and the total of (CIE + SEE) must be at least **40 marks out of 100 (40%)**.\n` +
+        `• **Grade Award:** Grade points for cleared backlogs are calculated based on the new total without penalty, and the backlog flag is cleared on subsequent grade sheets.\n` +
+        `• **No Attempt Limit:** There is no restriction on the number of attempts within the maximum permitted duration (N+2 rule).`,
+      action: { label: "Browse Question Papers for Practice →", path: "/papers" },
+      suggestions: ["📝 Internal Marks Criteria", "📊 SGPA Calculator", "📜 Promotion Rules"],
+    };
+  }
+
+  // 9. GRACE MARKS & SUBJECT EXEMPTION (0.15% RULE)
+  if (/grace mark|subject exemption|exemption rule|0\.15%?|can i drop subject|leave two subjects|grace marks rule|exemption in r20|exemption in r23/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Grace Marks & Subject Exemption Guidelines",
+      formula: "R23/R20: All 160 Credits Mandatory (Zero Exemption) | Grace Marks: Up to 0.15% Aggregate",
+      text:
+        `Official policy regarding grace marks and subject exemptions across JNTUA regulations:\n\n` +
+        `• **R23 and R20 Regulations (Mandatory 160 Credits):**\n` +
+        `  - **Subject Exemption is DISCONTINUED.** A student must pass all prescribed subjects and secure all **160 credits** (120 credits for Lateral Entry) to receive the B.Tech Degree.\n` +
+        `  - Students cannot drop or leave any core, elective, or lab courses.\n` +
+        `• **Grace Marks (0.15% University Provision):**\n` +
+        `  - JNTUA permits granting up to **0.15% of total maximum marks** of the course (typically 8 to 10 marks total) to enable a candidate to pass in one or two subjects, provided the student has passed all remaining subjects.\n` +
+        `• **R16 & Earlier Regulations (Legacy):**\n` +
+        `  - Allowed exemption of up to 2 theory subjects with a maximum of 8 credits, provided the candidate secured at least 172 out of 180 credits.`,
+      action: { label: "View Official Notifications →", path: "/notifications" },
+      suggestions: ["📊 CGPA Calculator", "📝 80:20 Mid Marks Rule", "📚 R23 Curriculum"],
+    };
+  }
+
+  // 10. MAXIMUM DURATION FOR DEGREE COMPLETION (N+2 RULE)
+  if (/maximum duration|maximum year|n\+2|n \+ 2|time limit to complete|how many years to complete btech|course completion limit|double duration/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Maximum Time Limit for Degree Completion (N+2 Rule)",
+      formula: "Regular 4-Year B.Tech: Max 8 Academic Years | Lateral Entry: Max 6 Academic Years",
+      text:
+        `Under official UGC and JNTUA academic guidelines, students must complete all academic requirements within a double duration limit:\n\n` +
+        `• **Regular 4-Year B.Tech Students:** Must complete all 8 semesters, clear all backlogs, and secure 160 credits within a maximum period of **8 consecutive academic years** from the year of initial admission.\n` +
+        `• **Lateral Entry (FDH) Students:** Must complete all 6 semesters and secure 120 credits within a maximum of **6 consecutive academic years** from admission into the 2nd year.\n` +
+        `• **Consequences of Expiry:** A student failing to fulfill all requirements within the stipulated timeframe forfeits their seat, and registration is automatically cancelled.`,
+      action: { label: "Open Student Profile →", path: "/profile" },
+      suggestions: ["📜 Promotion Rules", "📊 CGPA Calculator", "📝 Backlog Rules"],
+    };
+  }
+
+  // 11. JNTUA RESULTS CHECKING & OFFICIAL DEGREE CERTIFICATES
+  if (/check result|results portal|how to check result|jntuaresults|result link|marks memo|provisional certificate|pc and cmm|original degree|od application|tatkal/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Results Portal & Degree Certificates (PC / CMM / OD)",
+      formula: "Results: jntuaresults.ac.in | Student Services: jntuassp.ac.in",
+      text:
+        `Procedures for checking semester results and applying for official degree credentials:\n\n` +
+        `• **Official Results Web Portal:** Results are announced online at **\`jntuaresults.ac.in\`** and **\`jntua.ac.in\`**. Enter your 10-digit Hall Ticket Number (e.g. \`22B91A4201\`) to view grade cards.\n` +
+        `• **Recounting / Revaluation Window:** Open within **10 to 15 days** of the result publication date.\n` +
+        `• **Provisional Certificate (PC) & Consolidated Marks Memo (CMM):** Issued automatically through your college examination branch upon passing all 8 semesters.\n` +
+        `• **Original Degree (OD):** Applied via the JNTUA Student Services Portal (**\`jntuassp.ac.in\`**) for Convocation or under Tatkal mode for urgent dispatch.`,
+      action: { label: "Check University Circulars →", path: "/notifications" },
+      suggestions: ["📊 CGPA Calculator", "📝 Revaluation Procedure", "🚀 Build Student Profile"],
+    };
+  }
+
+  // 12. CAMPUS PLACEMENT ELIGIBILITY & CGPA CUTOFFS
+  if (/placement|campus drive|placement criteria|minimum cgpa for placement|placement eligibility|can backlog student sit for placement|company cutoff|tcs criteria|infosys criteria/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "Campus Placements Eligibility & Industry CGPA Benchmarks",
+      formula: "Product Tier: 7.5+ CGPA | IT Services (TCS, Infosys, Wipro): 60% / 6.5 CGPA with 0 Standing Arrears",
+      text:
+        `General industry recruitment criteria for engineering graduates at JNTU affiliated colleges:\n\n` +
+        `• **Top Tech / Product Companies (Google, Microsoft, Amazon, Cisco):**\n` +
+        `  - Minimum CGPA: **7.5 to 8.5+** with zero active backlogs.\n` +
+        `  - High emphasis on Data Structures & Algorithms (DSA), System Design, and projects.\n` +
+        `• **Mass IT Recruiters (TCS, Infosys, Wipro, Cognizant, Accenture, Capgemini):**\n` +
+        `  - Minimum **60% or 6.5 CGPA** across 10th, 12th/Diploma, and B.Tech.\n` +
+        `  - Strictly **0 active / standing backlogs** at the time of the recruitment drive.\n` +
+        `• **Standing vs. Cleared Backlogs:** History of cleared backlogs is accepted by most companies, provided all arrears are cleared before commencement of the final year (4-1).`,
+      action: { label: "Open CGPA & SGPA Calculator →", path: "/calculator" },
+      suggestions: ["📊 Target CGPA Planner", "📘 Data Structures Notes", "📝 10-Point Grade Scale"],
+    };
+  }
+
+  // 13. B.TECH FIRST YEAR (1-1 & 1-2) COMMON CURRICULUM
+  if (/1st year subject|first year subject|1-1 subject|1-2 subject|common subjects|first year syllabus|btech 1st year/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA B.Tech 1st Year (1-1 & 1-2) Common Core Curriculum",
+      formula: "Common Group-A & Group-B Foundation across All Engineering Disciplines",
+      text:
+        `Under official R23 regulations, the 1st year B.Tech curriculum is structured into core foundational groups:\n\n` +
+        `**Semester 1-1 Common Courses:**\n` +
+        `• Linear Algebra & Calculus (Mathematics-1)\n` +
+        `• Engineering Chemistry / Engineering Physics\n` +
+        `• Basic Electrical & Electronics Engineering (BEEE)\n` +
+        `• Introduction to Programming with Python / C\n` +
+        `• Communicative English\n` +
+        `• Respective Laboratories & IT Workshop\n\n` +
+        `**Semester 1-2 Common Courses:**\n` +
+        `• Differential Equations & Vector Calculus (Mathematics-2)\n` +
+        `• Engineering Physics / Engineering Chemistry\n` +
+        `• Basic Civil & Mechanical Engineering (BCME)\n` +
+        `• Data Structures / Engineering Graphics & CAD\n` +
+        `• Health & Wellness / Community Service Project`,
+      action: { label: "Browse 1st Year Curriculum in Syllabus →", path: "/syllabus" },
+      suggestions: ["📘 Linear Algebra Notes", "📘 Differential Equations Notes", "📊 CGPA Calculator"],
+    };
+  }
+
+  // 14. LABORATORY EVALUATION & PRACTICAL EXAM PATTERN
+  if (/lab mark|lab exam|practical exam|internal lab|external lab|viva|how lab marks are calculated/i.test(q)) {
+    return {
+      isKnowledge: true,
+      title: "JNTUA Practical & Laboratory Examination Evaluation Scheme",
+      formula: "Total: 100M | Day-to-Day Continuous (CIE): 30M | Semester End Practical (SEE): 70M",
+      text:
+        `Evaluation scheme for laboratory courses under JNTUA R23 and R20 regulations:\n\n` +
+        `• **Continuous Day-to-Day Internal Work (30 Marks):**\n` +
+        `  - Regular observation record, execution of programs, and viva: **15 Marks**.\n` +
+        `  - Internal practical test conducted by subject faculty: **15 Marks**.\n` +
+        `• **Semester End Laboratory Examination (70 Marks):**\n` +
+        `  - Conducted jointly by an internal teacher and an appointed external examiner.\n` +
+        `  - Experiment write-up & procedure: **20 Marks**.\n` +
+        `  - Program execution, output verification & viva-voce: **50 Marks**.\n` +
+        `• **Passing Minimum:** Minimum **35% (25/70)** in the external lab exam and **40% (40/100)** in aggregate.`,
+      action: { label: "Browse Lab Programs Catalog →", path: "/search?query=lab" },
+      suggestions: ["💻 Python Lab Programs", "💻 DS Lab Programs", "📊 Grade Scale"],
+    };
+  }
+
+  return null;
+}
+
+// =========================================================================
+// JNTUA SEMESTER CURRICULUM QUERY ENGINE
+// If user asks for branch and semester subjects (e.g. "CSE 2-1 subjects"),
+// extracts the exact course list with credits and instant study links.
+// =========================================================================
+
+export function getSemesterCurriculumAnswer(rawQuery) {
+  if (!rawQuery || typeof rawQuery !== "string") return null;
+  const q = rawQuery.toLowerCase().trim();
+
+  // Check if query is asking for curriculum/subjects
+  const isSubjectEnquiry = /subject|subjects|curriculum|course|courses|syllabus/.test(q);
+  if (!isSubjectEnquiry) return null;
+
+  // Detect branch
+  let branch = null;
+  if (/\baiml\b|\bai\b|\bml\b|artificial intelligence/i.test(q)) branch = "AIML";
+  else if (/\bcse\b|computer science/i.test(q)) branch = "CSE";
+  else if (/\bece\b|electronics/i.test(q)) branch = "ECE";
+  else if (/\beee\b|electrical/i.test(q)) branch = "EEE";
+  else if (/\bmech\b|\bme\b|mechanical/i.test(q)) branch = "ME";
+  else if (/\bcivil\b|\bce\b/i.test(q)) branch = "CE";
+
+  if (!branch) return null;
+
+  // Detect semester index (1 to 8)
+  let semIndex = null;
+  const directMatch = q.match(/\b([1-4])-([1-2])\b/);
+  if (directMatch) {
+    const year = parseInt(directMatch[1]);
+    const sem = parseInt(directMatch[2]);
+    semIndex = (year - 1) * 2 + sem;
+  } else if (/1-1|1st sem|sem 1\b/i.test(q)) {
+    semIndex = 1;
+  } else if (/1-2|2nd sem|sem 2\b/i.test(q)) {
+    semIndex = 2;
+  } else if (/2-1|3rd sem|sem 3\b/i.test(q)) {
+    semIndex = 3;
+  } else if (/2-2|4th sem|sem 4\b/i.test(q)) {
+    semIndex = 4;
+  } else if (/3-1|5th sem|sem 5\b/i.test(q)) {
+    semIndex = 5;
+  } else if (/3-2|6th sem|sem 6\b/i.test(q)) {
+    semIndex = 6;
+  } else if (/4-1|7th sem|sem 7\b/i.test(q)) {
+    semIndex = 7;
+  } else if (/4-2|8th sem|sem 8\b/i.test(q)) {
+    semIndex = 8;
+  }
+
+  if (!semIndex || semIndex < 1 || semIndex > 8) return null;
+
+  const key = `${branch}-${semIndex}`;
+  const subjectsList = (R23_SUBJECTS_BY_BRANCH_SEM && R23_SUBJECTS_BY_BRANCH_SEM[key]) || [];
+  if (subjectsList.length === 0) return null;
+
+  const yearNum = Math.ceil(semIndex / 2);
+  const semInYear = ((semIndex - 1) % 2) + 1;
+  const semCode = `${yearNum}-${semInYear}`;
+  const yearLabel = yearNum === 1 ? "1st Year" : yearNum === 2 ? "2nd Year" : yearNum === 3 ? "3rd Year" : "4th Year";
+  const semesterTitle = `${branch} • ${yearLabel}, Semester ${semInYear} (${semCode}) Curriculum`;
+
+  const totalCredits = subjectsList.reduce((acc, curr) => acc + (parseFloat(curr.credits) || 0), 0);
+  const theorySubjects = subjectsList.filter(
+    (s) => !s.name.toLowerCase().includes("lab") && !s.name.toLowerCase().includes("laboratory")
+  );
+  const labSubjects = subjectsList.filter(
+    (s) => s.name.toLowerCase().includes("lab") || s.name.toLowerCase().includes("laboratory")
+  );
+
+  const formattedSubjects = subjectsList.map((s) => ({
+    name: s.name,
+    credits: s.credits,
+    isLab: s.name.toLowerCase().includes("lab") || s.name.toLowerCase().includes("laboratory"),
+    branch,
+    semester: semCode,
+  }));
+
+  const textLines = [
+    `Here is the official **R23 Course Structure** for **${branch} ${semCode}** (${subjectsList.length} Courses, ${totalCredits} Total Credits):`,
+    "",
+    "**📚 Theory Courses:**",
+    ...theorySubjects.map((s) => `• **${s.name}** (${s.credits} Credits)`),
+    "",
+    "**💻 Practical / Laboratories:**",
+    ...labSubjects.map((s) => `• **${s.name}** (${s.credits} Credits)`),
+  ];
+
+  return {
+    isSemesterCurriculum: true,
+    branchCode: branch,
+    semesterCode: semCode,
+    semesterTitle,
+    totalCredits,
+    subjects: formattedSubjects,
+    text: textLines.join("\n"),
+    action: {
+      label: `Browse Full ${branch} Syllabus Portal →`,
+      path: `/syllabus?branch=${branch}`,
+    },
+    suggestions: formattedSubjects.slice(0, 4).map((s) => `${s.name} notes`),
+  };
 }
