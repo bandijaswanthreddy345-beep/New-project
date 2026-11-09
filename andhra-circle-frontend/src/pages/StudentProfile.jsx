@@ -1123,7 +1123,7 @@ function StudentProfile() {
                       </svg>
                       Print ID Card
                     </button>
-                    {activeAvatar && (
+                    {activeAvatar ? (
                       <button
                         type="button"
                         className="sp-kebab-item sp-kebab-item-remove-photo"
@@ -1137,6 +1137,21 @@ function StudentProfile() {
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
                         Remove Photo
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="sp-kebab-item"
+                        onClick={() => {
+                          setShowMenu(false);
+                          editFileInputRef.current?.click();
+                        }}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                          <circle cx="12" cy="13" r="4" />
+                        </svg>
+                        Upload Photo
                       </button>
                     )}
                     <button
@@ -1172,7 +1187,12 @@ function StudentProfile() {
                     }}
                   />
                 ) : (
-                  <div className="sp-profile-photo-placeholder" title="No Photo Set">
+                  <div
+                    className="sp-profile-photo-placeholder"
+                    title="No Photo Set • Click to Upload Photo"
+                    onClick={() => editFileInputRef.current?.click()}
+                    style={{ cursor: "pointer" }}
+                  >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                       <circle cx="12" cy="7" r="4" />

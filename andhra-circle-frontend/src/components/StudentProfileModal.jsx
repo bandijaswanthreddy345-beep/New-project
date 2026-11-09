@@ -1,18 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import profileImg from "../assets/jaswanth.png.png";
 import "./StudentProfileModal.css";
-import { getStoredStudentData } from "../data/studentData";
+import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 
-function StudentProfileModal({ isOpen, onClose }) {
+function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
   const navigate = useNavigate();
+  const [student, setStudent] = useState(getStoredStudentData());
+
+  useEffect(() => {
+    if (isOpen) {
+      setStudent(getStoredStudentData());
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleSync = () => {
+      setStudent(getStoredStudentData());
+    };
+    window.addEventListener("studentProfileUpdated", handleSync);
+    return () => window.removeEventListener("studentProfileUpdated", handleSync);
+  }, []);
+
   if (!isOpen) return null;
 
-  const student = getStoredStudentData();
   const avatar =
-    student.profilePhoto && student.profilePhoto !== "none"
+    student?.profilePhoto && student.profilePhoto !== "none"
       ? student.profilePhoto
+      : student?.profilePhoto === "none"
+      ? null
       : profileImg;
+
+  const handleRemovePhotoModal = () => {
+    const updated = {
+      ...student,
+      profilePhoto: "none",
+    };
+    saveStoredStudentData(updated);
+    setStudent(updated);
+    if (onProfileUpdated) onProfileUpdated(updated);
+  };
 
   // Sanitized display values (avoiding accidental query string repetitions)
   const sanitize = (val, fallback = "—") => {
@@ -51,19 +78,59 @@ function StudentProfileModal({ isOpen, onClose }) {
               <span className="sp-preview-badge">Student Profile</span>
             </div>
           </div>
+          <div className="sp-preview-header-actions">
+            {avatar && (
+              <button
+                type="button"
+                className="sp-modal-action-btn sp-modal-remove-photo"
+                onClick={handleRemovePhotoModal}
+                title="Remove profile photo"
+              >
+                Remove Photo
+              </button>
+            )}
+            <button
+              type="button"
+              className="sp-modal-action-btn"
+              onClick={handleOpenFullPage}
+              title="Open full profile"
+            >
+              Full Profile ↗
+            </button>
+          </div>
         </div>
 
         {/* Student Profile Info Section */}
         <div className="sp-preview-user-row">
           <div className="sp-preview-avatar-wrap">
-            <img
-              src={avatar}
-              alt={displayName}
-              className="sp-preview-avatar"
-              onError={(e) => {
-                e.currentTarget.src = profileImg;
-              }}
-            />
+            {avatar ? (
+              <img
+                src={avatar}
+                alt={displayName}
+                className="sp-preview-avatar"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            ) : null}
+            <div
+              className="sp-preview-avatar sp-preview-avatar-fallback"
+              style={{ display: avatar ? "none" : "flex" }}
+            >
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
             <span className="sp-preview-status-dot" />
           </div>
 

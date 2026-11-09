@@ -245,7 +245,8 @@ ul {
 .nav-links a:hover {
   color: var(--primary);
   background: rgba(13, 69, 60, 0.08);
-  border-color: rgba(13, 69, 60, 0.18);
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
   transform: translateY(-1px);
 }
 
@@ -322,10 +323,11 @@ ul {
 }
 
 .metal-search-btn:hover {
-  color: #ffffff;
+  color: #ffefb3;
+  border-color: #fbbf24;
   box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.35),
-    0 0 14px rgba(139, 92, 246, 0.25),
+    0 0 16px rgba(251, 191, 36, 0.45),
     inset 0 1px 1.5px rgba(255, 255, 255, 0.45);
   transform: translateY(-1px);
 }
@@ -400,11 +402,10 @@ ul {
 
 .nav-login-button:hover {
   background: var(--primary-dark);
-  color: white !important;
-
+  color: #ffefb3 !important;
+  border-color: #fbbf24;
   transform: translateY(-1px);
-
-  box-shadow: 0 5px 14px rgba(1, 62, 55, 0.3);
+  box-shadow: 0 5px 14px rgba(1, 62, 55, 0.3), 0 0 16px rgba(251, 191, 36, 0.45);
 }
 
 .login-arrow {
@@ -2558,7 +2559,9 @@ mark {
 
 .branch-card button:hover {
   background: var(--primary-dark);
-
+  border-color: #fbbf24;
+  color: #ffefb3;
+  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.25), 0 0 14px rgba(251, 191, 36, 0.45);
   transform: translateY(-1px);
 }
 
@@ -2644,6 +2647,9 @@ mark {
 
 .note-card button:hover {
   background: var(--primary-dark);
+  border-color: #fbbf24;
+  color: #ffefb3;
+  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.25), 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 /* =========================================================
@@ -2782,8 +2788,10 @@ mark {
 
 .view-paper-button:hover,
 .download-paper-button:hover {
-  opacity: 0.9;
-
+  opacity: 0.95;
+  border-color: #fbbf24;
+  color: #ffefb3;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
   transform: translateY(-1px);
 }
 
@@ -2857,6 +2865,9 @@ mark {
 
 .notification-card button:hover {
   background: var(--primary-dark);
+  border-color: #fbbf24;
+  color: #ffefb3;
+  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.25), 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 /* =========================================================
@@ -2931,6 +2942,9 @@ mark {
 
 .syllabus-card button:hover {
   background: var(--primary-dark);
+  border-color: #fbbf24;
+  color: #ffefb3;
+  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.25), 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 /* =========================================================
@@ -3005,6 +3019,9 @@ mark {
 
 .lab-program-card button:hover {
   background: var(--primary-dark);
+  border-color: #fbbf24;
+  color: #ffefb3;
+  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.25), 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 /* =========================================================
@@ -3902,10 +3919,10 @@ mark {
 
 .view-pdf-button:hover {
   background: linear-gradient(135deg, #013a33 0%, #01221e 100%);
-  border-color: #fed866;
+  border-color: #fbbf24;
   color: #fed866;
   transform: translateY(-1.5px);
-  box-shadow: 0 6px 16px rgba(1, 34, 30, 0.35), 0 0 10px rgba(254, 216, 102, 0.25);
+  box-shadow: 0 6px 16px rgba(1, 34, 30, 0.35), 0 0 16px rgba(251, 191, 36, 0.45);
 }
 
 .view-pdf-button:active {
@@ -3948,10 +3965,10 @@ mark {
 
 .download-pdf-button:hover {
   background: #f1f7f5;
-  border-color: #013a33;
+  border-color: #fbbf24;
   color: #01221e;
   transform: translateY(-1.5px);
-  box-shadow: 0 4px 12px rgba(1, 58, 51, 0.12);
+  box-shadow: 0 4px 12px rgba(1, 58, 51, 0.12), 0 0 14px rgba(251, 191, 36, 0.35);
 }
 
 .download-pdf-button:active {
@@ -6663,7 +6680,8 @@ textarea:focus-visible {
 
 .nav-profile-btn:hover {
   background: rgba(13, 69, 60, 0.08) !important;
-  border-color: rgba(217, 167, 38, 0.5) !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45) !important;
   transform: translateY(-1px) scale(1.04);
 }
 
@@ -6696,8 +6714,8 @@ textarea:focus-visible {
 }
 
 .nav-profile-btn:hover .nav-profile-avatar-img {
-  border-color: #d9a726;
-  box-shadow: 0 0 10px rgba(217, 167, 38, 0.4);
+  border-color: #fbbf24;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.5);
 }
 
 .nav-profile-fallback-icon {
@@ -7760,9 +7778,9 @@ textarea:focus-visible {
 
 .notif-btn-external:hover {
   background: linear-gradient(135deg, #01221e 0%, #052621 100%);
-  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.3);
+  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.3), 0 0 16px rgba(251, 191, 36, 0.45);
   color: #fed866;
-  border-color: #fed866;
+  border-color: #fbbf24;
 }
 
 .notif-btn-download {
@@ -7782,9 +7800,10 @@ textarea:focus-visible {
 }
 
 .notif-btn-download:hover {
-  background: #34d399;
-  border-color: #34d399;
+  background: #f1f7f5;
+  border-color: #fbbf24;
   color: #01221e;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 /* =========================================================

@@ -138,8 +138,9 @@
 .modal-3d-close-btn:hover {
   transform: translateZ(46px) scale(1.1);
   background: #004D40E6;
-  border-color: #34D39980;
-  color: #FFFFFF;
+  border-color: #fbbf24;
+  color: #fed866;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 .modal-3d-close-btn:active {
@@ -418,10 +419,11 @@
 .modal-3d-btn-primary:hover {
   transform: translateY(-1.5px) scale(1.015);
   background: linear-gradient(135deg, #005A4C 0%, #00897B 100%);
+  border-color: #fbbf24;
   box-shadow: 
     0 8px 24px #003C36B3,
+    0 0 16px rgba(251, 191, 36, 0.45),
     inset 0 1px 1px #FFFFFF66;
-  border-color: #34D39999;
 }
 
 .modal-3d-btn-primary:active {
@@ -456,9 +458,10 @@
 .modal-3d-btn-secondary:hover {
   transform: translateY(-1.5px) scale(1.015);
   background: #003C36CC;
-  border-color: #60A5FA80;
+  border-color: #fbbf24;
   box-shadow: 
     0 8px 20px #00000080,
+    0 0 16px rgba(251, 191, 36, 0.45),
     inset 0 1px 1px #FFFFFF40;
 }
 

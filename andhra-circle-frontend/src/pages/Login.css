@@ -495,11 +495,11 @@
 .login-submit-btn:hover {
   background: radial-gradient(ellipse at 40% 25%, #08695c 0%, #013e37 70%, #002722 100%);
   color: #ffffff;
-  border-color: #d9a726;
+  border-color: #fbbf24;
   transform: translateY(-1.5px);
   box-shadow: 
     0 8px 24px rgba(1, 62, 55, 0.35),
-    0 2px 6px rgba(0, 0, 0, 0.15);
+    0 0 16px rgba(251, 191, 36, 0.45);
 }
 
 .login-submit-btn:active {

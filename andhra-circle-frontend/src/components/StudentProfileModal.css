@@ -69,6 +69,41 @@
   border-bottom: 1px solid rgba(255, 239, 179, 0.15);
 }
 
+.sp-preview-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sp-modal-action-btn {
+  background: rgba(255, 239, 179, 0.1);
+  border: 1px solid rgba(255, 239, 179, 0.3);
+  color: #ffefb3;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sp-modal-action-btn:hover {
+  background: #ffefb3;
+  color: #013a33;
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.45);
+}
+
+.sp-modal-remove-photo {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.sp-modal-remove-photo:hover {
+  background: #fbbf24;
+  color: #013a33;
+}
+
 .sp-preview-brand {
   display: flex;
   align-items: center;
@@ -146,6 +181,20 @@
   object-fit: cover;
   border-radius: 50%;
   display: block;
+}
+
+.sp-preview-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffefb3;
+  background: rgba(1, 62, 55, 0.95);
+}
+
+.sp-preview-avatar-fallback svg {
+  width: 28px;
+  height: 28px;
+  stroke: #ffefb3;
 }
 
 .sp-preview-status-dot {
@@ -345,8 +394,10 @@
 
 .sp-preview-done-btn:hover {
   background: #02594f;
+  border-color: #fbbf24;
+  color: #fed866;
   transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(254, 216, 102, 0.45);
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
 }
 
 .sp-preview-done-btn:active {

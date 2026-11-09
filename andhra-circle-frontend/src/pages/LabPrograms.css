@@ -533,7 +533,8 @@
 
 .lab-view-button:hover {
   background: #1948c1;
-
+  border-color: #fbbf24;
+  box-shadow: 0 4px 14px rgba(25, 72, 193, 0.35), 0 0 14px rgba(251, 191, 36, 0.45);
   transform: translateY(-1px);
 }
 
@@ -589,7 +590,8 @@
 
 .lab-download-button:hover {
   background: #1d2939;
-
+  border-color: #fbbf24;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 14px rgba(251, 191, 36, 0.4);
   transform: translateY(-1px);
 }
 

@@ -207,6 +207,8 @@
 .calc-tab-btn:hover {
   color: #013a33;
   background-color: #f1f7f5;
+  border-color: rgba(251, 191, 36, 0.4);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
 }
 
 .calc-tab-btn.active {
@@ -679,7 +681,8 @@
 
 .calc-btn-add:hover {
   background-color: #e3eee9;
-  border-color: #013a33;
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
 }
 
 .calc-btn-reset {
@@ -700,7 +703,8 @@
 .calc-btn-reset:hover {
   background-color: #f1f7f5;
   color: #013a33;
-  border-color: #b8d4cb;
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
 }
 
 .calc-action-left {
@@ -734,7 +738,8 @@
 
 .calc-btn-fresh:hover {
   background-color: #f1f7f5;
-  border-color: #013a33;
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
   transform: translateY(-1px);
 }
 
@@ -975,9 +980,10 @@
 
 .calc-btn-save-profile:hover {
   background: linear-gradient(135deg, #012b26 0%, #013a33 100%);
-  border-color: #fed866;
+  border-color: #fbbf24;
   color: #fed866;
   transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 16px rgba(251, 191, 36, 0.45);
 }
 
 /* =========================================================
@@ -1402,7 +1408,8 @@
 
 .calc-btn-print-slip:hover {
   background-color: #e3eee9;
-  border-color: #013a33;
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
 }
 
 .calc-btn-dismiss {

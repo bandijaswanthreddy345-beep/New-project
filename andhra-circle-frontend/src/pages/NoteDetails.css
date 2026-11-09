@@ -2975,7 +2975,8 @@
 
 .note-details-page .open-pdf-button:hover {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.42);
+  border-color: #fbbf24;
+  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.42), 0 0 16px rgba(251, 191, 36, 0.4);
   transform: translateY(-2px);
 }
 
@@ -3001,10 +3002,10 @@
 }
 
 .note-details-page .download-pdf-button:hover {
-  border-color: #d9a726;
+  border-color: #fbbf24;
   background: #fffdf5;
   color: #8a6815;
-  box-shadow: 0 6px 18px rgba(217, 167, 38, 0.25);
+  box-shadow: 0 6px 18px rgba(251, 191, 36, 0.35), 0 0 14px rgba(251, 191, 36, 0.25);
   transform: translateY(-2px);
 }
 
@@ -3099,7 +3100,8 @@
 
 .note-details-page .comment-submit-button:hover {
   background: linear-gradient(135deg, #10b981, #059669);
-  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.4);
+  border-color: #fbbf24;
+  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.4), 0 0 14px rgba(251, 191, 36, 0.4);
   transform: translateY(-2px);
 }
 

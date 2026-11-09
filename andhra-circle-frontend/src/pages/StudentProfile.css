@@ -108,8 +108,9 @@
 .sp-btn-print-nav:hover {
   background: #ffefb3;
   color: #013a33;
-  border-color: #ffefb3;
+  border-color: #fbbf24;
   transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 .sp-header-close-btn {
@@ -998,9 +999,9 @@
 
 .sp-btn-create-submit:hover {
   background: linear-gradient(135deg, #0d5d51 0%, #154e43 100%);
-  border-color: #ffefb3;
+  border-color: #fbbf24;
   transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(1, 58, 51, 0.36), 0 0 20px rgba(255, 239, 179, 0.2);
+  box-shadow: 0 14px 34px rgba(1, 58, 51, 0.36), 0 0 20px rgba(251, 191, 36, 0.45);
 }
 
 .sp-btn-shine {
@@ -1107,10 +1108,11 @@
 }
 
 .sp-kebab-btn:hover {
-  background: #ffefb3;
+  background: #fbbf24;
   color: #013a33;
-  border-color: #ffefb3;
+  border-color: #fbbf24;
   transform: scale(1.06);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 .sp-kebab-dropdown {
@@ -1148,8 +1150,8 @@
 }
 
 .sp-kebab-item:hover {
-  background: rgba(255, 239, 179, 0.15);
-  color: #ffefb3;
+  background: rgba(251, 191, 36, 0.16);
+  color: #fbbf24;
 }
 
 .sp-kebab-item-remove-photo {
@@ -2050,7 +2052,10 @@
 
 .sp-btn-print-action:hover {
   background: #0d5d51;
+  border-color: #fbbf24;
+  color: #ffefb3;
   transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(1, 58, 51, 0.2), 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 .sp-btn-copy-usn {
@@ -2067,7 +2072,8 @@
 
 .sp-btn-copy-usn:hover {
   background: #f1f7f5;
-  border-color: #013a33;
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
 }
 
 /* =========================================================
@@ -2424,7 +2430,10 @@
 
 .sp-btn-view-material:hover {
   background: #0d453c;
+  border-color: #fbbf24;
+  color: #ffefb3;
   transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
 }
 
 .sp-empty-notice {

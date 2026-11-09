@@ -202,6 +202,13 @@ function Notes({ initialType }) {
   const [studentData, setStudentData] = useState(getStoredStudentData());
   const [pulsingBranch, setPulsingBranch] = useState(null);
 
+  const studentAvatar =
+    studentData?.profilePhoto && studentData.profilePhoto !== "none"
+      ? studentData.profilePhoto
+      : studentData?.profilePhoto === "none"
+      ? null
+      : profile;
+
   const searchInputRef = useRef(null);
 
   // Profile synchronization listener
@@ -720,7 +727,32 @@ function Notes({ initialType }) {
             title="View & Edit Student Profile"
           >
             <div className="profile-avatar-wrapper">
-              <img src={profile} alt={studentData.name} className="profile-avatar" />
+              {studentAvatar ? (
+                <img
+                  src={studentAvatar}
+                  alt={studentData.name || "Student"}
+                  className="profile-avatar"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="profile-avatar profile-avatar-fallback">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+              )}
               <span className="profile-status-dot" />
             </div>
             <div className="profile-info">

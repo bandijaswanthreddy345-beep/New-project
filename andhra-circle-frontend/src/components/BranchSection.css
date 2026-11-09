@@ -319,10 +319,10 @@
 }
 
 .branch-nav-btn:hover {
-  color: #ffffff;
-  border-color: #d9a726;
-  background: #d9a726;
-  box-shadow: 0 4px 14px rgba(217, 167, 38, 0.35);
+  color: #020617;
+  border-color: #fbbf24;
+  background: #fbbf24;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.45);
   transform: scale(1.06);
 }
 
