@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import StudentProfileModal from "../components/StudentProfileModal";
-import { getStoredStudentData, getStudentAvatarUrl } from "../data/studentData";
+import { getStoredStudentData, getStudentAvatar, getStudentAvatarUrl } from "../data/studentData";
 import AuthorProfile from "../components/AuthorProfile";
 import { normalizeSemester, normalizeScheme } from "../utils/semester";
 import "./Notes.css";
@@ -211,7 +211,11 @@ function Notes({ initialType }) {
       setStudentData(getStoredStudentData());
     };
     window.addEventListener("studentProfileUpdated", handleProfileSync);
-    return () => window.removeEventListener("studentProfileUpdated", handleProfileSync);
+    window.addEventListener("storage", handleProfileSync);
+    return () => {
+      window.removeEventListener("studentProfileUpdated", handleProfileSync);
+      window.removeEventListener("storage", handleProfileSync);
+    };
   }, []);
 
   // Sync state if URL branch query parameter changes

@@ -1447,3 +1447,49 @@
     position: static;
   }
 }
+
+/* =========================================================
+   INLINE INPUT VALIDATION ERROR STYLING
+   ========================================================= */
+.calc-field-error {
+  display: block;
+  color: #dc2626;
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.calc-row-error {
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+  display: block;
+}
+
+.calc-warning-banner {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+input[aria-invalid="true"] {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1.5px rgba(239, 68, 68, 0.4) !important;
+}
+
+button:disabled.calc-btn-complete-evaluation,
+button:disabled.calc-btn-save-score {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+

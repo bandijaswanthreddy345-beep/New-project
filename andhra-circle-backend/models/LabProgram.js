@@ -69,6 +69,24 @@ const labProgramSchema = new mongoose.Schema(
   }
 );
 
+labProgramSchema.index(
+  {
+    title: "text",
+    subject: "text",
+    subjectCode: "text",
+    description: "text",
+  },
+  {
+    weights: {
+      subjectCode: 10,
+      subject: 8,
+      title: 6,
+      description: 4,
+    },
+    name: "LabProgramTextIndex",
+  }
+);
+
 module.exports = mongoose.model(
   "LabProgram",
   labProgramSchema

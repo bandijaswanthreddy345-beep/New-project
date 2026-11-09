@@ -520,7 +520,7 @@ ul {
 }
 
 .hero-subtitle,
-.hero-content > p:not(.hero-slogan) {
+.hero-content>p:not(.hero-slogan) {
   max-width: 640px;
   margin: 0 auto 24px auto;
 
@@ -639,6 +639,7 @@ ul {
   align-items: center;
   justify-content: center;
 }
+
 .hero-ai-avatar-mobile-mic svg {
   width: 16px;
   height: 16px;
@@ -884,10 +885,12 @@ ul {
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7), 0 0 12px rgba(251, 191, 36, 0.6);
     transform: scale(1);
   }
+
   50% {
     box-shadow: 0 0 0 8px rgba(239, 68, 68, 0), 0 0 20px rgba(251, 191, 36, 0.9);
     transform: scale(1.07);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0), 0 0 12px rgba(251, 191, 36, 0.6);
     transform: scale(1);
@@ -1011,9 +1014,9 @@ ul {
 
 .hero-ai-starter-pill:hover,
 .starter-pill-highlight:hover {
-  background: #ffefb3 !important;
+  background: rgba(255, 239, 179, 0.15) !important;
   border-color: #ffefb3 !important;
-  color: #000000 !important;
+  color: #ffefb3 !important;
   transform: translateY(-1.5px);
   box-shadow: 0 4px 14px #ffefb355;
 }
@@ -1144,6 +1147,7 @@ body.chatbot-modal-open .floating-whatsapp-btn {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1174,6 +1178,7 @@ body.chatbot-modal-open .floating-whatsapp-btn {
     opacity: 0;
     transform: scale(0.94) translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -1460,6 +1465,15 @@ body.chatbot-modal-open .floating-whatsapp-btn {
 
 .chat-modal-clear-btn:hover {
   color: #cbd5e1;
+}
+
+.chat-modal-char-counter {
+  font-size: 11px;
+  color: #fed866;
+  opacity: 0.85;
+  padding: 0 4px;
+  white-space: nowrap;
+  user-select: none;
 }
 
 .chat-modal-metal-wrapper {
@@ -1901,6 +1915,133 @@ body.chatbot-modal-open .floating-whatsapp-btn {
   transform: scale(0.97);
 }
 
+/* RAG Sources Container & Verified Portal Chips */
+.chat-sources-container {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: rgba(6, 78, 59, 0.25);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 8px;
+}
+
+.chat-sources-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #a7f3d0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.chat-sources-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chat-source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #01241f;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: #ffefb3;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.chat-source-chip:hover {
+  background: #087943;
+  border-color: #fbbf24;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(8, 121, 67, 0.4);
+}
+
+.chat-source-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  text-transform: uppercase;
+}
+
+.chat-source-title {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-source-meta {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.chat-source-arrow {
+  font-size: 10px;
+  color: #fbbf24;
+  opacity: 0.8;
+}
+
+/* AI Message Quality Feedback (Thumbs Up / Down) */
+.chat-msg-feedback-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.chat-msg-feedback-label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.chat-feedback-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #e2e8f0;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-feedback-btn:hover {
+  background: rgba(251, 191, 36, 0.15);
+  border-color: #fbbf24;
+  transform: scale(1.1);
+}
+
+.chat-feedback-btn.is-active {
+  background: rgba(251, 191, 36, 0.3);
+  border-color: #fbbf24;
+  transform: scale(1.05);
+}
+
+.chat-feedback-thanks {
+  font-size: 11px;
+  color: #34d399;
+  font-weight: 600;
+}
+
 /* AI Thinking Orb Indicator (Compact single-line) */
 .hero-ai-thinking-card {
   border-color: #fed86644;
@@ -1962,10 +2103,14 @@ body.chatbot-modal-open .floating-whatsapp-btn {
 }
 
 @keyframes heroAiPulse {
-  0%, 80%, 100% {
+
+  0%,
+  80%,
+  100% {
     opacity: 0.25;
     transform: scale(0.75);
   }
+
   40% {
     opacity: 1;
     transform: scale(1.15);
@@ -3363,8 +3508,8 @@ mark {
   display: flex;
   flex-direction: column;
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.22s ease;
+    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.22s ease;
 }
 
 .resource-card:hover {
@@ -3783,16 +3928,35 @@ mark {
 }
 
 @keyframes buttonHapticPop {
-  0% { transform: scale(1); }
-  25% { transform: scale(0.88); }
-  55% { transform: scale(1.22); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(0.88);
+  }
+
+  55% {
+    transform: scale(1.22);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes countPopBounce {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.35); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.35);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* 3D Shockwave Pulse Ring */
@@ -3815,6 +3979,7 @@ mark {
     transform: translate(-50%, -50%) scale(0.6);
     opacity: 0.95;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(2.8);
     opacity: 0;
@@ -3837,14 +4002,17 @@ mark {
     opacity: 0;
     transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(0.2) rotate(0deg);
   }
+
   20% {
     opacity: 1;
     transform: translate(-50%, -50%) translate3d(0, -32px, 80px) scale(1.35) rotate(-6deg);
   }
+
   50% {
     opacity: 0.95;
     transform: translate(-50%, -50%) translate3d(0, -56px, 110px) scale(1.15) rotate(4deg);
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) translate3d(0, -82px, 140px) scale(0.8) rotate(-2deg);
@@ -3867,14 +4035,17 @@ mark {
     opacity: 0;
     transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(0.3) rotate(0deg);
   }
+
   22% {
     opacity: 1;
     transform: translate(-50%, -50%) translate3d(var(--x-mid, -15px), -28px, 45px) scale(calc(var(--scale, 1) * 1.25)) rotate(var(--rot, -15deg));
   }
+
   65% {
     opacity: 0.9;
     transform: translate(-50%, -50%) translate3d(var(--x-end, -25px), -62px, 75px) scale(var(--scale, 1)) rotate(calc(var(--rot, -15deg) * 1.3));
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) translate3d(var(--x-end, -30px), -92px, 95px) scale(0.55) rotate(calc(var(--rot, -15deg) * 1.6));
@@ -3897,10 +4068,12 @@ mark {
     opacity: 0;
     transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(0.2) rotate(0deg);
   }
+
   30% {
     opacity: 1;
     transform: translate(-50%, -50%) translate3d(var(--sx, 15px), var(--sy, -15px), 40px) scale(1.25) rotate(45deg);
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) translate3d(calc(var(--sx, 15px) * 1.5), calc(var(--sy, -15px) * 1.5), 60px) scale(0.3) rotate(90deg);
@@ -3960,12 +4133,15 @@ mark {
   0% {
     transform: scaleY(1);
   }
+
   38% {
     transform: scaleY(0.06);
   }
+
   56% {
     transform: scaleY(0.06);
   }
+
   100% {
     transform: scaleY(1);
   }
@@ -4389,10 +4565,12 @@ mark {
     transform: scale(0.95);
     opacity: 0.9;
   }
+
   50% {
     transform: scale(1.35);
     opacity: 0;
   }
+
   100% {
     transform: scale(1.35);
     opacity: 0;
@@ -4482,10 +4660,12 @@ mark {
     transform: scale(0.95);
     opacity: 0.9;
   }
+
   50% {
     transform: scale(1.35);
     opacity: 0;
   }
+
   100% {
     transform: scale(1.35);
     opacity: 0;
@@ -4575,10 +4755,12 @@ mark {
     transform: scale(0.95);
     opacity: 0.9;
   }
+
   50% {
     transform: scale(1.35);
     opacity: 0;
   }
+
   100% {
     transform: scale(1.35);
     opacity: 0;
@@ -4626,10 +4808,12 @@ mark {
     width: 48px;
     height: 48px;
   }
+
   .floating-email-icon {
     width: 22px;
     height: 22px;
   }
+
   .floating-email-tooltip {
     display: none;
   }
@@ -4640,10 +4824,12 @@ mark {
     width: 48px;
     height: 48px;
   }
+
   .floating-instagram-icon {
     width: 24px;
     height: 24px;
   }
+
   .floating-instagram-tooltip {
     display: none;
   }
@@ -4654,10 +4840,12 @@ mark {
     width: 48px;
     height: 48px;
   }
+
   .floating-whatsapp-icon {
     width: 26px;
     height: 26px;
   }
+
   .floating-whatsapp-tooltip {
     display: none;
   }
@@ -4844,7 +5032,7 @@ textarea:focus-visible {
   }
 
   .hero-subtitle,
-  .hero-content > p:not(.hero-slogan) {
+  .hero-content>p:not(.hero-slogan) {
     font-size: 15px;
     margin-bottom: 26px;
   }
@@ -4938,7 +5126,7 @@ textarea:focus-visible {
   }
 
   .hero-subtitle,
-  .hero-content > p:not(.hero-slogan) {
+  .hero-content>p:not(.hero-slogan) {
     font-size: 14px;
     line-height: 1.5;
     margin-bottom: 22px;
@@ -5132,7 +5320,7 @@ textarea:focus-visible {
     font-size: 30px;
   }
 
-  .hero-content > p {
+  .hero-content>p {
     font-size: 15px;
   }
 
@@ -5221,7 +5409,7 @@ textarea:focus-visible {
     font-size: 27px;
   }
 
-  .hero-content > p {
+  .hero-content>p {
     font-size: 14px;
   }
 
@@ -5445,11 +5633,13 @@ textarea:focus-visible {
     opacity: 0.8;
     box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
   }
+
   50% {
     transform: scale(1.2);
     opacity: 1;
     box-shadow: 0 0 0 6px rgba(52, 211, 153, 0);
   }
+
   100% {
     transform: scale(0.9);
     opacity: 0.8;
@@ -5519,8 +5709,13 @@ textarea:focus-visible {
 }
 
 @keyframes spinRefresh {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .live-timestamp {
@@ -6582,6 +6777,7 @@ textarea:focus-visible {
     transform: translate(-50%, -50%) scale(0.6);
     opacity: 1;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(2.6);
     opacity: 0;
@@ -6589,9 +6785,12 @@ textarea:focus-visible {
 }
 
 @keyframes badgeGentleGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 2px 8px rgba(225, 29, 72, 0.45);
   }
+
   50% {
     box-shadow: 0 3px 14px rgba(225, 29, 72, 0.8), 0 0 8px rgba(255, 255, 255, 0.4);
   }
@@ -6659,12 +6858,32 @@ textarea:focus-visible {
 }
 
 @keyframes bellWiggle {
-  0%, 82%, 100% { transform: rotate(0deg); }
-  85% { transform: rotate(15deg); }
-  88% { transform: rotate(-13deg); }
-  91% { transform: rotate(11deg); }
-  94% { transform: rotate(-7deg); }
-  97% { transform: rotate(3deg); }
+
+  0%,
+  82%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  85% {
+    transform: rotate(15deg);
+  }
+
+  88% {
+    transform: rotate(-13deg);
+  }
+
+  91% {
+    transform: rotate(11deg);
+  }
+
+  94% {
+    transform: rotate(-7deg);
+  }
+
+  97% {
+    transform: rotate(3deg);
+  }
 }
 
 /* Elegant brand color flip on tab hover or active */
@@ -6806,6 +7025,7 @@ textarea:focus-visible {
     opacity: 0;
     transform: translateY(-16px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -7359,6 +7579,7 @@ textarea:focus-visible {
 }
 
 @media (max-width: 640px) {
+
   .notif-page-topbar,
   .papers-page-topbar {
     gap: 12px;
@@ -7413,8 +7634,13 @@ textarea:focus-visible {
 }
 
 @keyframes notifFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .notif-modal-card {
@@ -7439,6 +7665,7 @@ textarea:focus-visible {
     opacity: 0;
     transform: translateY(24px) scale(0.97);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -7961,37 +8188,46 @@ textarea:focus-visible {
   .notif-page-topbar {
     margin-bottom: 20px;
   }
+
   .notif-modal-card {
     max-height: 94vh;
     border-radius: 18px;
   }
+
   .notif-modal-header {
     padding: 14px 18px;
   }
+
   .notif-modal-badge {
     display: none;
   }
+
   .notif-modal-body {
     padding: 20px 18px;
     gap: 16px;
   }
+
   .notif-modal-title {
     font-size: 18px;
   }
+
   .notif-modal-footer {
     flex-direction: column-reverse;
     align-items: stretch;
     padding: 14px 18px;
     gap: 10px;
   }
+
   .notif-btn-back-action {
     justify-content: center;
     width: 100%;
   }
+
   .notif-modal-footer-right {
     width: 100%;
     flex-direction: column;
   }
+
   .notif-btn-external,
   .notif-btn-download {
     width: 100%;
@@ -8097,7 +8333,8 @@ textarea:focus-visible {
    Clean Native App-Like Feel on All Devices (iOS, Android, Tablet)
    ========================================================= */
 
-html, body {
+html,
+body {
   overflow-x: hidden !important;
   max-width: 100vw;
   width: 100%;
@@ -8106,6 +8343,7 @@ html, body {
 
 /* Prevent auto-zoom on mobile inputs in iOS Safari */
 @media (max-width: 768px) {
+
   input,
   select,
   textarea {
@@ -8117,6 +8355,7 @@ html, body {
 .nav-mobile-actions {
   display: none;
 }
+
 .nav-mobile-backdrop {
   display: none;
 }
@@ -8307,6 +8546,7 @@ html, body {
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -8315,6 +8555,7 @@ html, body {
 
 /* Touch-optimized Card Grids on Mobile Phones */
 @media (max-width: 640px) {
+
   .notes-grid,
   .papers-grid,
   .syllabus-grid,
@@ -8348,6 +8589,7 @@ html, body {
 }
 
 @media (max-width: 400px) {
+
   .resource-buttons,
   .paper-pdf-actions {
     grid-template-columns: 1fr !important;
@@ -8375,8 +8617,8 @@ html, body {
 .toast-dot,
 .sp-online-dot,
 .notes-eyebrow-dot,
-.study-badge > span,
-.hero-topbar-label > span,
+.study-badge>span,
+.hero-topbar-label>span,
 .modules-eyebrow::before,
 .modules-header .modules-eyebrow::before,
 .ticker-badge-pulse,
@@ -8549,10 +8791,13 @@ html, body {
 }
 
 @keyframes aiSparkPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.18) rotate(12deg);
     opacity: 0.85;
@@ -8610,6 +8855,7 @@ body.chat-modal-open {
 }
 
 @media (max-width: 640px) {
+
   /* Floating contact buttons sizing on mobile */
   .floating-email-btn {
     bottom: 148px !important;
@@ -8617,10 +8863,12 @@ body.chat-modal-open {
     width: 44px !important;
     height: 44px !important;
   }
+
   .floating-email-icon {
     width: 20px !important;
     height: 20px !important;
   }
+
   .floating-email-pulse,
   .floating-instagram-pulse,
   .floating-whatsapp-pulse {
@@ -8633,6 +8881,7 @@ body.chat-modal-open {
     width: 44px !important;
     height: 44px !important;
   }
+
   .floating-instagram-icon {
     width: 22px !important;
     height: 22px !important;
@@ -8644,6 +8893,7 @@ body.chat-modal-open {
     width: 44px !important;
     height: 44px !important;
   }
+
   .floating-whatsapp-icon {
     width: 24px !important;
     height: 24px !important;
@@ -8797,12 +9047,14 @@ body.chat-modal-open {
   }
 
   .chat-modal-input-field {
-    font-size: 16px !important; /* 16px prevents mobile Safari auto-zoom */
+    font-size: 16px !important;
+    /* 16px prevents mobile Safari auto-zoom */
   }
 }
 
 /* Extra-small phones */
 @media (max-width: 400px) {
+
   .floating-email-btn,
   .floating-instagram-btn,
   .floating-whatsapp-btn {

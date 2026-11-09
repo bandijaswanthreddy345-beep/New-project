@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./StudentProfileModal.css";
-import { getStoredStudentData, saveStoredStudentData, getStudentAvatarUrl } from "../data/studentData";
+import {
+  getStoredStudentData,
+  saveStoredStudentData,
+  getStudentAvatarUrl,
+  cleanCollege,
+  cleanSemester,
+} from "../data/studentData";
 
 function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
   const navigate = useNavigate();
@@ -35,7 +41,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
     if (onProfileUpdated) onProfileUpdated(updated);
   };
 
-  // Sanitized display values (avoiding accidental query string repetitions)
+  // Sanitized display values
   const sanitize = (val, fallback = "—") => {
     if (!val || typeof val !== "string") return fallback;
     const clean = val.trim();
@@ -47,13 +53,13 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
 
   const displayName = sanitize(student.name, "Jaswanth");
   const displayBranch = sanitize(student.branch, "Computer Science & Engineering");
-  const displayHallTicket = sanitize(student.hallTicket, "22B91A4201");
-  const displayYear = sanitize(student.year, "1st Year");
-  const displaySemester = sanitize(student.semester, "1-1");
+  const displayHallTicket = sanitize(student.hallTicket, "21B91A0201");
+  const displayYear = sanitize(student.year, "3rd Year");
+  const displaySemester = cleanSemester(sanitize(student.semester, "6th Semester"));
   const displayRegulation = sanitize(student.regulation, "R23 Regulation");
-  const displayCgpa = student.cgpa && !isNaN(student.cgpa) ? student.cgpa : "8.75";
+  const displayCgpa = student.cgpa && !isNaN(student.cgpa) ? student.cgpa : "8.88";
   const displayAttendance = student.attendance || "82%";
-  const displayCollege = sanitize(student.college, "Madanapalle Institute of Technology & Science");
+  const displayCollege = cleanCollege(sanitize(student.college, "JNTU College of Engineering"));
 
   const handleOpenFullPage = () => {
     onClose();
@@ -158,37 +164,18 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
           <div className="sp-preview-metric-box">
             <span className="sp-p-metric-label">REGULATION</span>
             <span className="sp-p-metric-value">{displayRegulation}</span>
-            <span className="sp-p-metric-sub">Curriculum</span>
+            <span className="sp-p-metric-sub">JNTU Curriculum</span>
           </div>
         </div>
 
-        {/* Concise Academic Details Strip */}
-        <div className="sp-preview-details-list">
-          <div className="sp-preview-detail-item">
-            <span className="sp-pd-label">College</span>
-            <span className="sp-pd-value">{displayCollege}</span>
-          </div>
-          <div className="sp-preview-detail-item">
-            <span className="sp-pd-label">University</span>
-            <span className="sp-pd-value">{student.university || "Jawaharlal Nehru Technological University"}</span>
-          </div>
-          <div className="sp-preview-detail-item">
-            <span className="sp-pd-label">Hall Ticket No</span>
-            <span className="sp-pd-value sp-pd-code">{displayHallTicket}</span>
-          </div>
-        </div>
-
-        {/* Clean Footer Bar */}
-        <div className="sp-preview-footer">
-          <span className="sp-preview-footer-note">
-            JNTU Circle Student Academic Record
-          </span>
+        {/* Action Button */}
+        <div className="sp-preview-actions">
           <button
             type="button"
             className="sp-preview-done-btn"
             onClick={onClose}
           >
-            Done
+            Close Card
           </button>
         </div>
       </div>

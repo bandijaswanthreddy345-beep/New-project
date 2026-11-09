@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
-import { getStoredStudentData, getStudentAvatarUrl } from "../data/studentData";
+import { getStoredStudentData, getStudentAvatar, getStudentAvatarUrl } from "../data/studentData";
 
 // Standard fallback notices for the pop-up preview
 const FALLBACK_NOTICES = [
@@ -60,7 +60,11 @@ function Navbar() {
       setStudent(getStoredStudentData());
     };
     window.addEventListener("studentProfileUpdated", handleProfileSync);
-    return () => window.removeEventListener("studentProfileUpdated", handleProfileSync);
+    window.addEventListener("storage", handleProfileSync);
+    return () => {
+      window.removeEventListener("studentProfileUpdated", handleProfileSync);
+      window.removeEventListener("storage", handleProfileSync);
+    };
   }, []);
 
   const isBTechNotice = (n) => {
@@ -409,7 +413,7 @@ function Navbar() {
         <Link
           to="/student-profile"
           className="nav-mobile-action-btn nav-mobile-profile-btn"
-          title={`Student Profile • ${student?.name || "Student"}`}
+          title={`Student Profile • ${student?.name || "Chinnu"}`}
           aria-label="Student Profile"
           onClick={() => {
             setMobileMenuOpen(false);
@@ -417,11 +421,14 @@ function Navbar() {
           }}
         >
           <div className="nav-profile-avatar-wrapper nav-mobile-profile-avatar-wrapper">
-            {getStudentAvatarUrl(student?.profilePhoto) ? (
+            {getStudentAvatar(student) ? (
               <img
-                src={getStudentAvatarUrl(student?.profilePhoto)}
-                alt={student.name || "Student"}
+                src={getStudentAvatar(student)}
+                alt={student?.name || "Student"}
                 className="nav-profile-avatar-img nav-mobile-avatar-img"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
               />
             ) : (
               <span className="nav-profile-fallback-icon nav-mobile-fallback-icon">
@@ -553,8 +560,8 @@ function Navbar() {
             }
 
             if (item.isProfile || item.name === "Student Profile") {
-              const studentName = student?.name || "Jaswanth Reddy Bandi";
-              const photoSrc = getStudentAvatarUrl(student?.profilePhoto);
+              const studentName = student?.name || "Student";
+              const photoSrc = getStudentAvatar(student);
 
               return (
                 <li key={item.path} className="nav-item-profile">
@@ -575,10 +582,7 @@ function Navbar() {
                           alt={studentName}
                           className="nav-profile-avatar-img"
                           onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            if (e.currentTarget.nextElementSibling) {
-                              e.currentTarget.nextElementSibling.style.display = "flex";
-                            }
+                            e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
                           }}
                         />
                       ) : null}
