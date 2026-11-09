@@ -411,6 +411,7 @@ ul {
 
 /* Profile Dropdown Panel */
 .nav-profile-dropdown {
+  display: none;
   position: absolute;
   top: calc(100% + 14px);
   right: 0;
@@ -425,6 +426,13 @@ ul {
   overflow: hidden;
   animation: profileDropdownPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 8px 0;
+}
+
+@media (min-width: 993px) {
+  .nav-item-profile:hover .nav-profile-dropdown,
+  .nav-profile-dropdown:hover {
+    display: block;
+  }
 }
 
 @keyframes profileDropdownPop {
@@ -444,6 +452,13 @@ ul {
   align-items: center;
   gap: 12px;
   padding: 12px 16px 14px;
+  text-decoration: none;
+  transition: background 0.18s ease;
+  cursor: pointer;
+}
+
+.nav-profile-dd-header:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .nav-profile-dd-avatar {

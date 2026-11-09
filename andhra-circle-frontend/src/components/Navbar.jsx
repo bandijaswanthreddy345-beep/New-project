@@ -35,28 +35,10 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const profileDropdownRef = useRef(null);
 
   useEffect(() => {
     setMobileMenuOpen(false);
-    setProfileDropdownOpen(false);
   }, [location.pathname]);
-
-  // Outside click handler for profile dropdown
-  useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target)) {
-        setProfileDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    document.addEventListener("touchstart", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-      document.removeEventListener("touchstart", handleOutsideClick);
-    };
-  }, []);
   const notifContainerRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
 
@@ -603,21 +585,20 @@ function Navbar() {
               const photoSrc = getStudentAvatar(student);
 
               return (
-                <li key={item.path} className="nav-item-profile" ref={profileDropdownRef}>
+                <li key={item.path} className="nav-item-profile">
                   <button
                     type="button"
-                    className={`nav-profile-btn ${currentUser && profileDropdownOpen ? "is-active" : ""}`}
+                    className="nav-profile-btn"
                     onClick={() => {
+                      setMobileMenuOpen(false);
                       if (!currentUser) {
-                        setMobileMenuOpen(false);
                         navigate("/login");
                       } else {
-                        setProfileDropdownOpen((prev) => !prev);
+                        navigate("/profile");
                       }
                     }}
-                    title={currentUser ? displayName : "Sign In or Sign Up"}
-                    aria-label={currentUser ? `Student Menu (${displayName})` : "Sign In or Sign Up"}
-                    aria-expanded={currentUser ? profileDropdownOpen : undefined}
+                    title={currentUser ? `Student Dashboard • ${displayName}` : "Sign In or Sign Up"}
+                    aria-label={currentUser ? `Student Dashboard (${displayName})` : "Sign In or Sign Up"}
                   >
                     <div className="nav-profile-avatar-wrapper">
                       {photoSrc ? (
@@ -652,10 +633,15 @@ function Navbar() {
                     </div>
                   </button>
 
-                  {/* Profile & Account Dropdown Menu (only when signed in) */}
-                  {currentUser && profileDropdownOpen && (
+                  {/* Profile & Account Dropdown Menu (only when signed in, shown on hover/active) */}
+                  {currentUser && (
                     <div className="nav-profile-dropdown" role="menu">
-                      <div className="nav-profile-dd-header">
+                      <Link
+                        to="/profile"
+                        className="nav-profile-dd-header"
+                        onClick={() => setMobileMenuOpen(false)}
+                        title="Open Student Dashboard"
+                      >
                         <div className="nav-profile-dd-avatar">
                           {photoSrc ? (
                             <img src={photoSrc} alt={displayName} />
@@ -671,40 +657,16 @@ function Navbar() {
                             {currentUser?.email || (isConfigured ? `${student.branch || "JNTU"} • ${student.hallTicket || ""}` : "Student Account")}
                           </span>
                         </div>
-                      </div>
+                      </Link>
 
                       <div className="nav-profile-dd-divider" />
 
                       <div className="nav-profile-dd-actions">
-                        <Link
-                          to="/profile"
-                          className="nav-profile-dd-link"
-                          onClick={() => setProfileDropdownOpen(false)}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                            <circle cx="12" cy="7" r="4" />
-                          </svg>
-                          <span>Student Profile</span>
-                        </Link>
-
-                        <Link
-                          to="/cgpa-calculator"
-                          className="nav-profile-dd-link"
-                          onClick={() => setProfileDropdownOpen(false)}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect width="16" height="20" x="4" y="2" rx="2" />
-                            <line x1="8" x2="16" y1="6" y2="6" />
-                          </svg>
-                          <span>CGPA Calculator</span>
-                        </Link>
-
                         {currentUser?.role === "admin" && (
                           <Link
                             to="/dashboard"
                             className="nav-profile-dd-link"
-                            onClick={() => setProfileDropdownOpen(false)}
+                            onClick={() => setMobileMenuOpen(false)}
                           >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <rect width="7" height="9" x="3" y="3" rx="1" />
@@ -716,7 +678,6 @@ function Navbar() {
                           </Link>
                         )}
 
-                        <div className="nav-profile-dd-subdivider" />
                         <button
                           type="button"
                           className="nav-profile-dd-link nav-profile-dd-signout"
@@ -725,7 +686,6 @@ function Navbar() {
                             localStorage.removeItem("user");
                             setCurrentUser(null);
                             window.dispatchEvent(new Event("authChanged"));
-                            setProfileDropdownOpen(false);
                             navigate("/login");
                           }}
                         >
