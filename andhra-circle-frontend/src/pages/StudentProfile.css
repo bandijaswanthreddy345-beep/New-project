@@ -999,9 +999,9 @@
 
 .sp-btn-create-submit:hover {
   background: linear-gradient(135deg, #0d5d51 0%, #154e43 100%);
-  border-color: #fbbf24;
+  border-color: #34d399;
   transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(1, 58, 51, 0.36), 0 0 20px rgba(251, 191, 36, 0.45);
+  box-shadow: 0 14px 34px rgba(1, 58, 51, 0.36), 0 0 20px rgba(52, 211, 153, 0.35);
 }
 
 .sp-btn-shine {
