@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const emailjs = require("@emailjs/nodejs");
+const { createCaptcha, verifyCaptcha } = require("../services/captchaService");
 
 const MIN_PASSWORD_LENGTH = 8;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -13,6 +14,25 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const asString = (value) => (typeof value === "string" ? value.trim() : "");
 
 // ==========================================
+// CAPTCHA Generation
+// ==========================================
+exports.getCaptcha = (req, res) => {
+  try {
+    const captcha = createCaptcha();
+    return res.status(200).json({
+      success: true,
+      captchaToken: captcha.captchaToken,
+      captchaSvg: captcha.captchaSvg,
+    });
+  } catch (error) {
+    console.error("CAPTCHA Generation Error:", error);
+    return res.status(500).json({
+      message: "Failed to generate security verification challenge",
+    });
+  }
+};
+
+// ==========================================
 // Register User
 // ==========================================
 exports.registerUser = async (req, res) => {
@@ -21,6 +41,16 @@ exports.registerUser = async (req, res) => {
     const email = asString(req.body?.email);
     const password =
       typeof req.body?.password === "string" ? req.body.password : "";
+    const captchaToken = asString(req.body?.captchaToken);
+    const captchaAnswer = asString(req.body?.captchaAnswer);
+
+    // Verify security CAPTCHA
+    const captchaCheck = verifyCaptcha(captchaToken, captchaAnswer);
+    if (!captchaCheck.ok) {
+      return res.status(400).json({
+        message: captchaCheck.message,
+      });
+    }
 
     if (!name || name.length > 100) {
       return res.status(400).json({

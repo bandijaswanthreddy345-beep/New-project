@@ -370,6 +370,106 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* Security CAPTCHA Verification Challenge */
+.signup-captcha-group {
+  margin-top: 4px;
+}
+
+.signup-captcha-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(8, 24, 19, 0.8);
+  border: 1px solid rgba(160, 209, 184, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.signup-captcha-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.signup-captcha-svg-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.signup-captcha-img {
+  width: 100%;
+  max-width: 220px;
+  height: 52px;
+  border-radius: 8px;
+  display: block;
+}
+
+.signup-captcha-loading-box {
+  flex: 1;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #081813;
+  border-radius: 8px;
+  color: #8a938d;
+  font-size: 13px;
+  border: 1px dashed rgba(160, 209, 184, 0.25);
+}
+
+.signup-captcha-refresh-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(160, 209, 184, 0.1);
+  border: 1px solid rgba(160, 209, 184, 0.25);
+  color: #a0d1b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.signup-captcha-refresh-btn:hover:not(:disabled) {
+  background: rgba(160, 209, 184, 0.2);
+  color: #ffffff;
+  border-color: #a0d1b8;
+  transform: rotate(30deg);
+}
+
+.signup-captcha-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.signup-rotating {
+  animation: signupRotate 0.7s linear infinite;
+}
+
+@keyframes signupRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.signup-captcha-input {
+  letter-spacing: 4px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 /* Terms Checkbox */
 .signup-terms-row {
   display: flex;

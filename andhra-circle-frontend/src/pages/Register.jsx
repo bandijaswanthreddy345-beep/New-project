@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/api";
 import "./Register.css";
@@ -14,12 +14,38 @@ function Register() {
     agreeTerms: false,
   });
 
+  const [captchaData, setCaptchaData] = useState({ token: "", svg: "" });
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [captchaLoading, setCaptchaLoading] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [googleNotice, setGoogleNotice] = useState("");
+
+  const fetchCaptcha = useCallback(async () => {
+    try {
+      setCaptchaLoading(true);
+      const res = await API.get("/auth/captcha");
+      if (res.data?.success) {
+        setCaptchaData({
+          token: res.data.captchaToken,
+          svg: res.data.captchaSvg,
+        });
+        setCaptchaInput("");
+      }
+    } catch (err) {
+      console.error("Failed to load security CAPTCHA challenge:", err);
+    } finally {
+      setCaptchaLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, [fetchCaptcha]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -66,6 +92,12 @@ function Register() {
       return;
     }
 
+    const captchaTrimmed = captchaInput.trim();
+    if (!captchaTrimmed) {
+      setError("Please enter the 6-character security CAPTCHA verification code.");
+      return;
+    }
+
     if (!form.agreeTerms) {
       setError("Please agree to the Terms of Service and Privacy Policy to continue.");
       return;
@@ -74,11 +106,13 @@ function Register() {
     try {
       setLoading(true);
 
-      // Call backend registration endpoint
+      // Call backend registration endpoint with CAPTCHA verification
       const res = await API.post("/auth/register", {
         name: nameTrimmed,
         email: emailTrimmed,
         password: form.password,
+        captchaToken: captchaData.token,
+        captchaAnswer: captchaTrimmed,
       });
 
       setSuccess(
@@ -105,6 +139,8 @@ function Register() {
         err.response?.data?.message ||
         "Registration could not be completed. Please check your credentials and try again.";
       setError(errMsg);
+      // Refresh CAPTCHA on failure so user gets a fresh challenge
+      fetchCaptcha();
     } finally {
       setLoading(false);
     }
@@ -156,12 +192,12 @@ function Register() {
             </Link>
           </div>
 
-          {/* Right Header Avatar Icon */}
-          <div className="signup-header-avatar" title="Student Identity">
+          {/* Right Header Avatar Icon - Links to Sign In */}
+          <Link to="/login" className="signup-header-avatar" title="Sign In to your account" aria-label="Sign In">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
             </svg>
-          </div>
+          </Link>
         </div>
       </header>
 
@@ -362,6 +398,84 @@ function Register() {
                     </svg>
                   )}
                 </button>
+              </div>
+            </div>
+
+            {/* Security CAPTCHA Verification */}
+            <div className="signup-field-group signup-captcha-group">
+              <div className="signup-label-row">
+                <label className="signup-label" htmlFor="captcha-input">
+                  <span className="signup-label-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                    </svg>
+                  </span>
+                  <span>Security Verification</span>
+                </label>
+                <span className="signup-label-subtext">Case-insensitive</span>
+              </div>
+
+              <div className="signup-captcha-card">
+                <div className="signup-captcha-preview">
+                  {captchaData.svg ? (
+                    <div className="signup-captcha-svg-wrap">
+                      <img
+                        src={`data:image/svg+xml;utf8,${encodeURIComponent(captchaData.svg)}`}
+                        alt="Security verification challenge"
+                        className="signup-captcha-img"
+                      />
+                    </div>
+                  ) : (
+                    <div className="signup-captcha-loading-box">
+                      <span className="signup-spinner" />
+                      <span>Loading challenge...</span>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    className="signup-captcha-refresh-btn"
+                    onClick={fetchCaptcha}
+                    disabled={captchaLoading}
+                    title="Get a new verification challenge"
+                    aria-label="Refresh security code"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={captchaLoading ? "signup-rotating" : ""}
+                    >
+                      <polyline points="23 4 23 10 17 10" />
+                      <polyline points="1 20 1 14 7 14" />
+                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="signup-input-wrap signup-captcha-input-wrap">
+                  <input
+                    id="captcha-input"
+                    type="text"
+                    name="captchaInput"
+                    value={captchaInput}
+                    onChange={(e) => {
+                      setCaptchaInput(e.target.value.toUpperCase());
+                      if (error) setError("");
+                    }}
+                    placeholder="Enter 6-character code"
+                    className="signup-input signup-captcha-input"
+                    maxLength={6}
+                    autoComplete="off"
+                    spellCheck="false"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
