@@ -989,18 +989,18 @@ ul {
 }
 
 .starter-pill-highlight {
-  background: #fbbf24 !important;
-  color: #020617 !important;
-  border: none !important;
-  box-shadow: 0 3px 10px rgba(251, 191, 36, 0.4) !important;
+  background: #000000 !important;
+  color: #ffefb3 !important;
+  border: 1px solid #ffefb366 !important;
+  box-shadow: 0 2px 6px #00000030 !important;
 }
 
 .starter-pill-highlight:hover {
-  background: #ffefb3 !important;
+  background: rgba(255, 239, 179, 0.15) !important;
   border-color: #ffefb3 !important;
-  color: #000000 !important;
+  color: #ffefb3 !important;
   transform: translateY(-1.5px);
-  box-shadow: 0 6px 20px rgba(255, 239, 179, 0.45) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 .starter-pill-highlight:active {
@@ -1417,6 +1417,15 @@ ul {
 
 .chat-modal-clear-btn:hover {
   color: #cbd5e1;
+}
+
+.chat-modal-char-counter {
+  font-size: 11px;
+  color: #fed866;
+  opacity: 0.85;
+  padding: 0 4px;
+  white-space: nowrap;
+  user-select: none;
 }
 
 .chat-modal-metal-wrapper {

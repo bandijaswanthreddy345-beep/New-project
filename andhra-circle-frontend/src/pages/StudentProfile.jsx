@@ -10,7 +10,21 @@ import {
   calculateCgpaFromGrades,
   getStudentAvatar,
   DEFAULT_STUDENT_AVATAR,
+  cleanCollege,
+  cleanSemester,
 } from "../data/studentData";
+import {
+  validateName,
+  validateEmail,
+  validatePhone,
+  validateGradePoint,
+  validateAttendance,
+  validateHallTicket,
+  validateYear,
+  validateSemester,
+  validateBranch,
+  validateProfilePhoto,
+} from "../utils/validators";
 import "./StudentProfile.css";
 
 const POPULAR_BRANCHES = [
@@ -74,6 +88,11 @@ function StudentProfile() {
   // Edit Form State for existing users
   const [editForm, setEditForm] = useState(student);
 
+  // Field validation errors state
+  const [createErrors, setCreateErrors] = useState({});
+  const [editErrors, setEditErrors] = useState({});
+  const [photoError, setPhotoError] = useState("");
+
   // Sync state on mount and when storage updates
   useEffect(() => {
     const handleProfileUpdate = () => {
@@ -99,21 +118,22 @@ function StudentProfile() {
     setEditForm(student);
   }, [student]);
 
-  // Handle Photo Upload via FileReader
+  // Handle Photo Upload with strict validation (image types only, max 2MB)
   const handlePhotoUpload = (e, targetForm = "create") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file (PNG, JPG, JPEG, WEBP).");
+    const validation = validateProfilePhoto(file);
+    if (!validation.ok) {
+      setPhotoError(validation.message);
+      alert(validation.message);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (editFileInputRef.current) editFileInputRef.current.value = "";
+      if (mobileEditFileInputRef.current) mobileEditFileInputRef.current.value = "";
       return;
     }
 
-    if (file.size > 4 * 1024 * 1024) {
-      alert("Photo file size is too large (maximum 4MB). Please select a smaller photo.");
-      return;
-    }
-
+    setPhotoError("");
     const reader = new FileReader();
     reader.onload = () => {
       const base64Data = reader.result;
@@ -136,12 +156,14 @@ function StudentProfile() {
   };
 
   const handleRemovePhoto = (targetForm = "create") => {
+    setPhotoError("");
     if (targetForm === "create") {
       setCreateForm((prev) => ({ ...prev, profilePhoto: "none" }));
       if (fileInputRef.current) fileInputRef.current.value = "";
     } else {
       setEditForm((prev) => ({ ...prev, profilePhoto: "none" }));
       if (editFileInputRef.current) editFileInputRef.current.value = "";
+      if (mobileEditFileInputRef.current) mobileEditFileInputRef.current.value = "";
       const current = getStoredStudentData();
       const updated = {
         ...current,
@@ -151,6 +173,35 @@ function StudentProfile() {
       setStudent(updated);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
+    }
+  };
+
+  // Field validator helper
+  const validateFormField = (name, value, isRequired = true) => {
+    switch (name) {
+      case "name":
+        return validateName(value);
+      case "hallTicket":
+        return validateHallTicket(value);
+      case "email":
+        return validateEmail(value, { required: isRequired });
+      case "phone":
+        return validatePhone(value, { required: isRequired });
+      case "branch":
+        return validateBranch(value);
+      case "year":
+        return validateYear(value);
+      case "semester":
+        return validateSemester(value);
+      case "college": {
+        const trimmed = (value || "").trim();
+        if (isRequired && !trimmed) {
+          return { ok: false, message: "College / Institution name is required." };
+        }
+        return { ok: true, value: trimmed, message: "" };
+      }
+      default:
+        return { ok: true, value, message: "" };
     }
   };
 
@@ -173,13 +224,41 @@ function StudentProfile() {
       return;
     }
     setCreateForm((prev) => ({ ...prev, [name]: value }));
+    // Clear error for field as user types
+    if (createErrors[name]) {
+      setCreateErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  // Creation blur validation handler
+  const handleCreateBlur = (e) => {
+    const { name, value } = e.target;
+    if (name === "branchSelect") return;
+    const res = validateFormField(name, value, true);
+    setCreateErrors((prev) => ({
+      ...prev,
+      [name]: res.ok ? "" : res.message,
+    }));
   };
 
   // Creation semester grade change handler
   const handleCreateSemGradeChange = (semIndex, sgpaVal) => {
+    const numericVal = sgpaVal.trim();
+    if (numericVal !== "") {
+      const gCheck = validateGradePoint(numericVal, `Sem ${semIndex + 1} SGPA`);
+      setCreateErrors((prev) => ({
+        ...prev,
+        [`sem_${semIndex}`]: gCheck.ok ? "" : gCheck.message,
+      }));
+    } else {
+      setCreateErrors((prev) => ({
+        ...prev,
+        [`sem_${semIndex}`]: "",
+      }));
+    }
+
     setCreateForm((prev) => {
       const updatedGrades = [...prev.semesterGrades];
-      const numericVal = sgpaVal.trim();
       updatedGrades[semIndex] = {
         ...updatedGrades[semIndex],
         sgpa: numericVal,
@@ -193,13 +272,40 @@ function StudentProfile() {
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({ ...prev, [name]: value }));
+    if (editErrors[name]) {
+      setEditErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  // Edit blur validation handler
+  const handleEditBlur = (e) => {
+    const { name, value } = e.target;
+    const isRequired = name === "name" || name === "hallTicket" || name === "branch" || name === "college";
+    const res = validateFormField(name, value, isRequired);
+    setEditErrors((prev) => ({
+      ...prev,
+      [name]: res.ok ? "" : res.message,
+    }));
   };
 
   // Edit semester grade change handler
   const handleEditSemGradeChange = (semIndex, sgpaVal) => {
+    const numericVal = sgpaVal.trim();
+    if (numericVal !== "") {
+      const gCheck = validateGradePoint(numericVal, `Sem ${semIndex + 1} SGPA`);
+      setEditErrors((prev) => ({
+        ...prev,
+        [`sem_${semIndex}`]: gCheck.ok ? "" : gCheck.message,
+      }));
+    } else {
+      setEditErrors((prev) => ({
+        ...prev,
+        [`sem_${semIndex}`]: "",
+      }));
+    }
+
     setEditForm((prev) => {
       const updatedGrades = [...(prev.semesterGrades || INITIAL_SEMESTERS)];
-      const numericVal = sgpaVal.trim();
       updatedGrades[semIndex] = {
         ...updatedGrades[semIndex],
         sgpa: numericVal,
@@ -213,34 +319,59 @@ function StudentProfile() {
   const handleCreateProfileSubmit = (e) => {
     e.preventDefault();
 
-    if (!createForm.name.trim()) {
-      alert("Please enter your full name.");
-      return;
-    }
-    if (!createForm.hallTicket.trim()) {
-      alert("Please enter your USN / Hall Ticket Number.");
-      return;
+    const errors = {};
+    const nameCheck = validateName(createForm.name);
+    if (!nameCheck.ok) errors.name = nameCheck.message;
+
+    const htCheck = validateHallTicket(createForm.hallTicket);
+    if (!htCheck.ok) errors.hallTicket = htCheck.message;
+
+    if (!createForm.college?.trim()) {
+      errors.college = "College / Institution name is required.";
     }
 
+    const emailCheck = validateEmail(createForm.email, { required: true });
+    if (!emailCheck.ok) errors.email = emailCheck.message;
+
+    const phoneCheck = validatePhone(createForm.phone, { required: true });
+    if (!phoneCheck.ok) errors.phone = phoneCheck.message;
+
+    const attCheck = validateAttendance(createForm.attendancePercentage);
+    if (!attCheck.ok) errors.attendance = attCheck.message;
+
+    // Check SGPA inputs in semester grades
+    createForm.semesterGrades.forEach((sem, idx) => {
+      if (sem.sgpa && sem.sgpa.trim()) {
+        const gCheck = validateGradePoint(sem.sgpa, `Sem ${idx + 1} SGPA`);
+        if (!gCheck.ok) errors[`sem_${idx}`] = gCheck.message;
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setCreateErrors(errors);
+      return; // Block saving! Retain typed user text completely.
+    }
+
+    setCreateErrors({});
     const calculatedCgpa = calculateCgpaFromGrades(createForm.semesterGrades);
     const filledSems = createForm.semesterGrades.filter((g) => g.sgpa && !isNaN(g.sgpa)).length;
     const completedCredits = filledSems * 20;
 
     const newProfile = {
       ...EMPTY_STUDENT_DATA,
-      name: createForm.name.trim(),
-      shortName: createForm.name.trim().split(" ")[0] || "Student",
-      hallTicket: createForm.hallTicket.trim().toUpperCase(),
+      name: nameCheck.value,
+      shortName: nameCheck.value.split(" ")[0] || "Student",
+      hallTicket: htCheck.value,
       branch: createForm.branch || "Computer Science & Engineering",
       branchCode: createForm.branchCode || "CSE",
       college: createForm.college.trim() || "JNTU Affiliated Institution",
-      email: createForm.email.trim(),
-      phone: createForm.phone.trim(),
+      email: emailCheck.value,
+      phone: phoneCheck.value,
       year: createForm.year || "1st Year",
       semester: createForm.semester || "1st Semester",
       regulation: createForm.regulation || "R23 Regulation",
-      attendancePercentage: Number(createForm.attendancePercentage) || 75,
-      attendance: `${Number(createForm.attendancePercentage) || 75}%`,
+      attendancePercentage: attCheck.value,
+      attendance: attCheck.formatted,
       profilePhoto: createForm.profilePhoto,
       semesterGrades: createForm.semesterGrades,
       cgpa: calculatedCgpa || "0.00",
@@ -258,16 +389,74 @@ function StudentProfile() {
   // Edit Profile Save Submission
   const handleSaveProfile = (e) => {
     e.preventDefault();
+
+    const errors = {};
+    const nameCheck = validateName(editForm.name);
+    if (!nameCheck.ok) errors.name = nameCheck.message;
+
+    const htCheck = validateHallTicket(editForm.hallTicket);
+    if (!htCheck.ok) errors.hallTicket = htCheck.message;
+
+    const branchCheck = validateBranch(editForm.branch);
+    if (!branchCheck.ok) errors.branch = branchCheck.message;
+
+    if (!editForm.college?.trim()) {
+      errors.college = "College / Institution name is required.";
+    }
+
+    if (editForm.email && editForm.email.trim()) {
+      const emailCheck = validateEmail(editForm.email, { required: false });
+      if (!emailCheck.ok) errors.email = emailCheck.message;
+    }
+
+    if (editForm.phone && editForm.phone.trim()) {
+      const phoneCheck = validatePhone(editForm.phone, { required: false });
+      if (!phoneCheck.ok) errors.phone = phoneCheck.message;
+    }
+
+    if (editForm.year) {
+      const yearCheck = validateYear(editForm.year);
+      if (!yearCheck.ok) errors.year = yearCheck.message;
+    }
+
+    if (editForm.semester) {
+      const semCheck = validateSemester(editForm.semester);
+      if (!semCheck.ok) errors.semester = semCheck.message;
+    }
+
+    if (editForm.attendancePercentage !== undefined && editForm.attendancePercentage !== "") {
+      const attCheck = validateAttendance(editForm.attendancePercentage);
+      if (!attCheck.ok) errors.attendance = attCheck.message;
+    }
+
+    (editForm.semesterGrades || []).forEach((sem, idx) => {
+      if (sem.sgpa && String(sem.sgpa).trim()) {
+        const gCheck = validateGradePoint(sem.sgpa, `Sem ${idx + 1} SGPA`);
+        if (!gCheck.ok) errors[`sem_${idx}`] = gCheck.message;
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setEditErrors(errors);
+      return; // Block saving! Retain typed user text.
+    }
+
+    setEditErrors({});
     const calculatedCgpa = calculateCgpaFromGrades(editForm.semesterGrades);
     const filledSems = (editForm.semesterGrades || []).filter((g) => g.sgpa && !isNaN(g.sgpa)).length;
     const completedCredits = filledSems * 20;
 
+    const attVal = Number(editForm.attendancePercentage) || 75;
     const updated = {
       ...student,
       ...editForm,
-      shortName: editForm.name ? editForm.name.trim().split(" ")[0] : "Student",
-      attendancePercentage: Number(editForm.attendancePercentage) || 75,
-      attendance: `${Number(editForm.attendancePercentage) || 75}%`,
+      name: nameCheck.value,
+      shortName: nameCheck.value.split(" ")[0] || "Student",
+      hallTicket: htCheck.value,
+      branch: branchCheck.ok ? branchCheck.value : editForm.branch,
+      branchCode: branchCheck.ok ? branchCheck.code : (editForm.branchCode || "CSE"),
+      attendancePercentage: attVal,
+      attendance: `${attVal}%`,
       cgpa: calculatedCgpa || editForm.cgpa || "0.00",
       credits: `${completedCredits} / 160`,
       isConfigured: true,
@@ -494,6 +683,7 @@ function StudentProfile() {
                       </button>
                     )}
                   </div>
+                  {photoError && <span className="sp-photo-error" role="alert">{photoError}</span>}
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -523,9 +713,14 @@ function StudentProfile() {
                     name="name"
                     value={createForm.name}
                     onChange={handleCreateChange}
+                    onBlur={handleCreateBlur}
+                    aria-invalid={Boolean(createErrors.name)}
                     placeholder="e.g. Bandi Jaswanth Reddy"
                     required
                   />
+                  {createErrors.name && (
+                    <span className="sp-field-error" role="alert">{createErrors.name}</span>
+                  )}
                 </div>
 
                 <div className="sp-input-box">
@@ -535,9 +730,14 @@ function StudentProfile() {
                     name="hallTicket"
                     value={createForm.hallTicket}
                     onChange={handleCreateChange}
+                    onBlur={handleCreateBlur}
+                    aria-invalid={Boolean(createErrors.hallTicket)}
                     placeholder="e.g. 21691A0501"
                     required
                   />
+                  {createErrors.hallTicket && (
+                    <span className="sp-field-error" role="alert">{createErrors.hallTicket}</span>
+                  )}
                 </div>
 
                 <div className="sp-input-box">
@@ -565,9 +765,14 @@ function StudentProfile() {
                       name="branch"
                       value={createForm.branch}
                       onChange={handleCreateChange}
+                      onBlur={handleCreateBlur}
+                      aria-invalid={Boolean(createErrors.branch)}
                       placeholder="e.g. Chemical Engineering (CHEM)"
                       required
                     />
+                    {createErrors.branch && (
+                      <span className="sp-field-error" role="alert">{createErrors.branch}</span>
+                    )}
                   </div>
                 )}
 
@@ -578,9 +783,14 @@ function StudentProfile() {
                     name="college"
                     value={createForm.college}
                     onChange={handleCreateChange}
+                    onBlur={handleCreateBlur}
+                    aria-invalid={Boolean(createErrors.college)}
                     placeholder="e.g. Madanapalle Institute of Technology & Science"
                     required
                   />
+                  {createErrors.college && (
+                    <span className="sp-field-error" role="alert">{createErrors.college}</span>
+                  )}
                 </div>
 
                 <div className="sp-input-box">
@@ -590,9 +800,14 @@ function StudentProfile() {
                     name="email"
                     value={createForm.email}
                     onChange={handleCreateChange}
+                    onBlur={handleCreateBlur}
+                    aria-invalid={Boolean(createErrors.email)}
                     placeholder="e.g. jaswanth@gmail.com"
                     required
                   />
+                  {createErrors.email && (
+                    <span className="sp-field-error" role="alert">{createErrors.email}</span>
+                  )}
                 </div>
 
                 <div className="sp-input-box">
@@ -602,9 +817,14 @@ function StudentProfile() {
                     name="phone"
                     value={createForm.phone}
                     onChange={handleCreateChange}
+                    onBlur={handleCreateBlur}
+                    aria-invalid={Boolean(createErrors.phone)}
                     placeholder="e.g. +91 98765 43210"
                     required
                   />
+                  {createErrors.phone && (
+                    <span className="sp-field-error" role="alert">{createErrors.phone}</span>
+                  )}
                 </div>
 
                 <div className="sp-input-box">
@@ -843,27 +1063,20 @@ function StudentProfile() {
               <div className="sp-identity-details">
                 <div className="sp-name-badge-row">
                   <h1 className="sp-main-name">{student.name}</h1>
-                  <span className="sp-verified-pill">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                      <polyline points="9 12 11 14 15 10" />
-                    </svg>
-                    Verified Student
-                  </span>
                 </div>
                 <p className="sp-main-subtext">
                   <strong className="sp-main-roll">{student.hallTicket}</strong>
                    
                   <span>{student.branch} ({student.branchCode})</span>
                    
-                  <span className="sp-highlight-gold">{student.year} ({student.semester})</span>
+                  <span className="sp-highlight-gold">{student.year || "3rd Year"} ({cleanSemester(student.semester)})</span>
                 </p>
                 <p className="sp-college-subtext">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sp-inst-icon">
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
                     <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
                   </svg>
-                  <span>{student.college}</span>
+                  <span>{cleanCollege(student.college)}</span>
                 </p>
               </div>
             </div>
@@ -999,7 +1212,7 @@ function StudentProfile() {
                     </div>
                     <div className="sp-info-card">
                       <span className="sp-info-label">College / Institution</span>
-                      <span className="sp-info-data">{student.college}</span>
+                      <span className="sp-info-data">{cleanCollege(student.college)}</span>
                     </div>
                     <div className="sp-info-card">
                       <span className="sp-info-label">Affiliated University</span>
@@ -1007,7 +1220,7 @@ function StudentProfile() {
                     </div>
                     <div className="sp-info-card">
                       <span className="sp-info-label">Academic Level</span>
-                      <span className="sp-info-data">{student.year} | {student.semester}</span>
+                      <span className="sp-info-data">{student.year || "3rd Year"} | {cleanSemester(student.semester)}</span>
                     </div>
                     <div className="sp-info-card">
                       <span className="sp-info-label">Curriculum Regulation</span>
@@ -1273,8 +1486,13 @@ function StudentProfile() {
                           name="name"
                           value={editForm.name || ""}
                           onChange={handleEditChange}
+                          onBlur={handleEditBlur}
+                          aria-invalid={Boolean(editErrors.name)}
                           required
                         />
+                        {editErrors.name && (
+                          <span className="sp-field-error" role="alert">{editErrors.name}</span>
+                        )}
                       </div>
 
                       <div className="sp-input-group">
@@ -1284,8 +1502,13 @@ function StudentProfile() {
                           name="hallTicket"
                           value={editForm.hallTicket || ""}
                           onChange={handleEditChange}
+                          onBlur={handleEditBlur}
+                          aria-invalid={Boolean(editErrors.hallTicket)}
                           required
                         />
+                        {editErrors.hallTicket && (
+                          <span className="sp-field-error" role="alert">{editErrors.hallTicket}</span>
+                        )}
                       </div>
                     </div>
 
@@ -1297,8 +1520,13 @@ function StudentProfile() {
                           name="branch"
                           value={editForm.branch || ""}
                           onChange={handleEditChange}
+                          onBlur={handleEditBlur}
+                          aria-invalid={Boolean(editErrors.branch)}
                           required
                         />
+                        {editErrors.branch && (
+                          <span className="sp-field-error" role="alert">{editErrors.branch}</span>
+                        )}
                       </div>
 
                       <div className="sp-input-group">
@@ -1308,8 +1536,13 @@ function StudentProfile() {
                           name="branchCode"
                           value={editForm.branchCode || ""}
                           onChange={handleEditChange}
+                          onBlur={handleEditBlur}
+                          aria-invalid={Boolean(editErrors.branchCode)}
                           required
                         />
+                        {editErrors.branchCode && (
+                          <span className="sp-field-error" role="alert">{editErrors.branchCode}</span>
+                        )}
                       </div>
                     </div>
 
@@ -1320,8 +1553,13 @@ function StudentProfile() {
                         name="college"
                         value={editForm.college || ""}
                         onChange={handleEditChange}
+                        onBlur={handleEditBlur}
+                        aria-invalid={Boolean(editErrors.college)}
                         required
                       />
+                      {editErrors.college && (
+                        <span className="sp-field-error" role="alert">{editErrors.college}</span>
+                      )}
                     </div>
 
                     <div className="sp-form-row-2">
@@ -1332,7 +1570,12 @@ function StudentProfile() {
                           name="email"
                           value={editForm.email || ""}
                           onChange={handleEditChange}
+                          onBlur={handleEditBlur}
+                          aria-invalid={Boolean(editErrors.email)}
                         />
+                        {editErrors.email && (
+                          <span className="sp-field-error" role="alert">{editErrors.email}</span>
+                        )}
                       </div>
 
                       <div className="sp-input-group">
@@ -1342,7 +1585,12 @@ function StudentProfile() {
                           name="phone"
                           value={editForm.phone || ""}
                           onChange={handleEditChange}
+                          onBlur={handleEditBlur}
+                          aria-invalid={Boolean(editErrors.phone)}
                         />
+                        {editErrors.phone && (
+                          <span className="sp-field-error" role="alert">{editErrors.phone}</span>
+                        )}
                       </div>
                     </div>
 
@@ -1354,7 +1602,12 @@ function StudentProfile() {
                           name="year"
                           value={editForm.year || ""}
                           onChange={handleEditChange}
+                          onBlur={handleEditBlur}
+                          aria-invalid={Boolean(editErrors.year)}
                         />
+                        {editErrors.year && (
+                          <span className="sp-field-error" role="alert">{editErrors.year}</span>
+                        )}
                       </div>
 
                       <div className="sp-input-group">
@@ -1364,7 +1617,12 @@ function StudentProfile() {
                           name="semester"
                           value={editForm.semester || ""}
                           onChange={handleEditChange}
+                          onBlur={handleEditBlur}
+                          aria-invalid={Boolean(editErrors.semester)}
                         />
+                        {editErrors.semester && (
+                          <span className="sp-field-error" role="alert">{editErrors.semester}</span>
+                        )}
                       </div>
                     </div>
 
@@ -1396,6 +1654,9 @@ function StudentProfile() {
                           }
                           className="sp-att-range-slider"
                         />
+                        {editErrors.attendance && (
+                          <span className="sp-field-error" role="alert">{editErrors.attendance}</span>
+                        )}
                       </div>
                     </div>
 
@@ -1421,8 +1682,12 @@ function StudentProfile() {
                               placeholder="SGPA"
                               value={sem.sgpa || ""}
                               onChange={(e) => handleEditSemGradeChange(idx, e.target.value)}
+                              aria-invalid={Boolean(editErrors[`sem_${idx}`])}
                               className="sp-sem-score-input"
                             />
+                            {editErrors[`sem_${idx}`] && (
+                              <span className="sp-field-error" role="alert">{editErrors[`sem_${idx}`]}</span>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -1582,7 +1847,7 @@ function StudentProfile() {
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                  {student.year || "3rd Year"} ({student.semester || "6th Semester"})
+                  {student.year || "3rd Year"} ({cleanSemester(student.semester)})
                 </span>
               </div>
             </div>
@@ -1782,11 +2047,11 @@ function StudentProfile() {
                   </div>
                   <div className="sp-m-detail-box">
                     <p className="sp-m-detail-lbl">ACADEMIC LEVEL</p>
-                    <p className="sp-m-detail-val font-bold">{student.year || "3rd Year"} | {student.semester || "6th Semester"}</p>
+                    <p className="sp-m-detail-val font-bold">{student.year || "3rd Year"} | {cleanSemester(student.semester)}</p>
                   </div>
                   <div className="sp-m-detail-box">
                     <p className="sp-m-detail-lbl">COLLEGE / INSTITUTION</p>
-                    <p className="sp-m-detail-val font-semibold">{student.college || "JNTU College of Engineering"}</p>
+                    <p className="sp-m-detail-val font-semibold">{cleanCollege(student.college)}</p>
                   </div>
                   <div className="sp-m-detail-box">
                     <p className="sp-m-detail-lbl">AFFILIATED UNIVERSITY & REGULATION</p>
@@ -1939,8 +2204,13 @@ function StudentProfile() {
                       name="name"
                       value={editForm.name || ""}
                       onChange={handleEditChange}
+                      onBlur={handleEditBlur}
+                      aria-invalid={Boolean(editErrors.name)}
                       required
                     />
+                    {editErrors.name && (
+                      <span className="sp-field-error" role="alert">{editErrors.name}</span>
+                    )}
                   </div>
                   <div className="sp-m-input-item">
                     <label>Hall Ticket / Roll No.</label>
@@ -1949,8 +2219,13 @@ function StudentProfile() {
                       name="hallTicket"
                       value={editForm.hallTicket || ""}
                       onChange={handleEditChange}
+                      onBlur={handleEditBlur}
+                      aria-invalid={Boolean(editErrors.hallTicket)}
                       required
                     />
+                    {editErrors.hallTicket && (
+                      <span className="sp-field-error" role="alert">{editErrors.hallTicket}</span>
+                    )}
                   </div>
                   <div className="sp-m-input-item">
                     <label>Department / Branch</label>
@@ -1959,8 +2234,13 @@ function StudentProfile() {
                       name="branch"
                       value={editForm.branch || ""}
                       onChange={handleEditChange}
+                      onBlur={handleEditBlur}
+                      aria-invalid={Boolean(editErrors.branch)}
                       required
                     />
+                    {editErrors.branch && (
+                      <span className="sp-field-error" role="alert">{editErrors.branch}</span>
+                    )}
                   </div>
                   <div className="sp-m-input-item">
                     <label>Email Address</label>
@@ -1969,7 +2249,12 @@ function StudentProfile() {
                       name="email"
                       value={editForm.email || ""}
                       onChange={handleEditChange}
+                      onBlur={handleEditBlur}
+                      aria-invalid={Boolean(editErrors.email)}
                     />
+                    {editErrors.email && (
+                      <span className="sp-field-error" role="alert">{editErrors.email}</span>
+                    )}
                   </div>
                   <div className="sp-m-input-item">
                     <label>Contact Phone</label>
@@ -1978,7 +2263,12 @@ function StudentProfile() {
                       name="phone"
                       value={editForm.phone || ""}
                       onChange={handleEditChange}
+                      onBlur={handleEditBlur}
+                      aria-invalid={Boolean(editErrors.phone)}
                     />
+                    {editErrors.phone && (
+                      <span className="sp-field-error" role="alert">{editErrors.phone}</span>
+                    )}
                   </div>
                   <div className="sp-m-edit-actions">
                     <button type="button" className="sp-m-btn-cancel" onClick={() => setActiveTab("overview")}>

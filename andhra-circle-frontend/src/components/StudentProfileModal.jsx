@@ -1,6 +1,12 @@
 import React from "react";
 import "./StudentProfileModal.css";
-import { getStoredStudentData, getStudentAvatar, DEFAULT_STUDENT_AVATAR } from "../data/studentData";
+import {
+  getStoredStudentData,
+  getStudentAvatar,
+  DEFAULT_STUDENT_AVATAR,
+  cleanCollege,
+  cleanSemester,
+} from "../data/studentData";
 
 function StudentProfileModal({ isOpen, onClose }) {
   if (!isOpen) return null;
@@ -22,11 +28,11 @@ function StudentProfileModal({ isOpen, onClose }) {
   const displayBranch = sanitize(student.branch, "Electrical & Electronics Engineering (EEE)");
   const displayHallTicket = sanitize(student.hallTicket, "STGHJTY");
   const displayYear = sanitize(student.year, "3rd Year");
-  const displaySemester = sanitize(student.semester, "6th Semester");
+  const displaySemester = cleanSemester(sanitize(student.semester, "6th Semester"));
   const displayRegulation = sanitize(student.regulation, "R16 Regulation");
   const displayCgpa = student.cgpa && !isNaN(student.cgpa) ? student.cgpa : "8.88";
   const displayAttendance = student.attendance || "75%";
-  const displayCollege = sanitize(student.college, "JNTU College of Engineering");
+  const displayCollege = cleanCollege(sanitize(student.college, "JNTU College of Engineering"));
 
   return (
     <div className="sp-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">

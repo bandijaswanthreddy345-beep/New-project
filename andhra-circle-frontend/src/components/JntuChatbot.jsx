@@ -12,7 +12,6 @@ import {
   getBranchHubData,
   getAcademicKnowledgeAnswer,
   getSemesterCurriculumAnswer,
-  BRANCH_DIRECTORY,
 } from "../utils/searchEngine";
 import {
   getConversationalAnswer,
@@ -20,6 +19,15 @@ import {
   getStudyAdviceAnswer,
   synthesizeDynamicAcademicResponse,
 } from "../utils/aiReasoningEngine";
+import {
+  validateName,
+  validateHallTicket,
+  validateGradePoint,
+  validateAttendance,
+  validateBranch,
+  validateSemester,
+  validateRegulation,
+} from "../utils/validators";
 
 /**
  * Interactive Branch Showcase component rendered inside chatbot messages.
@@ -379,92 +387,7 @@ function formatBotText(text) {
   );
 }
 
-/**
- * Automatically computes academic Year and Semester from student's semester input.
- * Supports JNTU notation ("3-2", "2-1", "1-1"), numerical sem ("Sem 6", "6th sem", "6"),
- * and descriptive input ("3rd Year, 6th Sem").
- */
-function detectYearAndSemester(rawQuery) {
-  const str = (rawQuery || "").toLowerCase().trim();
 
-  // 1. Direct JNTU year-sem notation: e.g. "3-2", "2-1", "1-1", "4-2"
-  const jntuMatch = str.match(/\b([1-4])\s*[-–]\s*([1-2])\b/);
-  if (jntuMatch) {
-    const yr = parseInt(jntuMatch[1]);
-    const sm = parseInt(jntuMatch[2]);
-    const semNum = (yr - 1) * 2 + sm;
-    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
-    return {
-      year: yearLabels[yr - 1],
-      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
-      semCode: `${yr}-${sm}`,
-      semIndex: semNum,
-    };
-  }
-
-  // 2. Semester keywords: e.g. "sem 6", "6th sem", "semester 4", "4th semester"
-  const semWordMatch = str.match(/(?:sem|semester)\s*([1-8])\b|\b([1-8])(?:st|nd|rd|th)?\s*(?:sem|semester)\b/);
-  if (semWordMatch) {
-    const semNum = parseInt(semWordMatch[1] || semWordMatch[2]);
-    const yr = Math.ceil(semNum / 2);
-    const sm = ((semNum - 1) % 2) + 1;
-    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
-    return {
-      year: yearLabels[yr - 1],
-      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
-      semCode: `${yr}-${sm}`,
-      semIndex: semNum,
-    };
-  }
-
-  // 3. Comma-separated or compound input: e.g. "3rd Year, 6th Sem"
-  if (str.includes(",")) {
-    const parts = str.split(",");
-    const yrPart = parts[0]?.trim();
-    const semPart = parts[1]?.trim();
-    const detectedYrMatch = yrPart.match(/\b([1-4])\b/);
-    const detectedSemMatch = semPart.match(/\b([1-8])\b/);
-    if (detectedYrMatch && detectedSemMatch) {
-      const yr = parseInt(detectedYrMatch[1]);
-      const semNum = parseInt(detectedSemMatch[1]);
-      const sm = ((semNum - 1) % 2) + 1;
-      const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-      const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
-      return {
-        year: yearLabels[yr - 1],
-        semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
-        semCode: `${yr}-${sm}`,
-        semIndex: semNum,
-      };
-    }
-  }
-
-  // 4. Single digit 1 to 8: e.g. "6", "4", "2"
-  const digitMatch = str.match(/\b([1-8])\b/);
-  if (digitMatch) {
-    const semNum = parseInt(digitMatch[1]);
-    const yr = Math.ceil(semNum / 2);
-    const sm = ((semNum - 1) % 2) + 1;
-    const yearLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-    const semLabels = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
-    return {
-      year: yearLabels[yr - 1],
-      semester: `${semLabels[semNum - 1]} Semester (${yr}-${sm})`,
-      semCode: `${yr}-${sm}`,
-      semIndex: semNum,
-    };
-  }
-
-  // Fallback defaults
-  return {
-    year: "3rd Year",
-    semester: "6th Semester (3-2)",
-    semCode: "3-2",
-    semIndex: 6,
-  };
-}
 
 function JntuChatbot() {
   const [messages, setMessages] = useState([]);
@@ -654,15 +577,22 @@ function JntuChatbot() {
     const q = rawQuery.toLowerCase().trim();
 
     // =========================================================
-    // 1. ACTIVE PROFILE BUILDER WIZARD STEPS
+    // 1. ACTIVE PROFILE BUILDER WIZARD STEPS (WITH STRICT INPUT VALIDATION)
     // =========================================================
     if (currentSession.active && currentSession.step) {
       const step = currentSession.step;
       const draft = { ...currentSession.draft };
 
       if (step === "NAME") {
-        draft.name = rawQuery.trim();
-        draft.shortName = rawQuery.trim().split(" ")[0];
+        const nameVal = validateName(rawQuery);
+        if (!nameVal.ok) {
+          return {
+            text: `${nameVal.message} What is your full name?`,
+            wizardActive: true,
+          };
+        }
+        draft.name = nameVal.value;
+        draft.shortName = nameVal.value.split(" ")[0];
         setProfileSession({ active: true, step: "HALLTICKET", draft });
         return {
           text: `Awesome, ${draft.name}! What is your JNTU Hall Ticket / USN Roll Number? (e.g. 22B91A4201)`,
@@ -671,7 +601,14 @@ function JntuChatbot() {
       }
 
       if (step === "HALLTICKET") {
-        draft.hallTicket = rawQuery.trim().toUpperCase();
+        const htVal = validateHallTicket(rawQuery);
+        if (!htVal.ok) {
+          return {
+            text: `${htVal.message} What is your JNTU Hall Ticket / USN Roll Number?`,
+            wizardActive: true,
+          };
+        }
+        draft.hallTicket = htVal.value;
         setProfileSession({ active: true, step: "BRANCH", draft });
         return {
           text: `Got it (${draft.hallTicket})! What is your Department / Engineering Branch?`,
@@ -681,41 +618,52 @@ function JntuChatbot() {
       }
 
       if (step === "BRANCH") {
-        const branchCode = rawQuery.trim().toUpperCase();
-        draft.branchCode = branchCode;
-        const branchNames = {
-          AIML: "Artificial Intelligence & Machine Learning",
-          CSE: "Computer Science Engineering",
-          ECE: "Electronics & Communication Engineering",
-          EEE: "Electrical & Electronics Engineering",
-          MECH: "Mechanical Engineering",
-          ME: "Mechanical Engineering",
-          CIVIL: "Civil Engineering",
-          CE: "Civil Engineering",
-        };
-        draft.branch = branchNames[branchCode] || `${branchCode} Engineering`;
+        const branchVal = validateBranch(rawQuery);
+        if (!branchVal.ok) {
+          return {
+            text: `${branchVal.message} What is your Department / Engineering Branch?`,
+            suggestions: ["AIML", "CSE", "ECE", "EEE", "MECH", "CIVIL"],
+            wizardActive: true,
+          };
+        }
+        draft.branchCode = branchVal.code;
+        draft.branch = branchVal.value;
         setProfileSession({ active: true, step: "SEMESTER", draft });
         return {
-          text: `Great, ${draft.branch}! Which Semester are you currently in? (e.g. 3-2, 2-1, 1st Sem)`,
+          text: `Great, ${draft.branch}! Which Semester are you currently in? (e.g. 1st Semester, 3-2, or Sem 6)`,
           wizardActive: true,
         };
       }
 
       if (step === "SEMESTER" || step === "YEAR_SEM") {
-        const detected = detectYearAndSemester(rawQuery);
-        draft.year = detected.year;
-        draft.semester = detected.semester;
-        draft.semCode = detected.semCode;
+        const semVal = validateSemester(rawQuery);
+        if (!semVal.ok) {
+          return {
+            text: `${semVal.message} Which Semester are you currently in?`,
+            wizardActive: true,
+          };
+        }
+        draft.year = semVal.year;
+        draft.semester = semVal.value;
+        draft.semCode = semVal.semCode;
         setProfileSession({ active: true, step: "REGULATION", draft });
         return {
-          text: `Got it, ${detected.year} (${detected.semCode})! Which Academic Regulation applies to you?`,
+          text: `Got it, ${semVal.year} (${semVal.semCode})! Which Academic Regulation applies to you?`,
           suggestions: ["R23 Regulation", "R20 Regulation", "R19 Regulation", "R16 Regulation"],
           wizardActive: true,
         };
       }
 
       if (step === "REGULATION") {
-        draft.regulation = rawQuery.includes("R") ? rawQuery.trim() : `${rawQuery.trim()} Regulation`;
+        const regVal = validateRegulation(rawQuery);
+        if (!regVal.ok) {
+          return {
+            text: `${regVal.message} Which Academic Regulation applies to you?`,
+            suggestions: ["R23 Regulation", "R20 Regulation", "R19 Regulation", "R16 Regulation"],
+            wizardActive: true,
+          };
+        }
+        draft.regulation = regVal.value;
         setProfileSession({ active: true, step: "CGPA", draft });
         return {
           text: `What is your current Cumulative CGPA? (e.g. 8.85)`,
@@ -724,17 +672,31 @@ function JntuChatbot() {
       }
 
       if (step === "CGPA") {
-        const num = parseFloat(rawQuery.replace(/[^0-9.]/g, "")) || 8.5;
-        draft.cgpa = num.toFixed(2);
+        const cgpaVal = validateGradePoint(rawQuery, "CGPA");
+        if (!cgpaVal.ok) {
+          return {
+            text: `${cgpaVal.message} What is your current Cumulative CGPA? (e.g. 8.85)`,
+            wizardActive: true,
+          };
+        }
+        draft.cgpa = cgpaVal.value;
         setProfileSession({ active: true, step: "ATTENDANCE", draft });
         return {
-          text: `What is your current Attendance Percentage? (e.g. 89.4%)`,
+          text: `What is your current Attendance Percentage? (e.g. 85%)`,
           wizardActive: true,
         };
       }
 
       if (step === "ATTENDANCE") {
-        draft.attendance = rawQuery.includes("%") ? rawQuery.trim() : `${rawQuery.trim()}%`;
+        const attVal = validateAttendance(rawQuery);
+        if (!attVal.ok) {
+          return {
+            text: `${attVal.message} What is your current Attendance Percentage? (e.g. 85%)`,
+            wizardActive: true,
+          };
+        }
+        draft.attendance = attVal.formatted;
+        draft.attendancePercentage = attVal.value;
         draft.credits = draft.credits || "132 / 160";
         draft.role = "Student";
 
@@ -1020,8 +982,10 @@ function JntuChatbot() {
   };
 
   const handleSend = async (textToSend) => {
-    const query = (textToSend || "").trim();
-    if (!query) return;
+    // Trim and ignore empty or whitespace-only messages, enforce hard limit of 1000 characters
+    const raw = (textToSend || "").trim();
+    if (!raw) return;
+    const query = raw.slice(0, 1000);
 
     // Immediately open the overlay modal
     setIsModalOpen(true);
@@ -1219,6 +1183,7 @@ function JntuChatbot() {
             ref={inputRef}
             type="text"
             className="hero-ai-input"
+            maxLength={1000}
             placeholder={
               isListening && listeningTarget === "hero"
                 ? "🎙️ Listening... speak your question now..."
@@ -1261,7 +1226,7 @@ function JntuChatbot() {
         <div className="hero-ai-starter-chips">
           <button
             type="button"
-            className="hero-ai-starter-pill starter-pill-highlight"
+            className="hero-ai-quick-pill"
             onClick={handleStartProfileBuilder}
           >
             <span>Build Student Profile</span>
@@ -1813,6 +1778,7 @@ function JntuChatbot() {
                   ref={modalInputRef}
                   type="text"
                   className="chat-modal-input-field"
+                  maxLength={1000}
                   placeholder={
                     isListening && listeningTarget === "modal"
                       ? "🎙️ Listening... speak your message now..."
@@ -1839,6 +1805,12 @@ function JntuChatbot() {
                   onKeyDown={handleModalKeyDown}
                   autoComplete="off"
                 />
+
+                {modalInput.length >= 800 && (
+                  <span className="chat-modal-char-counter" title="Character count">
+                    {modalInput.length}/1000
+                  </span>
+                )}
 
                 {hasModalInput && (
                   <button
