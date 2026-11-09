@@ -239,7 +239,7 @@ function Register() {
                   name="fullName"
                   value={form.fullName}
                   onChange={handleChange}
-                  placeholder="e.g. Jaswanth Reddy"
+                  placeholder="Enter your full name"
                   className="signup-input"
                   autoComplete="name"
                   required
@@ -264,7 +264,7 @@ function Register() {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="e.g. name@example.com"
+                  placeholder="Enter your email address"
                   className="signup-input"
                   autoComplete="email"
                   required
@@ -292,7 +292,7 @@ function Register() {
                   name="password"
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="signup-input signup-input-pwd"
                   autoComplete="new-password"
                   minLength={8}
@@ -337,7 +337,7 @@ function Register() {
                   name="confirmPassword"
                   value={form.confirmPassword}
                   onChange={handleChange}
-                  placeholder="••••••••"
+                  placeholder="Re-enter your password"
                   className="signup-input signup-input-pwd"
                   autoComplete="new-password"
                   minLength={8}

@@ -649,7 +649,7 @@ function StudentProfile() {
             onChange={handleCreateChange}
             onBlur={handleCreateBlur}
             aria-invalid={Boolean(createErrors.name)}
-            placeholder="e.g. Bandi Jaswanth Reddy"
+            placeholder="Enter full student name"
             required
           />
           {createErrors.name && (
@@ -666,7 +666,7 @@ function StudentProfile() {
             onChange={handleCreateChange}
             onBlur={handleCreateBlur}
             aria-invalid={Boolean(createErrors.hallTicket)}
-            placeholder="e.g. 21B91A0201"
+            placeholder="Enter 10-digit Hall Ticket / USN"
             required
           />
           {createErrors.hallTicket && (
@@ -701,7 +701,7 @@ function StudentProfile() {
               onChange={handleCreateChange}
               onBlur={handleCreateBlur}
               aria-invalid={Boolean(createErrors.branch)}
-              placeholder="e.g. Chemical Engineering"
+              placeholder="Enter branch / specialization"
               required
             />
             {createErrors.branch && (
@@ -717,7 +717,7 @@ function StudentProfile() {
             name="college"
             value={createForm.college}
             onChange={handleCreateChange}
-            placeholder="e.g. JNTU College of Engineering, Anantapur"
+            placeholder="Enter college or campus name"
           />
         </div>
 
@@ -778,7 +778,7 @@ function StudentProfile() {
             onChange={handleCreateChange}
             onBlur={handleCreateBlur}
             aria-invalid={Boolean(createErrors.email)}
-            placeholder="e.g. student@gmail.com"
+            placeholder="Enter student email address"
           />
           {createErrors.email && (
             <span className="sp-field-error" role="alert">{createErrors.email}</span>
@@ -794,7 +794,7 @@ function StudentProfile() {
             onChange={handleCreateChange}
             onBlur={handleCreateBlur}
             aria-invalid={Boolean(createErrors.phone)}
-            placeholder="e.g. +91 9876543210"
+            placeholder="Enter 10-digit mobile number"
           />
           {createErrors.phone && (
             <span className="sp-field-error" role="alert">{createErrors.phone}</span>
@@ -864,7 +864,7 @@ function StudentProfile() {
               step="0.01"
               min="0"
               max="10"
-              placeholder="e.g. 8.75"
+              placeholder="SGPA"
               value={sem.sgpa}
               onChange={(e) => handleCreateSemGradeChange(idx, e.target.value)}
               className="sp-sem-score-input"
@@ -969,60 +969,6 @@ function StudentProfile() {
             --------------------------------------------------------- */}
         {!isConfigured ? (
           <div className="sp-create-wrapper">
-            {/* Account Portal Bridge Callout */}
-            <div className="sp-auth-bridge-card">
-              <div className="sp-auth-bridge-content">
-                <div className="sp-auth-bridge-icon">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                  </svg>
-                </div>
-                <div className="sp-auth-bridge-text">
-                  <div className="sp-auth-bridge-heading">
-                    <span className="sp-auth-bridge-title">JNTU Circle Cloud Account Portal</span>
-                    {authUser ? (
-                      <span className="sp-auth-status-pill is-signed-in">● Connected</span>
-                    ) : (
-                      <span className="sp-auth-status-pill is-guest">Guest Device</span>
-                    )}
-                  </div>
-                  <p className="sp-auth-bridge-sub">
-                    {authUser ? (
-                      <>Signed in as <strong>{authUser.name}</strong> ({authUser.email}). Cloud account synced.</>
-                    ) : (
-                      <>Looking to sign in or register for an official student account? Access the cloud login & signup portal.</>
-                    )}
-                  </p>
-                </div>
-              </div>
-              <div className="sp-auth-bridge-actions">
-                {authUser ? (
-                  <button
-                    type="button"
-                    className="sp-auth-link-btn sp-auth-signout"
-                    onClick={() => {
-                      localStorage.removeItem("token");
-                      localStorage.removeItem("user");
-                      setAuthUser(null);
-                      window.dispatchEvent(new Event("authChanged"));
-                      navigate("/login");
-                    }}
-                  >
-                    Sign Out
-                  </button>
-                ) : (
-                  <>
-                    <Link to="/login" className="sp-auth-link-btn sp-auth-signin">
-                      Sign In
-                    </Link>
-                    <Link to="/signup" className="sp-auth-link-btn sp-auth-signup">
-                      Create Account →
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-
             <div className="sp-create-hero">
               <div className="sp-create-hero-badge">🎓 JNTU Student Portal</div>
               <h1 className="sp-create-title">Create Your Student Academic Profile</h1>

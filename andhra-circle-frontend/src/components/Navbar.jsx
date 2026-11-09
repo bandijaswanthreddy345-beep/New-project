@@ -35,10 +35,28 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setProfileDropdownOpen(false);
   }, [location.pathname]);
+
+  // Outside click handler for profile dropdown
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, []);
   const notifContainerRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
 
@@ -371,22 +389,6 @@ function Navbar() {
           MOBILE ACTIONS (VISIBLE <= 768px)
       ========================================== */}
       <div className="nav-mobile-actions">
-        {/* Mobile Quick Sign In / Portal Link */}
-        {!currentUser ? (
-          <Link
-            to="/login"
-            className="nav-mobile-action-btn nav-mobile-auth-quick-btn"
-            title="Sign In to JNTU Circle"
-            aria-label="Sign In"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setShowMobileNotifPopup(false);
-            }}
-          >
-            <span>Sign In</span>
-          </Link>
-        ) : null}
-
         <div className="nav-mobile-notif-wrapper" ref={mobileNotifRef}>
           <Link
             to="/notifications"
@@ -597,26 +599,24 @@ function Navbar() {
 
             if (item.isProfile || item.name === "Student Profile") {
               const isConfigured = Boolean(student?.isConfigured && student?.name);
-              const studentName = isConfigured ? student.name : "Student Profile";
+              const displayName = currentUser?.name || (isConfigured ? student.name : "Student Scholar");
               const photoSrc = getStudentAvatar(student);
 
               return (
-                <li key={item.path} className="nav-item-profile">
-                  <NavLink
-                    to={item.path}
-                    className={({ isActive }) =>
-                      isActive
-                        ? "nav-link active nav-profile-btn"
-                        : "nav-link nav-profile-btn"
-                    }
-                    title={isConfigured ? `Student Profile • ${studentName}` : "Student Profile"}
-                    aria-label={isConfigured ? `Student Profile (${studentName})` : "Student Profile"}
+                <li key={item.path} className="nav-item-profile" ref={profileDropdownRef}>
+                  <button
+                    type="button"
+                    className={`nav-profile-btn ${profileDropdownOpen ? "is-active" : ""}`}
+                    onClick={() => setProfileDropdownOpen((prev) => !prev)}
+                    title={displayName}
+                    aria-label={`Student Menu (${displayName})`}
+                    aria-expanded={profileDropdownOpen}
                   >
                     <div className="nav-profile-avatar-wrapper">
                       {photoSrc ? (
                         <img
                           src={photoSrc}
-                          alt={studentName}
+                          alt={displayName}
                           className="nav-profile-avatar-img"
                           onError={(e) => {
                             e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
@@ -641,9 +641,132 @@ function Navbar() {
                           <circle cx="12" cy="7" r="4" />
                         </svg>
                       </span>
-                      <span className="nav-profile-status-dot" title="Active Student" />
+                      <span className={`nav-profile-status-dot ${currentUser ? "is-online" : ""}`} title={currentUser ? "Account Online" : "Student Profile"} />
                     </div>
-                  </NavLink>
+                  </button>
+
+                  {/* Profile & Account Dropdown Menu */}
+                  {profileDropdownOpen && (
+                    <div className="nav-profile-dropdown" role="menu">
+                      <div className="nav-profile-dd-header">
+                        <div className="nav-profile-dd-avatar">
+                          {photoSrc ? (
+                            <img src={photoSrc} alt={displayName} />
+                          ) : (
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            </svg>
+                          )}
+                        </div>
+                        <div className="nav-profile-dd-info">
+                          <span className="nav-profile-dd-name">{displayName}</span>
+                          <span className="nav-profile-dd-role">
+                            {currentUser?.email || (isConfigured ? `${student.branch || "JNTU"} • ${student.hallTicket || ""}` : "Academic Guest")}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="nav-profile-dd-divider" />
+
+                      <div className="nav-profile-dd-actions">
+                        {!currentUser ? (
+                          <>
+                            <Link
+                              to="/login"
+                              className="nav-profile-dd-link nav-profile-dd-signin"
+                              onClick={() => setProfileDropdownOpen(false)}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                                <polyline points="10 17 15 12 10 7" />
+                                <line x1="15" y1="12" x2="3" y2="12" />
+                              </svg>
+                              <span>Sign In</span>
+                            </Link>
+                            <Link
+                              to="/signup"
+                              className="nav-profile-dd-link nav-profile-dd-signup"
+                              onClick={() => setProfileDropdownOpen(false)}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <line x1="20" y1="8" x2="20" y2="14" />
+                                <line x1="23" y1="11" x2="17" y2="11" />
+                              </svg>
+                              <span>Create Account</span>
+                            </Link>
+                            <div className="nav-profile-dd-subdivider" />
+                          </>
+                        ) : null}
+
+                        <Link
+                          to="/profile"
+                          className="nav-profile-dd-link"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                          </svg>
+                          <span>Student Profile</span>
+                        </Link>
+
+                        <Link
+                          to="/cgpa-calculator"
+                          className="nav-profile-dd-link"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect width="16" height="20" x="4" y="2" rx="2" />
+                            <line x1="8" x2="16" y1="6" y2="6" />
+                          </svg>
+                          <span>CGPA Calculator</span>
+                        </Link>
+
+                        {currentUser?.role === "admin" && (
+                          <Link
+                            to="/dashboard"
+                            className="nav-profile-dd-link"
+                            onClick={() => setProfileDropdownOpen(false)}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect width="7" height="9" x="3" y="3" rx="1" />
+                              <rect width="7" height="5" x="14" y="3" rx="1" />
+                              <rect width="7" height="9" x="14" y="12" rx="1" />
+                              <rect width="7" height="5" x="3" y="16" rx="1" />
+                            </svg>
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        )}
+
+                        {currentUser && (
+                          <>
+                            <div className="nav-profile-dd-subdivider" />
+                            <button
+                              type="button"
+                              className="nav-profile-dd-link nav-profile-dd-signout"
+                              onClick={() => {
+                                localStorage.removeItem("token");
+                                localStorage.removeItem("user");
+                                setCurrentUser(null);
+                                window.dispatchEvent(new Event("authChanged"));
+                                setProfileDropdownOpen(false);
+                                navigate("/login");
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                              </svg>
+                              <span>Sign Out</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </li>
               );
             }
@@ -665,59 +788,6 @@ function Navbar() {
               </li>
             );
           })}
-
-          {/* ==========================================
-              AUTHENTICATION ACTIONS (SIGN IN / SIGN UP)
-          ========================================== */}
-          {!currentUser ? (
-            <>
-              <li className="nav-item-auth-signin">
-                <NavLink
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active nav-auth-signin-link" : "nav-link nav-auth-signin-link"
-                  }
-                  title="Sign In to your JNTU Circle account"
-                >
-                  <span>Sign In</span>
-                </NavLink>
-              </li>
-              <li className="nav-item-auth-signup">
-                <Link
-                  to="/signup"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="nav-auth-signup-btn"
-                  title="Create free student account"
-                >
-                  <span>Sign Up</span>
-                  <span className="nav-auth-arrow">→</span>
-                </Link>
-              </li>
-            </>
-          ) : (
-            <li className="nav-item-auth-logged">
-              <div className="nav-auth-user-chip" title={`Signed in as ${currentUser.name} (${currentUser.email})`}>
-                <span className="nav-auth-user-dot" />
-                <span className="nav-auth-user-name">{currentUser.name.split(" ")[0]}</span>
-              </div>
-              <button
-                type="button"
-                className="nav-auth-signout-text-btn"
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("user");
-                  setCurrentUser(null);
-                  window.dispatchEvent(new Event("authChanged"));
-                  setMobileMenuOpen(false);
-                  navigate("/login");
-                }}
-                title="Sign out of account"
-              >
-                Sign Out
-              </button>
-            </li>
-          )}
 
           {/* Mobile Drawer Quick Auth Footprint (Visible only when mobile drawer open) */}
           <li className="nav-mobile-drawer-auth-container">

@@ -193,7 +193,7 @@ function Login() {
                 id="login-email"
                 type="email"
                 name="email"
-                placeholder="name@example.com"
+                placeholder="Enter your registered email"
                 className="login-text-input"
                 value={form.email}
                 onChange={handleChange}
@@ -226,7 +226,7 @@ function Login() {
                 id="login-password"
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="••••••••••••"
+                placeholder="Enter your password"
                 className="login-text-input login-password-input"
                 value={form.password}
                 onChange={handleChange}
