@@ -789,49 +789,6 @@ function Navbar() {
             );
           })}
 
-          {/* Mobile Drawer Quick Auth Footprint (Visible only when mobile drawer open) */}
-          <li className="nav-mobile-drawer-auth-container">
-            <div className="nav-mobile-drawer-divider" />
-            {!currentUser ? (
-              <div className="nav-mobile-drawer-btn-grid">
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="nav-drawer-signin-btn"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="nav-drawer-signup-btn"
-                >
-                  Create Account →
-                </Link>
-              </div>
-            ) : (
-              <div className="nav-mobile-drawer-user-box">
-                <span className="nav-drawer-user-label">
-                  Signed in as <strong>{currentUser.name}</strong>
-                </span>
-                <button
-                  type="button"
-                  className="nav-drawer-logout-btn"
-                  onClick={() => {
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    setCurrentUser(null);
-                    window.dispatchEvent(new Event("authChanged"));
-                    setMobileMenuOpen(false);
-                    navigate("/login");
-                  }}
-                >
-                  Sign Out
-                </button>
-              </div>
-            )}
-          </li>
-
         </ul>
       </nav>
 

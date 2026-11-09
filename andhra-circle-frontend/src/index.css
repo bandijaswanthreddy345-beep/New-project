@@ -564,128 +564,6 @@ ul {
   color: #ffffff !important;
 }
 
-/* Mobile Drawer Auth Footer */
-.nav-mobile-drawer-auth-container {
-  display: none;
-  width: 100%;
-  margin-top: 14px;
-}
-
-@media (max-width: 992px) {
-  .nav-mobile-drawer-auth-container {
-    display: block;
-  }
-}
-
-.nav-mobile-drawer-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin-bottom: 12px;
-  width: 100%;
-}
-
-.nav-mobile-drawer-btn-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  width: 100%;
-}
-
-.nav-drawer-signin-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff !important;
-  font-size: 13px;
-  font-weight: 650;
-  text-decoration: none;
-  text-align: center;
-}
-
-.nav-drawer-signup-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: #ffb95f;
-  color: #2a1700 !important;
-  font-size: 13px;
-  font-weight: 750;
-  text-decoration: none;
-  text-align: center;
-}
-
-.nav-mobile-drawer-user-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: rgba(160, 209, 184, 0.1);
-  border: 1px solid rgba(160, 209, 184, 0.2);
-}
-
-.nav-drawer-user-label {
-  font-size: 13px;
-  color: #cbe9da;
-}
-
-.nav-drawer-logout-btn {
-  background: transparent;
-  border: 1px solid rgba(255, 180, 171, 0.4);
-  color: #ffb4ab;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.nav-login-button {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-
-  padding: 9px 16px !important;
-
-  background: var(--primary);
-  color: white !important;
-
-  border-radius: var(--radius-sm);
-
-  transition:
-    background var(--transition),
-    transform var(--transition),
-    box-shadow var(--transition);
-}
-
-.nav-login-button::after {
-  display: none;
-}
-
-.nav-login-button:hover {
-  background: var(--primary-dark);
-  color: white !important;
-
-  transform: translateY(-1px);
-
-  box-shadow: 0 5px 14px rgba(1, 62, 55, 0.3);
-}
-
-.login-arrow {
-  font-size: 16px;
-
-  transition: transform var(--transition);
-}
-
-.nav-login-button:hover .login-arrow {
-  transform: translateX(3px);
-}
 
 /* =========================================================
    HERO
@@ -5299,9 +5177,6 @@ textarea:focus-visible {
     font-size: 12px;
   }
 
-  .nav-login-button {
-    padding: 7px 12px !important;
-  }
 
   .hero {
     min-height: 490px;
@@ -5502,9 +5377,6 @@ textarea:focus-visible {
     height: 30px;
   }
 
-  .nav-login-button {
-    padding: 6px 10px !important;
-  }
 
   .hero {
     min-height: 430px;
