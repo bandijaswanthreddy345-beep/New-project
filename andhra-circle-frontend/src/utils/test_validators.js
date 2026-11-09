@@ -208,33 +208,39 @@ invalidCredits.forEach((c) => {
   assert(res.ok === false && res.message.length > 0, `Invalid credits: "${c}" -> rejected: "${res.message}"`);
 });
 
-// 7. validateHallTicket
-console.log("\n[7] validateHallTicket tests:");
+// 7. validateHallTicket / validateUsn
+console.log("\n[7] validateHallTicket (USN) tests:");
 const validHallTickets = [
-  "STGHJTY",
   "22B91A4201",
-  "21B91A0501",
-  "ABCDEF",
-  "123456",
-  "20B91A04J9",
+  "21B91A0201",
+  "194G1A0501",
+  "21015A0305",
+  "20691A04G2",
+  "22b91a4201",
+  "22-B9-1A-4201",
+  "1MS21CS001",
 ];
 validHallTickets.forEach((ht) => {
   const res = validateHallTicket(ht);
-  assert(res.ok === true && res.value === ht.toUpperCase(), `Valid hall ticket: "${ht}" -> ok (${res.value})`);
+  const cleanExpected = ht.replace(/[\s\-_.]/g, "").toUpperCase();
+  assert(res.ok === true && res.value === cleanExpected, `Valid USN / hall ticket: "${ht}" -> ok (${res.value})`);
 });
 
 const invalidHallTickets = [
   "",
   " ",
-  "12345", // Too short (< 6)
-  "22B91A4201ABCDEFG", // Too long (> 15)
-  "22B91A-4201", // Hyphen not allowed
-  "22B91A 4201", // Space not allowed
+  "STGHJTY", // Invalid 7-char format
+  "123456", // 6 digits
+  "ABCDEF", // 6 letters
+  "1234567890", // 10 digits without degree code
+  "ABCDEFGHIJ", // 10 letters
+  "22B91A4201ABCDEFG", // Too long
   "22B91A@4201", // Symbol not allowed
+  "<script>", // Malicious tag
 ];
 invalidHallTickets.forEach((ht) => {
   const res = validateHallTicket(ht);
-  assert(res.ok === false && res.message.length > 0, `Invalid hall ticket: "${ht}" -> rejected: "${res.message}"`);
+  assert(res.ok === false && res.message.length > 0, `Invalid USN / hall ticket: "${ht}" -> rejected: "${res.message}"`);
 });
 
 // 8. validateYear
@@ -359,3 +365,4 @@ console.log("=================================================");
 if (failedTests > 0) {
   process.exit(1);
 }
+

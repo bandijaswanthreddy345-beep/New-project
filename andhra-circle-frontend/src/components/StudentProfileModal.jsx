@@ -26,7 +26,7 @@ function StudentProfileModal({ isOpen, onClose }) {
 
   const displayName = sanitize(student.name, "Chinnu");
   const displayBranch = sanitize(student.branch, "Electrical & Electronics Engineering (EEE)");
-  const displayHallTicket = sanitize(student.hallTicket, "STGHJTY");
+  const displayHallTicket = sanitize(student.hallTicket, "21B91A0201");
   const displayYear = sanitize(student.year, "3rd Year");
   const displaySemester = cleanSemester(sanitize(student.semester, "6th Semester"));
   const displayRegulation = sanitize(student.regulation, "R16 Regulation");

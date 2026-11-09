@@ -19,15 +19,6 @@ import {
   getStudyAdviceAnswer,
   synthesizeDynamicAcademicResponse,
 } from "../utils/aiReasoningEngine";
-import {
-  validateName,
-  validateHallTicket,
-  validateGradePoint,
-  validateAttendance,
-  validateBranch,
-  validateSemester,
-  validateRegulation,
-} from "../utils/validators";
 
 /**
  * Interactive Branch Showcase component rendered inside chatbot messages.
@@ -403,13 +394,6 @@ function JntuChatbot() {
   const [listeningTarget, setListeningTarget] = useState(null); // "hero" | "modal"
   const recognitionRef = useRef(null);
 
-  // Profile Wizard Session State
-  const [profileSession, setProfileSession] = useState({
-    active: false,
-    step: null, // "NAME" | "HALLTICKET" | "BRANCH" | "SEMESTER" | "REGULATION" | "CGPA" | "ATTENDANCE"
-    draft: {},
-  });
-
   // User feedback on AI answers (msgId -> 'up' | 'down')
   const [feedbackState, setFeedbackState] = useState({});
 
@@ -573,149 +557,12 @@ function JntuChatbot() {
     return updated;
   };
 
-  const generateResponse = async (rawQuery, currentSession, conversationHistory = []) => {
+  const generateResponse = async (rawQuery, conversationHistory = []) => {
     const q = rawQuery.toLowerCase().trim();
 
     // =========================================================
-    // 1. ACTIVE PROFILE BUILDER WIZARD STEPS (WITH STRICT INPUT VALIDATION)
-    // =========================================================
-    if (currentSession.active && currentSession.step) {
-      const step = currentSession.step;
-      const draft = { ...currentSession.draft };
-
-      if (step === "NAME") {
-        const nameVal = validateName(rawQuery);
-        if (!nameVal.ok) {
-          return {
-            text: `${nameVal.message} What is your full name?`,
-            wizardActive: true,
-          };
-        }
-        draft.name = nameVal.value;
-        draft.shortName = nameVal.value.split(" ")[0];
-        setProfileSession({ active: true, step: "HALLTICKET", draft });
-        return {
-          text: `Awesome, ${draft.name}! What is your JNTU Hall Ticket / USN Roll Number? (e.g. 22B91A4201)`,
-          wizardActive: true,
-        };
-      }
-
-      if (step === "HALLTICKET") {
-        const htVal = validateHallTicket(rawQuery);
-        if (!htVal.ok) {
-          return {
-            text: `${htVal.message} What is your JNTU Hall Ticket / USN Roll Number?`,
-            wizardActive: true,
-          };
-        }
-        draft.hallTicket = htVal.value;
-        setProfileSession({ active: true, step: "BRANCH", draft });
-        return {
-          text: `Got it (${draft.hallTicket})! What is your Department / Engineering Branch?`,
-          suggestions: ["AIML", "CSE", "ECE", "EEE", "MECH", "CIVIL"],
-          wizardActive: true,
-        };
-      }
-
-      if (step === "BRANCH") {
-        const branchVal = validateBranch(rawQuery);
-        if (!branchVal.ok) {
-          return {
-            text: `${branchVal.message} What is your Department / Engineering Branch?`,
-            suggestions: ["AIML", "CSE", "ECE", "EEE", "MECH", "CIVIL"],
-            wizardActive: true,
-          };
-        }
-        draft.branchCode = branchVal.code;
-        draft.branch = branchVal.value;
-        setProfileSession({ active: true, step: "SEMESTER", draft });
-        return {
-          text: `Great, ${draft.branch}! Which Semester are you currently in? (e.g. 1st Semester, 3-2, or Sem 6)`,
-          wizardActive: true,
-        };
-      }
-
-      if (step === "SEMESTER" || step === "YEAR_SEM") {
-        const semVal = validateSemester(rawQuery);
-        if (!semVal.ok) {
-          return {
-            text: `${semVal.message} Which Semester are you currently in?`,
-            wizardActive: true,
-          };
-        }
-        draft.year = semVal.year;
-        draft.semester = semVal.value;
-        draft.semCode = semVal.semCode;
-        setProfileSession({ active: true, step: "REGULATION", draft });
-        return {
-          text: `Got it, ${semVal.year} (${semVal.semCode})! Which Academic Regulation applies to you?`,
-          suggestions: ["R23 Regulation", "R20 Regulation", "R19 Regulation", "R16 Regulation"],
-          wizardActive: true,
-        };
-      }
-
-      if (step === "REGULATION") {
-        const regVal = validateRegulation(rawQuery);
-        if (!regVal.ok) {
-          return {
-            text: `${regVal.message} Which Academic Regulation applies to you?`,
-            suggestions: ["R23 Regulation", "R20 Regulation", "R19 Regulation", "R16 Regulation"],
-            wizardActive: true,
-          };
-        }
-        draft.regulation = regVal.value;
-        setProfileSession({ active: true, step: "CGPA", draft });
-        return {
-          text: `What is your current Cumulative CGPA? (e.g. 8.85)`,
-          wizardActive: true,
-        };
-      }
-
-      if (step === "CGPA") {
-        const cgpaVal = validateGradePoint(rawQuery, "CGPA");
-        if (!cgpaVal.ok) {
-          return {
-            text: `${cgpaVal.message} What is your current Cumulative CGPA? (e.g. 8.85)`,
-            wizardActive: true,
-          };
-        }
-        draft.cgpa = cgpaVal.value;
-        setProfileSession({ active: true, step: "ATTENDANCE", draft });
-        return {
-          text: `What is your current Attendance Percentage? (e.g. 85%)`,
-          wizardActive: true,
-        };
-      }
-
-      if (step === "ATTENDANCE") {
-        const attVal = validateAttendance(rawQuery);
-        if (!attVal.ok) {
-          return {
-            text: `${attVal.message} What is your current Attendance Percentage? (e.g. 85%)`,
-            wizardActive: true,
-          };
-        }
-        draft.attendance = attVal.formatted;
-        draft.attendancePercentage = attVal.value;
-        draft.credits = draft.credits || "132 / 160";
-        draft.role = "Student";
-
-        // Save finalized profile
-        const updated = handleQuickProfileUpdate(draft);
-        setProfileSession({ active: false, step: null, draft: {} });
-
-        return {
-          text: `🎉 All set! Your Student Profile has been created and synced live across JNTU Circle.`,
-          profilePreview: updated,
-          action: { label: "Open Full Student Profile →", path: "/profile" },
-          suggestions: ["📊 CGPA Calculator", "👤 Student Profile", "📘 Notes"],
-        };
-      }
-    }
-
-    // =========================================================
-    // 2. CONVERSATIONAL & ASSISTANT IDENTITY HANDLER
-    // Instant friendly responses to greetings, questions about JNTU Circle,
+    // 1. CONVERSATIONAL & ASSISTANT IDENTITY HANDLER
+    // Friendly responses to greetings, questions about JNTU Circle,
     // gratitude, assistance, and guidance.
     // =========================================================
     const conversationalAnswer = getConversationalAnswer(rawQuery);
@@ -724,21 +571,23 @@ function JntuChatbot() {
     }
 
     // =========================================================
-    // 3. TRIGGER PROFILE BUILDER COMMAND
+    // 2. STUDENT PROFILE REDIRECTION
+    // Guides student to the verified Student Profile management page.
     // =========================================================
     if (
-      q.includes("build") && q.includes("profile") ||
-      q.includes("create") && q.includes("profile") ||
-      q.includes("setup") && q.includes("profile") ||
+      (q.includes("build") && q.includes("profile")) ||
+      (q.includes("create") && q.includes("profile")) ||
+      (q.includes("setup") && q.includes("profile")) ||
       q === "build your student profile using chatbot" ||
       q === "build student profile with ai" ||
       q === "student profile" ||
+      q === "my profile" ||
       q === "update profile"
     ) {
-      setProfileSession({ active: true, step: "NAME", draft: {} });
       return {
-        text: `🎓 Let's build your verified JNTU Student Profile together! First, what is your Full Name?`,
-        wizardActive: true,
+        text: "You can create, edit, and view your verified JNTU Student Profile directly on the Student Profile page with GPA tracking, semester grades, and attendance metrics.",
+        action: { label: "Open Student Profile →", path: "/profile" },
+        suggestions: ["🎓 View Student Profile", "📊 CGPA Calculator", "CSE", "AIML"],
       };
     }
 
@@ -1000,7 +849,7 @@ function JntuChatbot() {
     let orbState = "searching";
     let orbLabel = `Searching academic resources for "${query}"...`;
 
-    if (q.includes("profile") || profileSession.active) {
+    if (q.includes("profile")) {
       orbState = "weaving";
       orbLabel = "Structuring student profile attributes...";
     } else if (q.includes("calculator") || q.includes("cgpa") || q.includes("sgpa") || q.includes("percentage")) {
@@ -1031,7 +880,7 @@ function JntuChatbot() {
     setIsTyping(true);
 
     try {
-      const responseData = await generateResponse(query, profileSession, messages);
+      const responseData = await generateResponse(query, messages);
       const botMessage = {
         id: "bot-" + Date.now(),
         sender: "assistant",
@@ -1110,7 +959,8 @@ function JntuChatbot() {
   };
 
   const handleStartProfileBuilder = () => {
-    handleSend("Build your student profile using chatbot");
+    setIsModalOpen(false);
+    navigate("/profile");
   };
 
   const handleRedirectToBrowseByBranch = (e) => {
@@ -1229,7 +1079,7 @@ function JntuChatbot() {
             className="hero-ai-quick-pill"
             onClick={handleStartProfileBuilder}
           >
-            <span>Build Student Profile</span>
+            <span>Student Profile</span>
           </button>
           <button
             type="button"
@@ -1303,12 +1153,10 @@ function JntuChatbot() {
                 <div className="chat-modal-header-info">
                   <div className="chat-modal-title-row">
                     <h3 className="chat-modal-title">JNTU Circle AI Assistant</h3>
-                    <span className="chat-modal-role-badge">
-                      {profileSession.active ? "Profile Wizard" : "Online"}
-                    </span>
+                    <span className="chat-modal-role-badge">Online</span>
                   </div>
                   <p className="chat-modal-subtitle">
-                    Live academic guidance & instant answers
+                    Live academic guidance
                   </p>
                 </div>
               </div>
@@ -1334,7 +1182,7 @@ function JntuChatbot() {
                   </div>
                   <h4>JNTU Academic Assistant</h4>
                   <p>
-                    Instant, verified lecture notes, previous question papers, syllabus, or authoritative guidance on university academic regulations.
+                    Verified lecture notes, previous question papers, syllabus, or authoritative guidance on university academic regulations.
                   </p>
 
                   <div className="chat-modal-starter-categories">
@@ -1404,11 +1252,21 @@ function JntuChatbot() {
                         <button
                           type="button"
                           className="chat-modal-sugg-pill chat-modal-sugg-pill-accent"
-                          onClick={() => handleSend("Build your student profile using chatbot")}
+                          onClick={() => {
+                            setIsModalOpen(false);
+                            navigate("/profile");
+                          }}
                         >
-                          ✨ Build Student Profile
+                          🎓 Student Profile Page
                         </button>
-                        <button type="button" className="chat-modal-sugg-pill" onClick={() => handleSend("CGPA & SGPA Calculator")}>
+                        <button
+                          type="button"
+                          className="chat-modal-sugg-pill"
+                          onClick={() => {
+                            setIsModalOpen(false);
+                            navigate("/calculator");
+                          }}
+                        >
                           📊 CGPA & SGPA Calculator
                         </button>
                       </div>
@@ -1481,7 +1339,7 @@ function JntuChatbot() {
                                 <div>
                                   <h4 className="hero-ai-profile-name">{msg.profilePreview.name || "Chinnu"}</h4>
                                   <span className="hero-ai-profile-ht">
-                                    {msg.profilePreview.hallTicket || "STGHJTY"} • {msg.profilePreview.branchCode || "EEE"}
+                                    {msg.profilePreview.hallTicket || "21B91A0201"} • {msg.profilePreview.branchCode || "EEE"}
                                   </span>
                                 </div>
                               </div>
@@ -1782,23 +1640,7 @@ function JntuChatbot() {
                   placeholder={
                     isListening && listeningTarget === "modal"
                       ? "🎙️ Listening... speak your message now..."
-                      : profileSession.active
-                        ? profileSession.step === "NAME"
-                          ? "Type your full name..."
-                          : profileSession.step === "HALLTICKET"
-                            ? "Type your Hall Ticket / USN Roll Number..."
-                            : profileSession.step === "BRANCH"
-                              ? "Type or select your branch..."
-                              : profileSession.step === "SEMESTER" || profileSession.step === "YEAR_SEM"
-                                ? "Type your semester (e.g. 3-2, 2-1)..."
-                                : profileSession.step === "REGULATION"
-                                  ? "Type or select regulation..."
-                                  : profileSession.step === "CGPA"
-                                    ? "Type your CGPA (e.g. 8.85)..."
-                                    : profileSession.step === "ATTENDANCE"
-                                      ? "Type your attendance % (e.g. 89%)..."
-                                      : "Type your response here..."
-                        : "Type your message or answer..."
+                      : "Type your message or answer..."
                   }
                   value={modalInput}
                   onChange={(e) => setModalInput(e.target.value)}

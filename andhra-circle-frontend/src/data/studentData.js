@@ -51,7 +51,7 @@ export const DEFAULT_CHINNU_DATA = {
   name: "Chinnu",
   shortName: "Chinnu",
   role: "Student",
-  hallTicket: "STGHJTY",
+  hallTicket: "21B91A0201",
   college: "JNTU College of Engineering",
   university: "JNT University",
   branch: "Electrical & Electronics Engineering (EEE)",

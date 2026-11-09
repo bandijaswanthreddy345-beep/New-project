@@ -1836,7 +1836,7 @@ function StudentProfile() {
             <div className="sp-m-identity-details">
               <h1 className="sp-m-name">{student.name || "Chinnu"}</h1>
               <div className="sp-m-meta-row">
-                <span className="sp-m-roll-pill">{student.hallTicket || "STGHJTY"}</span>
+                <span className="sp-m-roll-pill">{student.hallTicket || "21B91A0201"}</span>
                 <span className="sp-m-branch-text">{student.branch || "Electrical & Electronics Engineering (EEE)"}</span>
               </div>
               <div className="sp-m-tag-row">
@@ -2039,7 +2039,7 @@ function StudentProfile() {
                   </div>
                   <div className="sp-m-detail-box">
                     <p className="sp-m-detail-lbl">HALL TICKET / USN</p>
-                    <p className="sp-m-detail-val font-mono font-bold tracking-wide">{student.hallTicket || "STGHJTY"}</p>
+                    <p className="sp-m-detail-val font-mono font-bold tracking-wide">{student.hallTicket || "21B91A0201"}</p>
                   </div>
                   <div className="sp-m-detail-box">
                     <p className="sp-m-detail-lbl">DEPARTMENT & BRANCH</p>

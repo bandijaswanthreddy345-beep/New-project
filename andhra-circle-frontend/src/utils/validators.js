@@ -267,35 +267,60 @@ export function validateSubjectMarks(val) {
   return { ok: true, value: num, message: "" };
 }
 
+// JNTU Hall Ticket regex (10 characters: e.g. 22B91A4201, 194G1A0501, 21015A0305, 20691A04G2)
+// Structure: 2 digits (Year) + 2 alphanumeric (College) + 1 digit (Entry: 1=Reg, 5=Lateral) + 1 letter (Degree: A=B.Tech) + 2 alphanumeric (Branch) + 2 alphanumeric (Roll)
+export const JNTU_HT_REGEX = /^\d{2}[A-Z0-9]{2}[1-5][A-Z][A-Z0-9]{2}[A-Z0-9]{2}$/;
+
+// VTU USN regex (10 characters: e.g. 1MS21CS001, 1RV20EC045)
+// Structure: 1 digit (Region) + 2 letters (College) + 2 digits (Year) + 2 letters (Branch) + 3 digits (Roll)
+export const VTU_USN_REGEX = /^[1-4][A-Z]{2}\d{2}[A-Z]{2}\d{3}$/;
+
 /**
- * Validates a Hall Ticket / Roll Number / USN.
- * Rule: letters and digits only, 6–15 characters, uppercased.
- * (Does NOT enforce a specific JNTUA pattern because formats vary across colleges/schemes).
+ * Validates a University Seat Number (USN) / Hall Ticket / Roll Number.
+ * Strictly checks the 10-character official university USN format (JNTU and VTU standards).
+ * Strips formatting spaces and hyphens before validating.
  */
 export function validateHallTicket(val) {
-  const normalized = normalizeString(val).toUpperCase();
-  if (!normalized) {
-    return { ok: false, value: "", message: "Hall Ticket / USN is required." };
+  const raw = normalizeString(val);
+  if (!raw) {
+    return { ok: false, value: "", message: "USN / Hall Ticket is required." };
   }
 
-  if (normalized.length < 6 || normalized.length > 15) {
-    return {
-      ok: false,
-      value: normalized,
-      message: "Hall Ticket must be between 6 and 15 alphanumeric characters.",
-    };
-  }
+  // Remove optional formatting separators (spaces, hyphens)
+  const normalized = raw.replace(/[\s\-_.]/g, "").toUpperCase();
 
+  // Check for invalid characters
   if (!/^[A-Z0-9]+$/.test(normalized)) {
     return {
       ok: false,
       value: normalized,
-      message: "Hall Ticket can only contain letters and numbers (no symbols or spaces).",
+      message: "USN / Hall Ticket can only contain letters and numbers.",
+    };
+  }
+
+  // Check exact 10-character length requirement
+  if (normalized.length !== 10) {
+    return {
+      ok: false,
+      value: normalized,
+      message: "USN / Hall Ticket must be exactly 10 alphanumeric characters (e.g. 22B91A4201).",
+    };
+  }
+
+  // Validate format against official JNTU Hall Ticket or VTU USN pattern
+  if (!JNTU_HT_REGEX.test(normalized) && !VTU_USN_REGEX.test(normalized)) {
+    return {
+      ok: false,
+      value: normalized,
+      message: "Please enter a valid JNTU Hall Ticket or USN format (e.g. 22B91A4201).",
     };
   }
 
   return { ok: true, value: normalized, message: "" };
 }
+
+// Alias for convenience
+export const validateUsn = validateHallTicket;
 
 // Canonical app years
 export const VALID_YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
