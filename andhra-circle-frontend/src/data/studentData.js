@@ -10,34 +10,15 @@ export const INITIAL_SEMESTERS = [
   { sem: "Sem 8", sgpa: "", credits: 20, status: "Not Started" },
 ];
 
-export const EMPTY_STUDENT_DATA = {
-  name: "",
-  shortName: "",
-  role: "Student",
-  hallTicket: "", // USN / Roll No
-  college: "",
-  university: "JNTU (Autonomous & Affiliated Colleges)",
-  branch: "",
-  branchCode: "",
-  year: "1st Year",
-  semester: "1st Semester",
-  regulation: "R23 Regulation",
-  cgpa: "",
-  credits: "0 / 160",
-  attendance: "75%",
-  attendancePercentage: 75,
-  email: "",
-  phone: "",
-  batch: "2023 - 2027",
-  mentor: "",
-  profilePhoto: null, // Base64 data URL or image path
-  isConfigured: false,
-  savedNotes: [],
-  semesterGrades: INITIAL_SEMESTERS,
-};
+// Canonical Stitch verified student avatar (Chinnu)
+export const DEFAULT_STUDENT_AVATAR =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuCh_iva9jSPl2iJE9piEPkD6YvBd1alVmSmd2txJmVJ7yoJ1rUW5snm5XgftETiPm_z30siDrBEWaKjZ4pjsp3jGKfADJvokenmu3nU4y6eRpiyaxYebDy9CcFf55JDQbzjmgAnlXU9hJ9Lcip89XFkvYkXTn-OSsOd3Ti5p04ubIqf605k3vfPL85LRZhvLns80AuBaGzk9bLpD_1xziJyUc_wXagz4D5tryCRCRE";
+
+export const PROFILE_STORAGE_VERSION = "v2_chinnu";
 
 // Stitch verified student profile default (Executive Edition)
 export const DEFAULT_CHINNU_DATA = {
+  _version: PROFILE_STORAGE_VERSION,
   name: "Chinnu",
   shortName: "Chinnu",
   role: "Student",
@@ -57,7 +38,7 @@ export const DEFAULT_CHINNU_DATA = {
   phone: "+91 98765 43210",
   batch: "2021–25",
   mentor: "Dr. K. Ramesh (HOD - EEE)",
-  profilePhoto: "https://lh3.googleusercontent.com/aida-public/AB6AXuCh_iva9jSPl2iJE9piEPkD6YvBd1alVmSmd2txJmVJ7yoJ1rUW5snm5XgftETiPm_z30siDrBEWaKjZ4pjsp3jGKfADJvokenmu3nU4y6eRpiyaxYebDy9CcFf55JDQbzjmgAnlXU9hJ9Lcip89XFkvYkXTn-OSsOd3Ti5p04ubIqf605k3vfPL85LRZhvLns80AuBaGzk9bLpD_1xziJyUc_wXagz4D5tryCRCRE",
+  profilePhoto: DEFAULT_STUDENT_AVATAR,
   isConfigured: true,
   savedNotes: [
     { id: 1, branch: "EEE", sem: "Sem 6", title: "Power Systems Operation & Control", units: "Unit 1 - 5 Full Notes", faculty: "Dr. K. Ramesh" },
@@ -69,6 +50,23 @@ export const DEFAULT_CHINNU_DATA = {
 };
 
 export const DEFAULT_STUDENT_DATA = DEFAULT_CHINNU_DATA;
+
+export const EMPTY_STUDENT_DATA = {
+  ...DEFAULT_CHINNU_DATA,
+  isConfigured: false,
+};
+
+// Helper to resolve the correct photo URL for a student object
+export function getStudentAvatar(student) {
+  if (!student) return DEFAULT_STUDENT_AVATAR;
+  if (student.profilePhoto && student.profilePhoto !== "none" && typeof student.profilePhoto === "string" && student.profilePhoto.trim()) {
+    return student.profilePhoto;
+  }
+  if (student.profilePhoto === "none") {
+    return null;
+  }
+  return DEFAULT_STUDENT_AVATAR;
+}
 
 // Calculate automatic CGPA from valid semester SGPAs
 export function calculateCgpaFromGrades(grades = []) {
@@ -87,27 +85,50 @@ export function hasStoredStudentProfile() {
     const raw = localStorage.getItem("jntu_student_profile");
     if (!raw) return true;
     const parsed = JSON.parse(raw);
-    return Boolean(parsed && parsed.isConfigured && parsed.name?.trim());
+    return Boolean(parsed && parsed.name?.trim());
   } catch (e) {
     return true;
   }
 }
 
-// Retrieve stored student data, or return clean template if not configured
+// Retrieve stored student data with automatic schema synchronization
 export function getStoredStudentData() {
   try {
     const raw = localStorage.getItem("jntu_student_profile");
     if (raw) {
       const parsed = JSON.parse(raw);
+
+      // If user had an older test profile or if version doesn't match:
+      if (!parsed._version || parsed._version !== PROFILE_STORAGE_VERSION) {
+        // Upgrade stale cache to canonical Chinnu profile with any user customized photo/name preserved if present
+        const upgraded = {
+          ...DEFAULT_CHINNU_DATA,
+          ...parsed,
+          _version: PROFILE_STORAGE_VERSION,
+          profilePhoto: parsed.profilePhoto && parsed.profilePhoto !== "none" ? parsed.profilePhoto : DEFAULT_STUDENT_AVATAR,
+          name: parsed.name?.trim() ? parsed.name : DEFAULT_CHINNU_DATA.name,
+          hallTicket: parsed.hallTicket?.trim() ? parsed.hallTicket : DEFAULT_CHINNU_DATA.hallTicket,
+          branch: parsed.branch?.trim() ? parsed.branch : DEFAULT_CHINNU_DATA.branch,
+          isConfigured: true,
+        };
+        localStorage.setItem("jntu_student_profile", JSON.stringify(upgraded));
+        return upgraded;
+      }
+
       // Ensure all 8 semesters exist
       const mergedGrades = INITIAL_SEMESTERS.map((initSem, idx) => {
         const found = parsed.semesterGrades?.[idx];
         return found ? { ...initSem, ...found } : initSem;
       });
 
+      const photo = parsed.profilePhoto && parsed.profilePhoto !== "none"
+        ? parsed.profilePhoto
+        : (parsed.profilePhoto === "none" ? "none" : DEFAULT_STUDENT_AVATAR);
+
       return {
         ...DEFAULT_CHINNU_DATA,
         ...parsed,
+        profilePhoto: photo,
         semesterGrades: mergedGrades,
         isConfigured: true,
       };
@@ -118,11 +139,13 @@ export function getStoredStudentData() {
   return { ...DEFAULT_CHINNU_DATA, isConfigured: true };
 }
 
-// Persist student profile data to local storage
+// Persist student profile data to local storage and broadcast to all listeners
 export function saveStoredStudentData(data) {
   try {
     const updated = {
+      ...DEFAULT_CHINNU_DATA,
       ...data,
+      _version: PROFILE_STORAGE_VERSION,
       isConfigured: true,
       shortName: data.name ? data.name.trim().split(" ")[0] : "Student",
     };
@@ -136,7 +159,7 @@ export function saveStoredStudentData(data) {
     }
 
     localStorage.setItem("jntu_student_profile", JSON.stringify(updated));
-    window.dispatchEvent(new Event("studentProfileUpdated"));
+    window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: updated }));
     return updated;
   } catch (e) {
     console.error("Error saving student profile to localStorage:", e);
@@ -148,7 +171,7 @@ export function saveStoredStudentData(data) {
 export function clearStoredStudentData() {
   try {
     localStorage.removeItem("jntu_student_profile");
-    window.dispatchEvent(new Event("studentProfileUpdated"));
+    window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: DEFAULT_CHINNU_DATA }));
   } catch (e) {
     console.error("Error logging out student profile:", e);
   }

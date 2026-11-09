@@ -8,6 +8,8 @@ import {
   saveStoredStudentData,
   logoutStudentProfile,
   calculateCgpaFromGrades,
+  getStudentAvatar,
+  DEFAULT_STUDENT_AVATAR,
 } from "../data/studentData";
 import "./StudentProfile.css";
 
@@ -85,7 +87,11 @@ function StudentProfile() {
     setEditForm(current);
 
     window.addEventListener("studentProfileUpdated", handleProfileUpdate);
-    return () => window.removeEventListener("studentProfileUpdated", handleProfileUpdate);
+    window.addEventListener("storage", handleProfileUpdate);
+    return () => {
+      window.removeEventListener("studentProfileUpdated", handleProfileUpdate);
+      window.removeEventListener("storage", handleProfileUpdate);
+    };
   }, []);
 
   // Update edit form when student data changes
@@ -115,6 +121,15 @@ function StudentProfile() {
         setCreateForm((prev) => ({ ...prev, profilePhoto: base64Data }));
       } else {
         setEditForm((prev) => ({ ...prev, profilePhoto: base64Data }));
+        const current = getStoredStudentData();
+        const updated = {
+          ...current,
+          profilePhoto: base64Data,
+        };
+        saveStoredStudentData(updated);
+        setStudent(updated);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 2000);
       }
     };
     reader.readAsDataURL(file);
@@ -127,8 +142,9 @@ function StudentProfile() {
     } else {
       setEditForm((prev) => ({ ...prev, profilePhoto: "none" }));
       if (editFileInputRef.current) editFileInputRef.current.value = "";
+      const current = getStoredStudentData();
       const updated = {
-        ...student,
+        ...current,
         profilePhoto: "none",
       };
       saveStoredStudentData(updated);
@@ -324,10 +340,7 @@ function StudentProfile() {
   const isConfigured = Boolean(student && student.isConfigured && student.name?.trim());
   const currentAttendance = Number(student?.attendancePercentage || 75);
   const attendanceStatus = getAttendanceStatus(currentAttendance);
-  const chinnuDefaultAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuCh_iva9jSPl2iJE9piEPkD6YvBd1alVmSmd2txJmVJ7yoJ1rUW5snm5XgftETiPm_z30siDrBEWaKjZ4pjsp3jGKfADJvokenmu3nU4y6eRpiyaxYebDy9CcFf55JDQbzjmgAnlXU9hJ9Lcip89XFkvYkXTn-OSsOd3Ti5p04ubIqf605k3vfPL85LRZhvLns80AuBaGzk9bLpD_1xziJyUc_wXagz4D5tryCRCRE";
-  const activeAvatar = student?.profilePhoto && student.profilePhoto !== "none"
-    ? student.profilePhoto
-    : (student?.profilePhoto === "none" ? null : (student?.name === "Chinnu" || !student?.profilePhoto ? chinnuDefaultAvatar : profileImgDefault));
+  const activeAvatar = getStudentAvatar(student);
 
   const handleDownloadPdf = () => {
     window.print();

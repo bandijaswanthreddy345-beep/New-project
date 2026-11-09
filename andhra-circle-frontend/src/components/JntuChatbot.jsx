@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import JntuBotAvatar from "./JntuBotAvatar";
 import { ThinkingOrb } from "thinking-orbs";
-import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
+import { getStoredStudentData, saveStoredStudentData, getStudentAvatar } from "../data/studentData";
 import {
   performSearch,
   formatResourceAction,
@@ -1099,7 +1099,7 @@ function JntuChatbot() {
           sender: "assistant",
           text: `AI is busy, showing portal results.\n\nHere are resources matching "${query}":`,
           action: { label: `Search in Portal →`, path: `/search?query=${encodeURIComponent(query)}` },
-          suggestions: ["Data Structures Notes", "Python Programming", "Syllabus"],
+          suggestions: [],
         },
       ]);
     } finally {
@@ -1502,26 +1502,36 @@ function JntuChatbot() {
                           {msg.profilePreview && (
                             <div className="hero-ai-profile-card">
                               <div className="hero-ai-profile-top">
-                                <div className="hero-ai-profile-avatar-box">🎓</div>
+                                <div className="hero-ai-profile-avatar-box">
+                                  {getStudentAvatar(msg.profilePreview) ? (
+                                    <img
+                                      src={getStudentAvatar(msg.profilePreview)}
+                                      alt="Student Avatar"
+                                      style={{ width: "100%", height: "100%", borderRadius: "8px", objectFit: "cover" }}
+                                    />
+                                  ) : (
+                                    "🎓"
+                                  )}
+                                </div>
                                 <div>
-                                  <h4 className="hero-ai-profile-name">{msg.profilePreview.name || "Student"}</h4>
+                                  <h4 className="hero-ai-profile-name">{msg.profilePreview.name || "Chinnu"}</h4>
                                   <span className="hero-ai-profile-ht">
-                                    {msg.profilePreview.hallTicket || "22B91A4201"} • {msg.profilePreview.branchCode || "AIML"}
+                                    {msg.profilePreview.hallTicket || "STGHJTY"} • {msg.profilePreview.branchCode || "EEE"}
                                   </span>
                                 </div>
                               </div>
                               <div className="hero-ai-profile-metrics">
                                 <div className="hero-ai-metric-item">
                                   <span>CGPA</span>
-                                  <strong>{msg.profilePreview.cgpa || "8.85"}</strong>
+                                  <strong>{msg.profilePreview.cgpa || "8.88"}</strong>
                                 </div>
                                 <div className="hero-ai-metric-item">
                                   <span>Attendance</span>
-                                  <strong>{msg.profilePreview.attendance || "89.4%"}</strong>
+                                  <strong>{msg.profilePreview.attendance || "75%"}</strong>
                                 </div>
                                 <div className="hero-ai-metric-item">
                                   <span>Regulation</span>
-                                  <strong>{msg.profilePreview.regulation || "R20"}</strong>
+                                  <strong>{msg.profilePreview.regulation || "R16 Regulation"}</strong>
                                 </div>
                               </div>
                             </div>
@@ -1698,16 +1708,26 @@ function JntuChatbot() {
 
                           {msg.suggestions && msg.suggestions.length > 0 && (
                             <div className="hero-ai-chips">
-                              {msg.suggestions.map((item, idx) => (
-                                <button
-                                  key={idx}
-                                  type="button"
-                                  className="hero-ai-chip"
-                                  onClick={() => handleSend(item)}
-                                >
-                                  {item}
-                                </button>
-                              ))}
+                              {msg.suggestions
+                                .filter((item) => {
+                                  const norm = (item || "").toLowerCase();
+                                  return (
+                                    !norm.includes("passing marks") &&
+                                    !norm.includes("9+ cgpa") &&
+                                    !norm.includes("exam notifications") &&
+                                    !norm.includes("data structures notes")
+                                  );
+                                })
+                                .map((item, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    className="hero-ai-chip"
+                                    onClick={() => handleSend(item)}
+                                  >
+                                    {item}
+                                  </button>
+                                ))}
                             </div>
                           )}
 

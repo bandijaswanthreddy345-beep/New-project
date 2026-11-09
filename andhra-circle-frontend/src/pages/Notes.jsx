@@ -2,9 +2,8 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { MetalFx, useMetalBend } from "metal-fx";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
-import profile from "../assets/jaswanth.png.png";
 import StudentProfileModal from "../components/StudentProfileModal";
-import { getStoredStudentData } from "../data/studentData";
+import { getStoredStudentData, getStudentAvatar, DEFAULT_STUDENT_AVATAR } from "../data/studentData";
 import AuthorProfile from "../components/AuthorProfile";
 import "./Notes.css";
 
@@ -209,7 +208,11 @@ function Notes({ initialType }) {
       setStudentData(getStoredStudentData());
     };
     window.addEventListener("studentProfileUpdated", handleProfileSync);
-    return () => window.removeEventListener("studentProfileUpdated", handleProfileSync);
+    window.addEventListener("storage", handleProfileSync);
+    return () => {
+      window.removeEventListener("studentProfileUpdated", handleProfileSync);
+      window.removeEventListener("storage", handleProfileSync);
+    };
   }, []);
 
   // Sync state if URL branch query parameter changes
@@ -716,7 +719,14 @@ function Notes({ initialType }) {
             title="View & Edit Student Profile"
           >
             <div className="profile-avatar-wrapper">
-              <img src={profile} alt={studentData.name} className="profile-avatar" />
+              <img
+                src={getStudentAvatar(studentData)}
+                alt={studentData?.name || "Chinnu"}
+                className="profile-avatar"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
+                }}
+              />
               <span className="profile-status-dot" />
             </div>
             <div className="profile-info">

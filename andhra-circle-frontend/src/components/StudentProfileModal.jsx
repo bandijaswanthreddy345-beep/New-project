@@ -1,16 +1,12 @@
 import React from "react";
-import profileImg from "../assets/jaswanth.png.png";
 import "./StudentProfileModal.css";
-import { getStoredStudentData } from "../data/studentData";
+import { getStoredStudentData, getStudentAvatar, DEFAULT_STUDENT_AVATAR } from "../data/studentData";
 
 function StudentProfileModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const student = getStoredStudentData();
-  const avatar =
-    student.profilePhoto && student.profilePhoto !== "none"
-      ? student.profilePhoto
-      : profileImg;
+  const avatar = getStudentAvatar(student);
 
   // Sanitized display values (avoiding accidental query string repetitions)
   const sanitize = (val, fallback = "—") => {
@@ -23,14 +19,14 @@ function StudentProfileModal({ isOpen, onClose }) {
   };
 
   const displayName = sanitize(student.name, "Chinnu");
-  const displayBranch = sanitize(student.branch, "Computer Science & Engineering");
-  const displayHallTicket = sanitize(student.hallTicket, "22131A0501");
+  const displayBranch = sanitize(student.branch, "Electrical & Electronics Engineering (EEE)");
+  const displayHallTicket = sanitize(student.hallTicket, "STGHJTY");
   const displayYear = sanitize(student.year, "3rd Year");
-  const displaySemester = sanitize(student.semester, "1st Semester");
-  const displayRegulation = sanitize(student.regulation, "R20 Regulation");
+  const displaySemester = sanitize(student.semester, "6th Semester");
+  const displayRegulation = sanitize(student.regulation, "R16 Regulation");
   const displayCgpa = student.cgpa && !isNaN(student.cgpa) ? student.cgpa : "8.88";
   const displayAttendance = student.attendance || "75%";
-  const displayCollege = sanitize(student.college, "JNTU College of Engineering (Autonomous)");
+  const displayCollege = sanitize(student.college, "JNTU College of Engineering");
 
   return (
     <div className="sp-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
@@ -50,11 +46,11 @@ function StudentProfileModal({ isOpen, onClose }) {
         <div className="sp-preview-user-row">
           <div className="sp-preview-avatar-wrap">
             <img
-              src={avatar}
+              src={avatar || DEFAULT_STUDENT_AVATAR}
               alt={displayName}
               className="sp-preview-avatar"
               onError={(e) => {
-                e.currentTarget.src = profileImg;
+                e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
               }}
             />
             <span className="sp-preview-status-dot" />
@@ -102,7 +98,7 @@ function StudentProfileModal({ isOpen, onClose }) {
           </div>
           <div className="sp-preview-detail-item">
             <span className="sp-pd-label">University</span>
-            <span className="sp-pd-value">{student.university || "Jawaharlal Nehru Technological University"}</span>
+            <span className="sp-pd-value">{student.university || "JNT University"}</span>
           </div>
           <div className="sp-preview-detail-item">
             <span className="sp-pd-label">Hall Ticket No</span>

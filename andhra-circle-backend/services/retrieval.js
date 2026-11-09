@@ -282,32 +282,18 @@ async function retrieveContext(rawInput) {
 function buildSuggestedQuestions(items, parsed) {
   const suggestions = [];
 
-  if (items.length > 0) {
+  if (items && items.length > 0) {
     const first = items[0];
     if (first.type === "Notification") {
       suggestions.push("Check upcoming JNTUA exam schedules");
       suggestions.push("How to apply for supplementary exams?");
-      suggestions.push("View latest official results & circulars");
     } else {
-      const subj = first.subject || first.title;
-      if (subj) {
-        suggestions.push(`What are the key topics in ${subj}?`);
-        suggestions.push(`Show syllabus and marking for ${subj}`);
-        suggestions.push(`Previous question papers for ${subj}`);
+      const subj = first.subject || (first.title !== "Notes" ? first.title : "");
+      if (subj && subj.length >= 3) {
+        suggestions.push(`Key topics in ${subj}`);
+        suggestions.push(`Syllabus for ${subj}`);
+        suggestions.push(`Question papers for ${subj}`);
       }
-    }
-  }
-
-  // Defaults if fewer than 3 suggestions
-  const defaults = [
-    "What are JNTUA R23 passing marks and grading rules?",
-    "How to prepare for semester exams and score 9+ CGPA?",
-    "Where can I find recent university exam notifications?",
-  ];
-
-  for (const def of defaults) {
-    if (suggestions.length < 3 && !suggestions.includes(def)) {
-      suggestions.push(def);
     }
   }
 
