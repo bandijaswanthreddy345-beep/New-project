@@ -2353,3 +2353,372 @@ select[aria-invalid="true"] {
   margin-top: 6px;
 }
 
+
+
+/* =========================================================
+   CREATE PROFILE VIEW & FORM STYLING (DESKTOP & MOBILE)
+   ========================================================= */
+
+.sp-create-wrapper {
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 10px 0 32px;
+}
+
+.sp-create-hero {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.sp-create-hero-badge {
+  display: inline-block;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+}
+
+.sp-create-title {
+  font-size: 24px;
+  font-weight: 850;
+  color: #013a33;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.01em;
+}
+
+.sp-create-subtitle {
+  font-size: 13.5px;
+  color: #557973;
+  margin: 0 auto;
+  max-width: 580px;
+  line-height: 1.5;
+}
+
+.sp-create-card {
+  background: #ffffff;
+  border: 1px solid #dcece6;
+  border-radius: 16px;
+  padding: 26px 30px;
+  box-shadow: 0 4px 20px rgba(1, 58, 51, 0.06);
+}
+
+.sp-create-photo-sec {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.sp-photo-preview-wrap {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  flex-shrink: 0;
+}
+
+.sp-photo-circle {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid #013a33;
+}
+
+.sp-photo-placeholder {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: #f0fdf4;
+  border: 2px dashed #6ee7b7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #059669;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sp-photo-placeholder svg {
+  width: 28px;
+  height: 28px;
+}
+
+.sp-upload-badge-btn {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #013a33;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.sp-photo-actions-text {
+  flex: 1;
+}
+
+.sp-photo-h {
+  font-size: 14px;
+  font-weight: 800;
+  color: #013a33;
+  margin: 0 0 2px 0;
+}
+
+.sp-photo-p {
+  font-size: 12px;
+  color: #557973;
+  margin: 0 0 8px 0;
+}
+
+.sp-photo-btns-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sp-btn-upload-file {
+  background: #f0fdf4;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sp-btn-upload-file:hover {
+  background: #dcfce7;
+}
+
+.sp-form-divider {
+  height: 1px;
+  background: #eef4f1;
+  margin: 20px 0;
+}
+
+.sp-section-heading-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.sp-sec-step {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #013a33;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sp-sec-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #013a33;
+  margin: 0 0 2px 0;
+}
+
+.sp-sec-desc {
+  font-size: 12px;
+  color: #557973;
+  margin: 0;
+}
+
+.sp-sec-heading-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sp-live-cgpa-pill {
+  background: #fff8e6;
+  border: 1px solid #f3dc98;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #946800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sp-form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.sp-input-box {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sp-input-box label {
+  font-size: 11.5px;
+  font-weight: 750;
+  color: #2d544f;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.sp-req {
+  color: #dc2626;
+}
+
+.sp-input-box input,
+.sp-input-box select,
+.sp-select-input {
+  padding: 9px 12px;
+  border: 1px solid #d4e5df;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: #012622;
+  outline: none;
+  background: #ffffff;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.sp-input-box input:focus,
+.sp-input-box select:focus {
+  border-color: #013a33;
+  box-shadow: 0 0 0 3px rgba(1, 58, 51, 0.12);
+}
+
+.sp-dual-selects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.sp-att-slider-box {
+  background: #f7faf8;
+  border: 1.5px solid #dcece6;
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.sp-att-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #2d544f;
+  font-weight: 600;
+}
+
+.sp-att-num-safe {
+  color: #059669;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.sp-att-num-warn {
+  color: #d97706;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.sp-range-slider {
+  width: 100%;
+  accent-color: #059669;
+  cursor: pointer;
+}
+
+.sp-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.sp-lbl-75 {
+  font-weight: 750;
+  color: #059669;
+}
+
+.sp-create-submit-bar {
+  margin-top: 22px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sp-btn-create-submit {
+  background: linear-gradient(135deg, #013a33 0%, #0d453c 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 239, 179, 0.35);
+  padding: 11px 26px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(1, 58, 51, 0.22);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.sp-btn-create-submit:hover {
+  background: #0d453c;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .sp-create-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .sp-form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sp-create-photo-sec {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .sp-photo-btns-row {
+    justify-content: center;
+  }
+
+  .sp-m-create-wrapper {
+    width: 100%;
+  }
+
+  .sp-btn-create-submit {
+    width: 100%;
+  }
+}

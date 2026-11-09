@@ -82,12 +82,30 @@ export const DEFAULT_STUDENT_DATA = DEFAULT_CHINNU_DATA;
 
 export const EMPTY_STUDENT_DATA = {
   ...DEFAULT_CHINNU_DATA,
+  name: "",
+  shortName: "",
+  hallTicket: "",
+  college: "JNTU College of Engineering",
+  branch: "Computer Science & Engineering",
+  branchCode: "CSE",
+  year: "1st Year",
+  semester: "1st Semester",
+  regulation: "R23 Regulation",
+  cgpa: "",
+  credits: "0 / 160",
+  attendance: "0%",
+  attendancePercentage: 0,
+  email: "",
+  phone: "",
+  profilePhoto: null,
   isConfigured: false,
+  savedNotes: [],
+  semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
 };
 
 // Helper to resolve the correct photo URL for a student object
 export function getStudentAvatar(student) {
-  if (!student) return DEFAULT_STUDENT_AVATAR;
+  if (!student || !student.isConfigured || !student.name?.trim()) return null;
   if (student.profilePhoto && student.profilePhoto !== "none" && typeof student.profilePhoto === "string" && student.profilePhoto.trim()) {
     return student.profilePhoto;
   }
@@ -111,21 +129,31 @@ export function calculateCgpaFromGrades(grades = []) {
 // Check if a profile is already configured in this browser
 export function hasStoredStudentProfile() {
   try {
-    const raw = localStorage.getItem("jntu_student_profile");
+    if (typeof localStorage !== "undefined" && localStorage.getItem("jntu_student_logged_out") === "true") {
+      return false;
+    }
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem("jntu_student_profile") : null;
     if (!raw) return true;
     const parsed = JSON.parse(raw);
+    if (parsed && parsed.isConfigured === false) return false;
     return Boolean(parsed && parsed.name?.trim());
   } catch (e) {
-    return true;
+    return false;
   }
 }
 
 // Retrieve stored student data with automatic schema synchronization and sanitization
 export function getStoredStudentData() {
   try {
-    const raw = localStorage.getItem("jntu_student_profile");
+    if (typeof localStorage !== "undefined" && localStorage.getItem("jntu_student_logged_out") === "true") {
+      return { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
+    }
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem("jntu_student_profile") : null;
     if (raw) {
       const parsed = JSON.parse(raw);
+      if (parsed && parsed.isConfigured === false) {
+        return { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
+      }
 
       // Validate core fields defensively so corrupt or stale data is safely healed
       const validName = validateName(parsed.name).ok ? parsed.name.trim() : DEFAULT_CHINNU_DATA.name;
@@ -272,6 +300,7 @@ export function saveStoredStudentData(data) {
     };
 
     if (typeof localStorage !== "undefined") {
+      localStorage.removeItem("jntu_student_logged_out");
       localStorage.setItem("jntu_student_profile", JSON.stringify(updated));
     }
     if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
@@ -287,8 +316,14 @@ export function saveStoredStudentData(data) {
 // Clear / Logout student profile from this device
 export function clearStoredStudentData() {
   try {
-    localStorage.removeItem("jntu_student_profile");
-    window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: DEFAULT_CHINNU_DATA }));
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("jntu_student_logged_out", "true");
+      localStorage.removeItem("jntu_student_profile");
+    }
+    const emptyProfile = { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
+    if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+      window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: emptyProfile }));
+    }
   } catch (e) {
     console.error("Error logging out student profile:", e);
   }

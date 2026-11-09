@@ -413,7 +413,7 @@ function Navbar() {
         <Link
           to="/student-profile"
           className="nav-mobile-action-btn nav-mobile-profile-btn"
-          title={`Student Profile • ${student?.name || "Chinnu"}`}
+          title={student?.isConfigured && student?.name ? `Student Profile • ${student.name}` : "Student Profile"}
           aria-label="Student Profile"
           onClick={() => {
             setMobileMenuOpen(false);
@@ -424,7 +424,7 @@ function Navbar() {
             {getStudentAvatar(student) ? (
               <img
                 src={getStudentAvatar(student)}
-                alt={student?.name || "Chinnu"}
+                alt={student?.name || "Student"}
                 className="nav-profile-avatar-img nav-mobile-avatar-img"
                 onError={(e) => {
                   e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
@@ -560,7 +560,8 @@ function Navbar() {
             }
 
             if (item.isProfile || item.name === "Student Profile") {
-              const studentName = student?.name || "Chinnu";
+              const isConfigured = Boolean(student?.isConfigured && student?.name);
+              const studentName = isConfigured ? student.name : "Student Profile";
               const photoSrc = getStudentAvatar(student);
 
               return (
@@ -572,8 +573,8 @@ function Navbar() {
                         ? "nav-link active nav-profile-btn"
                         : "nav-link nav-profile-btn"
                     }
-                    title={`Student Profile • ${studentName}`}
-                    aria-label={`Student Profile (${studentName})`}
+                    title={isConfigured ? `Student Profile • ${studentName}` : "Student Profile"}
+                    aria-label={isConfigured ? `Student Profile (${studentName})` : "Student Profile"}
                   >
                     <div className="nav-profile-avatar-wrapper">
                       {photoSrc ? (

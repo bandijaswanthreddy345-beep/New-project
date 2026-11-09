@@ -475,8 +475,10 @@ function StudentProfile() {
   const handleConfirmLogout = () => {
     logoutStudentProfile();
     setShowLogoutModal(false);
+    setShowMenu(false);
+    setShowMobileMenu(false);
     // Reset local state to fresh empty form
-    setStudent(EMPTY_STUDENT_DATA);
+    setStudent({ ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" });
     setCreateForm({
       name: "",
       branch: "Computer Science & Engineering",
@@ -535,8 +537,361 @@ function StudentProfile() {
     window.print();
   };
 
+  // Reusable Create Profile Form for both Desktop and Mobile views
+  const renderCreateProfileForm = () => (
+    <form onSubmit={handleCreateProfileSubmit} className="sp-create-card">
+      {/* Photo Upload Section */}
+      <div className="sp-create-photo-sec">
+        <div className="sp-photo-preview-wrap">
+          {createForm.profilePhoto ? (
+            <img
+              src={createForm.profilePhoto}
+              alt="Student Preview"
+              className="sp-photo-circle"
+            />
+          ) : (
+            <div className="sp-photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span>No Photo</span>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="sp-upload-badge-btn"
+            onClick={() => fileInputRef.current?.click()}
+            title="Upload Profile Photo"
+          >
+            📷
+          </button>
+        </div>
+
+        <div className="sp-photo-actions-text">
+          <h4 className="sp-photo-h">Student Profile Picture</h4>
+          <p className="sp-photo-p">
+            Upload a clear photo (JPG, PNG, or WEBP). Maximum 4MB.
+          </p>
+          <div className="sp-photo-btns-row">
+            <button
+              type="button"
+              className="sp-btn-upload-file"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Choose Photo From Device
+            </button>
+            {createForm.profilePhoto && (
+              <button
+                type="button"
+                className="sp-btn-remove-photo"
+                onClick={() => handleRemovePhoto("create")}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+          {photoError && <span className="sp-photo-error" role="alert">{photoError}</span>}
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => handlePhotoUpload(e, "create")}
+          />
+        </div>
+      </div>
+
+      <div className="sp-form-divider" />
+
+      {/* Personal & Academic Details */}
+      <div className="sp-section-heading-row">
+        <span className="sp-sec-step">1</span>
+        <div>
+          <h3 className="sp-sec-title">Personal & University Information</h3>
+          <p className="sp-sec-desc">Enter your primary student details as registered in college.</p>
+        </div>
+      </div>
+
+      <div className="sp-form-grid-2">
+        <div className="sp-input-box">
+          <label>Full Student Name <span className="sp-req">*</span></label>
+          <input
+            type="text"
+            name="name"
+            value={createForm.name}
+            onChange={handleCreateChange}
+            onBlur={handleCreateBlur}
+            aria-invalid={Boolean(createErrors.name)}
+            placeholder="e.g. Bandi Jaswanth Reddy"
+            required
+          />
+          {createErrors.name && (
+            <span className="sp-field-error" role="alert">{createErrors.name}</span>
+          )}
+        </div>
+
+        <div className="sp-input-box">
+          <label>USN / Hall Ticket Number <span className="sp-req">*</span></label>
+          <input
+            type="text"
+            name="hallTicket"
+            value={createForm.hallTicket}
+            onChange={handleCreateChange}
+            onBlur={handleCreateBlur}
+            aria-invalid={Boolean(createErrors.hallTicket)}
+            placeholder="e.g. 21B91A0201"
+            required
+          />
+          {createErrors.hallTicket && (
+            <span className="sp-field-error" role="alert">{createErrors.hallTicket}</span>
+          )}
+        </div>
+
+        <div className="sp-input-box">
+          <label>Branch / Specialization <span className="sp-req">*</span></label>
+          <select
+            name="branchSelect"
+            value={createForm.branchCode}
+            onChange={handleCreateChange}
+            className="sp-select-input"
+          >
+            {POPULAR_BRANCHES.map((b) => (
+              <option key={b.code} value={b.code}>
+                {b.name} ({b.code})
+              </option>
+            ))}
+            <option value="OTHER">Other Branch (Specify below)</option>
+          </select>
+        </div>
+
+        {createForm.branchCode === "OTHER" && (
+          <div className="sp-input-box">
+            <label>Custom Branch Name <span className="sp-req">*</span></label>
+            <input
+              type="text"
+              name="customBranch"
+              value={createForm.customBranch}
+              onChange={handleCreateChange}
+              onBlur={handleCreateBlur}
+              aria-invalid={Boolean(createErrors.branch)}
+              placeholder="e.g. Chemical Engineering"
+              required
+            />
+            {createErrors.branch && (
+              <span className="sp-field-error" role="alert">{createErrors.branch}</span>
+            )}
+          </div>
+        )}
+
+        <div className="sp-input-box">
+          <label>College / Campus Name</label>
+          <input
+            type="text"
+            name="college"
+            value={createForm.college}
+            onChange={handleCreateChange}
+            placeholder="e.g. JNTU College of Engineering, Anantapur"
+          />
+        </div>
+
+        <div className="sp-input-box">
+          <label>Academic Year & Regulation</label>
+          <div className="sp-dual-selects">
+            <select
+              name="year"
+              value={createForm.year}
+              onChange={handleCreateChange}
+              className="sp-select-input"
+            >
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
+            </select>
+            <select
+              name="regulation"
+              value={createForm.regulation}
+              onChange={handleCreateChange}
+              className="sp-select-input"
+            >
+              <option value="R23 Regulation">R23 Regulation</option>
+              <option value="R20 Regulation">R20 Regulation</option>
+              <option value="R19 Regulation">R19 Regulation</option>
+              <option value="R16 Regulation">R16 Regulation</option>
+              <option value="R15 Regulation">R15 Regulation</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="sp-input-box">
+          <label>Current Semester</label>
+          <select
+            name="semester"
+            value={createForm.semester}
+            onChange={handleCreateChange}
+            className="sp-select-input"
+          >
+            <option value="1st Semester">1st Semester (1-1)</option>
+            <option value="2nd Semester">2nd Semester (1-2)</option>
+            <option value="3rd Semester">3rd Semester (2-1)</option>
+            <option value="4th Semester">4th Semester (2-2)</option>
+            <option value="5th Semester">5th Semester (3-1)</option>
+            <option value="6th Semester">6th Semester (3-2)</option>
+            <option value="7th Semester">7th Semester (4-1)</option>
+            <option value="8th Semester">8th Semester (4-2)</option>
+          </select>
+        </div>
+
+        <div className="sp-input-box">
+          <label>Student Email (Optional)</label>
+          <input
+            type="email"
+            name="email"
+            value={createForm.email}
+            onChange={handleCreateChange}
+            onBlur={handleCreateBlur}
+            aria-invalid={Boolean(createErrors.email)}
+            placeholder="e.g. student@gmail.com"
+          />
+          {createErrors.email && (
+            <span className="sp-field-error" role="alert">{createErrors.email}</span>
+          )}
+        </div>
+
+        <div className="sp-input-box">
+          <label>Phone Number (Optional)</label>
+          <input
+            type="tel"
+            name="phone"
+            value={createForm.phone}
+            onChange={handleCreateChange}
+            onBlur={handleCreateBlur}
+            aria-invalid={Boolean(createErrors.phone)}
+            placeholder="e.g. +91 9876543210"
+          />
+          {createErrors.phone && (
+            <span className="sp-field-error" role="alert">{createErrors.phone}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="sp-form-divider" />
+
+      {/* Attendance Benchmark */}
+      <div className="sp-section-heading-row">
+        <span className="sp-sec-step">2</span>
+        <div>
+          <h3 className="sp-sec-title">Current Semester Attendance</h3>
+          <p className="sp-sec-desc">Keep track of your JNTU examination eligibility status.</p>
+        </div>
+      </div>
+
+      <div className="sp-att-slider-box">
+        <div className="sp-att-slider-header">
+          <span>Self-Reported Attendance:</span>
+          <strong className={createForm.attendancePercentage >= 75 ? "sp-att-num-safe" : "sp-att-num-warn"}>
+            {createForm.attendancePercentage}%
+          </strong>
+        </div>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          name="attendancePercentage"
+          value={createForm.attendancePercentage}
+          onChange={handleCreateChange}
+          className="sp-range-slider"
+        />
+        <div className="sp-slider-labels">
+          <span>0% (Detained)</span>
+          <span className="sp-lbl-75">75% (Min. Required)</span>
+          <span>100% (Perfect)</span>
+        </div>
+      </div>
+
+      <div className="sp-form-divider" />
+
+      {/* Semester Academic Matrix (SGPAs) */}
+      <div className="sp-section-heading-row">
+        <span className="sp-sec-step">3</span>
+        <div className="sp-sec-heading-flex">
+          <div>
+            <h3 className="sp-sec-title">Semester Grades (SGPA)</h3>
+            <p className="sp-sec-desc">Enter your SGPA for completed semesters (0.00 – 10.00). Leave blank if in progress.</p>
+          </div>
+          {calculateCgpaFromGrades(createForm.semesterGrades) && (
+            <div className="sp-live-cgpa-pill">
+              <span>Calculated CGPA:</span>
+              <strong>{calculateCgpaFromGrades(createForm.semesterGrades)} / 10.0</strong>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="sp-sem-matrix-grid">
+        {createForm.semesterGrades.map((sem, idx) => (
+          <div key={idx} className="sp-sem-input-card">
+            <span className="sp-sem-tag">{sem.sem}</span>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              max="10"
+              placeholder="e.g. 8.75"
+              value={sem.sgpa}
+              onChange={(e) => handleCreateSemGradeChange(idx, e.target.value)}
+              className="sp-sem-score-input"
+            />
+            <span className="sp-sem-subtext">20 Credits</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Form Action */}
+      <div className="sp-create-submit-bar">
+        <button type="submit" className="sp-btn-create-submit">
+          ✨ Create & Save My Student Profile
+        </button>
+      </div>
+    </form>
+  );
+
   return (
     <div className="student-profile-page">
+      {/* =========================================================
+          LOGOUT CONFIRMATION MODAL (ACCESSIBLE ON BOTH DESKTOP & MOBILE)
+          ========================================================= */}
+      {showLogoutModal && (
+        <div className="sp-modal-backdrop" onClick={() => setShowLogoutModal(false)}>
+          <div className="sp-confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="sp-confirm-icon">🚪</div>
+            <h3 className="sp-confirm-title">Log Out from Student Profile?</h3>
+            <p className="sp-confirm-text">
+              Logging out will clear your saved academic profile from this browser session.
+              You or another student can create or log into a new profile anytime.
+            </p>
+            <div className="sp-confirm-actions">
+              <button
+                type="button"
+                className="sp-btn-confirm-cancel"
+                onClick={() => setShowLogoutModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="sp-btn-confirm-logout"
+                onClick={handleConfirmLogout}
+              >
+                Yes, Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* =========================================================
           DESKTOP VIEW (SCREEN WIDTH > 768px)
           ========================================================= */}
@@ -574,38 +929,6 @@ function StudentProfile() {
       </header>
 
       {/* =========================================================
-          LOGOUT CONFIRMATION MODAL
-          ========================================================= */}
-      {showLogoutModal && (
-        <div className="sp-modal-backdrop" onClick={() => setShowLogoutModal(false)}>
-          <div className="sp-confirm-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="sp-confirm-icon">🚪</div>
-            <h3 className="sp-confirm-title">Log Out from Student Profile?</h3>
-            <p className="sp-confirm-text">
-              Logging out will clear your saved academic profile from this browser session.
-              You or another student can create or log into a new profile anytime.
-            </p>
-            <div className="sp-confirm-actions">
-              <button
-                type="button"
-                className="sp-btn-confirm-cancel"
-                onClick={() => setShowLogoutModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="sp-btn-confirm-logout"
-                onClick={handleConfirmLogout}
-              >
-                Yes, Log Out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================
           MAIN CONTAINER
           ========================================================= */}
       <main className="sp-page-main">
@@ -630,337 +953,7 @@ function StudentProfile() {
               </p>
             </div>
 
-            <form onSubmit={handleCreateProfileSubmit} className="sp-create-card">
-              {/* Photo Upload Section */}
-              <div className="sp-create-photo-sec">
-                <div className="sp-photo-preview-wrap">
-                  {createForm.profilePhoto ? (
-                    <img
-                      src={createForm.profilePhoto}
-                      alt="Student Preview"
-                      className="sp-photo-circle"
-                    />
-                  ) : (
-                    <div className="sp-photo-placeholder">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
-                      <span>No Photo</span>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    className="sp-upload-badge-btn"
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Upload Profile Photo"
-                  >
-                    📷
-                  </button>
-                </div>
-
-                <div className="sp-photo-actions-text">
-                  <h4 className="sp-photo-h">Student Profile Picture</h4>
-                  <p className="sp-photo-p">
-                    Upload a clear photo (JPG, PNG, or WEBP). Maximum 4MB.
-                  </p>
-                  <div className="sp-photo-btns-row">
-                    <button
-                      type="button"
-                      className="sp-btn-upload-file"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      Choose Photo From Device
-                    </button>
-                    {createForm.profilePhoto && (
-                      <button
-                        type="button"
-                        className="sp-btn-remove-photo"
-                        onClick={() => handleRemovePhoto("create")}
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                  {photoError && <span className="sp-photo-error" role="alert">{photoError}</span>}
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={(e) => handlePhotoUpload(e, "create")}
-                  />
-                </div>
-              </div>
-
-              <div className="sp-form-divider" />
-
-              {/* Personal & Academic Details */}
-              <div className="sp-section-heading-row">
-                <span className="sp-sec-step">1</span>
-                <div>
-                  <h3 className="sp-sec-title">Personal & University Information</h3>
-                  <p className="sp-sec-desc">Enter your primary student details as registered in college.</p>
-                </div>
-              </div>
-
-              <div className="sp-form-grid-2">
-                <div className="sp-input-box">
-                  <label>Full Student Name <span className="sp-req">*</span></label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={createForm.name}
-                    onChange={handleCreateChange}
-                    onBlur={handleCreateBlur}
-                    aria-invalid={Boolean(createErrors.name)}
-                    placeholder="e.g. Bandi Jaswanth Reddy"
-                    required
-                  />
-                  {createErrors.name && (
-                    <span className="sp-field-error" role="alert">{createErrors.name}</span>
-                  )}
-                </div>
-
-                <div className="sp-input-box">
-                  <label>USN / Hall Ticket Number <span className="sp-req">*</span></label>
-                  <input
-                    type="text"
-                    name="hallTicket"
-                    value={createForm.hallTicket}
-                    onChange={handleCreateChange}
-                    onBlur={handleCreateBlur}
-                    aria-invalid={Boolean(createErrors.hallTicket)}
-                    placeholder="e.g. 21691A0501"
-                    required
-                  />
-                  {createErrors.hallTicket && (
-                    <span className="sp-field-error" role="alert">{createErrors.hallTicket}</span>
-                  )}
-                </div>
-
-                <div className="sp-input-box">
-                  <label>Branch / Specialization <span className="sp-req">*</span></label>
-                  <select
-                    name="branchSelect"
-                    value={createForm.branchCode}
-                    onChange={handleCreateChange}
-                    className="sp-select-input"
-                  >
-                    {POPULAR_BRANCHES.map((b) => (
-                      <option key={b.code} value={b.code}>
-                        {b.name} ({b.code})
-                      </option>
-                    ))}
-                    <option value="OTHER">Other Branch (Specify below)</option>
-                  </select>
-                </div>
-
-                {createForm.branchCode === "OTHER" && (
-                  <div className="sp-input-box">
-                    <label>Specify Branch Name & Code</label>
-                    <input
-                      type="text"
-                      name="branch"
-                      value={createForm.branch}
-                      onChange={handleCreateChange}
-                      onBlur={handleCreateBlur}
-                      aria-invalid={Boolean(createErrors.branch)}
-                      placeholder="e.g. Chemical Engineering (CHEM)"
-                      required
-                    />
-                    {createErrors.branch && (
-                      <span className="sp-field-error" role="alert">{createErrors.branch}</span>
-                    )}
-                  </div>
-                )}
-
-                <div className="sp-input-box">
-                  <label>College / Institution Name <span className="sp-req">*</span></label>
-                  <input
-                    type="text"
-                    name="college"
-                    value={createForm.college}
-                    onChange={handleCreateChange}
-                    onBlur={handleCreateBlur}
-                    aria-invalid={Boolean(createErrors.college)}
-                    placeholder="e.g. Madanapalle Institute of Technology & Science"
-                    required
-                  />
-                  {createErrors.college && (
-                    <span className="sp-field-error" role="alert">{createErrors.college}</span>
-                  )}
-                </div>
-
-                <div className="sp-input-box">
-                  <label>Email Address <span className="sp-req">*</span></label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={createForm.email}
-                    onChange={handleCreateChange}
-                    onBlur={handleCreateBlur}
-                    aria-invalid={Boolean(createErrors.email)}
-                    placeholder="e.g. jaswanth@gmail.com"
-                    required
-                  />
-                  {createErrors.email && (
-                    <span className="sp-field-error" role="alert">{createErrors.email}</span>
-                  )}
-                </div>
-
-                <div className="sp-input-box">
-                  <label>Contact Phone Number <span className="sp-req">*</span></label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={createForm.phone}
-                    onChange={handleCreateChange}
-                    onBlur={handleCreateBlur}
-                    aria-invalid={Boolean(createErrors.phone)}
-                    placeholder="e.g. +91 98765 43210"
-                    required
-                  />
-                  {createErrors.phone && (
-                    <span className="sp-field-error" role="alert">{createErrors.phone}</span>
-                  )}
-                </div>
-
-                <div className="sp-input-box">
-                  <label>Current Academic Level</label>
-                  <div className="sp-inline-2">
-                    <select
-                      name="year"
-                      value={createForm.year}
-                      onChange={handleCreateChange}
-                      className="sp-select-input"
-                    >
-                      <option value="1st Year">1st Year</option>
-                      <option value="2nd Year">2nd Year</option>
-                      <option value="3rd Year">3rd Year</option>
-                      <option value="4th Year">4th Year</option>
-                    </select>
-                    <select
-                      name="semester"
-                      value={createForm.semester}
-                      onChange={handleCreateChange}
-                      className="sp-select-input"
-                    >
-                      <option value="1st Semester">1st Semester</option>
-                      <option value="2nd Semester">2nd Semester</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="sp-input-box">
-                  <label>Curriculum Regulation</label>
-                  <select
-                    name="regulation"
-                    value={createForm.regulation}
-                    onChange={handleCreateChange}
-                    className="sp-select-input"
-                  >
-                    <option value="R23 Regulation">R23 Regulation</option>
-                    <option value="R20 Regulation">R20 Regulation</option>
-                    <option value="R19 Regulation">R19 Regulation</option>
-                    <option value="R15 Regulation">R15 Regulation</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="sp-form-divider" />
-
-              {/* Attendance Tracker Input */}
-              <div className="sp-section-heading-row">
-                <span className="sp-sec-step">2</span>
-                <div>
-                  <h3 className="sp-sec-title">Overall Attendance Percentage</h3>
-                  <p className="sp-sec-desc">Keep track of your semester attendance for JNTU exam hall ticket clearance.</p>
-                </div>
-              </div>
-
-              <div className="sp-attendance-card-box">
-                <div className="sp-att-slider-row">
-                  <div className="sp-att-input-col">
-                    <div className="sp-att-num-display">
-                      <span className="sp-att-big-num">{createForm.attendancePercentage}%</span>
-                      <span className="sp-att-sub">Current Attendance</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={createForm.attendancePercentage}
-                      onChange={(e) =>
-                        setCreateForm((prev) => ({
-                          ...prev,
-                          attendancePercentage: Number(e.target.value),
-                        }))
-                      }
-                      className="sp-att-range-slider"
-                    />
-                  </div>
-
-                  <div className={`sp-att-status-badge-card ${getAttendanceStatus(createForm.attendancePercentage).class}`}>
-                    <div className="sp-att-status-header">
-                      <span className="sp-att-status-icon">{getAttendanceStatus(createForm.attendancePercentage).icon}</span>
-                      <strong>{getAttendanceStatus(createForm.attendancePercentage).label}</strong>
-                    </div>
-                    <p className="sp-att-status-text">
-                      {getAttendanceStatus(createForm.attendancePercentage).desc}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="sp-form-divider" />
-
-              {/* Semester-wise CGPA / SGPA Section */}
-              <div className="sp-section-heading-row">
-                <span className="sp-sec-step">3</span>
-                <div className="sp-sec-flex-header">
-                  <div>
-                    <h3 className="sp-sec-title">Semester-wise SGPA Performance</h3>
-                    <p className="sp-sec-desc">
-                      Enter your SGPA for each completed semester (1 through 8). Leave future semesters blank.
-                    </p>
-                  </div>
-                  {calculateCgpaFromGrades(createForm.semesterGrades) && (
-                    <div className="sp-live-cgpa-pill">
-                      <span>Calculated CGPA:</span>
-                      <strong>{calculateCgpaFromGrades(createForm.semesterGrades)} / 10.0</strong>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="sp-sem-matrix-grid">
-                {createForm.semesterGrades.map((sem, idx) => (
-                  <div key={idx} className="sp-sem-input-card">
-                    <span className="sp-sem-tag">{sem.sem}</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="10"
-                      placeholder="e.g. 8.75"
-                      value={sem.sgpa}
-                      onChange={(e) => handleCreateSemGradeChange(idx, e.target.value)}
-                      className="sp-sem-score-input"
-                    />
-                    <span className="sp-sem-subtext">20 Credits</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Form Action */}
-              <div className="sp-create-submit-bar">
-                <button type="submit" className="sp-btn-create-submit">
-                  ✨ Create & Save My Student Profile
-                </button>
-              </div>
-            </form>
+            {renderCreateProfileForm()}
           </div>
         ) : (
           /* ---------------------------------------------------------
@@ -1719,8 +1712,56 @@ function StudentProfile() {
           Exact match to Stitch Screen: ef9d9d11bcc84239961a51c2ba1fa1e6
           ========================================================= */}
       <div className="sp-mobile-stitch-container">
-        {/* BEGIN: MainHeader */}
-        <header className="sp-m-header">
+        {!isConfigured ? (
+          <div className="sp-m-create-wrapper">
+            <header className="sp-m-header">
+              <div className="sp-m-topbar">
+                <div className="sp-m-portal-badge" onClick={() => navigate("/")} title="JNTU Portal Home">
+                  <div className="sp-m-portal-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                    </svg>
+                  </div>
+                  <div className="sp-m-portal-text">
+                    <span className="sp-m-portal-name">JNTU PORTAL</span>
+                    <span className="sp-m-portal-sub">Student Academic System</span>
+                  </div>
+                </div>
+
+                <div className="sp-m-top-actions">
+                  <button
+                    type="button"
+                    className="sp-m-action-btn"
+                    onClick={() => navigate("/")}
+                    title="Return to Homepage"
+                    aria-label="Return to Homepage"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div className="sp-m-identity">
+                <span style={{ fontSize: "32px", marginBottom: "6px" }}>🎓</span>
+                <h1 className="sp-m-name" style={{ fontSize: "22px" }}>Create Student Profile</h1>
+                <p style={{ color: "#a7f3d0", fontSize: "12px", margin: "4px 0 0", textAlign: "center", maxWidth: "300px" }}>
+                  Set up your academic identity to track attendance, grades, and CGPA privately on this device.
+                </p>
+              </div>
+            </header>
+
+            <main className="sp-m-content">
+              {renderCreateProfileForm()}
+            </main>
+          </div>
+        ) : (
+          <>
+            {/* BEGIN: MainHeader */}
+            <header className="sp-m-header">
           {/* Top Action Row */}
           <div className="sp-m-topbar">
             <div className="sp-m-portal-badge" onClick={() => navigate("/")} title="JNTU Portal Home">
@@ -2299,6 +2340,8 @@ function StudentProfile() {
             </button>
           </div>
         </main>
+          </>
+        )}
       </div>
 
       <input
