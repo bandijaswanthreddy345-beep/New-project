@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import API from "../api/api";
+import { startAdminSession } from "../utils/adminSession";
 import "./Login.css";
 
 function Login() {
@@ -46,18 +47,13 @@ function Login() {
         return;
       }
 
-      // Save JWT token & user information
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      console.log("Login successful");
-      console.log("User:", user);
-      console.log("Token saved:", token);
-
-      // Role based redirection
+      // Role based storage & redirection
       if (user.role === "admin") {
+        startAdminSession(token, user);
         navigate("/dashboard");
       } else {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
         navigate("/");
       }
     } catch (err) {

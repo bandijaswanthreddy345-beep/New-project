@@ -70,7 +70,7 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    // Generate JWT Token with Role
+    // Generate JWT Token with Role (8h for admin sessions)
     const token = jwt.sign(
       {
         id: user._id,
@@ -78,7 +78,7 @@ exports.loginUser = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "7d",
+        expiresIn: user.role === "admin" ? "8h" : "7d",
       }
     );
 

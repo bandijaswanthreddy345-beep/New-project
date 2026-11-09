@@ -8,6 +8,8 @@ const {
   createNote,
   getNotes,
   getBranchStats,
+  getTrendingMaterials,
+  getRelatedMaterials,
   getNoteById,
   updateNote,
   deleteNote,
@@ -23,10 +25,22 @@ const {
 router.get("/", getNotes);
 
 // ==========================================
-// GET BRANCH STATS (FOR 3D CARDS & CATALOG)
+// GET BRANCH STATS (FOR 3D CARDS & CATALOG) - AGGREGATION PIPELINE
 // ==========================================
 
 router.get("/branch-stats", getBranchStats);
+
+// ==========================================
+// GET TRENDING MATERIALS - AGGREGATION PIPELINE
+// ==========================================
+
+router.get("/trending", getTrendingMaterials);
+
+// ==========================================
+// GET RELATED MATERIALS - AGGREGATION PIPELINE WITH $LOOKUP
+// ==========================================
+
+router.get("/:id/related", getRelatedMaterials);
 
 // ==========================================
 // GET SINGLE NOTE

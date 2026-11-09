@@ -24,6 +24,12 @@ const noteSchema = new mongoose.Schema(
       trim: true,
     },
 
+    regulation: {
+      type: String,
+      default: "R23",
+      trim: true,
+    },
+
     subject: {
       type: String,
       default: "",

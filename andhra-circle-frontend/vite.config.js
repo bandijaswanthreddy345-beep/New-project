@@ -21,6 +21,9 @@ export default defineConfig({
     include: ['react', 'react-dom', 'border-beam', 'bot-avatars'],
   },
   server: {
+    proxy: {
+      '/uploads': 'http://localhost:5000',
+    },
     watch: {
       usePolling: true,
       interval: 1000,

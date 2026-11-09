@@ -95,7 +95,7 @@ exports.updateLabProgram = async (req, res) => {
           description: req.body.description,
         },
         {
-          new: true,
+          returnDocument: "after",
           runValidators: true,
         }
       );
@@ -178,7 +178,7 @@ exports.likeLabProgram = async (req, res) => {
     const labProgram = await LabProgram.findByIdAndUpdate(
       req.params.id,
       { $set: { likes: targetLikes } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     res.status(200).json(labProgram);
@@ -198,7 +198,7 @@ exports.increaseViews = async (req, res) => {
     const labProgram = await LabProgram.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!labProgram) {
@@ -224,7 +224,7 @@ exports.increaseDownloads = async (req, res) => {
     const labProgram = await LabProgram.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!labProgram) {

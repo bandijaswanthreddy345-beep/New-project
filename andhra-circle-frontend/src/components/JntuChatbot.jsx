@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { BotAvatar } from "bot-avatars";
 import { ThinkingOrb } from "thinking-orbs";
@@ -8,7 +9,6 @@ import {
   formatResourceAction,
   detectBranchFromQuery,
   getBranchHubData,
-  BRANCH_DIRECTORY,
 } from "../utils/searchEngine";
 
 /**
@@ -289,6 +289,19 @@ function JntuChatbot() {
     }
   }, [isModalOpen, isTyping]);
 
+  // Lock body scroll and apply chatbot-modal-open class when modal is open
+  useEffect(() => {
+    if (isModalOpen && typeof document !== "undefined") {
+      document.body.classList.add("chatbot-modal-open");
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.classList.remove("chatbot-modal-open");
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isModalOpen]);
+
   // Handle ESC key to close modal overlay
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -427,7 +440,7 @@ function JntuChatbot() {
       setProfileSession({ active: true, step: "NAME", draft: {} });
       return {
         text: `🎓 Let's build your verified JNTU Student Profile together! First, what is your Full Name?`,
-        suggestions: ["Chinnu", "Jaswanth Reddy", "K. Suresh"],
+        suggestions: ["Jaswanth", "Jaswanth Reddy", "K. Suresh"],
         wizardActive: true,
       };
     }
@@ -839,8 +852,11 @@ function JntuChatbot() {
 
       {/* =========================================================
           POPUP MODAL & OVERLAY (COMMUNICATION IS DONE HERE)
+          Rendered via React Portal directly into document.body
+          to eliminate any stacking context traps from parent/sibling
+          sections, 3D carousels, and floating action buttons.
           ========================================================= */}
-      {isModalOpen && (
+      {isModalOpen && typeof document !== "undefined" && createPortal(
         <div
           className="chat-modal-overlay"
           onClick={(e) => {
@@ -1237,7 +1253,8 @@ function JntuChatbot() {
               </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

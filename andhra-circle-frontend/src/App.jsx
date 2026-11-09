@@ -1,5 +1,7 @@
 
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { isAdminPath, clearAdminSession } from "./utils/adminSession";
 
 // =========================
 // Public Pages
@@ -9,8 +11,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Notes from "./pages/Notes";
-import Syllabus from "./pages/Syllabus";
-import LabPrograms from "./pages/LabPrograms";
 import SearchResults from "./pages/SearchResults";
 import NoteDetails from "./pages/NoteDetails";
 import StudentProfile from "./pages/StudentProfile";
@@ -19,7 +19,6 @@ import StudentProfile from "./pages/StudentProfile";
 // Public Resource Pages
 // =========================
 
-import QuestionPapers from "./components/QuestionPapers";
 import Notifications from "./components/Notifications";
 import Calculator from "./pages/Calculator";
 import UploadMaterials from "./pages/UploadMaterials";
@@ -70,6 +69,23 @@ import AdminRoute from "./components/AdminRoute";
 import PdfViewer from "./pages/PdfViewer";
 
 function App() {
+  const location = useLocation();
+
+  // Route Exit Protection:
+  // When an admin leaves the restricted Admin Portal and navigates to ANY public page (e.g. /, /notes, etc.),
+  // automatically revoke the admin session so another user on this browser cannot open /dashboard.
+  useEffect(() => {
+    if (!isAdminPath(location.pathname) && location.pathname !== "/login") {
+      const activeAdmin =
+        sessionStorage.getItem("admin_active_portal") ||
+        localStorage.getItem("admin_active_portal");
+
+      if (activeAdmin) {
+        clearAdminSession();
+      }
+    }
+  }, [location.pathname]);
+
   return (
     <>
       <Routes>

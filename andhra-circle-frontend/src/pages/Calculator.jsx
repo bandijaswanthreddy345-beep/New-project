@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 import {
   R23_SUBJECTS_BY_BRANCH_SEM,
@@ -9,19 +9,6 @@ import {
 } from "../data/r23Subjects";
 import Footer from "../components/Footer";
 import "./Calculator.css";
-
-// Standard JNTU Grade Points Mapping
-const GRADE_POINTS = {
-  O: 10,
-  "A+": 9,
-  A: 8,
-  "B+": 7,
-  B: 6,
-  C: 5,
-  P: 4,
-  F: 0,
-  AB: 0,
-};
 
 // JNTU 10-Point Absolute Grading Scale: Marks to Grade & Points Converter
 export function getGradeInfoFromMarks(marks) {
@@ -150,14 +137,14 @@ export default function Calculator() {
       getR23PresetSubjects("AIML", "1").map((item) => ({ ...item, marks: "" }))
     );
     setCgpaSemesters([
-      { sem: "Semester 1", sgpa: "", active: true },
-      { sem: "Semester 2", sgpa: "", active: true },
-      { sem: "Semester 3", sgpa: "", active: false },
-      { sem: "Semester 4", sgpa: "", active: false },
-      { sem: "Semester 5", sgpa: "", active: false },
-      { sem: "Semester 6", sgpa: "", active: false },
-      { sem: "Semester 7", sgpa: "", active: false },
-      { sem: "Semester 8", sgpa: "", active: false },
+      { sem: "1-1", sgpa: "", active: true },
+      { sem: "1-2", sgpa: "", active: true },
+      { sem: "2-1", sgpa: "", active: false },
+      { sem: "2-2", sgpa: "", active: false },
+      { sem: "3-1", sgpa: "", active: false },
+      { sem: "3-2", sgpa: "", active: false },
+      { sem: "4-1", sgpa: "", active: false },
+      { sem: "4-2", sgpa: "", active: false },
     ]);
     setTaskCompleted(false);
     setCompletedReport(null);
@@ -248,14 +235,14 @@ export default function Calculator() {
   // CGPA STATE & LOGIC (NO CREDITS REQUIRED)
   // -------------------------------------------------------------
   const [cgpaSemesters, setCgpaSemesters] = useState([
-    { sem: "Semester 1", sgpa: "8.60", active: true },
-    { sem: "Semester 2", sgpa: "8.90", active: true },
-    { sem: "Semester 3", sgpa: "9.10", active: true },
-    { sem: "Semester 4", sgpa: "8.75", active: true },
-    { sem: "Semester 5", sgpa: "9.05", active: true },
-    { sem: "Semester 6", sgpa: "8.80", active: true },
-    { sem: "Semester 7", sgpa: "", active: false },
-    { sem: "Semester 8", sgpa: "", active: false },
+    { sem: "1-1", sgpa: "8.60", active: true },
+    { sem: "1-2", sgpa: "8.90", active: true },
+    { sem: "2-1", sgpa: "9.10", active: true },
+    { sem: "2-2", sgpa: "8.75", active: true },
+    { sem: "3-1", sgpa: "9.05", active: true },
+    { sem: "3-2", sgpa: "8.80", active: true },
+    { sem: "4-1", sgpa: "", active: false },
+    { sem: "4-2", sgpa: "", active: false },
   ]);
 
   const handleCgpaSemChange = (index, value) => {
@@ -522,9 +509,18 @@ export default function Calculator() {
                 }}
                 className="calc-field-select"
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
-                  <option key={s} value={s}>
-                    Semester {s}
+                {[
+                  { id: "1", label: "1-1" },
+                  { id: "2", label: "1-2" },
+                  { id: "3", label: "2-1" },
+                  { id: "4", label: "2-2" },
+                  { id: "5", label: "3-1" },
+                  { id: "6", label: "3-2" },
+                  { id: "7", label: "4-1" },
+                  { id: "8", label: "4-2" },
+                ].map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
                   </option>
                 ))}
               </select>

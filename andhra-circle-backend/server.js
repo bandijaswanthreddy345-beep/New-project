@@ -56,6 +56,12 @@ app.use(
 
 app.use(
   "/uploads",
+  (req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Content-Security-Policy", "frame-ancestors *");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
   express.static(path.join(__dirname, "uploads"))
 );
 
@@ -150,6 +156,15 @@ app.use(
 app.use(
   "/api/user-materials",
   require("./routes/userMaterialRoutes")
+);
+
+// ==========================
+// UNIVERSAL SEARCH (AGGREGATION PIPELINE)
+// ==========================
+
+app.use(
+  "/api/search",
+  require("./routes/searchRoutes")
 );
 
 // ==========================

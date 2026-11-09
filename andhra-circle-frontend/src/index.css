@@ -650,6 +650,7 @@ ul {
   box-shadow: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
+  appearance: none !important;
   font-size: 14.5px;
   font-weight: 450;
   color: #FFFFFF;
@@ -960,17 +961,37 @@ ul {
    All communication happens inside this popup overlay.
    ========================================================= */
 
+body.chatbot-modal-open {
+  overflow: hidden !important;
+}
+
+body.chatbot-modal-open #root {
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+body.chatbot-modal-open .floating-email-btn,
+body.chatbot-modal-open .floating-instagram-btn,
+body.chatbot-modal-open .floating-whatsapp-btn {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: scale(0.8) !important;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease !important;
+}
+
 .chat-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 999999;
-  background-color: #000000bd;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999999;
+  background-color: rgba(1, 15, 13, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overscroll-behavior: contain;
   animation: chatModalBackdropFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -988,16 +1009,18 @@ ul {
   max-width: 680px;
   height: 620px;
   max-height: 88vh;
-  background-color: #0a0f1d;
-  border: 1.5px solid #ffefb355;
+  background-color: #060c14;
+  border: 1.5px solid rgba(255, 239, 179, 0.35);
   border-radius: 24px;
   box-shadow:
-    0 25px 60px #000000e0,
-    0 0 35px #fed86626,
-    inset 0 1px 0 #ffffff1a;
+    0 30px 80px rgba(0, 0, 0, 0.95),
+    0 0 50px rgba(254, 216, 102, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  z-index: 2;
   animation: chatModalCardPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -1116,7 +1139,7 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background: radial-gradient(circle at 50% 0%, #111827 0%, #0a0f1d 70%);
+  background: radial-gradient(circle at 50% 0%, #0d1522 0%, #060c14 70%);
 }
 
 .chat-modal-body::-webkit-scrollbar {
@@ -1219,6 +1242,7 @@ ul {
   font-size: 14px;
   font-weight: 500;
   -webkit-appearance: none !important;
+  appearance: none !important;
 }
 
 .chat-modal-input-field::placeholder {
@@ -1609,6 +1633,7 @@ ul {
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1637,6 +1662,7 @@ ul {
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -3024,6 +3050,7 @@ mark {
   letter-spacing: -0.015em;
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3041,6 +3068,7 @@ mark {
   line-height: 1.36;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3907,6 +3935,8 @@ mark {
   border: 2px solid rgba(37, 99, 235, 0.6);
   animation: emailPulseRing 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
   pointer-events: none;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes emailPulseRing {
@@ -3998,6 +4028,8 @@ mark {
   border: 2px solid rgba(225, 48, 108, 0.6);
   animation: instaPulseRing 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
   pointer-events: none;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes instaPulseRing {
@@ -4089,6 +4121,8 @@ mark {
   border: 2px solid rgba(37, 211, 102, 0.6);
   animation: waPulseRing 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
   pointer-events: none;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes waPulseRing {
@@ -4815,6 +4849,8 @@ textarea:focus-visible {
   box-sizing: border-box;
 }
 
+.notes-section .section-heading,
+.syllabus-section .section-heading,
 .papers-section .section-heading,
 .lab-programs-section .section-heading,
 .notification-section .section-heading {
@@ -4825,6 +4861,8 @@ textarea:focus-visible {
   text-align: center;
 }
 
+.notes-section .section-heading .section-tag,
+.syllabus-section .section-heading .section-tag,
 .papers-section .section-heading .section-tag,
 .lab-programs-section .section-heading .section-tag,
 .notification-section .section-heading .section-tag {
@@ -4845,6 +4883,8 @@ textarea:focus-visible {
   text-transform: uppercase;
 }
 
+.notes-section .section-heading h2,
+.syllabus-section .section-heading h2,
 .papers-section .section-heading h2,
 .lab-programs-section .section-heading h2,
 .notification-section .section-heading h2 {
@@ -4856,6 +4896,8 @@ textarea:focus-visible {
   letter-spacing: -0.5px;
 }
 
+.notes-section .section-heading h2::after,
+.syllabus-section .section-heading h2::after,
 .papers-section .section-heading h2::after,
 .lab-programs-section .section-heading h2::after,
 .notification-section .section-heading h2::after {
@@ -4866,6 +4908,17 @@ textarea:focus-visible {
   margin: 12px auto 0;
   border-radius: 10px;
   background: var(--primary);
+}
+
+.notes-section .section-heading p,
+.syllabus-section .section-heading p,
+.papers-section .section-heading p,
+.lab-programs-section .section-heading p {
+  margin: 10px auto 0;
+  color: #52736c;
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 600px;
 }
 
 /* =========================================================
@@ -5415,6 +5468,8 @@ textarea:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .notes-section .section-heading .section-tag,
+  .syllabus-section .section-heading .section-tag,
   .papers-section .section-heading .section-tag,
   .lab-programs-section .section-heading .section-tag {
     position: static;
@@ -5866,6 +5921,7 @@ textarea:focus-visible {
   color: #38bdf8;
   background: linear-gradient(90deg, #38bdf8, #818cf8);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -6362,6 +6418,7 @@ textarea:focus-visible {
   margin-bottom: 5px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -7985,19 +8042,53 @@ html, body {
   display: none !important;
 }
 
-/* Subject snippet in the card gap */
+/* Subject snippet in the card gap - displays cleanly styled Semester & Scheme */
 .card-subject-snippet {
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #3b5a54;
-  margin: 8px 0 10px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 500;
-  letter-spacing: 0.1px;
+  margin: 6px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.card-sem-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4.5px;
+  padding: 3.5px 8.5px;
+  border-radius: 6px;
+  background: #edf5f2;
+  border: 1px solid rgba(1, 58, 51, 0.16);
+  color: #013a33;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.25px;
+  line-height: 1.25;
+}
+
+.card-sem-badge svg {
+  color: #0f766e;
+  flex-shrink: 0;
+}
+
+.card-scheme-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4.5px;
+  padding: 3.5px 8.5px;
+  border-radius: 6px;
+  background: #fff8e6;
+  border: 1px solid rgba(217, 167, 38, 0.35);
+  color: #855800;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+  line-height: 1.25;
+}
+
+.card-scheme-badge svg {
+  color: #d9a726;
+  flex-shrink: 0;
 }
 
 /* Academic AI Spark Icon Animation */
@@ -8018,4 +8109,29 @@ html, body {
 
 .ai-bot-spark-icon.is-typing {
   animation: aiSparkPulse 1.4s ease-in-out infinite;
+}
+
+/* =========================================================
+   UPLOAD MODAL BACKGROUND SUPPRESSION & PORTAL ISOLATION
+   Prevents background "Exam", "Results", and circular pills
+   from bleeding through or stacking over the modal dialog.
+   ========================================================= */
+
+body.upload-modal-open {
+  overflow: hidden !important;
+}
+
+body.upload-modal-open .read-time,
+body.upload-modal-open .resource-badge,
+body.upload-modal-open .resource-format-pill,
+body.upload-modal-open .meta-chip,
+body.upload-modal-open .meta-chip-category,
+body.upload-modal-open .pill-badge,
+body.upload-modal-open .summary-pill-btn,
+body.upload-modal-open .ticker-badge,
+body.upload-modal-open .live-status-pill,
+body.upload-modal-open .section-tag {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

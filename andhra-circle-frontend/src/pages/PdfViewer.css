@@ -236,7 +236,7 @@
   overflow: hidden;
 }
 
-.pdf-frame-wrapper {
+.pdf-viewer-page .pdf-frame-wrapper {
   width: 100%;
   height: 100%;
   display: flex;
@@ -247,7 +247,7 @@
   background: #2b2b2b;
 }
 
-.pdf-frame {
+.pdf-viewer-page .pdf-frame {
   width: 100%;
   height: 100%;
   border: none;
@@ -256,13 +256,13 @@
 }
 
 /* Clean rotation when user presses Rotate to adjust orientation */
-.pdf-rot-0 .pdf-frame {
+.pdf-viewer-page .pdf-rot-0 .pdf-frame {
   width: 100%;
   height: 100%;
   transform: none;
 }
 
-.pdf-rot-90 .pdf-frame {
+.pdf-viewer-page .pdf-rot-90 .pdf-frame {
   transform: rotate(90deg);
   transform-origin: center center;
   width: calc(100vh - 60px);
@@ -274,13 +274,13 @@
   margin-left: calc(-1 * (100vh - 60px) / 2);
 }
 
-.pdf-rot-180 .pdf-frame {
+.pdf-viewer-page .pdf-rot-180 .pdf-frame {
   transform: rotate(180deg);
   width: 100%;
   height: 100%;
 }
 
-.pdf-rot-270 .pdf-frame {
+.pdf-viewer-page .pdf-rot-270 .pdf-frame {
   transform: rotate(270deg);
   transform-origin: center center;
   width: calc(100vh - 60px);

@@ -87,13 +87,19 @@ return (
       required
     />
 
-    <input
-      type="text"
-      placeholder="Branch"
+    <select
       value={branch}
       onChange={(e) => setBranch(e.target.value)}
       required
-    />
+    >
+      <option value="">Select Branch</option>
+      <option value="CSE">CSE</option>
+      <option value="AIML">AIML</option>
+      <option value="ME">ME</option>
+      <option value="CE">CE</option>
+      <option value="ECE">ECE</option>
+      <option value="EEE">EEE</option>
+    </select>
 
     <input
       type="text"

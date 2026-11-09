@@ -75,12 +75,19 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
 
   // Responsive breakpoint tracking
   useEffect(() => {
+    let timeoutId = null;
     const handleResize = () => {
-      setWindowWidth(window.innerWidth);
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setWindowWidth(window.innerWidth);
+      }, 100);
     };
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   // Synchronize if selectedBranch prop changes externally
@@ -103,13 +110,13 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
     }
   }, [selectedBranch]);
 
-  // Smooth continuous auto-rotation: ALWAYS keeps moving smoothly even in view or out of view, never paused on hover
+  // Continuous reliable auto-rotation: advances to next branch every 2 seconds
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % BRANCHES.length);
-    }, 2800);
+    }, 2000);
     return () => clearInterval(timer);
-  }, []);
+  }, [activeIndex]);
 
   const prevBranch = () => {
     setActiveIndex((prev) => (prev - 1 + BRANCHES.length) % BRANCHES.length);

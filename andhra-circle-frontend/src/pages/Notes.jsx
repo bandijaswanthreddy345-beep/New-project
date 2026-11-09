@@ -1,14 +1,14 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
-import { MetalFx, useMetalBend } from "metal-fx";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import profile from "../assets/jaswanth.png.png";
 import StudentProfileModal from "../components/StudentProfileModal";
 import { getStoredStudentData } from "../data/studentData";
 import AuthorProfile from "../components/AuthorProfile";
+import { normalizeSemester, normalizeScheme } from "../utils/semester";
 import "./Notes.css";
 
-// Branch definitions matching homepage engineering departments
+// Branch definitions matching requested engineering departments: CSE, AIML, ME, CE, ECE, EEE
 const BRANCH_TABS = [
   {
     code: "CSE",
@@ -27,14 +27,24 @@ const BRANCH_TABS = [
     ],
   },
   {
-    code: "ECE",
-    name: "Electronics & Communication",
+    code: "AIML",
+    name: "AI & Machine Learning",
     aliases: [
-      "electronics and communication",
-      "electronics and communication engineering",
-      "electronics & communication engineering",
-      "electronics",
-      "ece",
+      "cse_aiml",
+      "cse aiml",
+      "cseaiml",
+      "aiml",
+      "ai & machine learning",
+      "ai and machine learning",
+      "artificial intelligence and machine learning",
+      "artificial intelligence & machine learning",
+      "artificial intelligence",
+      "machine learning",
+      "ai & data science",
+      "ai",
+      "ml",
+      "cse (ai & ml)",
+      "cse (aiml)",
     ],
   },
   {
@@ -58,19 +68,14 @@ const BRANCH_TABS = [
     ],
   },
   {
-    code: "AIML",
-    name: "AI & Machine Learning",
+    code: "ECE",
+    name: "Electronics & Communication",
     aliases: [
-      "artificial intelligence and machine learning",
-      "artificial intelligence & machine learning",
-      "artificial intelligence",
-      "machine learning",
-      "ai and machine learning",
-      "ai & machine learning",
-      "ai & data science",
-      "aiml",
-      "ai",
-      "ml",
+      "electronics and communication",
+      "electronics and communication engineering",
+      "electronics & communication engineering",
+      "electronics",
+      "ece",
     ],
   },
   {
@@ -197,10 +202,6 @@ function Notes({ initialType }) {
   const [pulsingBranch, setPulsingBranch] = useState(null);
 
   const searchInputRef = useRef(null);
-  const searchMetalRef = useRef(null);
-
-  // Hook for cursor-driven liquid metal bend interaction
-  useMetalBend(searchMetalRef);
 
   // Profile synchronization listener
   useEffect(() => {
@@ -357,11 +358,12 @@ function Notes({ initialType }) {
         if (title.toLowerCase() === "notes" && n.subject) {
           title = n.subject;
         }
-        const sem = n.semester ? n.semester.replace(/semester/i, "Sem").trim() : "";
+        const sem = normalizeSemester(n.semester);
         return {
           id: n._id,
           title: formatTitle(title),
           semester: sem,
+          scheme: normalizeScheme(n),
           branchCode: activeBranch,
           extraBadge: n.subjectCode || "",
           pdfUrl: n.pdfUrl || "",
@@ -388,7 +390,7 @@ function Notes({ initialType }) {
           displayTitle = formatTitle(rawTitle || subj || "Question Paper");
         }
 
-        const sem = p.semester ? p.semester.replace(/semester/i, "Sem").trim() : "";
+        const sem = normalizeSemester(p.semester);
         const metaItems = [];
         if (p.year) metaItems.push(p.year);
         if (p.examType && !displayTitle.toLowerCase().includes(p.examType.toLowerCase())) {
@@ -399,6 +401,7 @@ function Notes({ initialType }) {
           id: p._id,
           title: displayTitle,
           semester: sem,
+          scheme: normalizeScheme(p),
           branchCode: activeBranch,
           extraBadge: metaItems.join(" • "),
           pdfUrl: p.pdfUrl || "",
@@ -423,15 +426,15 @@ function Notes({ initialType }) {
           title = formatTitle(title);
         }
 
-        const sem = s.semester ? s.semester.replace(/semester/i, "Sem").trim() : "";
+        const sem = normalizeSemester(s.semester);
         const metaItems = [];
-        if (s.regulation) metaItems.push(s.regulation);
         if (s.subjectCode) metaItems.push(s.subjectCode);
 
         return {
           id: s._id,
           title: title,
           semester: sem,
+          scheme: normalizeScheme(s),
           branchCode: activeBranch,
           extraBadge: metaItems.join(" • "),
           pdfUrl: s.pdfUrl || "",
@@ -454,7 +457,7 @@ function Notes({ initialType }) {
           title = formatTitle(title || subj || "Lab Program");
         }
 
-        const sem = l.semester ? l.semester.replace(/semester/i, "Sem").trim() : "";
+        const sem = normalizeSemester(l.semester);
         const metaItems = [];
         if (l.subjectCode) metaItems.push(l.subjectCode);
 
@@ -462,6 +465,7 @@ function Notes({ initialType }) {
           id: l._id,
           title: title,
           semester: sem,
+          scheme: normalizeScheme(l),
           branchCode: activeBranch,
           extraBadge: metaItems.join(" • "),
           pdfUrl: l.pdfUrl || "",
@@ -485,14 +489,14 @@ function Notes({ initialType }) {
         (item) =>
           item.title.toLowerCase().includes(q) ||
           item.semester.toLowerCase().includes(q) ||
+          (item.scheme && item.scheme.toLowerCase().includes(q)) ||
           (item.extraBadge && item.extraBadge.toLowerCase().includes(q))
       );
     }
 
     // Filter by semester dropdown
     if (selectedSemester !== "ALL") {
-      const s = selectedSemester.toLowerCase();
-      list = list.filter((item) => item.semester.toLowerCase().includes(s));
+      list = list.filter((item) => normalizeSemester(item.semester) === selectedSemester);
     }
 
     return list;
@@ -719,7 +723,7 @@ function Notes({ initialType }) {
               <span className="profile-status-dot" />
             </div>
             <div className="profile-info">
-              <span className="profile-name">{studentData.shortName || "Chinnu"}</span>
+              <span className="profile-name">{studentData.shortName || "Jaswanth"}</span>
               <span className="profile-role">{studentData.role || "Student"}</span>
             </div>
             <svg className="profile-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -742,38 +746,29 @@ function Notes({ initialType }) {
               {/* Search Box with Reactive Search Button */}
               <div className="notes-search-box">
                 <div className="notes-search-metal-wrap">
-                  <MetalFx
-                    ref={searchMetalRef}
-                    preset="chromatic"
-                    variant="circle"
-                    strength={1}
-                    innerShadow
-                    className="metal-search-wrapper"
+                  <button
+                    type="button"
+                    className="notes-metal-search-btn"
+                    onClick={handleExecuteSearch}
+                    title={`Search ${currentConfig.label}`}
+                    aria-label="Search"
                   >
-                    <button
-                      type="button"
-                      className="metal-search-btn notes-metal-search-btn"
-                      onClick={handleExecuteSearch}
-                      title={`Search ${currentConfig.label}`}
-                      aria-label="Search"
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="metal-search-icon"
+                      aria-hidden="true"
                     >
-                      <svg
-                        width="15"
-                        height="15"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="metal-search-icon"
-                        aria-hidden="true"
-                      >
-                        <circle cx="11" cy="11" r="7" />
-                        <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
-                      </svg>
-                    </button>
-                  </MetalFx>
+                      <circle cx="11" cy="11" r="7" />
+                      <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
+                    </svg>
+                  </button>
                 </div>
                 <input
                   ref={searchInputRef}
@@ -804,10 +799,10 @@ function Notes({ initialType }) {
                 onChange={(e) => handleSelectBranch(e.target.value)}
               >
                 <option value="CSE">CSE — Computer Science</option>
-                <option value="ECE">ECE — Electronics & Comm.</option>
+                <option value="AIML">AIML — AI & Machine Learning</option>
                 <option value="ME">ME — Mechanical Eng.</option>
                 <option value="CE">CE — Civil Eng.</option>
-                <option value="AIML">AIML — AI & Data Science</option>
+                <option value="ECE">ECE — Electronics & Comm.</option>
                 <option value="EEE">EEE — Electrical & Electronics</option>
               </select>
 
@@ -818,14 +813,14 @@ function Notes({ initialType }) {
                 onChange={(e) => setSelectedSemester(e.target.value)}
               >
                 <option value="ALL">All Semesters</option>
-                <option value="1st">1st Semester</option>
-                <option value="2nd">2nd Semester</option>
-                <option value="3rd">3rd Semester</option>
-                <option value="4th">4th Semester</option>
-                <option value="5th">5th Semester</option>
-                <option value="6th">6th Semester</option>
-                <option value="7th">7th Semester</option>
-                <option value="8th">8th Semester</option>
+                <option value="1-1">1-1</option>
+                <option value="1-2">1-2</option>
+                <option value="2-1">2-1</option>
+                <option value="2-2">2-2</option>
+                <option value="3-1">3-1</option>
+                <option value="3-2">3-2</option>
+                <option value="4-1">4-1</option>
+                <option value="4-2">4-2</option>
               </select>
             </div>
           </section>
@@ -920,6 +915,12 @@ function Notes({ initialType }) {
                               <span>{item.semester}</span>
                             </>
                           )}
+                          {item.scheme && (
+                            <>
+                              <span>•</span>
+                              <span className="folder-scheme-tag">{item.scheme} Scheme</span>
+                            </>
+                          )}
                           {item.extraBadge && (
                             <>
                               <span>•</span>
@@ -953,24 +954,14 @@ function Notes({ initialType }) {
                         </button>
                       )}
 
-                      <MetalFx
-                        preset="gold"
-                        variant="button"
-                        theme="dark"
-                        strength={1}
-                        innerShadow
-                        normalizeHostStyles={false}
-                        className="folder-view-metal-wrap"
+                      <button
+                        type="button"
+                        className="folder-view-btn"
+                        onClick={() => handleViewItem(item)}
+                        title={`View ${item.title}`}
                       >
-                        <button
-                          type="button"
-                          className="folder-view-btn"
-                          onClick={() => handleViewItem(item)}
-                          title={`View ${item.title}`}
-                        >
-                          View
-                        </button>
-                      </MetalFx>
+                        View
+                      </button>
                     </div>
                   </article>
                 ))

@@ -352,32 +352,50 @@
 ========================================== */
 
 .upload-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: rgba(0, 24, 20, 0.78);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  overflow-y: auto;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999999 !important;
+  background: rgba(0, 24, 20, 0.82) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
+  isolation: isolate !important;
 }
 
 .upload-modal {
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 32px 28px;
+  position: relative !important;
+  z-index: 1000000 !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  background: #ffffff !important;
+  border-radius: 24px !important;
+  padding: 32px 28px !important;
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(15, 118, 110, 0.15);
-  animation: uploadModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-sizing: border-box;
+    0 0 0 1px rgba(15, 118, 110, 0.15) !important;
+  animation: uploadModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
+}
+
+/* Hide background badges, pills, and category tags when the upload modal is open */
+body.upload-modal-open .read-time,
+body.upload-modal-open .resource-badge,
+body.upload-modal-open .resource-format-pill,
+body.upload-modal-open .meta-chip,
+body.upload-modal-open .pill-badge,
+body.upload-modal-open .summary-pill-btn,
+body.upload-modal-open .ticker-badge,
+body.upload-modal-open .live-status-pill,
+body.upload-modal-open .section-tag {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 @keyframes uploadModalIn {

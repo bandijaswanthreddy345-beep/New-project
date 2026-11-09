@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import "./UploadMaterials.css";
@@ -14,6 +14,13 @@ export default function UploadMaterials() {
     name: "",
     email: "",
   });
+
+  useEffect(() => {
+    document.body.classList.add("upload-modal-open");
+    return () => {
+      document.body.classList.remove("upload-modal-open");
+    };
+  }, []);
 
   const handleClose = () => {
     if (window.history.length > 1) {

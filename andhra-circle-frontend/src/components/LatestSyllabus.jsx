@@ -3,16 +3,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "./LikeReactionButton";
-
-const getSyllabusSnippet = (item) => {
-  if (item.description && item.description.trim().length > 10) {
-    return item.description.trim();
-  }
-  const branchText = item.branch ? `${item.branch} · ` : "";
-  const semText = item.semester ? `Sem ${item.semester} · ` : "";
-  const subName = item.subject || item.title || "Curriculum";
-  return `Official course curriculum, unit breakdown, learning objectives & prescribed references for ${subName} (${branchText}${semText}Academic Regulations).`;
-};
+import { normalizeSemester, normalizeScheme } from "../utils/semester";
 
 function LatestSyllabus({ search = "" }) {
   const navigate = useNavigate();
@@ -63,6 +54,7 @@ return (
       String(item.title || "").toLowerCase().includes(searchText) ||
       String(item.branch || "").toLowerCase().includes(searchText) ||
       String(item.semester || "").toLowerCase().includes(searchText) ||
+      normalizeScheme(item).toLowerCase().includes(searchText) ||
       String(item.subject || "").toLowerCase().includes(searchText) ||
       String(item.subjectCode || "").toLowerCase().includes(searchText) ||
       String(item.description || "").toLowerCase().includes(searchText)
@@ -376,9 +368,23 @@ return (
                   {getSyllabusDisplayTitle(item)}
                 </h3>
 
-                {/* Subject Description in the gap */}
-                <p className="card-subject-snippet" title={getSyllabusSnippet(item)}>
-                  {getSyllabusSnippet(item)}
+                {/* Subject Semester & Scheme */}
+                <p className="card-subject-snippet" title={`Semester: ${normalizeSemester(item.semester) || "1-1"} • Scheme: ${normalizeScheme(item)}`}>
+                  <span className="card-sem-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                    Semester: {normalizeSemester(item.semester) || "1-1"}
+                  </span>
+                  <span className="card-scheme-badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                    {normalizeScheme(item)} Scheme
+                  </span>
                 </p>
 
                 {/* Spacer */}

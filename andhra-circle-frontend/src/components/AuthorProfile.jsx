@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import API from "../api/api";
 import "./AuthorProfile.css";
 import bharathProfile from "../assets/bharath-profile.png";
@@ -59,6 +60,8 @@ function AuthorProfile() {
   useEffect(() => {
     if (!isUploadModalOpen) return undefined;
 
+    document.body.classList.add("upload-modal-open");
+
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setIsUploadModalOpen(false);
@@ -66,7 +69,10 @@ function AuthorProfile() {
     };
 
     window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
+    return () => {
+      document.body.classList.remove("upload-modal-open");
+      window.removeEventListener("keydown", handleEscape);
+    };
   }, [isUploadModalOpen]);
 
   const resetUploadForm = () => {
@@ -265,136 +271,139 @@ function AuthorProfile() {
         </div>
       </section>
 
-      {isUploadModalOpen && (
-        <div
-          className="upload-modal-overlay"
-          onClick={() => setIsUploadModalOpen(false)}
-          role="presentation"
-        >
+      {isUploadModalOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
           <div
-            className="upload-modal"
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="upload-materials-title"
+            className="upload-modal-overlay"
+            onClick={() => setIsUploadModalOpen(false)}
+            role="presentation"
           >
-            <button
-              type="button"
-              className="upload-modal-close"
-              onClick={() => setIsUploadModalOpen(false)}
-              aria-label="Close upload form"
+            <div
+              className="upload-modal"
+              onClick={(event) => event.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="upload-materials-title"
             >
-              ×
-            </button>
+              <button
+                type="button"
+                className="upload-modal-close"
+                onClick={() => setIsUploadModalOpen(false)}
+                aria-label="Close upload form"
+              >
+                ×
+              </button>
 
-            <h2 id="upload-materials-title">Upload Materials</h2>
-            <p className="upload-modal-subtitle">
-              Upload notes, papers, syllabus, or lab programs in PDF format only.
-            </p>
+              <h2 id="upload-materials-title">Upload Materials</h2>
+              <p className="upload-modal-subtitle">
+                Upload notes, papers, syllabus, or lab programs in PDF format only.
+              </p>
 
-            <form className="upload-material-form" onSubmit={handleUploadSubmit}>
-              <label className="upload-field-label" htmlFor="material-type">
-                Material Type <span>*</span>
-              </label>
-              <div className="upload-select-wrap">
-                <select
-                  id="material-type"
-                  name="materialType"
-                  value={uploadForm.materialType}
-                  onChange={handleUploadFormChange}
-                  className="upload-select"
-                  required
-                >
-                  <option value="" disabled>
-                    Select Material Type
-                  </option>
-                  <option value="notes">Notes</option>
-                  <option value="syllabus">Syllabus</option>
-                  <option value="question-papers">Question Papers or Solutions</option>
-                  <option value="academic-report">Academic Report</option>
-                  <option value="lab-manual">Lab Manual</option>
-                </select>
-              </div>
+              <form className="upload-material-form" onSubmit={handleUploadSubmit}>
+                <label className="upload-field-label" htmlFor="material-type">
+                  Material Type <span>*</span>
+                </label>
+                <div className="upload-select-wrap">
+                  <select
+                    id="material-type"
+                    name="materialType"
+                    value={uploadForm.materialType}
+                    onChange={handleUploadFormChange}
+                    className="upload-select"
+                    required
+                  >
+                    <option value="" disabled>
+                      Select Material Type
+                    </option>
+                    <option value="notes">Notes</option>
+                    <option value="syllabus">Syllabus</option>
+                    <option value="question-papers">Question Papers or Solutions</option>
+                    <option value="academic-report">Academic Report</option>
+                    <option value="lab-manual">Lab Manual</option>
+                  </select>
+                </div>
 
-              {uploadForm.materialType === "notes" && (
-                <div className="upload-file-field">
-                  <label className="upload-field-label" htmlFor="notes-file">
-                    Notes PDF <span>*</span>
-                  </label>
+                {uploadForm.materialType === "notes" && (
+                  <div className="upload-file-field">
+                    <label className="upload-field-label" htmlFor="notes-file">
+                      Notes PDF <span>*</span>
+                    </label>
+                    <input
+                      id="notes-file"
+                      name="file"
+                      type="file"
+                      accept="application/pdf,.pdf"
+                      onChange={handleFileChange}
+                      required
+                    />
+                    <span className="upload-file-hint">
+                      PDF only, up to 20 MB.
+                      {selectedFile ? ` Selected: ${selectedFile.name}` : ""}
+                    </span>
+                  </div>
+                )}
+
+                <div className="upload-comment-box">
+                  <div className="upload-avatar" aria-hidden="true">
+                    👤
+                  </div>
+                  <textarea
+                    name="comment"
+                    placeholder="Your Comment"
+                    rows={4}
+                    className="upload-comment-input"
+                    value={uploadForm.comment}
+                    onChange={handleUploadFormChange}
+                  />
+                </div>
+
+                <div className="upload-input-row">
+                  <span className="upload-input-icon" aria-hidden="true">
+                    👤
+                  </span>
                   <input
-                    id="notes-file"
-                    name="file"
-                    type="file"
-                    accept="application/pdf,.pdf"
-                    onChange={handleFileChange}
+                    type="text"
+                    name="name"
+                    placeholder="Enter your Name*"
+                    value={uploadForm.name}
+                    onChange={handleUploadFormChange}
                     required
                   />
-                  <span className="upload-file-hint">
-                    PDF only, up to 20 MB.
-                    {selectedFile ? ` Selected: ${selectedFile.name}` : ""}
+                </div>
+
+                <div className="upload-input-row">
+                  <span className="upload-input-icon" aria-hidden="true">
+                    @
                   </span>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your Email*"
+                    value={uploadForm.email}
+                    onChange={handleUploadFormChange}
+                    required
+                  />
                 </div>
-              )}
 
-              <div className="upload-comment-box">
-                <div className="upload-avatar" aria-hidden="true">
-                  👤
+                {submitMessage.text && (
+                  <div
+                    className={`upload-form-message ${submitMessage.type === "error" ? "error" : "success"}`}
+                  >
+                    {submitMessage.text}
+                  </div>
+                )}
+
+                <div className="upload-submit-row">
+                  <button type="submit" className="upload-submit-button" disabled={isSubmitting}>
+                    {isSubmitting ? "Uploading..." : "Submit Material"}
+                  </button>
                 </div>
-                <textarea
-                  name="comment"
-                  placeholder="Your Comment"
-                  rows={4}
-                  className="upload-comment-input"
-                  value={uploadForm.comment}
-                  onChange={handleUploadFormChange}
-                />
-              </div>
-
-              <div className="upload-input-row">
-                <span className="upload-input-icon" aria-hidden="true">
-                  👤
-                </span>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Enter your Name*"
-                  value={uploadForm.name}
-                  onChange={handleUploadFormChange}
-                  required
-                />
-              </div>
-
-              <div className="upload-input-row">
-                <span className="upload-input-icon" aria-hidden="true">
-                  @
-                </span>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter your Email*"
-                  value={uploadForm.email}
-                  onChange={handleUploadFormChange}
-                  required
-                />
-              </div>
-
-              {submitMessage.text && (
-                <div
-                  className={`upload-form-message ${submitMessage.type === "error" ? "error" : "success"}`}
-                >
-                  {submitMessage.text}
-                </div>
-              )}
-
-              <div className="upload-submit-row">
-                <button type="submit" className="upload-submit-button" disabled={isSubmitting}>
-                  {isSubmitting ? "Uploading..." : "Submit Material"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }

@@ -3,16 +3,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "../components/LikeReactionButton";
-
-const getLabSnippet = (program) => {
-  if (program.description && program.description.trim().length > 10) {
-    return program.description.trim();
-  }
-  const branchText = program.branch ? `${program.branch} · ` : "";
-  const semText = program.semester ? `Sem ${program.semester} · ` : "";
-  const subName = program.subject || program.title || "Lab Practical";
-  return `Complete laboratory experiment codes, viva preparation questions & practical manual records for ${subName} (${branchText}${semText}JNTU Lab Course).`;
-};
+import { normalizeSemester, normalizeScheme } from "../utils/semester";
 
 function LabPrograms({ search = "" }) {
   const navigate = useNavigate();
@@ -74,6 +65,7 @@ return (
       String(program.subjectCode || "").toLowerCase().includes(searchText) ||
       String(program.branch || "").toLowerCase().includes(searchText) ||
       String(program.semester || "").toLowerCase().includes(searchText) ||
+      normalizeScheme(program).toLowerCase().includes(searchText) ||
       String(program.description || "").toLowerCase().includes(searchText)
     );
   });
@@ -453,9 +445,23 @@ return (
                   {getLabDisplayTitle(program)}
                 </h3>
 
-                {/* Subject Description in the gap */}
-                <p className="card-subject-snippet" title={getLabSnippet(program)}>
-                  {getLabSnippet(program)}
+                {/* Subject Semester & Scheme */}
+                <p className="card-subject-snippet" title={`Semester: ${normalizeSemester(program.semester) || "1-1"} • Scheme: ${normalizeScheme(program)}`}>
+                  <span className="card-sem-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                    Semester: {normalizeSemester(program.semester) || "1-1"}
+                  </span>
+                  <span className="card-scheme-badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                    {normalizeScheme(program)} Scheme
+                  </span>
                 </p>
 
                 {/* Spacer */}

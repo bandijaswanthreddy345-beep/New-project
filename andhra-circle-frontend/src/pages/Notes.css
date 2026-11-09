@@ -450,23 +450,51 @@
 
 .notes-search-metal-wrap {
   position: absolute;
-  left: 6px;
+  left: 7px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
+  pointer-events: auto;
 }
 
 .notes-metal-search-btn {
+  position: relative;
   width: 32px !important;
   height: 32px !important;
+  border-radius: 50%;
+  border: 1px solid rgba(1, 58, 51, 0.22);
+  background: #01221e;
+  color: #ffefb3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.notes-metal-search-btn:hover {
+  background: #0d453c;
+  color: #ffffff;
+  border-color: #d9a726;
+  transform: scale(1.08);
+  box-shadow: 0 0 10px rgba(217, 167, 38, 0.35);
+}
+
+.notes-metal-search-btn:active {
+  transform: scale(0.95);
 }
 
 .notes-metal-search-btn .metal-search-icon {
   width: 15px !important;
   height: 15px !important;
+  stroke: currentColor;
+  display: block;
 }
 
 .notes-search-input {
@@ -610,7 +638,6 @@
   box-shadow: 0 2px 8px rgba(0, 36, 32, 0.12) !important;
   transform: none !important;
 }
-
 .notes-branch-tab-text {
   display: inline-block;
   background: none !important;
@@ -622,6 +649,24 @@
   font-weight: 800;
   letter-spacing: 0.8px;
   line-height: 1;
+}
+
+.branch-icon-box.eee-icon {
+  background: rgba(217, 119, 6, 0.08);
+  border-color: rgba(217, 119, 6, 0.2);
+}
+.branch-icon-box.me-icon {
+  background: rgba(147, 51, 234, 0.08);
+  border-color: rgba(147, 51, 234, 0.2);
+}
+.branch-icon-box.ce-icon {
+  background: rgba(8, 145, 178, 0.08);
+  border-color: rgba(8, 145, 178, 0.2);
+}
+.branch-icon-box.cse_aiml-icon,
+.branch-icon-box.aiml-icon {
+  background: rgba(5, 150, 105, 0.08);
+  border-color: rgba(5, 150, 105, 0.2);
 }
 
 /* Reactive Burst Animation on Click / Search Trigger */
@@ -793,6 +838,18 @@
   font-weight: 700;
   background: #e6f3f1;
   color: #013e37;
+  letter-spacing: 0.3px;
+}
+
+.folder-scheme-tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #fff8e6;
+  border: 1px solid rgba(217, 167, 38, 0.3);
+  color: #855800;
   letter-spacing: 0.3px;
 }
 

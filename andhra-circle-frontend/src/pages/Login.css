@@ -162,7 +162,7 @@
   align-items: center;
   text-decoration: none;
   gap: 12px;
-  group: pointer;
+  cursor: pointer;
   transition: transform 0.2s ease;
 }
 

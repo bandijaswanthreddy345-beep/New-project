@@ -4,16 +4,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "./LikeReactionButton";
-
-const getSubjectSnippet = (item) => {
-  if (item.description && item.description.trim().length > 10) {
-    return item.description.trim();
-  }
-  const branchText = item.branch ? `${item.branch} · ` : "";
-  const semText = item.semester ? `Sem ${item.semester} · ` : "";
-  const subName = item.subject || item.title || "Subject";
-  return `Comprehensive study notes, module-wise topics, derivations & question banks for ${subName} (${branchText}${semText}JNTU Curriculum).`;
-};
+import { normalizeSemester, normalizeScheme } from "../utils/semester";
 
 function LatestNotes({ search = "" }) {
   const navigate = useNavigate();
@@ -168,6 +159,9 @@ return (
         .toLowerCase()
         .includes(searchText) ||
       String(note.semester || "")
+        .toLowerCase()
+        .includes(searchText) ||
+      normalizeScheme(note)
         .toLowerCase()
         .includes(searchText) ||
       String(note.subject || "")
@@ -372,10 +366,9 @@ const getDisplayTitle = (note) => {
     return (
       <section className="notes-section">
         <div className="section-heading">
-          <span className="section-tag">
-            STUDY MATERIALS
-          </span>
+          <span className="section-tag">STUDY MATERIALS</span>
           <h2>Latest Notes</h2>
+          <p>Explore and download curated semester lecture notes & study materials.</p>
         </div>
 
         <div className="notes-loading">
@@ -395,10 +388,9 @@ const getDisplayTitle = (note) => {
           SECTION HEADING
       ========================================== */}
       <div className="section-heading">
-        <span className="section-tag">
-          STUDY MATERIALS
-        </span>
+        <span className="section-tag">STUDY MATERIALS</span>
         <h2>Latest Notes</h2>
+        <p>Explore and download curated semester lecture notes & study materials.</p>
       </div>
 
       {/* ==========================================
@@ -452,9 +444,23 @@ const getDisplayTitle = (note) => {
                   {getSubjectName(note)}
                 </h3>
 
-                {/* Subject Description in the gap */}
-                <p className="card-subject-snippet" title={getSubjectSnippet(note)}>
-                  {getSubjectSnippet(note)}
+                {/* Subject Semester & Scheme */}
+                <p className="card-subject-snippet" title={`Semester: ${normalizeSemester(note.semester) || "1-1"} • Scheme: ${normalizeScheme(note)}`}>
+                  <span className="card-sem-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                    Semester: {normalizeSemester(note.semester) || "1-1"}
+                  </span>
+                  <span className="card-scheme-badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                    {normalizeScheme(note)} Scheme
+                  </span>
                 </p>
 
                 {/* Spacer to push stats to bottom */}

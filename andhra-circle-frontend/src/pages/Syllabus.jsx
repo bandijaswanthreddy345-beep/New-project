@@ -5,6 +5,7 @@ import defaultBanner from "../assets/banner.jpg.jpg.jpg";
 import LikeReactionButton from "../components/LikeReactionButton";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { normalizeSemester, normalizeScheme } from "../utils/semester";
 import "./Syllabus.css";
 
 // Branch definitions matching homepage engineering departments
@@ -20,25 +21,15 @@ const BRANCH_FILTERS = [
 
 const SEMESTER_OPTIONS = [
   { value: "ALL", label: "All Semesters" },
-  { value: "1st Semester", label: "1st Semester" },
-  { value: "2nd Semester", label: "2nd Semester" },
-  { value: "3rd Semester", label: "3rd Semester" },
-  { value: "4th Semester", label: "4th Semester" },
-  { value: "5th Semester", label: "5th Semester" },
-  { value: "6th Semester", label: "6th Semester" },
-  { value: "7th Semester", label: "7th Semester" },
-  { value: "8th Semester", label: "8th Semester" },
+  { value: "1-1", label: "1-1" },
+  { value: "1-2", label: "1-2" },
+  { value: "2-1", label: "2-1" },
+  { value: "2-2", label: "2-2" },
+  { value: "3-1", label: "3-1" },
+  { value: "3-2", label: "3-2" },
+  { value: "4-1", label: "4-1" },
+  { value: "4-2", label: "4-2" },
 ];
-
-const getSyllabusSnippet = (item) => {
-  if (item.description && item.description.trim().length > 10) {
-    return item.description.trim();
-  }
-  const branchText = item.branch ? `${item.branch} · ` : "";
-  const semText = item.semester ? `Sem ${item.semester} · ` : "";
-  const subName = item.subject || item.title || "Curriculum";
-  return `Official course curriculum, unit breakdown, learning objectives & prescribed references for ${subName} (${branchText}${semText}Academic Regulations).`;
-};
 
 function Syllabus({ search: propSearch = "" }) {
   const navigate = useNavigate();
@@ -112,6 +103,7 @@ function Syllabus({ search: propSearch = "" }) {
           String(item.title || "").toLowerCase().includes(query) ||
           String(item.branch || "").toLowerCase().includes(query) ||
           String(item.semester || "").toLowerCase().includes(query) ||
+          normalizeScheme(item).toLowerCase().includes(query) ||
           String(item.subject || "").toLowerCase().includes(query) ||
           String(item.subjectCode || "").toLowerCase().includes(query) ||
           String(item.description || "").toLowerCase().includes(query);
@@ -137,9 +129,7 @@ function Syllabus({ search: propSearch = "" }) {
 
       // 3. Semester Filter
       if (activeSemester !== "ALL") {
-        const itemSem = String(item.semester || "").toLowerCase();
-        const targetSem = activeSemester.toLowerCase();
-        if (!itemSem.includes(targetSem)) {
+        if (normalizeSemester(item.semester) !== activeSemester) {
           return false;
         }
       }
@@ -153,7 +143,9 @@ function Syllabus({ search: propSearch = "" }) {
   // ==========================================
   const getSyllabusDisplayTitle = (item) => {
     if (!item || !item.title) return "Syllabus";
-    const raw = String(item.title).trim();
+    let raw = String(item.title).trim();
+    // Strip leading serial numbers (e.g. "01 ", "01_", "02. ", "00 - ")
+    raw = raw.replace(/^[0-9]+[\s_.-]+/, "");
     if (!raw) return "Syllabus";
     const words = raw.split(/\s+/).map((w) => {
       if (w.length <= 1) return w.toUpperCase();
@@ -318,7 +310,8 @@ function Syllabus({ search: propSearch = "" }) {
     }
 
     if (fileName) {
-      navigate(`/pdf/${encodeURIComponent(fileName)}`);
+      const displayTitle = item.title || "";
+      navigate(`/pdf/${encodeURIComponent(fileName)}?title=${encodeURIComponent(displayTitle)}&source=syllabus`);
     } else if (item.pdfUrl) {
       window.open(getPdfUrl(item.pdfUrl), "_blank");
     }
@@ -720,9 +713,23 @@ return (
                   {getSyllabusDisplayTitle(item)}
                 </h3>
 
-                {/* Subject Description in the gap */}
-                <p className="card-subject-snippet" title={getSyllabusSnippet(item)}>
-                  {getSyllabusSnippet(item)}
+                {/* Subject Semester & Scheme */}
+                <p className="card-subject-snippet" title={`Semester: ${normalizeSemester(item.semester) || "1-1"} • Scheme: ${normalizeScheme(item)}`}>
+                  <span className="card-sem-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                    Semester: {normalizeSemester(item.semester) || "1-1"}
+                  </span>
+                  <span className="card-scheme-badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                    {normalizeScheme(item)} Scheme
+                  </span>
                 </p>
 
                 {/* Spacer */}

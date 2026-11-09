@@ -93,7 +93,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
     const updated = {
       ...student,
       ...editForm,
-      shortName: editForm.name.split(" ")[0] || "Chinnu",
+      shortName: editForm.name.split(" ")[0] || "Jaswanth",
     };
     saveStoredStudentData(updated);
     setStudent(updated);

@@ -84,7 +84,7 @@ exports.updatePaper = async (req, res) => {
       req.params.id,
       req.body,
       {
-        new: true,
+        returnDocument: "after",
       }
     );
 
@@ -158,7 +158,7 @@ exports.likePaper = async (req, res) => {
     const paper = await Paper.findByIdAndUpdate(
       req.params.id,
       { $set: { likes: targetLikes } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     res.status(200).json(paper);
@@ -180,7 +180,7 @@ exports.increaseViews = async (req, res) => {
     const paper = await Paper.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!paper) {
@@ -208,7 +208,7 @@ exports.increaseDownloads = async (req, res) => {
     const paper = await Paper.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!paper) {

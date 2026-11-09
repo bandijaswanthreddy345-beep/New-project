@@ -1,38 +1,49 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import profileImgDefault from "../assets/jaswanth.png.png";
 import {
   EMPTY_STUDENT_DATA,
   INITIAL_SEMESTERS,
+  SAMPLE_STUDENT_PROFILE,
   getStoredStudentData,
   saveStoredStudentData,
   logoutStudentProfile,
+  restoreDefaultStudentData,
   calculateCgpaFromGrades,
+  calculateEquivalentPercentage,
+  getAcademicClassification,
+  getGradeLetter,
 } from "../data/studentData";
 import "./StudentProfile.css";
 
 const POPULAR_BRANCHES = [
   { name: "Computer Science & Engineering", code: "CSE" },
-  { name: "Artificial Intelligence & Machine Learning", code: "AI & ML" },
-  { name: "Artificial Intelligence & Data Science", code: "AI & DS" },
+  { name: "Artificial Intelligence & Machine Learning", code: "CSE (AI&ML)" },
+  { name: "Artificial Intelligence & Data Science", code: "CSE (AI&DS)" },
+  { name: "Data Science", code: "CSE (DS)" },
+  { name: "Information Technology", code: "IT" },
   { name: "Electronics & Communication Engineering", code: "ECE" },
   { name: "Electrical & Electronics Engineering", code: "EEE" },
   { name: "Mechanical Engineering", code: "MECH" },
   { name: "Civil Engineering", code: "CIVIL" },
-  { name: "Information Technology", code: "IT" },
+  { name: "Computer Science & Business Systems", code: "CSBS" },
+  { name: "Cyber Security", code: "CSE (Cyber Security)" },
 ];
 
 function StudentProfile() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
+  const menuRef = useRef(null);
 
   const [student, setStudent] = useState(getStoredStudentData());
-  const [activeTab, setActiveTab] = useState("overview"); // "overview" | "grades" | "attendance" | "notes" | "edit"
+  const [activeTab, setActiveTab] = useState("overview"); // "overview" | "idcard" | "grades" | "attendance" | "notes" | "edit"
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [copiedUsn, setCopiedUsn] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const menuRef = useRef(null);
+  const [isDraggingPhoto, setIsDraggingPhoto] = useState(false);
 
   // Close kebab dropdown on click outside
   useEffect(() => {
@@ -56,7 +67,7 @@ function StudentProfile() {
     email: "",
     phone: "",
     year: "1st Year",
-    semester: "1st Semester",
+    semester: "1-1",
     regulation: "R23 Regulation",
     attendancePercentage: 82,
     profilePhoto: null,
@@ -87,13 +98,12 @@ function StudentProfile() {
     setEditForm(student);
   }, [student]);
 
-  // Handle Photo Upload via FileReader
-  const handlePhotoUpload = (e, targetForm = "create") => {
-    const file = e.target.files?.[0];
+  // Handle Photo File validation and conversion
+  const processImageFile = (file, targetForm = "create") => {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file (PNG, JPG, JPEG, WEBP).");
+      alert("Please select a valid image file (PNG, JPG, JPEG, or WEBP).");
       return;
     }
 
@@ -109,9 +119,31 @@ function StudentProfile() {
         setCreateForm((prev) => ({ ...prev, profilePhoto: base64Data }));
       } else {
         setEditForm((prev) => ({ ...prev, profilePhoto: base64Data }));
+        const updated = {
+          ...student,
+          profilePhoto: base64Data,
+        };
+        saveStoredStudentData(updated);
+        setStudent(updated);
+        setToastMessage("Student profile photo updated successfully!");
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 2200);
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  const handlePhotoUpload = (e, targetForm = "create") => {
+    const file = e.target.files?.[0];
+    processImageFile(file, targetForm);
+  };
+
+  // Drag and Drop support for Profile Picture
+  const handlePhotoDrop = (e, targetForm = "create") => {
+    e.preventDefault();
+    setIsDraggingPhoto(false);
+    const file = e.dataTransfer.files?.[0];
+    processImageFile(file, targetForm);
   };
 
   const handleRemovePhoto = (targetForm = "create") => {
@@ -127,8 +159,9 @@ function StudentProfile() {
       };
       saveStoredStudentData(updated);
       setStudent(updated);
+      setToastMessage("Student profile photo removed.");
       setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 2000);
+      setTimeout(() => setSaveSuccess(false), 2200);
     }
   };
 
@@ -161,7 +194,7 @@ function StudentProfile() {
       updatedGrades[semIndex] = {
         ...updatedGrades[semIndex],
         sgpa: numericVal,
-        status: numericVal && !isNaN(numericVal) ? "Completed" : "Not Started",
+        status: numericVal && !isNaN(numericVal) && Number(numericVal) > 0 ? "Completed" : "Not Started",
       };
       return { ...prev, semesterGrades: updatedGrades };
     });
@@ -181,10 +214,73 @@ function StudentProfile() {
       updatedGrades[semIndex] = {
         ...updatedGrades[semIndex],
         sgpa: numericVal,
-        status: numericVal && !isNaN(numericVal) ? "Completed" : "Not Started",
+        status: numericVal && !isNaN(numericVal) && Number(numericVal) > 0 ? "Completed" : "Not Started",
       };
       return { ...prev, semesterGrades: updatedGrades };
     });
+  };
+
+  // Quick fill sample data matching prompt
+  const handleQuickFillSample = () => {
+    setCreateForm({
+      name: "Jaswanth",
+      branch: "Computer Science & Engineering",
+      branchCode: "CSE",
+      customBranch: "",
+      hallTicket: "22B91A4201",
+      college: "Madanapalle Institute of Technology & Science",
+      email: "jaswanth@gmail.com",
+      phone: "+91 98765 43210",
+      year: "1st Year",
+      semester: "1-1",
+      regulation: "R23 Regulation",
+      attendancePercentage: 82,
+      profilePhoto: profileImgDefault,
+      semesterGrades: [
+        { sem: "1-1", sgpa: "8.75", credits: 20, status: "Completed" },
+        { sem: "1-2", sgpa: "", credits: 20, status: "Not Started" },
+        { sem: "2-1", sgpa: "", credits: 20, status: "Not Started" },
+        { sem: "2-2", sgpa: "", credits: 20, status: "Not Started" },
+        { sem: "3-1", sgpa: "", credits: 20, status: "Not Started" },
+        { sem: "3-2", sgpa: "", credits: 20, status: "Not Started" },
+        { sem: "4-1", sgpa: "", credits: 20, status: "Not Started" },
+        { sem: "4-2", sgpa: "", credits: 20, status: "Not Started" },
+      ],
+    });
+  };
+
+  // Reset form to blank
+  const handleResetCreateForm = () => {
+    setCreateForm({
+      name: "",
+      branch: "Computer Science & Engineering",
+      branchCode: "CSE",
+      customBranch: "",
+      hallTicket: "",
+      college: "",
+      email: "",
+      phone: "",
+      year: "1st Year",
+      semester: "1-1",
+      regulation: "R23 Regulation",
+      attendancePercentage: 75,
+      profilePhoto: null,
+      semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
+    });
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  // Copy USN to clipboard
+  const handleCopyUsn = (usn) => {
+    if (!usn) return;
+    navigator.clipboard?.writeText(usn);
+    setCopiedUsn(true);
+    setTimeout(() => setCopiedUsn(false), 2000);
+  };
+
+  // Print Profile / ID Card
+  const handlePrintIdCard = () => {
+    window.print();
   };
 
   // Create Profile Submission
@@ -201,7 +297,9 @@ function StudentProfile() {
     }
 
     const calculatedCgpa = calculateCgpaFromGrades(createForm.semesterGrades);
-    const filledSems = createForm.semesterGrades.filter((g) => g.sgpa && !isNaN(g.sgpa)).length;
+    const filledSems = createForm.semesterGrades.filter(
+      (g) => g.sgpa && !isNaN(g.sgpa) && Number(g.sgpa) > 0
+    ).length;
     const completedCredits = filledSems * 20;
 
     const newProfile = {
@@ -211,11 +309,11 @@ function StudentProfile() {
       hallTicket: createForm.hallTicket.trim().toUpperCase(),
       branch: createForm.branch || "Computer Science & Engineering",
       branchCode: createForm.branchCode || "CSE",
-      college: createForm.college.trim() || "JNTU Affiliated Institution",
+      college: createForm.college.trim() || "Madanapalle Institute of Technology & Science",
       email: createForm.email.trim(),
       phone: createForm.phone.trim(),
       year: createForm.year || "1st Year",
-      semester: createForm.semester || "1st Semester",
+      semester: createForm.semester || "1-1",
       regulation: createForm.regulation || "R23 Regulation",
       attendancePercentage: Number(createForm.attendancePercentage) || 75,
       attendance: `${Number(createForm.attendancePercentage) || 75}%`,
@@ -237,7 +335,9 @@ function StudentProfile() {
   const handleSaveProfile = (e) => {
     e.preventDefault();
     const calculatedCgpa = calculateCgpaFromGrades(editForm.semesterGrades);
-    const filledSems = (editForm.semesterGrades || []).filter((g) => g.sgpa && !isNaN(g.sgpa)).length;
+    const filledSems = (editForm.semesterGrades || []).filter(
+      (g) => g.sgpa && !isNaN(g.sgpa) && Number(g.sgpa) > 0
+    ).length;
     const completedCredits = filledSems * 20;
 
     const updated = {
@@ -264,8 +364,7 @@ function StudentProfile() {
   const handleConfirmLogout = () => {
     logoutStudentProfile();
     setShowLogoutModal(false);
-    // Reset local state to fresh empty form
-    setStudent(EMPTY_STUDENT_DATA);
+    setStudent({ ...EMPTY_STUDENT_DATA, isConfigured: false });
     setCreateForm({
       name: "",
       branch: "Computer Science & Engineering",
@@ -276,13 +375,28 @@ function StudentProfile() {
       email: "",
       phone: "",
       year: "1st Year",
-      semester: "1st Semester",
+      semester: "1-1",
       regulation: "R23 Regulation",
       attendancePercentage: 82,
       profilePhoto: null,
       semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
     });
     setActiveTab("overview");
+    setToastMessage("Logged out from student profile.");
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2200);
+  };
+
+  // Restore Jaswanth Profile handler
+  const handleResetToSample = () => {
+    const sample = restoreDefaultStudentData();
+    setShowLogoutModal(false);
+    setStudent(sample);
+    setEditForm(sample);
+    setActiveTab("overview");
+    setToastMessage("Restored Jaswanth's profile successfully!");
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2200);
   };
 
   // Helper for attendance status
@@ -302,7 +416,7 @@ function StudentProfile() {
         class: "sp-att-warn",
         icon: "⚠️",
         color: "#d97706",
-        desc: "Medical certificate or special approval required to avoid examination detention.",
+        desc: "Requires medical certificate or official JNTU condonation fee (₹500–₹1000) sanctioned by Principal.",
       };
     } else {
       return {
@@ -310,7 +424,7 @@ function StudentProfile() {
         class: "sp-att-danger",
         icon: "✕",
         color: "#dc2626",
-        desc: "Below minimum condonation limit. Immediate faculty mentor consultation needed.",
+        desc: "Below minimum 65% condonation limit. Ineligible for semester end exams under JNTU academic rules.",
       };
     }
   };
@@ -318,14 +432,38 @@ function StudentProfile() {
   const isConfigured = Boolean(student && student.isConfigured && student.name?.trim());
   const currentAttendance = Number(student?.attendancePercentage || 75);
   const attendanceStatus = getAttendanceStatus(currentAttendance);
-  const activeAvatar = student?.profilePhoto && student.profilePhoto !== "none"
-    ? student.profilePhoto
-    : (student?.profilePhoto === "none" ? null : profileImgDefault);
+  const activeAvatar =
+    student?.profilePhoto && student.profilePhoto !== "none"
+      ? student.profilePhoto
+      : student?.profilePhoto === "none"
+      ? null
+      : profileImgDefault;
+
+  // Memoized live calculations for create form to ensure instantaneous slider & input response
+  const liveCreateCgpa = useMemo(
+    () => calculateCgpaFromGrades(createForm.semesterGrades),
+    [createForm.semesterGrades]
+  );
+  const liveCreatePct = useMemo(
+    () => calculateEquivalentPercentage(liveCreateCgpa),
+    [liveCreateCgpa]
+  );
+  const liveCreateStanding = useMemo(
+    () => getAcademicClassification(liveCreateCgpa),
+    [liveCreateCgpa]
+  );
+  const liveCreateFilledCount = useMemo(
+    () =>
+      createForm.semesterGrades.filter(
+        (g) => g.sgpa && !isNaN(g.sgpa) && Number(g.sgpa) > 0
+      ).length,
+    [createForm.semesterGrades]
+  );
 
   return (
     <div className="student-profile-page">
       {/* =========================================================
-          TOP NAVIGATION BAR (ANCHORED LOGO AT LEFT CORNER)
+          TOP NAVIGATION BAR (ANCHORED BRAND & ACTION BUTTONS)
           ========================================================= */}
       <header className="sp-page-header">
         <div className="sp-page-header-inner">
@@ -363,10 +501,10 @@ function StudentProfile() {
         <div className="sp-modal-backdrop" onClick={() => setShowLogoutModal(false)}>
           <div className="sp-confirm-dialog" onClick={(e) => e.stopPropagation()}>
             <div className="sp-confirm-icon">🚪</div>
-            <h3 className="sp-confirm-title">Log Out from Student Profile?</h3>
+            <h3 className="sp-confirm-title">Switch / Log Out Profile?</h3>
             <p className="sp-confirm-text">
-              Logging out will clear your saved academic profile from this browser session.
-              You or another student can create or log into a new profile anytime.
+              Are you sure you want to log out from <strong>{student.name || "Student"}</strong> ({student.hallTicket || "JNTU"})?
+              You can log back in, create a fresh profile, or reset back to Jaswanth at any time.
             </p>
             <div className="sp-confirm-actions">
               <button
@@ -375,6 +513,14 @@ function StudentProfile() {
                 onClick={() => setShowLogoutModal(false)}
               >
                 Cancel
+              </button>
+              <button
+                type="button"
+                className="sp-btn-confirm-reset"
+                onClick={handleResetToSample}
+                title="Restore default Jaswanth profile"
+              >
+                Reset to Jaswanth
               </button>
               <button
                 type="button"
@@ -395,7 +541,14 @@ function StudentProfile() {
         {saveSuccess && (
           <div className="sp-floating-toast">
             <span className="sp-toast-icon">✓</span>
-            <span>Profile successfully updated and saved securely!</span>
+            <span>{toastMessage || "Profile successfully updated and saved privately on device!"}</span>
+          </div>
+        )}
+
+        {copiedUsn && (
+          <div className="sp-floating-toast sp-toast-copied">
+            <span className="sp-toast-icon">📋</span>
+            <span>Hall Ticket Number copied to clipboard!</span>
           </div>
         )}
 
@@ -405,19 +558,60 @@ function StudentProfile() {
         {!isConfigured ? (
           <div className="sp-create-wrapper">
             <div className="sp-create-hero">
-              <div className="sp-create-hero-badge">🎓 JNTU Student Portal</div>
+              <div className="sp-create-hero-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                </svg>
+                <span>🎓 JNTU Student Portal</span>
+                <span className="sp-badge-dot">•</span>
+                <span>Autonomous & Affiliated</span>
+              </div>
               <h1 className="sp-create-title">Create Your Student Academic Profile</h1>
               <p className="sp-create-subtitle">
                 Set up your official university credential with attendance tracking,
                 semester-wise CGPA matrix, and personalized profile picture. Stored privately on your device.
               </p>
+
+              {/* Quick Demo Pre-fill Bar */}
+              <div className="sp-quick-fill-bar">
+                <div className="sp-qf-label">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  <span>Quick Start Option:</span>
+                </div>
+                <button
+                  type="button"
+                  className="sp-btn-quick-fill"
+                  onClick={handleQuickFillSample}
+                  title="Populate Jaswanth • 22B91A4201 • 82% Attendance"
+                >
+                  ⚡ Fill Sample Data (Jaswanth • 22B91A4201)
+                </button>
+                <button
+                  type="button"
+                  className="sp-btn-quick-reset"
+                  onClick={handleResetCreateForm}
+                  title="Clear all fields"
+                >
+                  Reset Form
+                </button>
+              </div>
             </div>
 
             <form onSubmit={handleCreateProfileSubmit} className="sp-create-card">
               {/* Photo Upload Section */}
-              <div className="sp-create-photo-sec">
+              <div
+                className={`sp-create-photo-sec ${isDraggingPhoto ? "sp-photo-drag-active" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDraggingPhoto(true);
+                }}
+                onDragLeave={() => setIsDraggingPhoto(false)}
+                onDrop={(e) => handlePhotoDrop(e, "create")}
+              >
                 <div className="sp-photo-preview-wrap">
-                  {createForm.profilePhoto ? (
+                  {createForm.profilePhoto && createForm.profilePhoto !== "none" ? (
                     <img
                       src={createForm.profilePhoto}
                       alt="Student Preview"
@@ -425,7 +619,7 @@ function StudentProfile() {
                     />
                   ) : (
                     <div className="sp-photo-placeholder">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                         <circle cx="12" cy="7" r="4" />
                       </svg>
@@ -438,15 +632,22 @@ function StudentProfile() {
                     className="sp-upload-badge-btn"
                     onClick={() => fileInputRef.current?.click()}
                     title="Upload Profile Photo"
+                    aria-label="Upload Profile Photo"
                   >
-                    📷
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
+                    </svg>
                   </button>
                 </div>
 
                 <div className="sp-photo-actions-text">
-                  <h4 className="sp-photo-h">Student Profile Picture</h4>
+                  <div className="sp-photo-header-line">
+                    <h4 className="sp-photo-h">Student Profile Picture</h4>
+                    <span className="sp-photo-tag">Official ID Photo</span>
+                  </div>
                   <p className="sp-photo-p">
-                    Upload a clear photo (JPG, PNG, or WEBP). Maximum 4MB.
+                    Upload a clear photo (JPG, PNG, or WEBP). Maximum 4MB. Drag and drop supported.
                   </p>
                   <div className="sp-photo-btns-row">
                     <button
@@ -454,9 +655,14 @@ function StudentProfile() {
                       className="sp-btn-upload-file"
                       onClick={() => fileInputRef.current?.click()}
                     >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                      </svg>
                       Choose Photo From Device
                     </button>
-                    {createForm.profilePhoto && (
+                    {createForm.profilePhoto && createForm.profilePhoto !== "none" && (
                       <button
                         type="button"
                         className="sp-btn-remove-photo"
@@ -478,7 +684,7 @@ function StudentProfile() {
 
               <div className="sp-form-divider" />
 
-              {/* Personal & Academic Details */}
+              {/* Step 1: Personal & Academic Details */}
               <div className="sp-section-heading-row">
                 <span className="sp-sec-step">1</span>
                 <div>
@@ -489,32 +695,47 @@ function StudentProfile() {
 
               <div className="sp-form-grid-2">
                 <div className="sp-input-box">
-                  <label>Full Student Name <span className="sp-req">*</span></label>
+                  <label htmlFor="student-name">
+                    Full Student Name <span className="sp-req">*</span>
+                  </label>
                   <input
+                    id="student-name"
                     type="text"
                     name="name"
                     value={createForm.name}
                     onChange={handleCreateChange}
-                    placeholder="e.g. Bandi Jaswanth Reddy"
+                    placeholder="e.g. Jaswanth Reddy"
                     required
                   />
                 </div>
 
                 <div className="sp-input-box">
-                  <label>USN / Hall Ticket Number <span className="sp-req">*</span></label>
+                  <label htmlFor="hall-ticket">
+                    USN / Hall Ticket Number <span className="sp-req">*</span>
+                  </label>
                   <input
+                    id="hall-ticket"
                     type="text"
                     name="hallTicket"
                     value={createForm.hallTicket}
-                    onChange={handleCreateChange}
-                    placeholder="e.g. 21691A0501"
+                    onChange={(e) => {
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        hallTicket: e.target.value.toUpperCase(),
+                      }));
+                    }}
+                    placeholder="e.g. 22B91A4201"
+                    className="font-mono"
                     required
                   />
                 </div>
 
                 <div className="sp-input-box">
-                  <label>Branch / Specialization <span className="sp-req">*</span></label>
+                  <label htmlFor="branch-select">
+                    Branch / Specialization <span className="sp-req">*</span>
+                  </label>
                   <select
+                    id="branch-select"
                     name="branchSelect"
                     value={createForm.branchCode}
                     onChange={handleCreateChange}
@@ -531,8 +752,9 @@ function StudentProfile() {
 
                 {createForm.branchCode === "OTHER" && (
                   <div className="sp-input-box">
-                    <label>Specify Branch Name & Code</label>
+                    <label htmlFor="custom-branch">Specify Branch Name & Code</label>
                     <input
+                      id="custom-branch"
                       type="text"
                       name="branch"
                       value={createForm.branch}
@@ -544,8 +766,11 @@ function StudentProfile() {
                 )}
 
                 <div className="sp-input-box">
-                  <label>College / Institution Name <span className="sp-req">*</span></label>
+                  <label htmlFor="college-name">
+                    College / Institution Name <span className="sp-req">*</span>
+                  </label>
                   <input
+                    id="college-name"
                     type="text"
                     name="college"
                     value={createForm.college}
@@ -556,8 +781,11 @@ function StudentProfile() {
                 </div>
 
                 <div className="sp-input-box">
-                  <label>Email Address <span className="sp-req">*</span></label>
+                  <label htmlFor="email-address">
+                    Email Address <span className="sp-req">*</span>
+                  </label>
                   <input
+                    id="email-address"
                     type="email"
                     name="email"
                     value={createForm.email}
@@ -568,8 +796,11 @@ function StudentProfile() {
                 </div>
 
                 <div className="sp-input-box">
-                  <label>Contact Phone Number <span className="sp-req">*</span></label>
+                  <label htmlFor="phone-number">
+                    Contact Phone Number <span className="sp-req">*</span>
+                  </label>
                   <input
+                    id="phone-number"
                     type="tel"
                     name="phone"
                     value={createForm.phone}
@@ -599,23 +830,31 @@ function StudentProfile() {
                       onChange={handleCreateChange}
                       className="sp-select-input"
                     >
-                      <option value="1st Semester">1st Semester</option>
-                      <option value="2nd Semester">2nd Semester</option>
+                      <option value="1-1">Semester 1-1</option>
+                      <option value="1-2">Semester 1-2</option>
+                      <option value="2-1">Semester 2-1</option>
+                      <option value="2-2">Semester 2-2</option>
+                      <option value="3-1">Semester 3-1</option>
+                      <option value="3-2">Semester 3-2</option>
+                      <option value="4-1">Semester 4-1</option>
+                      <option value="4-2">Semester 4-2</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="sp-input-box">
-                  <label>Curriculum Regulation</label>
+                  <label htmlFor="regulation-select">Curriculum Regulation</label>
                   <select
+                    id="regulation-select"
                     name="regulation"
                     value={createForm.regulation}
                     onChange={handleCreateChange}
                     className="sp-select-input"
                   >
-                    <option value="R23 Regulation">R23 Regulation</option>
+                    <option value="R23 Regulation">R23 Regulation (Latest JNTU)</option>
                     <option value="R20 Regulation">R20 Regulation</option>
                     <option value="R19 Regulation">R19 Regulation</option>
+                    <option value="R18 Regulation">R18 Regulation</option>
                     <option value="R15 Regulation">R15 Regulation</option>
                   </select>
                 </div>
@@ -623,7 +862,7 @@ function StudentProfile() {
 
               <div className="sp-form-divider" />
 
-              {/* Attendance Tracker Input */}
+              {/* Step 2: Attendance Tracker Input */}
               <div className="sp-section-heading-row">
                 <span className="sp-sec-step">2</span>
                 <div>
@@ -639,6 +878,38 @@ function StudentProfile() {
                       <span className="sp-att-big-num">{createForm.attendancePercentage}%</span>
                       <span className="sp-att-sub">Current Attendance</span>
                     </div>
+
+                    <div className="sp-att-presets-row">
+                      <button
+                        type="button"
+                        className={`sp-att-preset-btn ${createForm.attendancePercentage === 65 ? "active" : ""}`}
+                        onClick={() => setCreateForm((prev) => ({ ...prev, attendancePercentage: 65 }))}
+                      >
+                        65% (Min Condonation)
+                      </button>
+                      <button
+                        type="button"
+                        className={`sp-att-preset-btn ${createForm.attendancePercentage === 75 ? "active" : ""}`}
+                        onClick={() => setCreateForm((prev) => ({ ...prev, attendancePercentage: 75 }))}
+                      >
+                        75% (Min Safe)
+                      </button>
+                      <button
+                        type="button"
+                        className={`sp-att-preset-btn ${createForm.attendancePercentage === 82 ? "active" : ""}`}
+                        onClick={() => setCreateForm((prev) => ({ ...prev, attendancePercentage: 82 }))}
+                      >
+                        82% (Default)
+                      </button>
+                      <button
+                        type="button"
+                        className={`sp-att-preset-btn ${createForm.attendancePercentage === 90 ? "active" : ""}`}
+                        onClick={() => setCreateForm((prev) => ({ ...prev, attendancePercentage: 90 }))}
+                      >
+                        90% (Distinction)
+                      </button>
+                    </div>
+
                     <input
                       type="range"
                       min="0"
@@ -651,24 +922,43 @@ function StudentProfile() {
                         }))
                       }
                       className="sp-att-range-slider"
+                      aria-label="Attendance Percentage Slider"
                     />
+
+                    <div className="sp-att-bar-track">
+                      <div
+                        className={`sp-att-bar-fill ${getAttendanceStatus(createForm.attendancePercentage).class}`}
+                        style={{ width: `${createForm.attendancePercentage}%` }}
+                      />
+                      <div className="sp-att-marker mark-65" title="65% Condonation Limit">
+                        <span>65%</span>
+                      </div>
+                      <div className="sp-att-marker mark-75" title="75% Safe Threshold">
+                        <span>75%</span>
+                      </div>
+                    </div>
                   </div>
 
                   <div className={`sp-att-status-badge-card ${getAttendanceStatus(createForm.attendancePercentage).class}`}>
                     <div className="sp-att-status-header">
-                      <span className="sp-att-status-icon">{getAttendanceStatus(createForm.attendancePercentage).icon}</span>
+                      <span className="sp-att-status-icon">
+                        {getAttendanceStatus(createForm.attendancePercentage).icon}
+                      </span>
                       <strong>{getAttendanceStatus(createForm.attendancePercentage).label}</strong>
                     </div>
                     <p className="sp-att-status-text">
                       {getAttendanceStatus(createForm.attendancePercentage).desc}
                     </p>
+                    <div className="sp-att-status-footer">
+                      <span className="sp-att-rule-badge">Official JNTU Rule §4.2</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className="sp-form-divider" />
 
-              {/* Semester-wise CGPA / SGPA Section */}
+              {/* Step 3: Semester-wise CGPA / SGPA Section */}
               <div className="sp-section-heading-row">
                 <span className="sp-sec-step">3</span>
                 <div className="sp-sec-flex-header">
@@ -678,38 +968,85 @@ function StudentProfile() {
                       Enter your SGPA for each completed semester (1 through 8). Leave future semesters blank.
                     </p>
                   </div>
-                  {calculateCgpaFromGrades(createForm.semesterGrades) && (
+                  {liveCreateCgpa && (
                     <div className="sp-live-cgpa-pill">
-                      <span>Calculated CGPA:</span>
-                      <strong>{calculateCgpaFromGrades(createForm.semesterGrades)} / 10.0</strong>
+                      <div className="sp-live-cgpa-score">
+                        <span>CGPA:</span>
+                        <strong>{liveCreateCgpa} / 10.0</strong>
+                      </div>
+                      {liveCreatePct && (
+                        <span className="sp-live-equiv-tag">({liveCreatePct}%)</span>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="sp-sem-matrix-grid">
-                {createForm.semesterGrades.map((sem, idx) => (
-                  <div key={idx} className="sp-sem-input-card">
-                    <span className="sp-sem-tag">{sem.sem}</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="10"
-                      placeholder="e.g. 8.75"
-                      value={sem.sgpa}
-                      onChange={(e) => handleCreateSemGradeChange(idx, e.target.value)}
-                      className="sp-sem-score-input"
-                    />
-                    <span className="sp-sem-subtext">20 Credits</span>
+              {/* Dynamic Live CGPA Summary Meter */}
+              {liveCreateCgpa && (
+                <div className="sp-live-metric-card">
+                  <div className="sp-lmc-left">
+                    <span className="sp-lmc-label">CALCULATED CGPA</span>
+                    <strong className="sp-lmc-score">{liveCreateCgpa}</strong>
+                    <span className="sp-lmc-standing">★ {liveCreateStanding}</span>
                   </div>
-                ))}
+                  <div className="sp-lmc-right">
+                    <div className="sp-lmc-stat">
+                      <span>Equivalent %</span>
+                      <strong>{liveCreatePct}%</strong>
+                    </div>
+                    <div className="sp-lmc-stat">
+                      <span>Completed Semesters</span>
+                      <strong>{liveCreateFilledCount} of 8</strong>
+                    </div>
+                    <div className="sp-lmc-stat">
+                      <span>Credits Earned</span>
+                      <strong>{liveCreateFilledCount * 20} / 160</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 8-Semester Matrix Grid */}
+              <div className="sp-sem-matrix-grid">
+                {createForm.semesterGrades.map((sem, idx) => {
+                  const gradeInfo = getGradeLetter(sem.sgpa);
+                  return (
+                    <div key={idx} className={`sp-sem-input-card ${sem.sgpa ? "has-value" : ""}`}>
+                      <div className="sp-sem-card-top">
+                        <span className="sp-sem-tag">{sem.sem}</span>
+                        <span className="sp-sem-subtext">20 Credits</span>
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="10"
+                        placeholder="e.g. 8.75"
+                        value={sem.sgpa}
+                        onChange={(e) => handleCreateSemGradeChange(idx, e.target.value)}
+                        className="sp-sem-score-input"
+                        aria-label={`Semester ${sem.sem} SGPA`}
+                      />
+                      <div className="sp-sem-grade-footer">
+                        {gradeInfo ? (
+                          <span className="sp-grade-chip" style={{ color: gradeInfo.color }}>
+                            {gradeInfo.grade} • {gradeInfo.label}
+                          </span>
+                        ) : (
+                          <span className="sp-grade-chip-empty">Pending</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Form Action */}
               <div className="sp-create-submit-bar">
                 <button type="submit" className="sp-btn-create-submit">
-                  ✨ Create & Save My Student Profile
+                  <span className="sp-btn-shine" />
+                  <span>✨ Create & Save My Student Profile</span>
                 </button>
               </div>
             </form>
@@ -719,10 +1056,28 @@ function StudentProfile() {
               SCENARIO 2: CONFIGURED USER (EXECUTIVE ACADEMIC CARD)
               --------------------------------------------------------- */
           <div className="sp-page-card">
+            {/* Hidden Input for Global Profile Photo Upload */}
+            <input
+              type="file"
+              ref={editFileInputRef}
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={(e) => handlePhotoUpload(e, "edit")}
+            />
+
             {/* Academic Cover Banner with Three Dots Kebab Menu */}
             <div className="sp-page-banner">
               <div className="sp-page-banner-glow" />
               <div className="sp-banner-eyebrow" ref={menuRef}>
+                <div className="sp-banner-left-info">
+                  <span className="sp-banner-inst-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                    </svg>
+                    JNTU Verified Student Record
+                  </span>
+                </div>
+
                 <button
                   type="button"
                   className="sp-kebab-btn"
@@ -753,6 +1108,21 @@ function StudentProfile() {
                       </svg>
                       Edit Profile
                     </button>
+                    <button
+                      type="button"
+                      className="sp-kebab-item"
+                      onClick={() => {
+                        setShowMenu(false);
+                        handlePrintIdCard();
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9" />
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                        <rect x="6" y="14" width="12" height="8" />
+                      </svg>
+                      Print ID Card
+                    </button>
                     {activeAvatar && (
                       <button
                         type="button"
@@ -782,7 +1152,7 @@ function StudentProfile() {
                         <polyline points="16 17 21 12 16 7" />
                         <line x1="21" y1="12" x2="9" y2="12" />
                       </svg>
-                      Logout
+                      Switch / Logout
                     </button>
                   </div>
                 )}
@@ -802,7 +1172,7 @@ function StudentProfile() {
                     }}
                   />
                 ) : (
-                  <div className="sp-profile-photo-placeholder">
+                  <div className="sp-profile-photo-placeholder" title="No Photo Set">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                       <circle cx="12" cy="7" r="4" />
@@ -820,16 +1190,26 @@ function StudentProfile() {
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                       <polyline points="9 12 11 14 15 10" />
                     </svg>
-                    Verified Student
+                    Verified JNTU Student
                   </span>
                 </div>
-                <p className="sp-main-subtext">
-                  <strong className="sp-main-roll">{student.hallTicket}</strong>
-                   
+                <div className="sp-main-subtext">
+                  <span
+                    className="sp-main-roll clickable"
+                    onClick={() => handleCopyUsn(student.hallTicket)}
+                    title="Click to copy Hall Ticket Number"
+                  >
+                    <strong>{student.hallTicket}</strong>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                  </span>
+                  <span className="sp-dot-separator">•</span>
                   <span>{student.branch} ({student.branchCode})</span>
-                   
+                  <span className="sp-dot-separator">•</span>
                   <span className="sp-highlight-gold">{student.year} ({student.semester})</span>
-                </p>
+                </div>
                 <p className="sp-college-subtext">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sp-inst-icon">
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
@@ -855,11 +1235,8 @@ function StudentProfile() {
                   {student.cgpa || "0.00"} <span className="sp-pm-max">/ 10.0</span>
                 </div>
                 <span className="sp-pm-desc sp-gold-sub">
-                  {Number(student.cgpa) >= 8.5
-                    ? "★ Distinction Standing"
-                    : Number(student.cgpa) >= 7.0
-                    ? "✓ First Class Standing"
-                    : "Active Academic Record"}
+                  ★ {getAcademicClassification(student.cgpa)}
+                  {calculateEquivalentPercentage(student.cgpa) && ` (${calculateEquivalentPercentage(student.cgpa)}%)`}
                 </span>
               </div>
 
@@ -910,7 +1287,7 @@ function StudentProfile() {
               </div>
             </div>
 
-            {/* Tabs Navigation (Professional Minimalist, No Emojis) */}
+            {/* Tabs Navigation (Professional Minimalist, No Forced Scrollbar) */}
             <div className="sp-page-tabs">
               <button
                 type="button"
@@ -921,10 +1298,17 @@ function StudentProfile() {
               </button>
               <button
                 type="button"
+                className={`sp-page-tab ${activeTab === "idcard" ? "active" : ""}`}
+                onClick={() => setActiveTab("idcard")}
+              >
+                Digital ID Card
+              </button>
+              <button
+                type="button"
                 className={`sp-page-tab ${activeTab === "grades" ? "active" : ""}`}
                 onClick={() => setActiveTab("grades")}
               >
-                Semester Grade Card (SGPA)
+                Semester Grades (SGPA)
               </button>
               <button
                 type="button"
@@ -1003,7 +1387,107 @@ function StudentProfile() {
                 </div>
               )}
 
-              {/* TAB 2: SEMESTER GRADES */}
+              {/* TAB 2: DIGITAL ID CARD */}
+              {activeTab === "idcard" && (
+                <div className="sp-tab-fade">
+                  <div className="sp-idcard-wrapper">
+                    <div className="sp-idcard-badge-wrap">
+                      <div className="sp-idcard-official-card" id="printable-id-card">
+                        <div className="sp-idc-header">
+                          <img src="/jntu-circle-logo.png" alt="University Logo" className="sp-idc-logo" />
+                          <div className="sp-idc-univ-text">
+                            <h3>JAWAHARLAL NEHRU TECHNOLOGICAL UNIVERSITY</h3>
+                            <p>OFFICIAL STUDENT CREDENTIAL & DIGITAL IDENTITY CARD</p>
+                          </div>
+                        </div>
+
+                        <div className="sp-idc-body">
+                          <div className="sp-idc-photo-col">
+                            {activeAvatar ? (
+                              <img src={activeAvatar} alt={student.name} className="sp-idc-avatar" />
+                            ) : (
+                              <div className="sp-idc-avatar-placeholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                  <circle cx="12" cy="7" r="4" />
+                                </svg>
+                              </div>
+                            )}
+                            <div className="sp-idc-valid-tag">VALID STUDENT</div>
+                          </div>
+
+                          <div className="sp-idc-info-col">
+                            <h2 className="sp-idc-name">{student.name}</h2>
+                            <div className="sp-idc-roll-line">
+                              <span>USN / ROLL NO:</span>
+                              <strong>{student.hallTicket}</strong>
+                            </div>
+                            <div className="sp-idc-details-grid">
+                              <div>
+                                <small>BRANCH</small>
+                                <span>{student.branchCode}</span>
+                              </div>
+                              <div>
+                                <small>LEVEL</small>
+                                <span>{student.year} ({student.semester})</span>
+                              </div>
+                              <div>
+                                <small>REGULATION</small>
+                                <span>{student.regulation}</span>
+                              </div>
+                              <div>
+                                <small>ATTENDANCE</small>
+                                <span className={attendanceStatus.class}>{student.attendancePercentage || 75}% ({attendanceStatus.label.split(" ")[0]})</span>
+                              </div>
+                            </div>
+                            <div className="sp-idc-college-line">
+                              <small>COLLEGE / INSTITUTION</small>
+                              <span>{student.college}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="sp-idc-footer">
+                          <div className="sp-idc-barcode-sim">
+                            <span className="sp-bar-lines" />
+                            <small>{student.hallTicket} • JNTU-ID-VERIFIED</small>
+                          </div>
+                          <div className="sp-idc-seal-wrap">
+                            <div className="sp-idc-seal">
+                              <span>JNTU</span>
+                              <small>OFFICIAL</small>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="sp-idcard-actions">
+                        <button
+                          type="button"
+                          className="sp-btn-print-action"
+                          onClick={handlePrintIdCard}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                            <polyline points="6 9 6 2 18 2 18 9" />
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                            <rect x="6" y="14" width="12" height="8" />
+                          </svg>
+                          Download / Print ID Card
+                        </button>
+                        <button
+                          type="button"
+                          className="sp-btn-copy-usn"
+                          onClick={() => handleCopyUsn(student.hallTicket)}
+                        >
+                          📋 Copy Hall Ticket Number
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: SEMESTER GRADES */}
               {activeTab === "grades" && (
                 <div className="sp-tab-fade">
                   <div className="sp-card-box">
@@ -1017,6 +1501,11 @@ function StudentProfile() {
                       <div className="sp-cgpa-display">
                         <span>CUMULATIVE CGPA</span>
                         <strong>{student.cgpa || "0.00"} / 10.0</strong>
+                        {calculateEquivalentPercentage(student.cgpa) && (
+                          <small className="sp-cgpa-equiv">
+                            Equivalent: {calculateEquivalentPercentage(student.cgpa)}%
+                          </small>
+                        )}
                       </div>
                     </div>
 
@@ -1027,13 +1516,14 @@ function StudentProfile() {
                           <th>Credits</th>
                           <th>SGPA Score</th>
                           <th>Visual Progression</th>
-                          <th>Academic Standing</th>
+                          <th>Standing & Letter Grade</th>
                         </tr>
                       </thead>
                       <tbody>
                         {(student.semesterGrades || INITIAL_SEMESTERS).map((grade, index) => {
                           const sgpaNum = parseFloat(grade.sgpa);
                           const hasScore = !isNaN(sgpaNum) && sgpaNum > 0;
+                          const gradeInfo = getGradeLetter(grade.sgpa);
                           return (
                             <tr key={index}>
                               <td>
@@ -1053,6 +1543,12 @@ function StudentProfile() {
                                     className="sp-progress-bar-fill"
                                     style={{
                                       width: hasScore ? `${(sgpaNum / 10) * 100}%` : "0%",
+                                      background:
+                                        hasScore && sgpaNum >= 8.5
+                                          ? "linear-gradient(90deg, #10b981, #fed866)"
+                                          : hasScore && sgpaNum >= 7.0
+                                          ? "#10b981"
+                                          : "#3b82f6",
                                     }}
                                   />
                                 </div>
@@ -1067,13 +1563,7 @@ function StudentProfile() {
                                       : ""
                                   }`}
                                 >
-                                  {hasScore
-                                    ? sgpaNum >= 9.0
-                                      ? "Outstanding (O)"
-                                      : sgpaNum >= 8.0
-                                      ? "Excellent (A+)"
-                                      : "Cleared (Pass)"
-                                    : "Pending"}
+                                  {gradeInfo ? `${gradeInfo.grade} (${gradeInfo.label})` : "Pending"}
                                 </span>
                               </td>
                             </tr>
@@ -1085,7 +1575,7 @@ function StudentProfile() {
                 </div>
               )}
 
-              {/* TAB 3: ATTENDANCE DETAILS */}
+              {/* TAB 4: ATTENDANCE DETAILS */}
               {activeTab === "attendance" && (
                 <div className="sp-tab-fade">
                   <div className="sp-att-analytics-card">
@@ -1111,24 +1601,21 @@ function StudentProfile() {
 
                     <div className="sp-att-benchmarks">
                       <div className="sp-benchmark-item safe">
-                        
                         <div>
                           <strong>75% – 100%: Normal Eligibility</strong>
-                          <p>Issued official examination hall ticket without penalty.</p>
+                          <p>Issued official examination hall ticket without penalty or condonation fee.</p>
                         </div>
                       </div>
                       <div className="sp-benchmark-item warn">
-                        
                         <div>
                           <strong>65% – 74%: Condonation Allowed</strong>
-                          <p>Eligible upon payment of university condonation fee with medical proof.</p>
+                          <p>Eligible upon payment of university condonation fee with medical or genuine reason approval.</p>
                         </div>
                       </div>
                       <div className="sp-benchmark-item danger">
-                        
                         <div>
                           <strong>Below 65%: Detained</strong>
-                          <p>Not eligible for semester examinations; must repeat course.</p>
+                          <p>Not eligible for semester end examinations; student must repeat the semester.</p>
                         </div>
                       </div>
                     </div>
@@ -1136,7 +1623,7 @@ function StudentProfile() {
                 </div>
               )}
 
-              {/* TAB 4: SAVED NOTES */}
+              {/* TAB 5: SAVED NOTES */}
               {activeTab === "notes" && (
                 <div className="sp-tab-fade">
                   <div className="sp-notes-stack">
@@ -1176,7 +1663,7 @@ function StudentProfile() {
                 </div>
               )}
 
-              {/* TAB 5: EDIT PROFILE */}
+              {/* TAB 6: EDIT PROFILE */}
               {activeTab === "edit" && (
                 <div className="sp-tab-fade">
                   <form onSubmit={handleSaveProfile} className="sp-form-container">
@@ -1217,7 +1704,7 @@ function StudentProfile() {
                           >
                             📷 Select New Photo
                           </button>
-                          {(editForm.profilePhoto !== "none" && (editForm.profilePhoto || activeAvatar)) && (
+                          {editForm.profilePhoto !== "none" && (editForm.profilePhoto || activeAvatar) && (
                             <button
                               type="button"
                               className="sp-btn-remove-photo"
@@ -1255,7 +1742,13 @@ function StudentProfile() {
                           type="text"
                           name="hallTicket"
                           value={editForm.hallTicket || ""}
-                          onChange={handleEditChange}
+                          onChange={(e) =>
+                            setEditForm((prev) => ({
+                              ...prev,
+                              hallTicket: e.target.value.toUpperCase(),
+                            }))
+                          }
+                          className="font-mono"
                           required
                         />
                       </div>

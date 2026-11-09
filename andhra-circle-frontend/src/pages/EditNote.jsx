@@ -83,29 +83,12 @@ return (
     >
       <option value="">Select Branch</option>
 
-      <option value="Computer Science Engineering">
-        Computer Science Engineering
-      </option>
-
-      <option value="Information Science Engineering">
-        Information Science Engineering
-      </option>
-
-      <option value="Artificial Intelligence & Machine Learning">
-        Artificial Intelligence & Machine Learning
-      </option>
-
-      <option value="Electronics & Communication Engineering">
-        Electronics & Communication Engineering
-      </option>
-
-      <option value="Mechanical Engineering">
-        Mechanical Engineering
-      </option>
-
-      <option value="Civil Engineering">
-        Civil Engineering
-      </option>
+      <option value="CSE">CSE</option>
+      <option value="AIML">AIML</option>
+      <option value="ME">ME</option>
+      <option value="CE">CE</option>
+      <option value="ECE">ECE</option>
+      <option value="EEE">EEE</option>
     </select>
 
     <select
@@ -115,14 +98,14 @@ return (
     >
       <option value="">Select Semester</option>
 
-      <option value="1st Semester">1st Semester</option>
-      <option value="2nd Semester">2nd Semester</option>
-      <option value="3rd Semester">3rd Semester</option>
-      <option value="4th Semester">4th Semester</option>
-      <option value="5th Semester">5th Semester</option>
-      <option value="6th Semester">6th Semester</option>
-      <option value="7th Semester">7th Semester</option>
-      <option value="8th Semester">8th Semester</option>
+      <option value="1-1">1-1</option>
+      <option value="1-2">1-2</option>
+      <option value="2-1">2-1</option>
+      <option value="2-2">2-2</option>
+      <option value="3-1">3-1</option>
+      <option value="3-2">3-2</option>
+      <option value="4-1">4-1</option>
+      <option value="4-2">4-2</option>
     </select>
 
     <button type="submit">

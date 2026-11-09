@@ -56,7 +56,7 @@ export const BRANCH_DIRECTORY = {
     name: "Artificial Intelligence & Machine Learning",
     icon: "🤖",
     description: "Verified Python code, Deep Learning lecture notes, Machine Learning exam papers, and official curriculum for AI & ML.",
-    aliases: ["aiml", "ai", "ml", "artificial intelligence", "machine learning", "ai & ml", "ai and ml", "ai & data science", "data science", "ds"],
+    aliases: ["aiml", "cse_aiml", "cse aiml", "cseaiml", "ai", "ml", "artificial intelligence", "machine learning", "ai & ml", "ai and ml", "ai & data science", "data science", "ds"],
     portalQuery: "AIML",
   },
   ECE: {
@@ -877,22 +877,17 @@ export function scoreItem(item, analysis) {
   if (cleanQuery.length > 2 && subjectCode.includes(cleanQuery)) score += 90;
 
   // 2. Token Matching
-  let matchedTokenCount = 0;
   tokens.forEach((token) => {
     if (token.length < 2) return;
 
     if (title.includes(token)) {
       score += 25;
-      matchedTokenCount++;
     } else if (subject.includes(token)) {
       score += 20;
-      matchedTokenCount++;
     } else if (subjectCode.includes(token)) {
       score += 25;
-      matchedTokenCount++;
     } else if (searchableText.includes(token)) {
       score += 10;
-      matchedTokenCount++;
     }
   });
 
@@ -940,6 +935,44 @@ export async function performSearch(query, options = {}) {
       suggestedQueries: [],
       categoryCounts: { all: 0, notes: 0, papers: 0, syllabus: 0, labs: 0, notifications: 0 },
     };
+  }
+
+  // 1. Attempt High-Performance Server-side MongoDB Aggregation Pipeline Search
+  try {
+    const res = await API.get("/search", {
+      params: { q: trimmed, limit: 100 },
+    });
+    if (res?.data?.success && Array.isArray(res.data.results) && res.data.results.length > 0) {
+      const serverResults = res.data.results;
+      const categoryCounts = res.data.categoryCounts || {
+        all: serverResults.length,
+        notes: serverResults.filter((i) => i.type === "Notes").length,
+        papers: serverResults.filter((i) => i.type === "Question Paper").length,
+        syllabus: serverResults.filter((i) => i.type === "Syllabus").length,
+        labs: serverResults.filter((i) => i.type === "Lab Program").length,
+        notifications: serverResults.filter((i) => i.type === "Notification").length,
+      };
+
+      const topItem = serverResults[0];
+      const relatedResources = serverResults.slice(1, 7);
+      const suggestedQueries = [
+        `${topItem.branch || "CSE"} ${topItem.semester || "1-1"} Notes`,
+        `${topItem.subject || topItem.title} Question Papers`,
+        "JNTUA Exam Notifications",
+      ];
+
+      return {
+        query: trimmed,
+        analysis: analyzeQuery(trimmed),
+        results: serverResults,
+        relatedResources,
+        relatedSubjects: [],
+        suggestedQueries,
+        categoryCounts,
+      };
+    }
+  } catch (apiErr) {
+    // Graceful fallback to client-side search engine if backend search pipeline is unavailable
   }
 
   const allResources = await getAllResources(options.forceRefresh);

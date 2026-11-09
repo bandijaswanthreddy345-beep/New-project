@@ -1,4 +1,54 @@
 const Syllabus = require("../models/syllabus");
+const path = require("path");
+const fs = require("fs");
+
+let allBranchesSynced = false;
+async function syncAllBranchesSyllabus() {
+  if (allBranchesSynced) return;
+  try {
+    const branchConfigs = [
+      {
+        regex: /computer science/i,
+        file: "cse_all_semesters.json",
+        label: "CSE"
+      },
+      {
+        regex: /artificial intelligence/i,
+        file: "aiml_fixed_syllabus_items.json",
+        label: "AIML"
+      },
+      {
+        regex: /electronics/i,
+        file: "ece_fixed_syllabus_items.json",
+        label: "ECE"
+      },
+      {
+        regex: /mechanical/i,
+        file: "mechanical_fixed_syllabus_items.json",
+        label: "Mechanical"
+      }
+    ];
+
+    for (const b of branchConfigs) {
+      const hasSem2_1 = await Syllabus.exists({ branch: { $regex: b.regex }, semester: "2-1" });
+      const hasSem3_1 = await Syllabus.exists({ branch: { $regex: b.regex }, semester: "3-1" });
+
+      if (!hasSem2_1 || !hasSem3_1) {
+        console.log(`[Auto-Migration] Refreshing ${b.label} across all semesters...`);
+        await Syllabus.deleteMany({ branch: { $regex: b.regex } });
+        const jsonPath = path.join(__dirname, "../scripts", b.file);
+        if (fs.existsSync(jsonPath)) {
+          const items = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+          await Syllabus.insertMany(items);
+          console.log(`[Auto-Migration] Successfully loaded all ${items.length} ${b.label} subjects!`);
+        }
+      }
+    }
+    allBranchesSynced = true;
+  } catch (err) {
+    console.error("[Auto-Migration Error]:", err.message);
+  }
+}
 
 // Create Syllabus
 exports.createSyllabus = async (req, res) => {
@@ -31,6 +81,7 @@ exports.getSyllabus = async (req, res) => {
     if (require("mongoose").connection.readyState !== 1) {
       return res.status(200).json([]);
     }
+    await syncAllBranchesSyllabus();
     const syllabus = await Syllabus.find().sort({ createdAt: -1 });
 
     res.status(200).json(syllabus);
@@ -65,7 +116,7 @@ exports.updateSyllabus = async (req, res) => {
     const syllabus = await Syllabus.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!syllabus) {
@@ -128,7 +179,7 @@ exports.likeSyllabus = async (req, res) => {
     const syllabus = await Syllabus.findByIdAndUpdate(
       req.params.id,
       { $set: { likes: targetLikes } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     res.status(200).json(syllabus);
@@ -148,7 +199,7 @@ exports.increaseViews = async (req, res) => {
     const syllabus = await Syllabus.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!syllabus) {
@@ -174,7 +225,7 @@ exports.increaseDownloads = async (req, res) => {
     const syllabus = await Syllabus.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!syllabus) {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
+import { normalizeSemester } from "../utils/semester";
 import "./NoteDetails.css";
 
 function NoteDetails() {
@@ -12,6 +13,7 @@ function NoteDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [openUnit, setOpenUnit] = useState(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   // =========================================================
   // COMMENTS STATE
@@ -182,6 +184,32 @@ function NoteDetails() {
   };
 
   // =========================================================
+  // BUILD EMBED PDF URL (SAFE AGAINST CSP FRAME-ANCESTORS)
+  // =========================================================
+
+  const getEmbedPdfUrl = (value) => {
+    if (!value || typeof value !== "string") {
+      return "";
+    }
+
+    // Local uploads: use same-origin relative path so it is always same-origin
+    if (value.includes("/uploads/")) {
+      const uploadPath = value.substring(value.indexOf("/uploads/"));
+      return `${uploadPath}#toolbar=1&navpanes=0&view=FitH`;
+    }
+
+    // External URLs (Google Drive, university portals, etc.): proxy through backend
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      if (!value.includes("localhost:5000")) {
+        return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(value)}#toolbar=1&navpanes=0&view=FitH`;
+      }
+    }
+
+    const fullUrl = getBackendUrl(value);
+    return `${fullUrl}#toolbar=1&navpanes=0&view=FitH`;
+  };
+
+  // =========================================================
   // NOTE DATA
   // =========================================================
 
@@ -194,7 +222,7 @@ function NoteDetails() {
   const subject = note?.subject || "";
   const subjectCode = note?.subjectCode || "";
   const branch = note?.branch || "";
-  const semester = note?.semester || "";
+  const semester = normalizeSemester(note?.semester || "");
 
   // =========================================================
   // CREDITS
@@ -1115,7 +1143,7 @@ function NoteDetails() {
 
                       {/* PDF PREVIEW */}
 
-                      {pdfUrl && (
+                      {isOpen && pdfUrl && (
 
                         <div className="pdf-preview-card">
 
@@ -1149,15 +1177,37 @@ function NoteDetails() {
 
                           </div>
 
-                          <div className="pdf-frame-wrapper">
+                          <div className="unit-pdf-frame-wrapper">
 
                             <iframe
-                              src={pdfUrl}
+                              src={getEmbedPdfUrl(unit.pdf)}
                               title={`Unit ${unit.number} PDF`}
-                              className="pdf-frame"
+                              className="unit-pdf-frame"
                               loading="lazy"
                             />
 
+                          </div>
+
+                          <div className="pdf-preview-bottom-bar">
+                            <div className="pdf-preview-hint">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="16" x2="12" y2="12" />
+                                <line x1="12" y1="8" x2="12.01" y2="8" />
+                              </svg>
+                              <span>Use document viewer controls inside to navigate pages or zoom</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="pdf-preview-expand-btn"
+                              onClick={() =>
+                                openPdfInNewTab(
+                                  unit.pdf
+                                )
+                              }
+                            >
+                              Full Window View ↗
+                            </button>
                           </div>
 
                         </div>

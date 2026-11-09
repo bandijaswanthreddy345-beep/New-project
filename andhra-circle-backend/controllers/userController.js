@@ -37,7 +37,7 @@ exports.updateUserRole = async (req, res) => {
       req.params.id,
       { role },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }
     ).select(
