@@ -39,13 +39,29 @@ export function cleanCollege(col) {
 
 // Helper to remove any lingering "(3-2)", "(X-Y)", or year notation from semester names
 export function cleanSemester(sem) {
-  if (!sem || typeof sem !== "string") return "6th Semester";
+  if (!sem || typeof sem !== "string") return "Semester 6";
   let str = sem.replace(/\b[1-4](?:st|nd|rd|th)?\s*year\b/gi, "").replace(/[|•–—()]/g, " ").trim();
   const validated = validateSemester(str);
-  if (validated.ok) return validated.value;
+  if (validated.ok) {
+    const semNumMatch = validated.value.match(/(\d+)/);
+    if (semNumMatch) {
+      return `Semester ${semNumMatch[1]}`;
+    }
+    return validated.value;
+  }
   const direct = validateSemester(sem);
-  if (direct.ok) return direct.value;
-  return sem.replace(/\s*\([1-4]-[1-2]\)/gi, "").replace(/\b[1-4]-[1-2]\b/gi, "").trim() || "6th Semester";
+  if (direct.ok) {
+    const semNumMatch = direct.value.match(/(\d+)/);
+    if (semNumMatch) {
+      return `Semester ${semNumMatch[1]}`;
+    }
+    return direct.value;
+  }
+  const rawNumMatch = sem.match(/(\d+)/);
+  if (rawNumMatch && Number(rawNumMatch[1]) >= 1 && Number(rawNumMatch[1]) <= 8) {
+    return `Semester ${rawNumMatch[1]}`;
+  }
+  return sem.replace(/\s*\([1-4]-[1-2]\)/gi, "").replace(/\b[1-4]-[1-2]\b/gi, "").trim() || "Semester 6";
 }
 
 // Stitch verified student profile default (Executive Edition)

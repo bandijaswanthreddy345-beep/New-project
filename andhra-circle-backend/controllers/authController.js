@@ -174,10 +174,11 @@ exports.loginUser = async (req, res) => {
     // Login successful: reset failed attempt counters for this client and email
     clearFailedAttempts(clientIp, email);
 
-    // Generate JWT Token with Role and passwordChangedAt
+    // Generate JWT Token with Role, passwordChangedAt and tokenVersion
     const tokenPayload = {
       id: user._id,
       role: user.role,
+      tokenVersion: user.tokenVersion || 0,
     };
     if (user.passwordChangedAt) {
       tokenPayload.passwordChangedAt = user.passwordChangedAt.getTime();
@@ -323,6 +324,7 @@ exports.resetPassword = async (req, res) => {
 
     // Invalidate previously issued login tokens
     user.passwordChangedAt = new Date();
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
 
     // One-time use: clear the reset token
     user.resetPasswordToken = undefined;

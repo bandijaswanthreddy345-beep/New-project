@@ -102,7 +102,6 @@ function StudentProfile() {
     college: "",
     email: "",
     phone: "",
-    year: "1st Year",
     semester: "1st Semester",
     regulation: "R23 Regulation",
     attendancePercentage: 82,
@@ -392,7 +391,7 @@ function StudentProfile() {
       college: createForm.college.trim() || "JNTU Affiliated Institution",
       email: emailCheck.value,
       phone: phoneCheck.value,
-      year: createForm.year || "1st Year",
+      year: "",
       semester: createForm.semester || "1st Semester",
       regulation: createForm.regulation || "R23 Regulation",
       attendancePercentage: attCheck.value,
@@ -437,11 +436,6 @@ function StudentProfile() {
     if (editForm.phone && editForm.phone.trim()) {
       const phoneCheck = validatePhone(editForm.phone, { required: false });
       if (!phoneCheck.ok) errors.phone = phoneCheck.message;
-    }
-
-    if (editForm.year) {
-      const yearCheck = validateYear(editForm.year);
-      if (!yearCheck.ok) errors.year = yearCheck.message;
     }
 
     if (editForm.semester) {
@@ -513,7 +507,6 @@ function StudentProfile() {
       college: "",
       email: "",
       phone: "",
-      year: "1st Year",
       semester: "1st Semester",
       regulation: "R23 Regulation",
       attendancePercentage: 82,
@@ -729,32 +722,19 @@ function StudentProfile() {
         </div>
 
         <div className="sp-input-box">
-          <label>Academic Year & Regulation</label>
-          <div className="sp-dual-selects">
-            <select
-              name="year"
-              value={createForm.year}
-              onChange={handleCreateChange}
-              className="sp-select-input"
-            >
-              <option value="1st Year">1st Year</option>
-              <option value="2nd Year">2nd Year</option>
-              <option value="3rd Year">3rd Year</option>
-              <option value="4th Year">4th Year</option>
-            </select>
-            <select
-              name="regulation"
-              value={createForm.regulation}
-              onChange={handleCreateChange}
-              className="sp-select-input"
-            >
-              <option value="R23 Regulation">R23 Regulation</option>
-              <option value="R20 Regulation">R20 Regulation</option>
-              <option value="R19 Regulation">R19 Regulation</option>
-              <option value="R16 Regulation">R16 Regulation</option>
-              <option value="R15 Regulation">R15 Regulation</option>
-            </select>
-          </div>
+          <label>Curriculum Regulation</label>
+          <select
+            name="regulation"
+            value={createForm.regulation}
+            onChange={handleCreateChange}
+            className="sp-select-input"
+          >
+            <option value="R23 Regulation">R23 Regulation</option>
+            <option value="R20 Regulation">R20 Regulation</option>
+            <option value="R19 Regulation">R19 Regulation</option>
+            <option value="R16 Regulation">R16 Regulation</option>
+            <option value="R15 Regulation">R15 Regulation</option>
+          </select>
         </div>
 
         <div className="sp-input-box">
@@ -765,14 +745,14 @@ function StudentProfile() {
             onChange={handleCreateChange}
             className="sp-select-input"
           >
-            <option value="1st Semester">1st Semester (1-1)</option>
-            <option value="2nd Semester">2nd Semester (1-2)</option>
-            <option value="3rd Semester">3rd Semester (2-1)</option>
-            <option value="4th Semester">4th Semester (2-2)</option>
-            <option value="5th Semester">5th Semester (3-1)</option>
-            <option value="6th Semester">6th Semester (3-2)</option>
-            <option value="7th Semester">7th Semester (4-1)</option>
-            <option value="8th Semester">8th Semester (4-2)</option>
+            <option value="1st Semester">Semester 1 (Sem 1)</option>
+            <option value="2nd Semester">Semester 2 (Sem 2)</option>
+            <option value="3rd Semester">Semester 3 (Sem 3)</option>
+            <option value="4th Semester">Semester 4 (Sem 4)</option>
+            <option value="5th Semester">Semester 5 (Sem 5)</option>
+            <option value="6th Semester">Semester 6 (Sem 6)</option>
+            <option value="7th Semester">Semester 7 (Sem 7)</option>
+            <option value="8th Semester">Semester 8 (Sem 8)</option>
           </select>
         </div>
 
@@ -865,18 +845,22 @@ function StudentProfile() {
       <div className="sp-sem-matrix-grid">
         {createForm.semesterGrades.map((sem, idx) => (
           <div key={idx} className="sp-sem-input-card">
-            <span className="sp-sem-tag">{sem.sem}</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              max="10"
-              placeholder="SGPA"
-              value={sem.sgpa}
-              onChange={(e) => handleCreateSemGradeChange(idx, e.target.value)}
-              className="sp-sem-score-input"
-            />
-            <span className="sp-sem-subtext">20 Credits</span>
+            <div className="sp-sem-card-header">
+              <span className="sp-sem-tag">{sem.sem}</span>
+              <span className="sp-sem-subtext">20 Credits</span>
+            </div>
+            <div className="sp-sem-input-wrapper">
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="10"
+                placeholder="SGPA (e.g. 8.75)"
+                value={sem.sgpa}
+                onChange={(e) => handleCreateSemGradeChange(idx, e.target.value)}
+                className="sp-sem-score-input"
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -1128,7 +1112,7 @@ function StudentProfile() {
 
                 <span className="sp-dot-separator">•</span>
 
-                {student.semester?.trim() || student.year?.trim() ? (
+                {student.semester?.trim() ? (
                   <span className="sp-highlight-gold">
                     {cleanSemester(student.semester)}
                   </span>
@@ -1383,7 +1367,7 @@ function StudentProfile() {
                     <div className="sp-info-card">
                       <span className="sp-info-label">Academic Semester</span>
                       <span className="sp-info-data">
-                        {student.semester?.trim() || student.year?.trim() ? (
+                        {student.semester?.trim() ? (
                           cleanSemester(student.semester)
                         ) : (
                           <button type="button" className="sp-inline-add-btn" onClick={() => setActiveTab("edit")}>
@@ -1822,47 +1806,45 @@ function StudentProfile() {
 
                     <div className="sp-form-row-2">
                       <div className="sp-input-group">
-                        <label>Academic Year</label>
-                        <input
-                          type="text"
-                          name="year"
-                          value={editForm.year || ""}
-                          onChange={handleEditChange}
-                          onBlur={handleEditBlur}
-                          aria-invalid={Boolean(editErrors.year)}
-                        />
-                        {editErrors.year && (
-                          <span className="sp-field-error" role="alert">{editErrors.year}</span>
-                        )}
-                      </div>
-
-                      <div className="sp-input-group">
                         <label>Current Semester</label>
-                        <input
-                          type="text"
+                        <select
                           name="semester"
-                          value={editForm.semester || ""}
+                          value={editForm.semester || "1st Semester"}
                           onChange={handleEditChange}
-                          onBlur={handleEditBlur}
-                          aria-invalid={Boolean(editErrors.semester)}
-                        />
+                          className="sp-select-input"
+                        >
+                          <option value="1st Semester">Semester 1 (Sem 1)</option>
+                          <option value="2nd Semester">Semester 2 (Sem 2)</option>
+                          <option value="3rd Semester">Semester 3 (Sem 3)</option>
+                          <option value="4th Semester">Semester 4 (Sem 4)</option>
+                          <option value="5th Semester">Semester 5 (Sem 5)</option>
+                          <option value="6th Semester">Semester 6 (Sem 6)</option>
+                          <option value="7th Semester">Semester 7 (Sem 7)</option>
+                          <option value="8th Semester">Semester 8 (Sem 8)</option>
+                        </select>
                         {editErrors.semester && (
                           <span className="sp-field-error" role="alert">{editErrors.semester}</span>
                         )}
                       </div>
+
+                      <div className="sp-input-group">
+                        <label>Curriculum Regulation</label>
+                        <select
+                          name="regulation"
+                          value={editForm.regulation || "R23 Regulation"}
+                          onChange={handleEditChange}
+                          className="sp-select-input"
+                        >
+                          <option value="R23 Regulation">R23 Regulation</option>
+                          <option value="R20 Regulation">R20 Regulation</option>
+                          <option value="R19 Regulation">R19 Regulation</option>
+                          <option value="R16 Regulation">R16 Regulation</option>
+                          <option value="R15 Regulation">R15 Regulation</option>
+                        </select>
+                      </div>
                     </div>
 
-                    <div className="sp-form-row-2">
-                      <div className="sp-input-group">
-                        <label>Regulation</label>
-                        <input
-                          type="text"
-                          name="regulation"
-                          value={editForm.regulation || ""}
-                          onChange={handleEditChange}
-                        />
-                      </div>
-
+                    <div className="sp-form-row-1">
                       <div className="sp-input-group">
                         <label>
                           Attendance Percentage ({editForm.attendancePercentage || 75}%)
@@ -1899,18 +1881,23 @@ function StudentProfile() {
                       <div className="sp-sem-matrix-grid">
                         {(editForm.semesterGrades || INITIAL_SEMESTERS).map((sem, idx) => (
                           <div key={idx} className="sp-sem-input-card">
-                            <span className="sp-sem-tag">{sem.sem}</span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              max="10"
-                              placeholder="SGPA"
-                              value={sem.sgpa || ""}
-                              onChange={(e) => handleEditSemGradeChange(idx, e.target.value)}
-                              aria-invalid={Boolean(editErrors[`sem_${idx}`])}
-                              className="sp-sem-score-input"
-                            />
+                            <div className="sp-sem-card-header">
+                              <span className="sp-sem-tag">{sem.sem}</span>
+                              <span className="sp-sem-subtext">20 Credits</span>
+                            </div>
+                            <div className="sp-sem-input-wrapper">
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                max="10"
+                                placeholder="SGPA (e.g. 8.75)"
+                                value={sem.sgpa || ""}
+                                onChange={(e) => handleEditSemGradeChange(idx, e.target.value)}
+                                aria-invalid={Boolean(editErrors[`sem_${idx}`])}
+                                className="sp-sem-score-input"
+                              />
+                            </div>
                             {editErrors[`sem_${idx}`] && (
                               <span className="sp-field-error" role="alert">{editErrors[`sem_${idx}`]}</span>
                             )}
@@ -2089,7 +2076,7 @@ function StudentProfile() {
                 )}
               </div>
               <div className="sp-m-tag-row">
-                {student.semester?.trim() || student.year?.trim() ? (
+                {student.semester?.trim() ? (
                   <span className="sp-m-sem-badge">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -2369,7 +2356,7 @@ function StudentProfile() {
                   <div className="sp-m-detail-box">
                     <p className="sp-m-detail-lbl">ACADEMIC SEMESTER</p>
                     <p className="sp-m-detail-val font-bold">
-                      {student.semester?.trim() || student.year?.trim() ? (
+                      {student.semester?.trim() ? (
                         cleanSemester(student.semester)
                       ) : (
                         <button type="button" className="sp-m-add-link-btn" onClick={() => setActiveTab("edit")}>
@@ -2478,8 +2465,22 @@ function StudentProfile() {
                   <h2 className="sp-m-group-title">SEMESTER PERFORMANCE MATRIX</h2>
                 </div>
 
+                <div className="sp-m-grades-header-bar">
+                  <div className="sp-m-cgpa-stat">
+                    <span className="sp-m-cgpa-lbl">Cumulative CGPA</span>
+                    <strong className="sp-m-cgpa-val">{hasCgpa ? `${student.cgpa} / 10.0` : "-- / 10.0"}</strong>
+                  </div>
+                  <button
+                    type="button"
+                    className="sp-m-btn-edit-grades"
+                    onClick={() => setActiveTab("edit")}
+                  >
+                    ✏️ Edit Grades
+                  </button>
+                </div>
+
                 <div className="sp-m-grades-list">
-                  {(student.semesterGrades || []).map((grade, idx) => {
+                  {(student.semesterGrades || INITIAL_SEMESTERS).map((grade, idx) => {
                     const sgpaNum = parseFloat(grade.sgpa);
                     const hasScore = !isNaN(sgpaNum) && sgpaNum > 0;
                     return (
@@ -2497,13 +2498,23 @@ function StudentProfile() {
                               </div>
                             </>
                           ) : (
-                            <span className="sp-m-score-pending">{grade.status || "Pending"}</span>
+                            <span className="sp-m-score-not-entered">Not entered</span>
                           )}
                         </div>
                         <div className="sp-m-grade-right">
-                          <span className={`sp-m-grade-badge ${hasScore && sgpaNum >= 8.5 ? "gold" : hasScore ? "green" : "gray"}`}>
-                            {hasScore ? (sgpaNum >= 9.0 ? "Outstanding" : sgpaNum >= 8.0 ? "Distinction" : "Pass") : "Upcoming"}
-                          </span>
+                          {hasScore ? (
+                            <span className={`sp-m-grade-badge ${sgpaNum >= 8.5 ? "gold" : "green"}`}>
+                              {sgpaNum >= 9.0 ? "Outstanding" : sgpaNum >= 8.0 ? "Distinction" : "Pass"}
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="sp-m-add-grade-btn"
+                              onClick={() => setActiveTab("edit")}
+                            >
+                              + Add SGPA
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -2657,34 +2668,37 @@ function StudentProfile() {
                     )}
                   </div>
                   <div className="sp-m-input-item">
-                    <label>Academic Year</label>
-                    <input
-                      type="text"
-                      name="year"
-                      value={editForm.year || ""}
-                      onChange={handleEditChange}
-                      onBlur={handleEditBlur}
-                    />
-                  </div>
-                  <div className="sp-m-input-item">
                     <label>Current Semester</label>
-                    <input
-                      type="text"
+                    <select
                       name="semester"
-                      value={editForm.semester || ""}
+                      value={editForm.semester || "1st Semester"}
                       onChange={handleEditChange}
-                      onBlur={handleEditBlur}
-                    />
+                      className="sp-m-select-input"
+                    >
+                      <option value="1st Semester">Semester 1 (Sem 1)</option>
+                      <option value="2nd Semester">Semester 2 (Sem 2)</option>
+                      <option value="3rd Semester">Semester 3 (Sem 3)</option>
+                      <option value="4th Semester">Semester 4 (Sem 4)</option>
+                      <option value="5th Semester">Semester 5 (Sem 5)</option>
+                      <option value="6th Semester">Semester 6 (Sem 6)</option>
+                      <option value="7th Semester">Semester 7 (Sem 7)</option>
+                      <option value="8th Semester">Semester 8 (Sem 8)</option>
+                    </select>
                   </div>
                   <div className="sp-m-input-item">
                     <label>Curriculum Regulation</label>
-                    <input
-                      type="text"
+                    <select
                       name="regulation"
-                      value={editForm.regulation || ""}
+                      value={editForm.regulation || "R23 Regulation"}
                       onChange={handleEditChange}
-                      onBlur={handleEditBlur}
-                    />
+                      className="sp-m-select-input"
+                    >
+                      <option value="R23 Regulation">R23 Regulation</option>
+                      <option value="R20 Regulation">R20 Regulation</option>
+                      <option value="R19 Regulation">R19 Regulation</option>
+                      <option value="R16 Regulation">R16 Regulation</option>
+                      <option value="R15 Regulation">R15 Regulation</option>
+                    </select>
                   </div>
                   <div className="sp-m-input-item">
                     <label>Attendance Percentage (%)</label>
@@ -2696,6 +2710,44 @@ function StudentProfile() {
                       value={editForm.attendancePercentage !== undefined ? editForm.attendancePercentage : ""}
                       onChange={handleEditChange}
                     />
+                  </div>
+                  <div className="sp-m-input-item">
+                    <div className="sp-m-sem-grades-heading">
+                      <label>Semester Grades (SGPA 1 – 8)</label>
+                      {calculateCgpaFromGrades(editForm.semesterGrades) && (
+                        <span className="sp-m-cgpa-pill">
+                          CGPA: {calculateCgpaFromGrades(editForm.semesterGrades)} / 10.0
+                        </span>
+                      )}
+                    </div>
+                    <p className="sp-m-sem-grades-hint">
+                      Enter SGPA for completed semesters (0.00 – 10.00). Leave blank if in progress.
+                    </p>
+                    <div className="sp-sem-matrix-grid">
+                      {(editForm.semesterGrades || INITIAL_SEMESTERS).map((sem, idx) => (
+                        <div key={idx} className="sp-sem-input-card">
+                          <div className="sp-sem-card-header">
+                            <span className="sp-sem-tag">{sem.sem}</span>
+                            <span className="sp-sem-subtext">20 Credits</span>
+                          </div>
+                          <div className="sp-sem-input-wrapper">
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              max="10"
+                              placeholder="SGPA (e.g. 8.75)"
+                              value={sem.sgpa || ""}
+                              onChange={(e) => handleEditSemGradeChange(idx, e.target.value)}
+                              className="sp-sem-score-input"
+                            />
+                          </div>
+                          {editErrors[`sem_${idx}`] && (
+                            <span className="sp-field-error" role="alert">{editErrors[`sem_${idx}`]}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <div className="sp-m-edit-actions">
                     <button type="button" className="sp-m-btn-cancel" onClick={() => setActiveTab("overview")}>

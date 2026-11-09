@@ -2083,10 +2083,113 @@
     color: #0b3e2d;
   }
 
-  .sp-m-score-pending {
+  .sp-m-grades-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+  }
+
+  .sp-m-cgpa-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .sp-m-cgpa-lbl {
+    font-size: 11px;
+    font-weight: 750;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .sp-m-cgpa-val {
+    font-size: 15px;
+    font-weight: 800;
+    color: #013a33;
+  }
+
+  .sp-m-btn-edit-grades {
+    background: #013a33;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .sp-m-btn-edit-grades:active {
+    transform: scale(0.97);
+  }
+
+  .sp-m-score-pending,
+  .sp-m-score-not-entered {
     font-size: 11px;
     color: #94a3b8;
-    font-style: italic;
+  }
+
+  .sp-m-add-grade-btn {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+    font-size: 11.5px;
+    font-weight: 750;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  .sp-m-add-grade-btn:hover,
+  .sp-m-add-grade-btn:active {
+    background: #013a33;
+    color: #ffffff;
+    border-color: #013a33;
+  }
+
+  .sp-m-select-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d4e5df;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #012622;
+    background: #ffffff;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  .sp-m-sem-grades-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .sp-m-cgpa-pill {
+    background: #fff8e6;
+    border: 1px solid #f3dc98;
+    color: #946800;
+    font-size: 11px;
+    font-weight: 750;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .sp-m-sem-grades-hint {
+    font-size: 11.5px;
+    color: #557973;
+    margin: 0 0 10px 0;
   }
 
   .sp-m-grade-badge {
@@ -2667,6 +2770,98 @@ select[aria-invalid="true"] {
 .sp-lbl-75 {
   font-weight: 750;
   color: #059669;
+}
+
+/* =========================================================
+   SEMESTER GRADES MATRIX (CREATION & EDIT FORMS)
+   ========================================================= */
+.sp-sem-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.sp-sem-input-card {
+  background: #ffffff;
+  border: 1.5px solid #d4e5df;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.sp-sem-input-card:focus-within {
+  border-color: #013a33;
+  box-shadow: 0 0 0 3px rgba(1, 58, 51, 0.1);
+  background: #fbfdfc;
+}
+
+.sp-sem-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sp-sem-tag {
+  font-size: 13px;
+  font-weight: 800;
+  color: #013a33;
+}
+
+.sp-sem-subtext {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #557973;
+  background: #eef7f4;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+.sp-sem-input-wrapper {
+  width: 100%;
+}
+
+.sp-sem-score-input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #012622;
+  background: #f8fafc;
+  border: 1.5px solid #d4e5df;
+  border-radius: 8px;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.sp-sem-score-input:focus {
+  background: #ffffff;
+  border-color: #013a33;
+  box-shadow: 0 0 0 2px rgba(1, 58, 51, 0.15);
+}
+
+.sp-sem-score-input::placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+  font-size: 12.5px;
+}
+
+@media (max-width: 900px) {
+  .sp-sem-matrix-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .sp-sem-matrix-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .sp-create-submit-bar {

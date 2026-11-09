@@ -1329,7 +1329,6 @@ function JntuChatbot() {
                 <div className="chat-modal-header-info">
                   <div className="chat-modal-title-row">
                     <h3 className="chat-modal-title">JNTU Circle AI Assistant</h3>
-                    <span className="chat-modal-role-badge">Online</span>
                   </div>
                   <p className="chat-modal-subtitle">
                     Live academic guidance

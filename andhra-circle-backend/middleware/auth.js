@@ -31,6 +31,18 @@ const auth = async (req, res, next) => {
 
     // Reject tokens issued before the last password change
     if (user.passwordChangedAt) {
+      const tokenVersion =
+        typeof decoded.tokenVersion === "number" ? decoded.tokenVersion : null;
+      const currentVersion = user.tokenVersion || 0;
+
+      // Check version first (handles sub-second race conditions reliably)
+      if (tokenVersion !== null && tokenVersion < currentVersion) {
+        return res.status(401).json({
+          message: "Password was recently changed. Please login again.",
+        });
+      }
+
+      // Check timestamp for tokens
       const passwordChangedSeconds = Math.floor(
         new Date(user.passwordChangedAt).getTime() / 1000
       );
