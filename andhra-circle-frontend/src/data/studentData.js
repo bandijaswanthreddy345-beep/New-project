@@ -37,11 +37,14 @@ export function cleanCollege(col) {
   return cleaned || "JNTU College of Engineering";
 }
 
-// Helper to remove any lingering "(3-2)", "(X-Y)" notation from semester names
+// Helper to remove any lingering "(3-2)", "(X-Y)", or year notation from semester names
 export function cleanSemester(sem) {
   if (!sem || typeof sem !== "string") return "6th Semester";
-  const validated = validateSemester(sem);
+  let str = sem.replace(/\b[1-4](?:st|nd|rd|th)?\s*year\b/gi, "").replace(/[|•–—()]/g, " ").trim();
+  const validated = validateSemester(str);
   if (validated.ok) return validated.value;
+  const direct = validateSemester(sem);
+  if (direct.ok) return direct.value;
   return sem.replace(/\s*\([1-4]-[1-2]\)/gi, "").replace(/\b[1-4]-[1-2]\b/gi, "").trim() || "6th Semester";
 }
 
@@ -85,11 +88,11 @@ export const EMPTY_STUDENT_DATA = {
   name: "",
   shortName: "",
   hallTicket: "",
-  college: "JNTU College of Engineering",
-  branch: "Computer Science & Engineering",
-  branchCode: "CSE",
-  year: "1st Year",
-  semester: "1st Semester",
+  college: "",
+  branch: "",
+  branchCode: "",
+  year: "",
+  semester: "",
   regulation: "R23 Regulation",
   cgpa: "",
   credits: "0 / 160",

@@ -2722,3 +2722,336 @@ select[aria-invalid="true"] {
     width: 100%;
   }
 }
+
+/* =========================================================
+   INTERACTIVE "+ ADD DETAILS" DASHBOARD STYLES (UNCONFIGURED STATE)
+   ========================================================= */
+
+/* Top Invitation Setup Banner */
+.sp-unconfigured-setup-banner {
+  background: linear-gradient(135deg, #012822 0%, #013a33 50%, #03483f 100%);
+  border-bottom: 2px solid #fed866;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 4px 20px rgba(1, 40, 34, 0.25);
+  animation: spFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sp-unconfigured-setup-icon {
+  font-size: 32px;
+  line-height: 1;
+  background: rgba(254, 216, 102, 0.15);
+  border: 1px solid rgba(254, 216, 102, 0.35);
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sp-unconfigured-setup-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-unconfigured-badge {
+  display: inline-block;
+  background: rgba(254, 216, 102, 0.18);
+  border: 1px solid rgba(254, 216, 102, 0.4);
+  color: #ffefb3;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+}
+
+.sp-unconfigured-title {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 850;
+  margin: 0 0 3px 0;
+  letter-spacing: -0.2px;
+}
+
+.sp-unconfigured-desc {
+  color: #a7f3d0;
+  font-size: 12.5px;
+  margin: 0;
+  line-height: 1.4;
+  max-width: 780px;
+}
+
+.sp-unconfigured-add-btn {
+  background: #fed866;
+  color: #01221e;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 850;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.sp-unconfigured-add-btn:hover {
+  background: #ffefb3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(254, 216, 102, 0.35);
+}
+
+.sp-unconfigured-add-btn .sp-arrow {
+  font-size: 15px;
+  font-weight: 900;
+  transition: transform 0.2s ease;
+}
+
+.sp-unconfigured-add-btn:hover .sp-arrow {
+  transform: translateX(3px);
+}
+
+/* Clickable Avatar Photo Upload */
+.sp-clickable-avatar {
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sp-clickable-avatar:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 24px rgba(1, 58, 51, 0.35);
+}
+
+.sp-avatar-add-overlay {
+  position: absolute;
+  bottom: 6px;
+  background: rgba(1, 38, 34, 0.88);
+  color: #ffefb3;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 239, 179, 0.4);
+  letter-spacing: 0.3px;
+}
+
+/* Identity Row Interactive Chips */
+.sp-inline-add-chip {
+  background: rgba(1, 58, 51, 0.06);
+  border: 1.5px dashed #059669;
+  color: #047857;
+  font-size: 11.5px;
+  font-weight: 750;
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.3;
+}
+
+.sp-inline-add-chip:hover {
+  background: #059669;
+  color: #ffffff;
+  border-style: solid;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+}
+
+.sp-inline-add-accent {
+  background: #fef3c7;
+  border: 1.5px solid #f59e0b;
+  color: #b45309;
+}
+
+.sp-inline-add-accent:hover {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #d97706;
+}
+
+/* KPI Cards Interactive Links */
+.sp-kpi-add-link {
+  background: transparent;
+  border: none;
+  color: #fed866;
+  font-size: 11.5px;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.18s ease;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.sp-kpi-add-link:hover {
+  color: #ffffff;
+  text-decoration: none;
+  transform: translateX(2px);
+}
+
+/* Info Grid "+ Add" Buttons */
+.sp-inline-add-btn {
+  background: rgba(1, 58, 51, 0.05);
+  border: 1px dashed #0d9488;
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 750;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.18s ease;
+}
+
+.sp-inline-add-btn:hover {
+  background: #0f766e;
+  color: #ffffff;
+  border-style: solid;
+  transform: translateY(-1px);
+}
+
+/* Tab Empty Banners (for Grades, Attendance, Notes) */
+.sp-tab-empty-banner {
+  background: #f0fdf4;
+  border: 1.5px dashed #86efac;
+  border-radius: 12px;
+  padding: 18px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sp-tab-empty-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.sp-tab-empty-info {
+  flex: 1;
+}
+
+.sp-tab-empty-info h4 {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #065f46;
+  margin: 0 0 3px 0;
+}
+
+.sp-tab-empty-info p {
+  font-size: 12.5px;
+  color: #047857;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Mobile Alert & Chip Styles */
+.sp-m-setup-alert {
+  background: linear-gradient(135deg, rgba(254, 216, 102, 0.18) 0%, rgba(1, 58, 51, 0.85) 100%);
+  border: 1px solid rgba(254, 216, 102, 0.45);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 8px 16px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sp-m-setup-info strong {
+  display: block;
+  font-size: 12.5px;
+  color: #fed866;
+  font-weight: 800;
+}
+
+.sp-m-setup-info p {
+  font-size: 11px;
+  color: #d1fae5;
+  margin: 2px 0 0;
+  line-height: 1.3;
+}
+
+.sp-m-setup-btn {
+  background: #fed866;
+  color: #01221e;
+  border: none;
+  font-size: 11.5px;
+  font-weight: 800;
+  border-radius: 8px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.sp-m-setup-btn:active {
+  transform: scale(0.96);
+}
+
+.sp-m-add-chip {
+  background: rgba(255, 239, 179, 0.15);
+  border: 1px dashed rgba(255, 239, 179, 0.55);
+  color: #ffefb3;
+  font-size: 11px;
+  font-weight: 750;
+  border-radius: 999px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.sp-m-add-chip:hover,
+.sp-m-add-chip:active {
+  background: #fed866;
+  color: #01221e;
+  border-style: solid;
+}
+
+.sp-m-add-link-btn {
+  background: rgba(1, 58, 51, 0.06);
+  border: 1px dashed #059669;
+  color: #059669;
+  font-size: 11.5px;
+  font-weight: 750;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.sp-m-add-link-btn:active {
+  background: #059669;
+  color: #ffffff;
+}
+
+.sp-m-kpi-add-link {
+  background: transparent;
+  border: none;
+  color: #fed866;
+  font-size: 11px;
+  font-weight: 750;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
