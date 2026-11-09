@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/api";
+import "./Login.css";
 import "./Register.css";
 
 function Register() {
@@ -23,7 +24,6 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [googleNotice, setGoogleNotice] = useState("");
 
   const fetchCaptcha = useCallback(async () => {
     try {
@@ -54,7 +54,6 @@ function Register() {
       [name]: type === "checkbox" ? checked : value,
     }));
     if (error) setError("");
-    if (googleNotice) setGoogleNotice("");
   };
 
   const handleToggleTerms = () => {
@@ -66,7 +65,6 @@ function Register() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    setGoogleNotice("");
 
     // 1. Validation checks
     const nameTrimmed = form.fullName.trim();
@@ -116,13 +114,14 @@ function Register() {
       });
 
       setSuccess(
-        res.data?.message || "Account created successfully! Preparing your dashboard..."
+        res.data?.message || "Account created successfully! Preparing your sign in..."
       );
 
       // If token and user returned, persist session immediately
       if (res.data?.token && res.data?.user) {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
+        window.dispatchEvent(new Event("authChanged"));
       }
 
       // Smooth redirection to sign in or home
@@ -146,364 +145,371 @@ function Register() {
     }
   };
 
-  const handleGoogleSignup = () => {
-    setGoogleNotice(
-      "Google Institutional Single Sign-On is currently connecting with university domains. Please complete standard sign up above."
-    );
-  };
-
   return (
-    <div className="signup-page-wrapper">
-      {/* Background Ambient Glow */}
-      <div className="signup-bg-glow" aria-hidden="true" />
+    <div className="login-page-wrapper signup-theme-wrapper">
+      {/* Background Ambience Decorations */}
+      <div className="login-bg-decorations" aria-hidden="true">
+        <div className="login-bg-grid" />
+        <div className="login-bg-orb-1" />
+        <div className="login-bg-orb-2" />
+      </div>
 
-      {/* =========================================================
-          STICKY TOP NAVIGATION HEADER
-          ========================================================= */}
-      <header className="signup-header">
-        <div className="signup-header-inner">
-          <div className="signup-header-left">
-            {/* Back Button */}
-            <button
-              type="button"
-              className="signup-back-btn"
-              onClick={() => navigate(-1)}
-              aria-label="Navigate back"
-              title="Go back"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12" />
-                <polyline points="12 19 5 12 12 5" />
-              </svg>
-            </button>
+      {/* Top Bar: Return to Home Navigation */}
+      <div className="login-top-bar">
+        <Link to="/" className="login-back-home-btn" title="Return to Homepage">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          <span>Back to Home</span>
+        </Link>
+      </div>
 
-            {/* Portal Identity */}
-            <Link to="/" className="signup-brand" title="JNTU Circle Academic Portal">
-              <div className="signup-brand-icon-wrap">
-                {/* Mortarboard icon */}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" />
-                </svg>
-              </div>
-              <div className="signup-brand-text">
-                <span className="signup-brand-title">JNTU Circle</span>
-                <span className="signup-brand-sub">Student Academic Portal</span>
-              </div>
-            </Link>
-          </div>
-
-          {/* Right Header Avatar Icon - Links to Sign In */}
-          <Link to="/login" className="signup-header-avatar" title="Sign In to your account" aria-label="Sign In">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
+      {/* Main Authentication Card */}
+      <div className="login-auth-card signup-auth-card">
+        {/* Brand Header: JNTU Circle Logo & Name */}
+        <div className="login-brand-header">
+          <Link to="/" className="login-brand-link" title="JNTU Circle Academic Hub">
+            <div className="login-logo-glow-ring">
+              <img
+                src="/jntu-circle-logo.png"
+                alt="JNTU Circle"
+                className="login-logo-img"
+              />
+            </div>
+            <div className="login-brand-text">
+              <h2 className="login-brand-name">
+                <span className="font-deltha">JNTU</span> Circle
+              </h2>
+              <span className="login-brand-tagline">Academic Resource Hub</span>
+            </div>
           </Link>
         </div>
-      </header>
 
-      {/* =========================================================
-          MAIN REGISTRATION CONTENT
-          ========================================================= */}
-      <main className="signup-main">
-        <div className="signup-container">
-          {/* Welcome Header Section */}
-          <div className="signup-hero">
-            <div className="signup-hero-badge-wrap">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" />
+        {/* Welcome Section */}
+        <div className="login-heading-section">
+          <h1 className="login-main-title">Create Your Account</h1>
+          <p className="login-main-sub">
+            Join JNTU Circle to explore notes, past papers, syllabus & academic tools
+          </p>
+        </div>
+
+        {/* Success Alert Banner */}
+        {success && (
+          <div className="login-alert login-alert-admin" role="status">
+            <svg
+              className="login-alert-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span>{success}</span>
+          </div>
+        )}
+
+        {/* Error Alert Banner */}
+        {error && (
+          <div className="login-alert login-alert-error" role="alert">
+            <svg
+              className="login-alert-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Registration Form */}
+        <form className="login-form-inner" onSubmit={handleSubmit} noValidate>
+          {/* Full Name */}
+          <div className="login-field-group">
+            <label className="login-field-label" htmlFor="signup-name">
+              <span>Full Name</span>
+              <span className="login-required-star">*</span>
+            </label>
+            <div className="login-input-wrapper">
+              <svg
+                className="login-input-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
               </svg>
-              <span className="signup-hero-dot" />
+              <input
+                id="signup-name"
+                type="text"
+                name="fullName"
+                placeholder="Enter full student name"
+                className="login-text-input"
+                value={form.fullName}
+                onChange={handleChange}
+                autoComplete="name"
+                required
+              />
             </div>
-
-            <h1 className="signup-hero-title">Create an Account</h1>
-            <p className="signup-hero-desc">
-              Join JNTU Circle to explore notes, past papers, and curated study guides.
-            </p>
           </div>
 
-          {/* Main Registration Form Card */}
-          <form className="signup-card" onSubmit={handleSubmit} noValidate>
-            {/* Error Banner */}
-            {error && (
-              <div className="signup-alert signup-alert-error" role="alert">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <span>{error}</span>
-              </div>
-            )}
-
-            {/* Success Banner */}
-            {success && (
-              <div className="signup-alert signup-alert-success" role="status">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-                <span>{success}</span>
-              </div>
-            )}
-
-            {/* Google Notice Banner */}
-            {googleNotice && (
-              <div className="signup-alert" style={{ background: "rgba(255, 185, 95, 0.15)", border: "1px solid rgba(255, 185, 95, 0.35)", color: "#ffb95f" }} role="status">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="16" x2="12" y2="12" />
-                  <line x1="12" y1="8" x2="12.01" y2="8" />
-                </svg>
-                <span>{googleNotice}</span>
-              </div>
-            )}
-
-            {/* Full Name Field */}
-            <div className="signup-field-group">
-              <label className="signup-label" htmlFor="full-name">
-                <span className="signup-label-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-9-3h2v3h-2V4zm1 8c1.38 0 2.5 1.12 2.5 2.5S13.38 17 12 17s-2.5-1.12-2.5-2.5S10.62 12 12 12zm5 7H7v-.5c0-1.67 3.33-2.5 5-2.5s5 .83 5 2.5v.5z" />
-                  </svg>
-                </span>
-                <span>Full Name</span>
-              </label>
-              <div className="signup-input-wrap">
-                <input
-                  id="full-name"
-                  type="text"
-                  name="fullName"
-                  value={form.fullName}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                  className="signup-input"
-                  autoComplete="name"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Email Address Field */}
-            <div className="signup-field-group">
-              <label className="signup-label" htmlFor="email-address">
-                <span className="signup-label-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                  </svg>
-                </span>
-                <span>Email Address</span>
-              </label>
-              <div className="signup-input-wrap">
-                <input
-                  id="email-address"
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email address"
-                  className="signup-input"
-                  autoComplete="email"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="signup-field-group">
-              <div className="signup-label-row">
-                <label className="signup-label" htmlFor="password">
-                  <span className="signup-label-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-                    </svg>
-                  </span>
-                  <span>Password</span>
-                </label>
-                <span className="signup-label-subtext">Min. 8 chars</span>
-              </div>
-              <div className="signup-input-wrap">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  placeholder="Enter your password"
-                  className="signup-input signup-input-pwd"
-                  autoComplete="new-password"
-                  minLength={8}
-                  required
-                />
-                <button
-                  type="button"
-                  className="signup-pwd-toggle-btn"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  title={showPassword ? "Hide password" : "Show password"}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password Field */}
-            <div className="signup-field-group">
-              <label className="signup-label" htmlFor="confirm-password">
-                <span className="signup-label-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
-                  </svg>
-                </span>
-                <span>Confirm Password</span>
-              </label>
-              <div className="signup-input-wrap">
-                <input
-                  id="confirm-password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Re-enter your password"
-                  className="signup-input signup-input-pwd"
-                  autoComplete="new-password"
-                  minLength={8}
-                  required
-                />
-                <button
-                  type="button"
-                  className="signup-pwd-toggle-btn"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  title={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                >
-                  {showConfirmPassword ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Security CAPTCHA Verification */}
-            <div className="signup-field-group signup-captcha-group">
-              <div className="signup-label-row">
-                <label className="signup-label" htmlFor="captcha-input">
-                  <span className="signup-label-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-                    </svg>
-                  </span>
-                  <span>Security Verification</span>
-                </label>
-                <span className="signup-label-subtext">Case-insensitive</span>
-              </div>
-
-              <div className="signup-captcha-card">
-                <div className="signup-captcha-preview">
-                  {captchaData.svg ? (
-                    <div className="signup-captcha-svg-wrap">
-                      <img
-                        src={`data:image/svg+xml;utf8,${encodeURIComponent(captchaData.svg)}`}
-                        alt="Security verification challenge"
-                        className="signup-captcha-img"
-                      />
-                    </div>
-                  ) : (
-                    <div className="signup-captcha-loading-box">
-                      <span className="signup-spinner" />
-                      <span>Loading challenge...</span>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    className="signup-captcha-refresh-btn"
-                    onClick={fetchCaptcha}
-                    disabled={captchaLoading}
-                    title="Get a new verification challenge"
-                    aria-label="Refresh security code"
-                  >
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className={captchaLoading ? "signup-rotating" : ""}
-                    >
-                      <polyline points="23 4 23 10 17 10" />
-                      <polyline points="1 20 1 14 7 14" />
-                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="signup-input-wrap signup-captcha-input-wrap">
-                  <input
-                    id="captcha-input"
-                    type="text"
-                    name="captchaInput"
-                    value={captchaInput}
-                    onChange={(e) => {
-                      setCaptchaInput(e.target.value.toUpperCase());
-                      if (error) setError("");
-                    }}
-                    placeholder="Enter 6-character code"
-                    className="signup-input signup-captcha-input"
-                    maxLength={6}
-                    autoComplete="off"
-                    spellCheck="false"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Terms & Privacy Checkbox */}
-            <div className="signup-terms-row" onClick={handleToggleTerms}>
-              <div
-                className={`signup-checkbox-custom ${form.agreeTerms ? "is-checked" : ""}`}
-                role="checkbox"
-                aria-checked={form.agreeTerms}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === " " || e.key === "Enter") {
-                    e.preventDefault();
-                    handleToggleTerms();
-                  }
-                }}
+          {/* Email Address */}
+          <div className="login-field-group">
+            <label className="login-field-label" htmlFor="signup-email">
+              <span>Email Address</span>
+              <span className="login-required-star">*</span>
+            </label>
+            <div className="login-input-wrapper">
+              <svg
+                className="login-input-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                {form.agreeTerms && (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <input
+                id="signup-email"
+                type="email"
+                name="email"
+                placeholder="Enter your registered email"
+                className="login-text-input"
+                value={form.email}
+                onChange={handleChange}
+                autoComplete="email"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="login-field-group">
+            <div className="signup-label-between">
+              <label className="login-field-label" htmlFor="signup-password">
+                <span>Password</span>
+                <span className="login-required-star">*</span>
+              </label>
+              <span className="signup-helper-text">Min. 8 chars</span>
+            </div>
+            <div className="login-input-wrapper">
+              <svg
+                className="login-input-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <input
+                id="signup-password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter your password"
+                className="login-text-input login-password-input"
+                value={form.password}
+                onChange={handleChange}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+              <button
+                type="button"
+                className="login-password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                title={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
                   </svg>
                 )}
+              </button>
+            </div>
+          </div>
+
+          {/* Confirm Password */}
+          <div className="login-field-group">
+            <label className="login-field-label" htmlFor="signup-confirm-password">
+              <span>Confirm Password</span>
+              <span className="login-required-star">*</span>
+            </label>
+            <div className="login-input-wrapper">
+              <svg
+                className="login-input-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              <input
+                id="signup-confirm-password"
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Re-enter your password"
+                className="login-text-input login-password-input"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+              <button
+                type="button"
+                className="login-password-toggle-btn"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                title={showConfirmPassword ? "Hide password" : "Show password"}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Security Verification (CAPTCHA) */}
+          <div className="login-field-group signup-captcha-section">
+            <div className="signup-label-between">
+              <label className="login-field-label" htmlFor="signup-captcha">
+                <span>Security Verification</span>
+                <span className="login-required-star">*</span>
+              </label>
+              <span className="signup-helper-text">Case-insensitive</span>
+            </div>
+
+            <div className="signup-captcha-box">
+              <div className="signup-captcha-visual-row">
+                {captchaData.svg ? (
+                  <div className="signup-captcha-svg-container">
+                    <img
+                      src={`data:image/svg+xml;utf8,${encodeURIComponent(captchaData.svg)}`}
+                      alt="Security verification challenge"
+                      className="signup-captcha-image"
+                    />
+                  </div>
+                ) : (
+                  <div className="signup-captcha-placeholder">
+                    <span className="login-spinner" />
+                    <span>Loading challenge...</span>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  className="signup-captcha-reload-btn"
+                  onClick={fetchCaptcha}
+                  disabled={captchaLoading}
+                  title="Generate a new security challenge"
+                  aria-label="Refresh security challenge"
+                >
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={captchaLoading ? "signup-spin" : ""}
+                  >
+                    <polyline points="23 4 23 10 17 10" />
+                    <polyline points="1 20 1 14 7 14" />
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                  </svg>
+                </button>
               </div>
-              <span className="signup-terms-text">
+
+              <div className="login-input-wrapper">
+                <svg
+                  className="login-input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect width="18" height="18" x="3" y="3" rx="2" />
+                  <path d="M9 10h6" />
+                  <path d="M12 10v4" />
+                </svg>
+                <input
+                  id="signup-captcha"
+                  type="text"
+                  name="captchaInput"
+                  value={captchaInput}
+                  onChange={(e) => {
+                    setCaptchaInput(e.target.value.toUpperCase());
+                    if (error) setError("");
+                  }}
+                  placeholder="Enter 6-character code"
+                  className="login-text-input signup-captcha-text-input"
+                  maxLength={6}
+                  autoComplete="off"
+                  spellCheck="false"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Terms & Privacy Agreement */}
+          <div className="signup-terms-agreement" onClick={handleToggleTerms}>
+            <label className="login-remember-label">
+              <input
+                type="checkbox"
+                className="login-remember-checkbox"
+                checked={form.agreeTerms}
+                onChange={handleToggleTerms}
+              />
+              <span className="signup-terms-copy">
                 I agree to the{" "}
                 <Link
                   to="/terms"
-                  className="signup-terms-link"
+                  className="signup-terms-hyperlink"
                   onClick={(e) => e.stopPropagation()}
                 >
                   Terms of Service
@@ -511,79 +517,51 @@ function Register() {
                 and{" "}
                 <Link
                   to="/privacy"
-                  className="signup-terms-link"
+                  className="signup-terms-hyperlink"
                   onClick={(e) => e.stopPropagation()}
                 >
                   Privacy Policy
                 </Link>
               </span>
-            </div>
-
-            {/* Create Account CTA Button */}
-            <button
-              type="submit"
-              className="signup-submit-btn"
-              disabled={loading}
-              id="submit-signup-btn"
-            >
-              {loading ? (
-                <>
-                  <span className="signup-spinner" />
-                  <span>Creating Account...</span>
-                </>
-              ) : (
-                <>
-                  <span>Create Account</span>
-                  <span className="signup-btn-arrow">→</span>
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Social Sign Up Divider */}
-          <div className="signup-divider">
-            <div className="signup-divider-line" />
-            <span className="signup-divider-text">Or continue with</span>
-            <div className="signup-divider-line" />
+            </label>
           </div>
 
-          {/* Google Sign In Button */}
+          {/* Submit Button */}
           <button
-            type="button"
-            className="signup-google-btn"
-            onClick={handleGoogleSignup}
+            type="submit"
+            className="login-submit-btn signup-submit-btn"
+            disabled={loading}
           >
-            {/* Multi-color Google 'G' icon */}
-            <svg className="signup-google-icon" viewBox="0 0 24 24">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285F4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                fill="#EA4335"
-              />
-            </svg>
-            <span>Sign up with Google</span>
+            {loading ? (
+              <>
+                <span className="login-spinner" />
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              <>
+                <span>Create Account</span>
+                <span className="login-btn-arrow">→</span>
+              </>
+            )}
           </button>
+        </form>
 
-          {/* Already have an account? Sign In */}
-          <div className="signup-footer">
-            <span className="signup-footer-text">Already have an account?</span>
-            <Link to="/login" className="signup-footer-link">
-              Sign In
-            </Link>
-          </div>
+        {/* Existing Account Prompt */}
+        <p className="login-register-prompt">
+          Already have an account?
+          <Link to="/login" className="login-register-cta">
+            Sign In
+          </Link>
+        </p>
+
+        {/* Security Trust Badge */}
+        <div className="login-security-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          <span>Official JNTU Academic Portal · Secure Access</span>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
