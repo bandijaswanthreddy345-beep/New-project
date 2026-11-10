@@ -7,7 +7,6 @@ function UploadNote() {
   const [semester, setSemester] = useState("");
   const [subject, setSubject] = useState("");
   const [subjectCode, setSubjectCode] = useState("");
-  const [description, setDescription] = useState("");
   const [credits, setCredits] = useState("");
 
   // =========================================================
@@ -56,7 +55,7 @@ function UploadNote() {
     formData.append("semester", semester);
     formData.append("subject", subject);
     formData.append("subjectCode", subjectCode);
-    formData.append("description", description);
+    formData.append("description", "");
 
     // =======================================================
     // CREDITS
@@ -132,7 +131,6 @@ function UploadNote() {
       setSemester("");
       setSubject("");
       setSubjectCode("");
-      setDescription("");
       setCredits("");
 
       setModule1("");
@@ -306,19 +304,6 @@ function UploadNote() {
         />
 
         {/* ==================================================
-            DESCRIPTION
-        ================================================== */}
-
-        <textarea
-          rows="4"
-          placeholder="Description"
-          value={description}
-          onChange={(e) =>
-            setDescription(e.target.value)
-          }
-        />
-
-        {/* ==================================================
             CREDITS
         ================================================== */}
 
@@ -336,11 +321,6 @@ function UploadNote() {
               setCredits(e.target.value)
             }
           />
-
-          <small>
-            Enter the name of the person who prepared
-            or contributed to these notes.
-          </small>
         </div>
 
         {/* ==================================================
