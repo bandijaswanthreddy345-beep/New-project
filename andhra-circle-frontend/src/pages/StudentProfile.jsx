@@ -961,70 +961,72 @@ function StudentProfile() {
           {/* Academic Cover Banner with Three Dots Kebab Menu */}
           <div className="sp-page-banner">
             <div className="sp-page-banner-glow" />
-            <div className="sp-banner-eyebrow" ref={menuRef}>
-              <button
-                type="button"
-                className="sp-kebab-btn"
-                onClick={() => setShowMenu((prev) => !prev)}
-                title="Profile Options"
-                aria-label="Profile Options"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="5" r="2.2" />
-                  <circle cx="12" cy="12" r="2.2" />
-                  <circle cx="12" cy="19" r="2.2" />
-                </svg>
-              </button>
+            <div className="sp-banner-eyebrow">
+              <div className="sp-kebab-wrap" ref={menuRef}>
+                <button
+                  type="button"
+                  className="sp-kebab-btn"
+                  onClick={() => setShowMenu((prev) => !prev)}
+                  title="Profile Options"
+                  aria-label="Profile Options"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2.2" />
+                    <circle cx="12" cy="12" r="2.2" />
+                    <circle cx="12" cy="19" r="2.2" />
+                  </svg>
+                </button>
 
-              {showMenu && (
-                <div className="sp-kebab-dropdown">
-                  <button
-                    type="button"
-                    className="sp-kebab-item"
-                    onClick={() => {
-                      setShowMenu(false);
-                      setActiveTab("edit");
-                    }}
-                  >
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 20h9" />
-                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                    </svg>
-                    Edit Profile
-                  </button>
-                  {activeAvatar && (
+                {showMenu && (
+                  <div className="sp-kebab-dropdown">
                     <button
                       type="button"
-                      className="sp-kebab-item sp-kebab-item-remove-photo"
+                      className="sp-kebab-item"
                       onClick={() => {
                         setShowMenu(false);
-                        handleRemovePhoto("edit");
+                        setActiveTab("edit");
                       }}
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                       </svg>
-                      Remove Photo
+                      Edit Profile
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    className="sp-kebab-item sp-kebab-item-logout"
-                    onClick={() => {
-                      setShowMenu(false);
-                      setShowLogoutModal(true);
-                    }}
-                  >
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <polyline points="16 17 21 12 16 7" />
-                      <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    Logout
-                  </button>
-                </div>
-              )}
+                    {activeAvatar && (
+                      <button
+                        type="button"
+                        className="sp-kebab-item sp-kebab-item-remove-photo"
+                        onClick={() => {
+                          setShowMenu(false);
+                          handleRemovePhoto("edit");
+                        }}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                        Remove Photo
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="sp-kebab-item sp-kebab-item-logout"
+                      onClick={() => {
+                        setShowMenu(false);
+                        setShowLogoutModal(true);
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

@@ -1067,9 +1067,18 @@
 .sp-banner-eyebrow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   position: relative;
   z-index: 20;
+  width: 100%;
+}
+
+.sp-kebab-wrap {
+  margin-left: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .sp-banner-left-info {
