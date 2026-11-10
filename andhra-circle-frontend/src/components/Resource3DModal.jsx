@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import defaultBanner from "../assets/banner.webp";
+import { formatSemDisplay } from "../utils/validators";
 import "./Resource3DModal.css";
 
 function Resource3DModal({
@@ -222,7 +223,7 @@ function Resource3DModal({
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
                     <path d="M6 12v5c3 3 9 3 12 0v-5" />
                   </svg>
-                  {note.semester}
+                  {formatSemDisplay(note.semester)}
                 </span>
               )}
 

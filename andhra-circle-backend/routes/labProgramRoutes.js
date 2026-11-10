@@ -3,6 +3,8 @@ const router = express.Router();
 
 const upload = require("../config/multer");
 const auth = require("../middleware/auth");
+const validateObjectId = require("../middleware/validateObjectId");
+const { verifyMagicBytes } = require("../middleware/validateUpload");
 
 const {
   createLabProgram,
@@ -27,7 +29,7 @@ router.get("/", getLabPrograms);
 // GET /api/lab-programs/:id
 // PUBLIC
 // ==========================================
-router.get("/:id", getLabProgramById);
+router.get("/:id", validateObjectId("id"), getLabProgramById);
 
 // ==========================================
 // CREATE / UPLOAD LAB PROGRAM
@@ -38,6 +40,7 @@ router.post(
   "/",
   auth,
   upload.single("file"),
+  verifyMagicBytes,
   createLabProgram
 );
 
@@ -49,6 +52,9 @@ router.post(
 router.put(
   "/:id",
   auth,
+  validateObjectId("id"),
+  upload.single("file"),
+  verifyMagicBytes,
   updateLabProgram
 );
 
@@ -60,22 +66,23 @@ router.put(
 router.delete(
   "/:id",
   auth,
+  validateObjectId("id"),
   deleteLabProgram
 );
 
 // ==========================================
 // LIKE LAB PROGRAM
 // ==========================================
-router.put("/:id/like", likeLabProgram);
+router.put("/:id/like", validateObjectId("id"), likeLabProgram);
 
 // ==========================================
 // INCREASE VIEWS
 // ==========================================
-router.put("/:id/view", increaseViews);
+router.put("/:id/view", validateObjectId("id"), increaseViews);
 
 // ==========================================
 // INCREASE DOWNLOADS
 // ==========================================
-router.put("/:id/download", increaseDownloads);
+router.put("/:id/download", validateObjectId("id"), increaseDownloads);
 
 module.exports = router;

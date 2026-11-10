@@ -3,6 +3,8 @@ const router = express.Router();
 
 const upload = require("../config/multer");
 const auth = require("../middleware/auth");
+const validateObjectId = require("../middleware/validateObjectId");
+const { verifyMagicBytes } = require("../middleware/validateUpload");
 
 const {
   createSyllabus,
@@ -25,7 +27,7 @@ router.get("/", getSyllabus);
 // GET SINGLE SYLLABUS
 // GET /api/syllabus/:id
 // ==========================================
-router.get("/:id", getSyllabusById);
+router.get("/:id", validateObjectId("id"), getSyllabusById);
 
 // ==========================================
 // CREATE / UPLOAD SYLLABUS
@@ -35,6 +37,7 @@ router.post(
   "/",
   auth,
   upload.single("file"),
+  verifyMagicBytes,
   createSyllabus
 );
 
@@ -45,6 +48,9 @@ router.post(
 router.put(
   "/:id",
   auth,
+  validateObjectId("id"),
+  upload.single("file"),
+  verifyMagicBytes,
   updateSyllabus
 );
 
@@ -55,6 +61,7 @@ router.put(
 router.delete(
   "/:id",
   auth,
+  validateObjectId("id"),
   deleteSyllabus
 );
 
@@ -62,18 +69,18 @@ router.delete(
 // LIKE SYLLABUS
 // PUT /api/syllabus/:id/like
 // ==========================================
-router.put("/:id/like", likeSyllabus);
+router.put("/:id/like", validateObjectId("id"), likeSyllabus);
 
 // ==========================================
 // INCREASE VIEW COUNT
 // PUT /api/syllabus/:id/view
 // ==========================================
-router.put("/:id/view", increaseViews);
+router.put("/:id/view", validateObjectId("id"), increaseViews);
 
 // ==========================================
 // INCREASE DOWNLOAD COUNT
 // PUT /api/syllabus/:id/download
 // ==========================================
-router.put("/:id/download", increaseDownloads);
+router.put("/:id/download", validateObjectId("id"), increaseDownloads);
 
 module.exports = router;

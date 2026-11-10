@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const recordAuditLog = require("../services/auditLogger");
 
 // ==========================================
 // Get All Users
@@ -59,6 +60,17 @@ exports.updateUserRole = async (req, res) => {
       });
     }
 
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "role change",
+        resourceType: "User",
+        resourceId: user._id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
+
     res.status(200).json({
       message: "Role Updated Successfully",
       user,
@@ -101,6 +113,17 @@ exports.deleteUser = async (req, res) => {
     await User.findByIdAndDelete(
       req.params.id
     );
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "delete",
+        resourceType: "User",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
 
     res.status(200).json({
       message: "User Deleted Successfully",

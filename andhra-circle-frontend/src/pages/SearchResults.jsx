@@ -1,8 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import { BACKEND_URL } from "../api/api";
+import defaultBanner from "../assets/banner.webp";
 import { performSearch, formatResourceAction } from "../utils/searchEngine";
+import { formatSemDisplay } from "../utils/validators";
 import "./SearchResults.css";
+
+const PAGE_SIZE = 15;
 
 function SearchResults() {
   const location = useLocation();
@@ -28,10 +32,51 @@ function SearchResults() {
 
   const [search, setSearch] = useState(urlQuery);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
     setSearch(urlQuery);
+    setVisibleCount(PAGE_SIZE);
   }, [urlQuery]);
+
+  // =========================================================
+  // DEBOUNCED SEARCH INPUT (250 ms)
+  // =========================================================
+
+  const debounceTimerRef = useRef(null);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearch(value);
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      const trimmed = value.trim();
+      const currentParam = (new URLSearchParams(location.search).get("query") || "").trim();
+      if (trimmed !== currentParam) {
+        if (trimmed) {
+          navigate(`/search?query=${encodeURIComponent(trimmed)}`, {
+            replace: true,
+          });
+        } else {
+          navigate("/search", {
+            replace: true,
+          });
+        }
+      }
+    }, 250);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
 
   // =========================================================
   // SEARCH ENGINE STATE
@@ -53,28 +98,39 @@ function SearchResults() {
     },
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
-
   // =========================================================
-  // PERFORM SEARCH
+  // PERFORM SEARCH WITH ABORT CONTROLLER / CANCEL STALE
   // =========================================================
 
   useEffect(() => {
     let mounted = true;
+    const abortCtrl = new AbortController();
 
     const executeSearch = async () => {
+      if (!urlQuery) {
+        setSearchData({
+          query: "",
+          results: [],
+          relatedResources: [],
+          relatedSubjects: [],
+          suggestedQueries: [],
+          categoryCounts: { all: 0, notes: 0, papers: 0, syllabus: 0, labs: 0, notifications: 0 },
+        });
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError("");
 
-        const result = await performSearch(urlQuery);
+        const result = await performSearch(urlQuery, { signal: abortCtrl.signal });
 
         if (mounted) {
           setSearchData(result);
-          // If current category has 0 items but another has items, keep or reset
           if (
             activeCategory !== "all" &&
             result.categoryCounts[activeCategory.toLowerCase()] === 0
@@ -83,9 +139,10 @@ function SearchResults() {
           }
         }
       } catch (err) {
+        if (err.name === "AbortError") return;
         console.error("SEARCH ERROR:", err);
         if (mounted) {
-          setError("Unable to complete search.");
+          setError("Unable to complete search. Please check connection and retry.");
         }
       } finally {
         if (mounted) {
@@ -98,6 +155,7 @@ function SearchResults() {
 
     return () => {
       mounted = false;
+      abortCtrl.abort();
     };
   }, [urlQuery]);
 
@@ -116,26 +174,6 @@ function SearchResults() {
   };
 
   // =========================================================
-  // AUTOMATIC SEARCH INPUT CHANGE
-  // =========================================================
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearch(value);
-
-    const trimmed = value.trim();
-    if (trimmed) {
-      navigate(`/search?query=${encodeURIComponent(trimmed)}`, {
-        replace: true,
-      });
-    } else {
-      navigate("/search", {
-        replace: true,
-      });
-    }
-  };
-
-  // =========================================================
   // CLEAR SEARCH
   // =========================================================
 
@@ -145,6 +183,21 @@ function SearchResults() {
     navigate("/search", {
       replace: true,
     });
+  };
+
+  // =========================================================
+  // GET META
+  // =========================================================
+
+  const getMeta = (item) => {
+    const meta = [];
+    if (item.branch) meta.push(item.branch);
+    if (item.semester) meta.push(formatSemDisplay(item.semester));
+    if (item.regulation) meta.push(item.regulation);
+    if (item.year) meta.push(`Year ${item.year}`);
+    if (item.subjectCode) meta.push(`Code: ${item.subjectCode}`);
+    if (item.examType) meta.push(item.examType);
+    return meta;
   };
 
   // =========================================================
@@ -160,11 +213,17 @@ function SearchResults() {
   // FILTER DISPLAYED RESULTS BY ACTIVE CATEGORY TAB
   // =========================================================
 
-  const displayedResults = useMemo(() => {
+  const filteredResults = useMemo(() => {
     if (!searchData.results) return [];
     if (activeCategory === "all") return searchData.results;
     return searchData.results.filter((item) => item.type === activeCategory);
   }, [searchData.results, activeCategory]);
+
+  const displayedResults = useMemo(() => {
+    return filteredResults.slice(0, visibleCount);
+  }, [filteredResults, visibleCount]);
+
+  const hasMore = filteredResults.length > visibleCount;
 
   // =========================================================
   // IMAGE URL
@@ -248,103 +307,49 @@ function SearchResults() {
       return;
     }
 
-    if (item.type === "Question Paper") {
-      navigate(`/papers?search=${encodeURIComponent(title)}`);
-      return;
-    }
-
-    if (item.type === "Syllabus") {
-      navigate(`/syllabus?search=${encodeURIComponent(title)}`);
-      return;
-    }
-
-    if (item.type === "Lab Program") {
-      navigate(`/lab-programs?search=${encodeURIComponent(title)}`);
-      return;
-    }
-
-    if (item.type === "Notification") {
-      navigate(
-        item._id
-          ? `/notifications?view=${encodeURIComponent(item._id)}`
-          : `/notifications?search=${encodeURIComponent(title)}`
-      );
-      return;
-    }
-
     if (item.pdfUrl) {
-      let pdfUrl = item.pdfUrl;
-      if (!pdfUrl.startsWith("http://") && !pdfUrl.startsWith("https://")) {
-        pdfUrl = pdfUrl.startsWith("/")
-          ? `${BACKEND_URL}${pdfUrl}`
-          : `${BACKEND_URL}/${pdfUrl}`;
-      }
-      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+      navigate(
+        `/pdf/${encodeURIComponent(item.pdfUrl)}?title=${encodeURIComponent(
+          title
+        )}`
+      );
       return;
     }
 
     if (item.link) {
       window.open(item.link, "_blank", "noopener,noreferrer");
+      return;
     }
+
+    alert(`No digital file or URL attached to ${title}`);
   };
 
-  // =========================================================
-  // RESULT META PILLS
-  // =========================================================
-
-  const getMeta = (item) => {
-    const parts = [];
-    if (item.subject) parts.push(item.subject);
-    if (item.subjectCode) parts.push(item.subjectCode);
-    if (item.branch) parts.push(item.branch);
-    if (item.semester) parts.push(item.semester);
-    if (item.year) parts.push(item.year);
-    if (item.regulation) parts.push(item.regulation);
-    if (item.credits) parts.push(`${item.credits} Credits`);
-    return parts;
-  };
-
-  // =========================================================
-  // CATEGORY TABS DATA
-  // =========================================================
-
+  // Category counts and label list
   const categoryTabs = [
-    { id: "all", label: "All Resources", count: searchData.categoryCounts.all },
-    { id: "Notes", label: "📘 Notes", count: searchData.categoryCounts.notes },
-    { id: "Question Paper", label: "📄 Question Papers", count: searchData.categoryCounts.papers },
-    { id: "Syllabus", label: "📚 Syllabus", count: searchData.categoryCounts.syllabus },
-    { id: "Lab Program", label: "🧪 Lab Programs", count: searchData.categoryCounts.labs },
-    { id: "Notification", label: "📢 Notifications", count: searchData.categoryCounts.notifications },
+    { id: "all", label: "All Results", count: searchData.categoryCounts.all },
+    { id: "Notes", label: "Notes", count: searchData.categoryCounts.notes },
+    { id: "Paper", label: "Papers", count: searchData.categoryCounts.papers },
+    { id: "Syllabus", label: "Syllabus", count: searchData.categoryCounts.syllabus },
+    { id: "Lab", label: "Lab Manuals", count: searchData.categoryCounts.labs },
+    {
+      id: "Notification",
+      label: "Circulars",
+      count: searchData.categoryCounts.notifications,
+    },
   ];
 
-  // =========================================================
-  // RENDER PAGE
-  // =========================================================
-
   return (
-    <main className="search-page">
-      {/* Animated ambient background */}
-      <div className="search-animated-background" aria-hidden="true">
-        <div className="search-gradient-orb search-orb-one"></div>
-        <div className="search-gradient-orb search-orb-two"></div>
-        <div className="search-gradient-orb search-orb-three"></div>
-        <div className="search-gradient-orb search-orb-four"></div>
-        <div className="search-background-wave search-wave-one"></div>
-        <div className="search-background-wave search-wave-two"></div>
-        <div className="search-background-glow"></div>
-      </div>
-
+    <main className="search-results-page">
       {/* =====================================================
-          FULL SCREEN SEARCH HEADER & CATEGORY TABS
+          TOP HEADER
       ====================================================== */}
-      <section className="search-top">
-        <div className="search-bar">
-          <span className="search-icon" aria-hidden="true">
-            🔍
-          </span>
+      <section className="search-header">
+        <div className="search-input-wrapper">
+          <span className="search-icon">🔍</span>
 
           <input
             type="text"
+            className="search-input"
             value={search}
             onChange={handleSearchChange}
             placeholder="Search notes, question papers, syllabus, lab programs, subjects..."
@@ -372,10 +377,12 @@ function SearchResults() {
               <button
                 key={tab.id}
                 type="button"
-                className={`search-category-tab ${
-                  activeCategory === tab.id ? "active" : ""
-                }`}
-                onClick={() => setActiveCategory(tab.id)}
+                className={`search-category-tab ${activeCategory === tab.id ? "active" : ""
+                  }`}
+                onClick={() => {
+                  setActiveCategory(tab.id);
+                  setVisibleCount(PAGE_SIZE);
+                }}
               >
                 <span>{tab.label}</span>
                 <span className="search-tab-count">{tab.count}</span>
@@ -428,7 +435,7 @@ function SearchResults() {
                   >
                     <span>📚</span>
                     <span>
-                      {sub.name} ({sub.branch} Sem {sub.semester})
+                      {sub.name} ({sub.branch} {formatSemDisplay(sub.semester)})
                     </span>
                   </button>
                 ))}
@@ -504,19 +511,66 @@ function SearchResults() {
         )}
 
         {/* ===================================================
-            LOADING
+            LOADING SKELETON (Layout-preserving)
         ==================================================== */}
         {loading && (
-          <div className="search-loading">
-            <div className="loading-spinner"></div>
-            <p>Scanning academic records & ranking related content...</p>
+          <div className="search-results-list" style={{ opacity: 0.7 }}>
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={`skel-${i}`}
+                className="search-result-item"
+                style={{
+                  pointerEvents: "none",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                }}
+              >
+                <div
+                  className="result-image-box"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.06)",
+                    animation: "pulse 1.5s infinite",
+                  }}
+                />
+                <div className="result-information" style={{ width: "100%" }}>
+                  <div
+                    style={{
+                      height: "20px",
+                      width: "60%",
+                      borderRadius: "6px",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      marginBottom: "8px",
+                    }}
+                  />
+                  <div
+                    style={{
+                      height: "14px",
+                      width: "35%",
+                      borderRadius: "4px",
+                      background: "rgba(255, 255, 255, 0.04)",
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
         {/* ===================================================
-            ERROR
+            ERROR STATE WITH RETRY
         ==================================================== */}
-        {!loading && error && <div className="search-error">{error}</div>}
+        {!loading && error && (
+          <div className="search-error" style={{ textAlign: "center", padding: "2rem" }}>
+            <p>{error}</p>
+            <button
+              type="button"
+              className="search-related-chip"
+              onClick={() => handleQuickSearch(urlQuery)}
+              style={{ marginTop: "1rem", cursor: "pointer" }}
+            >
+              🔄 Retry Search
+            </button>
+          </div>
+        )}
 
         {/* ===================================================
             NO RESULTS STATE
@@ -524,7 +578,7 @@ function SearchResults() {
         {!loading &&
           !error &&
           urlQuery &&
-          displayedResults.length === 0 && (
+          filteredResults.length === 0 && (
             <div className="search-no-results">
               <div className="no-results-icon">🔍</div>
               <h2>No matching resources found for "{urlQuery}"</h2>
@@ -541,75 +595,99 @@ function SearchResults() {
         {!loading &&
           !error &&
           displayedResults.length > 0 && (
-            <div className="search-results-list">
-              {displayedResults.map((item, index) => {
-                const itemId =
-                  item._id ||
-                  item.id ||
-                  `${item.type}-${index}`;
+            <>
+              <div className="search-results-list">
+                {displayedResults.map((item, index) => {
+                  const itemId =
+                    item._id ||
+                    item.id ||
+                    `${item.type}-${index}`;
 
-                const title = getTitle(item);
-                const meta = getMeta(item);
+                  const title = getTitle(item);
+                  const meta = getMeta(item);
 
-                return (
-                  <article
-                    key={`${item.type}-${itemId}`}
-                    className="search-result-item"
-                    onClick={() => openItem(item)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        openItem(item);
-                      }
-                    }}
-                  >
-                    {/* IMAGE */}
-                    <div className="result-image-box">
-                      <img
-                        src={getImageUrl(item)}
-                        alt=""
-                        className="result-image"
-                        onError={(e) => {
-                          if (e.currentTarget.src !== defaultBanner) {
-                            e.currentTarget.src = defaultBanner;
-                          }
-                        }}
-                      />
-                    </div>
-
-                    {/* INFORMATION */}
-                    <div className="result-information">
-                      <h2>{highlight(title)}</h2>
-
-                      <div className="result-meta">
-                        <span className="result-type">
-                          {item.icon} {item.type}
-                        </span>
-
-                        {meta.map((value, metaIndex) => (
-                          <span key={metaIndex} className="result-meta-value">
-                            • {highlight(value)}
-                          </span>
-                        ))}
+                  return (
+                    <article
+                      key={`${item.type}-${itemId}`}
+                      className="search-result-item"
+                      onClick={() => openItem(item)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          openItem(item);
+                        }
+                      }}
+                    >
+                      {/* IMAGE */}
+                      <div className="result-image-box">
+                        <img
+                          src={getImageUrl(item)}
+                          alt=""
+                          width="100"
+                          height="70"
+                          loading="lazy"
+                          decoding="async"
+                          className="result-image"
+                          onError={(e) => {
+                            if (e.currentTarget.src !== defaultBanner) {
+                              e.currentTarget.src = defaultBanner;
+                            }
+                          }}
+                        />
                       </div>
 
-                      {item.description && (
-                        <p className="result-description">
-                          {highlight(item.description)}
-                        </p>
-                      )}
-                    </div>
+                      {/* INFORMATION */}
+                      <div className="result-information">
+                        <h2>{highlight(title)}</h2>
 
-                    {/* ARROW */}
-                    <div className="result-arrow" aria-hidden="true">
-                      →
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+                        <div className="result-meta">
+                          <span className="result-type">
+                            {item.icon} {item.type}
+                          </span>
+
+                          {meta.map((value, metaIndex) => (
+                            <span key={metaIndex} className="result-meta-value">
+                              • {highlight(value)}
+                            </span>
+                          ))}
+                        </div>
+
+                        {item.description && (
+                          <p className="result-description">
+                            {highlight(item.description)}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* ARROW */}
+                      <div className="result-arrow" aria-hidden="true">
+                        →
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              {hasMore && (
+                <div style={{ textAlign: "center", margin: "2rem 0" }}>
+                  <button
+                    type="button"
+                    className="search-related-chip"
+                    onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                    style={{
+                      padding: "10px 24px",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Load More Results ({filteredResults.length - visibleCount} remaining) ↓
+                  </button>
+                </div>
+              )}
+            </>
           )}
       </section>
     </main>

@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import API from "../api/api";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import API, { BACKEND_URL } from "../api/api";
+import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
+import { formatSemDisplay } from "../utils/validators";
 
 const getPaperSnippet = (paper) => {
   if (paper.description && paper.description.trim().length > 10) {
     return paper.description.trim();
   }
   const branchText = paper.branch ? `${paper.branch} · ` : "";
-  const semText = paper.semester ? `Sem ${paper.semester} · ` : "";
+  const semText = paper.semester ? `${formatSemDisplay(paper.semester)} · ` : "";
   const subName = paper.subject || paper.title || "University Subject";
   return `Previous university examination question papers, mid-term tests & solution keys for ${subName} (${branchText}${semText}JNTU Exams).`;
 };
@@ -70,7 +71,7 @@ function QuestionPapers({ search = "" }) {
 
   const filteredPapers = papers.filter((paper) => {
     if (!searchText) return true;
-return (
+    return (
       String(paper.title || "").toLowerCase().includes(searchText) ||
       String(paper.branch || "").toLowerCase().includes(searchText) ||
       String(paper.semester || "").toLowerCase().includes(searchText) ||
@@ -119,7 +120,7 @@ return (
     if (!value.startsWith("/")) {
       value = `/${value}`;
     }
-    return `${import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`}${value}`;
+    return `${BACKEND_URL}${value}`;
   };
 
   const getPdfFileName = (pdfUrl) => {
@@ -215,7 +216,7 @@ return (
         }
         try {
           localStorage.setItem("andhra_liked_papers", JSON.stringify([...next]));
-        } catch {}
+        } catch { }
         return next;
       });
 
@@ -332,7 +333,7 @@ return (
           </button>
           <span className="papers-breadcrumb-slash">/</span>
           <span className="papers-breadcrumb-current">
-                        Question Papers
+            Question Papers
           </span>
         </div>
       </div>

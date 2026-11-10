@@ -1,7 +1,7 @@
 /* =========================================================
-   AI chat answers (Google Gemini + MongoDB RAG)
+   AI chat answers (OpenRouter Free Model + Google Gemini + MongoDB RAG)
 
-   - The API key stays on the server (GEMINI_API_KEY in .env).
+   - The API key stays on the server (OPENROUTER_API_KEY / GEMINI_API_KEY in .env).
    - Never log the API key or the question text.
    - Retrieval runs first over MongoDB text indexes on 5 collections.
    - Results are passed in a delimited <portal_context> block.
@@ -17,7 +17,7 @@ const ChatFeedback = require("../models/ChatFeedback");
 const MAX_MESSAGE = 1000;
 const MAX_HISTORY = 6;
 const MAX_HISTORY_TEXT = 600;
-const TIMEOUT_MS = 10000;
+const TIMEOUT_MS = 25000;
 const DAILY_CAP = Number(process.env.CHAT_DAILY_CAP) || 800;
 
 // =========================================================
@@ -110,8 +110,10 @@ function formatPortalContext(items) {
 }
 
 exports.chat = async (req, res) => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+
+  if (!openRouterApiKey && !geminiApiKey) {
     return res.status(503).json({ success: false, message: "AI is not configured" });
   }
 
@@ -166,50 +168,130 @@ exports.chat = async (req, res) => {
     return res.status(503).json({ success: false, message: "Daily AI limit reached" });
   }
 
-  // 5. Structure conversation history (last 6 turns, each max 600 chars)
-  const contents = [];
-  for (const turn of rawHistory.slice(-MAX_HISTORY)) {
-    const text = asString(turn && turn.text).trim().slice(0, MAX_HISTORY_TEXT);
-    if (!text) continue;
-    contents.push({
-      role: turn.role === "model" ? "model" : "user",
-      parts: [{ text }],
-    });
-  }
-
-  // Gemini requires the conversation to start with a user turn
-  while (contents.length && contents[0].role !== "user") {
-    contents.shift();
-  }
-
-  // Append latest turn with delimited <portal_context>
+  // Context preparation
   const portalContext = formatPortalContext(retrievedItems);
   const userPromptText = portalContext
     ? `${portalContext}\n\nStudent Question: ${message}`
     : message;
-  contents.push({ role: "user", parts: [{ text: userPromptText }] });
 
-  // 6. Gemini Model configuration & Fallbacks
-  // If the env model is gemini-2.5-flash (which Google deprecated for new users),
-  // automatically use gemini-3.1-flash-lite or gemini-3.8-flash.
-  let envModel = (process.env.GEMINI_MODEL || "gemini-3.1-flash-lite").replace(/[^\w.\-]/g, "");
-  if (envModel === "gemini-2.5-flash") {
-    envModel = "gemini-3.1-flash-lite";
+  // =========================================================
+  // 5. OpenRouter Free Model Integration (Primary Choice)
+  // =========================================================
+  if (openRouterApiKey) {
+    const openRouterMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+    ];
+
+    for (const turn of rawHistory.slice(-MAX_HISTORY)) {
+      const text = asString(turn && turn.text).trim().slice(0, MAX_HISTORY_TEXT);
+      if (!text) continue;
+      const role = (turn.role === "model" || turn.role === "assistant") ? "assistant" : "user";
+      openRouterMessages.push({ role, content: text });
+    }
+
+    openRouterMessages.push({ role: "user", content: userPromptText });
+
+    const primaryModel = (process.env.OPENROUTER_MODEL || "openrouter/free").trim();
+    const openRouterCandidates = [
+      primaryModel,
+      "openrouter/free",
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "cohere/north-mini-code:free",
+      "liquid/lfm-3-1.7b:free",
+      "nvidia/nemotron-3.5-lightning:free",
+    ];
+
+    const triedOpenRouterModels = new Set();
+
+    for (const model of openRouterCandidates) {
+      if (triedOpenRouterModels.has(model)) continue;
+      triedOpenRouterModels.add(model);
+
+      try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${openRouterApiKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": process.env.FRONTEND_URL || "https://jntucircle.com",
+            "X-Title": "JNTU Circle Assistant",
+          },
+          body: JSON.stringify({
+            model,
+            messages: openRouterMessages,
+            temperature: 0.3,
+            max_tokens: 800,
+          }),
+          signal: AbortSignal.timeout(TIMEOUT_MS),
+        });
+
+        if (!response.ok) {
+          console.error(`OpenRouter failed for model ${model} with status ${response.status}`);
+          continue;
+        }
+
+        const data = await response.json();
+        const choice = data?.choices?.[0];
+        let reply = choice?.message?.content || "";
+
+        // Remove <think>...</think> reasoning blocks from thinking models
+        if (reply) {
+          reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        }
+
+        if (!reply) {
+          console.warn(`OpenRouter model ${model} returned empty content, trying next candidate...`);
+          continue;
+        }
+
+        const payload = {
+          success: true,
+          reply: reply.slice(0, 4000),
+          sources,
+          suggestedQuestions,
+          provider: "openrouter",
+          model: data.model || model,
+        };
+
+        if (!isHistoryTurn) {
+          setCachedAnswer(message, payload);
+        }
+
+        return res.json(payload);
+      } catch (err) {
+        console.error(`OpenRouter error (${model}):`, err.name || err.message);
+      }
+    }
   }
 
-  const modelCandidates = [envModel, "gemini-3.1-flash-lite", "gemini-3.8-flash"];
-  const triedModels = new Set();
+  // =========================================================
+  // 6. Gemini Fallback (if OpenRouter key not set or all models failed)
+  // =========================================================
+  if (geminiApiKey) {
+    const contents = [];
+    for (const turn of rawHistory.slice(-MAX_HISTORY)) {
+      const text = asString(turn && turn.text).trim().slice(0, MAX_HISTORY_TEXT);
+      if (!text) continue;
+      contents.push({
+        role: turn.role === "model" ? "model" : "user",
+        parts: [{ text }],
+      });
+    }
 
-  for (const model of modelCandidates) {
-    if (triedModels.has(model)) continue;
-    triedModels.add(model);
+    while (contents.length && contents[0].role !== "user") {
+      contents.shift();
+    }
+
+    contents.push({ role: "user", parts: [{ text: userPromptText }] });
+
+    const model = (process.env.GEMINI_MODEL || "gemini-1.5-flash").replace(/[^\w.\-]/g, "");
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
     try {
       const response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+        headers: { "Content-Type": "application/json", "x-goog-api-key": geminiApiKey },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents,
@@ -218,41 +300,38 @@ exports.chat = async (req, res) => {
         signal: AbortSignal.timeout(TIMEOUT_MS),
       });
 
-      if (!response.ok) {
-        // Log status only (never the key or the student's text)
+      if (response.ok) {
+        const data = await response.json();
+        const parts = data?.candidates?.[0]?.content?.parts;
+        const reply = Array.isArray(parts)
+          ? parts.map((p) => asString(p.text)).join("").trim()
+          : "";
+
+        if (reply) {
+          const payload = {
+            success: true,
+            reply: reply.slice(0, 4000),
+            sources,
+            suggestedQuestions,
+            provider: "gemini",
+            model,
+          };
+
+          if (!isHistoryTurn) {
+            setCachedAnswer(message, payload);
+          }
+
+          return res.json(payload);
+        }
+      } else {
         console.error(`Gemini request failed for model ${model} with status ${response.status}`);
-        continue; // Try next fallback model if 404 or 503
       }
-
-      const data = await response.json();
-      const parts = data?.candidates?.[0]?.content?.parts;
-      const reply = Array.isArray(parts)
-        ? parts.map((p) => asString(p.text)).join("").trim()
-        : "";
-
-      if (!reply) {
-        continue;
-      }
-
-      const payload = {
-        success: true,
-        reply: reply.slice(0, 4000),
-        sources,
-        suggestedQuestions,
-      };
-
-      // Cache single-turn answers
-      if (!isHistoryTurn) {
-        setCachedAnswer(message, payload);
-      }
-
-      return res.json(payload);
     } catch (error) {
       console.error(`Gemini error (${model}):`, error.name);
     }
   }
 
-  // If all model attempts failed, return 503 so frontend gracefully falls back
+  // If all attempts failed, return 503 so frontend gracefully falls back
   return res.status(503).json({
     success: false,
     message: "AI unavailable",

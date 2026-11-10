@@ -1,4 +1,5 @@
 const Syllabus = require("../models/syllabus");
+const recordAuditLog = require("../services/auditLogger");
 
 // Create Syllabus
 exports.createSyllabus = async (req, res) => {
@@ -9,13 +10,35 @@ exports.createSyllabus = async (req, res) => {
       });
     }
 
+    const title = String(req.body.title || "").trim().slice(0, 300);
+    const branch = String(req.body.branch || "").trim().slice(0, 100);
+    const semester = String(req.body.semester || "").trim().slice(0, 50);
+    const description = String(req.body.description || "").trim().slice(0, 5000);
+
+    if (!title) {
+      return res.status(400).json({
+        message: "Title is required",
+      });
+    }
+
     const syllabus = await Syllabus.create({
-      title: req.body.title,
-      branch: req.body.branch,
-      semester: req.body.semester,
-      description: req.body.description || "",
+      title,
+      branch,
+      semester,
+      description,
       pdfUrl: `/uploads/${req.file.filename}`,
     });
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "create",
+        resourceType: "Syllabus",
+        resourceId: syllabus._id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
 
     res.status(201).json(syllabus);
   } catch (error) {
@@ -31,8 +54,43 @@ exports.getSyllabus = async (req, res) => {
     if (require("mongoose").connection.readyState !== 1) {
       return res.status(200).json([]);
     }
-    const syllabus = await Syllabus.find().sort({ createdAt: -1 });
 
+    const { branch, semester, regulation, page, limit } = req.query;
+    const filter = {};
+    if (branch && branch !== "ALL") filter.branch = branch;
+    if (semester && semester !== "ALL") filter.semester = semester;
+    if (regulation && regulation !== "ALL") filter.regulation = regulation;
+
+    let query = Syllabus.find(filter)
+      .select("_id title branch semester regulation subject subjectCode pdfUrl views downloads likes createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=60, stale-while-revalidate=120"
+    );
+
+    if (limit) {
+      const parsedLimit = Math.min(
+        Math.max(parseInt(limit, 10) || 20, 1),
+        100
+      );
+      const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+      const total = await Syllabus.countDocuments(filter);
+      const syllabus = await query
+        .skip((parsedPage - 1) * parsedLimit)
+        .limit(parsedLimit);
+
+      return res.status(200).json({
+        syllabus,
+        total,
+        page: parsedPage,
+        totalPages: Math.ceil(total / parsedLimit),
+      });
+    }
+
+    const syllabus = await query;
     res.status(200).json(syllabus);
   } catch (error) {
     console.warn("Get Syllabus Warning:", error.message);
@@ -62,15 +120,36 @@ exports.getSyllabusById = async (req, res) => {
 // Update Syllabus
 exports.updateSyllabus = async (req, res) => {
   try {
+    const updateData = {};
+    if (req.body.title !== undefined) updateData.title = String(req.body.title).trim().slice(0, 300);
+    if (req.body.branch !== undefined) updateData.branch = String(req.body.branch).trim().slice(0, 100);
+    if (req.body.semester !== undefined) updateData.semester = String(req.body.semester).trim().slice(0, 50);
+    if (req.body.description !== undefined) updateData.description = String(req.body.description).trim().slice(0, 5000);
+
+    if (req.file) {
+      updateData.pdfUrl = `/uploads/${req.file.filename}`;
+    }
+
     const syllabus = await Syllabus.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      { $set: updateData },
+      { new: true, runValidators: true }
     );
 
     if (!syllabus) {
       return res.status(404).json({
         message: "Syllabus not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "update",
+        resourceType: "Syllabus",
+        resourceId: syllabus._id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -90,6 +169,17 @@ exports.deleteSyllabus = async (req, res) => {
     if (!syllabus) {
       return res.status(404).json({
         message: "Syllabus not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "delete",
+        resourceType: "Syllabus",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -190,4 +280,4 @@ exports.increaseDownloads = async (req, res) => {
       message: error.message,
     });
   }
-};
+};

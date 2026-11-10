@@ -3,6 +3,8 @@ const router = express.Router();
 const upload = require("../config/multer");
 const auth = require("../middleware/auth");
 const { rateLimit } = require("../middleware/rateLimit");
+const validateObjectId = require("../middleware/validateObjectId");
+const { verifyMagicBytes } = require("../middleware/validateUpload");
 
 const {
   createUserMaterial,
@@ -21,9 +23,10 @@ router.post(
     message: "Upload limit reached. Please try again in an hour.",
   }),
   upload.pdf.single("file"),
+  verifyMagicBytes,
   createUserMaterial
 );
 
-router.delete("/:id", auth, deleteUserMaterial);
+router.delete("/:id", auth, validateObjectId("id"), deleteUserMaterial);
 
 module.exports = router;

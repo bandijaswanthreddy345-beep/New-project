@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const compression = require("compression");
 
 const connectDB = require("./config/db");
 
@@ -11,6 +12,7 @@ const { rateLimit } = require("./middleware/rateLimit");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const userRoutes = require("./routes/userRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const auditRoutes = require("./routes/auditRoutes");
 
 // Admin authentication middleware
 const auth = require("./middleware/auth");
@@ -19,7 +21,8 @@ const auth = require("./middleware/auth");
 // LOAD ENVIRONMENT VARIABLES
 // ==========================
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, ".env") });
+
 
 // ==========================
 // SECURITY: REFUSE TO RUN WITH A WEAK JWT SECRET
@@ -63,11 +66,36 @@ const app = express();
 // Do not advertise the framework to scanners
 app.disable("x-powered-by");
 
-// If this runs behind a reverse proxy (Nginx, Render, Railway...), uncomment
-// so rate limits see each visitor's real IP instead of the proxy's:
-// app.set("trust proxy", 1);
+// Trust proxy setting:
+// Behind a reverse proxy (e.g. Nginx, Cloudflare, Render, Railway, Vercel), TRUST_PROXY must be set
+// so that rate limiting and HTTPS redirects see the client's real IP instead of the proxy's IP.
+if (process.env.TRUST_PROXY) {
+  const val = process.env.TRUST_PROXY.trim().toLowerCase();
+  if (val === "true") {
+    app.set("trust proxy", true);
+  } else if (val === "false") {
+    app.set("trust proxy", false);
+  } else if (!isNaN(Number(val))) {
+    app.set("trust proxy", Number(val));
+  } else {
+    app.set("trust proxy", process.env.TRUST_PROXY.trim());
+  }
+}
+
+// In production, redirect plain HTTP to HTTPS when x-forwarded-proto says it was HTTP
+if (process.env.NODE_ENV === "production") {
+  app.use((req, res, next) => {
+    const proto = req.headers["x-forwarded-proto"];
+    if (proto && proto.toLowerCase() === "http") {
+      const host = req.headers.host;
+      return res.redirect(301, `https://${host}${req.originalUrl}`);
+    }
+    next();
+  });
+}
 
 app.use(securityHeaders);
+app.use(compression({ threshold: 1024 }));
 
 // Enable CORS.
 // In production set CORS_ORIGINS in .env to your website address(es),
@@ -77,6 +105,13 @@ const allowedOrigins = (process.env.CORS_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+
+if (process.env.NODE_ENV === "production" && allowedOrigins.length === 0) {
+  console.error(
+    "FATAL: CORS_ORIGINS is missing or empty. Set your domain(s) in .env in production."
+  );
+  process.exit(1);
+}
 
 app.use(
   cors(
@@ -126,8 +161,12 @@ app.use(
   express.static(path.join(__dirname, "uploads"), {
     dotfiles: "deny",
     index: false,
+    maxAge: "7d",
+    etag: true,
+    lastModified: true,
     setHeaders: (res, filePath) => {
       res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Cache-Control", "public, max-age=604800, immutable");
 
       // Anything that is not a plain PDF/image (e.g. an old .html upload)
       // is forced to download so it can never run as a web page.
@@ -266,6 +305,16 @@ app.use(
 );
 
 // ==========================
+// AUDIT LOGS (ADMIN ONLY)
+// ==========================
+
+app.use(
+  "/api/audit-logs",
+  auth,
+  auditRoutes
+);
+
+// ==========================
 // 404 HANDLER
 // ==========================
 
@@ -283,10 +332,25 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
 
-  res.status(err.status || 500).json({
+  // Mongoose CastError (invalid ObjectId) returns clean 400
+  if (err.name === "CastError" || err.kind === "ObjectId") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ID format",
+    });
+  }
+
+  const isProd = process.env.NODE_ENV === "production";
+  const statusCode = err.status || err.statusCode || 500;
+  const message =
+    isProd && statusCode >= 500
+      ? "Internal server error"
+      : (err.message || "Internal server error");
+
+  res.status(statusCode).json({
     success: false,
-    message:
-      err.message || "Internal server error",
+    message,
+    ...(isProd ? {} : { stack: err.stack }),
   });
 });
 
