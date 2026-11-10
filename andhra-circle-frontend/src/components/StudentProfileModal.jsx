@@ -27,6 +27,16 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
     return () => window.removeEventListener("studentProfileUpdated", handleSync);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const isConfigured = Boolean(student && student.isConfigured && student.name?.trim());
@@ -79,16 +89,7 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
               <span className="sp-preview-badge">Student Profile</span>
             </div>
           </div>
-          <div className="sp-modal-ctrls">
-            <button
-              type="button"
-              className="sp-modal-close-icon"
-              onClick={onClose}
-              title="Close modal"
-              aria-label="Close modal"
-            >
-              ✕
-            </button>
+          <div className="sp-preview-header-actions">
             <button
               type="button"
               className="sp-modal-action-btn"
@@ -96,6 +97,27 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
               title="Open full profile"
             >
               Full Profile ↗
+            </button>
+            <button
+              type="button"
+              className="sp-preview-close-btn"
+              onClick={onClose}
+              title="Close modal (Esc)"
+              aria-label="Close modal"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </button>
           </div>
         </div>

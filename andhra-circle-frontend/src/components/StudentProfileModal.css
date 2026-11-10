@@ -69,22 +69,27 @@
   border-bottom: 1px solid rgba(255, 239, 179, 0.15);
 }
 
-.sp-preview-header-actions {
+.sp-preview-header-actions,
+.sp-modal-ctrls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .sp-modal-action-btn {
   background: rgba(255, 239, 179, 0.1);
   border: 1px solid rgba(255, 239, 179, 0.3);
   color: #ffefb3;
-  padding: 5px 12px;
+  padding: 6px 13px;
   border-radius: 8px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 650;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
 }
 
 .sp-modal-action-btn:hover {
@@ -139,24 +144,40 @@
   text-transform: uppercase;
 }
 
-.sp-preview-close {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  width: 28px;
-  height: 28px;
+.sp-preview-close,
+.sp-preview-close-btn,
+.sp-modal-close-icon {
+  background: rgba(255, 239, 179, 0.08);
+  border: 1px solid rgba(255, 239, 179, 0.22);
+  color: #ffefb3;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
+  font-size: 13px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  flex-shrink: 0;
+  outline: none;
 }
 
-.sp-preview-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+.sp-preview-close:hover,
+.sp-preview-close-btn:hover,
+.sp-modal-close-icon:hover {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #ff8080;
+  transform: rotate(90deg);
+}
+
+.sp-preview-close:focus-visible,
+.sp-preview-close-btn:focus-visible,
+.sp-modal-close-icon:focus-visible {
+  border-color: #ffefb3;
+  box-shadow: 0 0 0 2px rgba(255, 239, 179, 0.35);
 }
 
 /* User Identity Section */
@@ -412,6 +433,27 @@
   .sp-preview-card {
     max-width: 95vw;
     border-radius: 16px;
+  }
+
+  .sp-preview-header {
+    padding: 12px 14px;
+  }
+
+  .sp-preview-header-actions,
+  .sp-modal-ctrls {
+    gap: 8px;
+  }
+
+  .sp-modal-action-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .sp-preview-close,
+  .sp-preview-close-btn,
+  .sp-modal-close-icon {
+    width: 28px;
+    height: 28px;
   }
 
   .sp-preview-user-row {
