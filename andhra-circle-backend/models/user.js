@@ -24,6 +24,17 @@ const userSchema = new mongoose.Schema(
       default: "student",
     },
 
+    // Session hardening: timestamp and version of the last password modification
+    // Used to invalidate JWTs issued prior to password reset
+    passwordChangedAt: {
+      type: Date,
+    },
+
+    tokenVersion: {
+      type: Number,
+      default: 0,
+    },
+
     // Forgot Password
     resetPasswordToken: {
       type: String,

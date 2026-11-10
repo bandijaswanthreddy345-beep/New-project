@@ -4,10 +4,6 @@ import ResourceHighlights from "./ResourceHighlights";
 function Hero() {
   return (
     <section className="hero">
-      {/* Background ambient lighting and subtle grid texture */}
-      <div className="hero-grid-overlay" aria-hidden="true" />
-      <div className="hero-ambient-glow" aria-hidden="true" />
-
       <div className="hero-content">
 
         {/* =================================================

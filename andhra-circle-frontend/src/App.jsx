@@ -113,9 +113,13 @@ function App() {
         element={<Login />}
       />
 
-      {/* Register */}
+      {/* Register & Signup */}
       <Route
         path="/register"
+        element={<Register />}
+      />
+      <Route
+        path="/signup"
         element={<Register />}
       />
 

@@ -1,0 +1,191 @@
+/* =========================================================
+   JNTU CIRCLE — STUDENT REGISTRATION / SIGN UP STYLING
+   Harmonized with the White Card / Midnight Emerald Auth Design
+   ========================================================= */
+
+.signup-auth-card {
+  max-width: 470px;
+  animation: signupCardSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes signupCardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.signup-label-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.signup-helper-text {
+  font-size: 11.5px;
+  color: #628781;
+  font-weight: 500;
+}
+
+/* =========================================================
+   CAPTCHA VERIFICATION CONTAINER
+   ========================================================= */
+
+.signup-captcha-section {
+  gap: 8px;
+}
+
+.signup-captcha-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f8fbf9;
+  border: 1.5px solid #d4e5df;
+  border-radius: 14px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.signup-captcha-visual-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.signup-captcha-svg-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 36, 32, 0.08);
+}
+
+.signup-captcha-image {
+  width: 100%;
+  max-width: 220px;
+  height: 52px;
+  border-radius: 10px;
+  display: block;
+}
+
+.signup-captcha-placeholder {
+  flex: 1;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #081813;
+  border-radius: 10px;
+  color: #a0d1b8;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.signup-captcha-reload-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1.5px solid #d4e5df;
+  color: #013e37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.signup-captcha-reload-btn:hover:not(:disabled) {
+  background: #e6f3f1;
+  border-color: #013e37;
+  color: #002420;
+  transform: rotate(30deg);
+}
+
+.signup-captcha-reload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.signup-spin {
+  animation: signupSpinIcon 0.7s linear infinite;
+}
+
+@keyframes signupSpinIcon {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.signup-captcha-text-input {
+  letter-spacing: 3px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14.5px;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   TERMS & PRIVACY ROW
+   ========================================================= */
+
+.signup-terms-agreement {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  cursor: pointer;
+}
+
+.signup-terms-copy {
+  font-size: 12.5px;
+  color: #3b5752;
+  line-height: 1.45;
+  user-select: none;
+}
+
+.signup-terms-hyperlink {
+  color: #013e37;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.signup-terms-hyperlink:hover {
+  color: #b5830a;
+}
+
+/* =========================================================
+   RESPONSIVE OVERRIDES
+   ========================================================= */
+
+@media (max-width: 520px) {
+  .signup-auth-card {
+    padding: 28px 18px 24px;
+    border-radius: 20px;
+  }
+
+  .signup-captcha-box {
+    padding: 10px;
+  }
+
+  .signup-captcha-image {
+    height: 48px;
+  }
+
+  .signup-captcha-reload-btn {
+    width: 38px;
+    height: 38px;
+  }
+}

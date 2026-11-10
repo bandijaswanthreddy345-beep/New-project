@@ -375,29 +375,59 @@ ul {
 }
 
 /* =========================================================
-   LOGIN NAVIGATION BUTTON
+   STUDENT PROFILE AVATAR & DROPDOWN MENU
 ========================================================= */
 
-.nav-login-button {
+.nav-item-profile {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 7px;
-
-  padding: 9px 16px !important;
-
-  background: var(--primary);
-  color: white !important;
-
-  border-radius: var(--radius-sm);
-
-  transition:
-    background var(--transition),
-    transform var(--transition),
-    box-shadow var(--transition);
 }
 
-.nav-login-button::after {
+.nav-profile-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  outline: none;
+}
+
+.nav-profile-btn:hover {
+  transform: scale(1.05);
+}
+
+.nav-profile-btn.is-active .nav-profile-avatar-wrapper {
+  box-shadow: 0 0 0 2px #ffb95f, 0 0 16px rgba(255, 185, 95, 0.4);
+}
+
+.nav-profile-status-dot.is-online {
+  background: #4edea3 !important;
+  box-shadow: 0 0 6px #4edea3 !important;
+}
+
+/* Profile Dropdown Panel */
+.nav-profile-dropdown {
   display: none;
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  width: 270px;
+  background: linear-gradient(180deg, #062a1e 0%, #031c13 100%);
+  border: 1px solid rgba(160, 209, 184, 0.22);
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 1000;
+  overflow: hidden;
+  animation: profileDropdownPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 8px 0;
 }
 
 .nav-login-button:hover {
@@ -408,15 +438,157 @@ ul {
   box-shadow: 0 5px 14px rgba(1, 62, 55, 0.3), 0 0 16px rgba(251, 191, 36, 0.45);
 }
 
-.login-arrow {
-  font-size: 16px;
-
-  transition: transform var(--transition);
+@media (min-width: 993px) {
+  .nav-item-profile:hover .nav-profile-dropdown,
+  .nav-profile-dropdown:hover {
+    display: block;
+  }
 }
 
-.nav-login-button:hover .login-arrow {
-  transform: translateX(3px);
+@keyframes profileDropdownPop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
+
+/* Header inside dropdown */
+.nav-profile-dd-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 14px;
+  text-decoration: none;
+  transition: background 0.18s ease;
+  cursor: pointer;
+}
+
+.nav-profile-dd-header:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-profile-dd-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #142f25;
+  border: 1px solid rgba(255, 185, 95, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffb95f;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.nav-profile-dd-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-profile-dd-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nav-profile-dd-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.nav-profile-dd-role {
+  font-size: 11px;
+  color: #a0d1b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.nav-profile-dd-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 0 6px 0;
+}
+
+.nav-profile-dd-subdivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 6px 12px;
+}
+
+.nav-profile-dd-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 6px;
+}
+
+.nav-profile-dd-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #cbe9da;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.nav-profile-dd-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.nav-profile-dd-signin {
+  color: #ffb95f !important;
+}
+
+.nav-profile-dd-signin:hover {
+  background: rgba(255, 185, 95, 0.12) !important;
+  color: #ffddb8 !important;
+}
+
+.nav-profile-dd-signup {
+  background: rgba(255, 185, 95, 0.14) !important;
+  color: #ffb95f !important;
+  font-weight: 700 !important;
+}
+
+.nav-profile-dd-signup:hover {
+  background: #ffb95f !important;
+  color: #2a1700 !important;
+}
+
+.nav-profile-dd-signout {
+  color: #ffb4ab !important;
+}
+
+.nav-profile-dd-signout:hover {
+  background: rgba(147, 0, 10, 0.25) !important;
+  color: #ffffff !important;
+}
+
 
 /* =========================================================
    HERO
@@ -438,38 +610,17 @@ ul {
   text-align: center;
   overflow: hidden;
 
-  /* Exact color palette & concentric curved arcs sampled from reference image */
-  background:
-    radial-gradient(circle at 50% 28%, rgba(255, 239, 179, 0.16) 0%, transparent 55%),
-    radial-gradient(ellipse 980px 720px at 15% 115%, transparent 66%, rgba(21, 78, 67, 0.5) 67%, rgba(26, 92, 80, 0.28) 72%, transparent 73%),
-    radial-gradient(ellipse 1200px 900px at 15% 115%, transparent 73%, rgba(21, 78, 67, 0.45) 74%, rgba(26, 92, 80, 0.22) 78%, transparent 79%),
-    radial-gradient(ellipse 1450px 1100px at 15% 115%, transparent 79%, rgba(21, 78, 67, 0.35) 80%, rgba(26, 92, 80, 0.18) 84%, transparent 85%),
-    radial-gradient(circle at 92% 12%, #154E43 0%, #0D453C 42%, #0E3F37 70%, #013A33 100%);
+  /* Clean, solid midnight emerald background without concentric curved arcs or patterns */
+  background: #013a33;
 }
 
-/* Subtle atmospheric grid & soft ambient glow */
+/* Subtle atmospheric grid & soft ambient glow disabled */
 .hero-grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 239, 179, 0.08) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at 50% 50%, #000000 45%, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000000 45%, transparent 80%);
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .hero-ambient-glow {
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 620px;
-  height: 280px;
-  background: radial-gradient(ellipse at center, rgba(21, 78, 67, 0.35), rgba(13, 69, 60, 0.18) 50%, transparent 75%);
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(45px);
+  display: none;
 }
 
 .hero-content {
@@ -3797,13 +3948,13 @@ mark {
   line-height: 1;
 }
 
+.stat-unit {
+  display: none !important;
+}
+
 .stat-chip-views .stat-unit,
 .stat-item:first-child .stat-unit {
-  color: #55726e !important;
-  font-size: 9px !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
+  display: none !important;
 }
 
 .stat-chip-downloads,
@@ -3830,11 +3981,7 @@ mark {
 
 .stat-chip-downloads .stat-unit,
 .stat-item:nth-child(2) .stat-unit {
-  color: #55726e !important;
-  font-size: 9px !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
+  display: none !important;
 }
 
 /* ---------------------------------------------------------
@@ -5103,9 +5250,6 @@ textarea:focus-visible {
     font-size: 12px;
   }
 
-  .nav-login-button {
-    padding: 7px 12px !important;
-  }
 
   .hero {
     min-height: 490px;
@@ -5306,9 +5450,6 @@ textarea:focus-visible {
     height: 30px;
   }
 
-  .nav-login-button {
-    padding: 6px 10px !important;
-  }
 
   .hero {
     min-height: 430px;

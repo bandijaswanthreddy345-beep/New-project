@@ -693,7 +693,7 @@
 
   /* 1. Hero Container & Typography */
   .hero {
-    background: linear-gradient(180deg, #0c352d 0%, #114a3f 50%, #0c3830 100%) !important;
+    background: #013a33 !important;
     border-bottom-left-radius: 2.5rem !important;
     border-bottom-right-radius: 2.5rem !important;
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45) !important;
@@ -703,16 +703,7 @@
   }
 
   .hero-ambient-glow {
-    position: absolute !important;
-    top: -6rem !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 24rem !important;
-    height: 24rem !important;
-    background: rgba(52, 211, 153, 0.12) !important;
-    border-radius: 9999px !important;
-    filter: blur(48px) !important;
-    pointer-events: none !important;
+    display: none !important;
   }
 
   .hero-content {

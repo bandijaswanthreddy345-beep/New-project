@@ -49,6 +49,14 @@ function Navbar() {
   const [showToastAlert, setShowToastAlert] = useState(false);
   const [activeAlertItem, setActiveAlertItem] = useState(null);
   const [student, setStudent] = useState(getStoredStudentData());
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
 
   // Mobile auto-popping notification states
   const [mobileNotifIndex, setMobileNotifIndex] = useState(0);
@@ -59,11 +67,23 @@ function Navbar() {
     const handleProfileSync = () => {
       setStudent(getStoredStudentData());
     };
+    const handleAuthSync = () => {
+      try {
+        const raw = localStorage.getItem("user");
+        setCurrentUser(raw ? JSON.parse(raw) : null);
+      } catch {
+        setCurrentUser(null);
+      }
+    };
     window.addEventListener("studentProfileUpdated", handleProfileSync);
     window.addEventListener("storage", handleProfileSync);
+    window.addEventListener("storage", handleAuthSync);
+    window.addEventListener("authChanged", handleAuthSync);
     return () => {
       window.removeEventListener("studentProfileUpdated", handleProfileSync);
       window.removeEventListener("storage", handleProfileSync);
+      window.removeEventListener("storage", handleAuthSync);
+      window.removeEventListener("authChanged", handleAuthSync);
     };
   }, []);
 
@@ -413,7 +433,7 @@ function Navbar() {
         <Link
           to="/student-profile"
           className="nav-mobile-action-btn nav-mobile-profile-btn"
-          title={`Student Profile • ${student?.name || "Chinnu"}`}
+          title={student?.isConfigured && student?.name ? `Student Profile • ${student.name}` : "Student Profile"}
           aria-label="Student Profile"
           onClick={() => {
             setMobileMenuOpen(false);
@@ -565,26 +585,32 @@ function Navbar() {
             }
 
             if (item.isProfile || item.name === "Student Profile") {
-              const studentName = student?.name || "Student";
+              const isConfigured = Boolean(student?.isConfigured && student?.name);
+              const displayName = currentUser?.name || (isConfigured ? student.name : "Student Scholar");
+              const studentName = student?.name || displayName;
               const photoSrc = getStudentAvatar(student);
 
               return (
                 <li key={item.path} className="nav-item-profile">
-                  <NavLink
-                    to={item.path}
-                    className={({ isActive }) =>
-                      isActive
-                        ? "nav-link active nav-profile-btn"
-                        : "nav-link nav-profile-btn"
-                    }
-                    title={`Student Profile • ${studentName}`}
-                    aria-label={`Student Profile (${studentName})`}
+                  <button
+                    type="button"
+                    className="nav-profile-btn"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (!currentUser) {
+                        navigate("/login");
+                      } else {
+                        navigate("/profile");
+                      }
+                    }}
+                    title={currentUser ? `Student Dashboard • ${displayName}` : "Sign In or Sign Up"}
+                    aria-label={currentUser ? `Student Dashboard (${displayName})` : "Sign In or Sign Up"}
                   >
                     <div className="nav-profile-avatar-wrapper">
                       {photoSrc ? (
                         <img
                           src={photoSrc}
-                          alt={studentName}
+                          alt={displayName}
                           className="nav-profile-avatar-img"
                           onError={(e) => {
                             e.currentTarget.style.display = "none";
@@ -612,9 +638,76 @@ function Navbar() {
                           <circle cx="12" cy="7" r="4" />
                         </svg>
                       </span>
-                      <span className="nav-profile-status-dot" title="Active Student" />
+                      <span className={`nav-profile-status-dot ${currentUser ? "is-online" : ""}`} title={currentUser ? "Account Online" : "Sign In or Sign Up"} />
                     </div>
-                  </NavLink>
+                  </button>
+
+                  {/* Profile & Account Dropdown Menu (only when signed in, shown on hover/active) */}
+                  {currentUser && (
+                    <div className="nav-profile-dropdown" role="menu">
+                      <Link
+                        to="/profile"
+                        className="nav-profile-dd-header"
+                        onClick={() => setMobileMenuOpen(false)}
+                        title="Open Student Dashboard"
+                      >
+                        <div className="nav-profile-dd-avatar">
+                          {photoSrc ? (
+                            <img src={photoSrc} alt={displayName} />
+                          ) : (
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            </svg>
+                          )}
+                        </div>
+                        <div className="nav-profile-dd-info">
+                          <span className="nav-profile-dd-name">{displayName}</span>
+                          <span className="nav-profile-dd-role">
+                            {currentUser?.email || (isConfigured ? `${student.branch || "JNTU"} • ${student.hallTicket || ""}` : "Student Account")}
+                          </span>
+                        </div>
+                      </Link>
+
+                      <div className="nav-profile-dd-divider" />
+
+                      <div className="nav-profile-dd-actions">
+                        {currentUser?.role === "admin" && (
+                          <Link
+                            to="/dashboard"
+                            className="nav-profile-dd-link"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect width="7" height="9" x="3" y="3" rx="1" />
+                              <rect width="7" height="5" x="14" y="3" rx="1" />
+                              <rect width="7" height="9" x="14" y="12" rx="1" />
+                              <rect width="7" height="5" x="3" y="16" rx="1" />
+                            </svg>
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        )}
+
+                        <button
+                          type="button"
+                          className="nav-profile-dd-link nav-profile-dd-signout"
+                          onClick={() => {
+                            localStorage.removeItem("token");
+                            localStorage.removeItem("user");
+                            setCurrentUser(null);
+                            window.dispatchEvent(new Event("authChanged"));
+                            navigate("/login");
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                          </svg>
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </li>
               );
             }

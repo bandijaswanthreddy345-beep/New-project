@@ -33,12 +33,31 @@ export function cleanCollege(col) {
   return cleaned || "JNTU College of Engineering";
 }
 
-// Helper to remove any lingering "(3-2)", "(X-Y)" notation from semester names
+// Helper to remove any lingering "(3-2)", "(X-Y)", or year notation from semester names
 export function cleanSemester(sem) {
-  if (!sem || typeof sem !== "string") return "6th Semester";
-  const validated = validateSemester(sem);
-  if (validated.ok) return validated.value;
-  return sem.replace(/\s*\([1-4]-[1-2]\)/gi, "").replace(/\b[1-4]-[1-2]\b/gi, "").trim() || "6th Semester";
+  if (!sem || typeof sem !== "string") return "Semester 6";
+  let str = sem.replace(/\b[1-4](?:st|nd|rd|th)?\s*year\b/gi, "").replace(/[|•–—()]/g, " ").trim();
+  const validated = validateSemester(str);
+  if (validated.ok) {
+    const semNumMatch = validated.value.match(/(\d+)/);
+    if (semNumMatch) {
+      return `Semester ${semNumMatch[1]}`;
+    }
+    return validated.value;
+  }
+  const direct = validateSemester(sem);
+  if (direct.ok) {
+    const semNumMatch = direct.value.match(/(\d+)/);
+    if (semNumMatch) {
+      return `Semester ${semNumMatch[1]}`;
+    }
+    return direct.value;
+  }
+  const rawNumMatch = sem.match(/(\d+)/);
+  if (rawNumMatch && Number(rawNumMatch[1]) >= 1 && Number(rawNumMatch[1]) <= 8) {
+    return `Semester ${rawNumMatch[1]}`;
+  }
+  return sem.replace(/\s*\([1-4]-[1-2]\)/gi, "").replace(/\b[1-4]-[1-2]\b/gi, "").trim() || "Semester 6";
 }
 
 // Verified student profile default
@@ -81,7 +100,22 @@ export const EMPTY_STUDENT_DATA = {
   name: "",
   shortName: "",
   hallTicket: "",
+  college: "",
+  branch: "",
+  branchCode: "",
+  year: "",
+  semester: "",
+  regulation: "R23 Regulation",
+  cgpa: "",
+  credits: "0 / 160",
+  attendance: "0%",
+  attendancePercentage: 0,
+  email: "",
+  phone: "",
+  profilePhoto: null,
   isConfigured: false,
+  savedNotes: [],
+  semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
 };
 
 // Helper to safely resolve the avatar URL for a student object or photo string.
@@ -153,25 +187,35 @@ export function getGradeLetter(sgpa) {
 // Check if a profile is already configured in this browser
 export function hasStoredStudentProfile() {
   try {
-    const raw = localStorage.getItem("jntu_student_profile");
+    if (typeof localStorage !== "undefined" && localStorage.getItem("jntu_student_logged_out") === "true") {
+      return false;
+    }
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem("jntu_student_profile") : null;
     if (!raw) return true;
     if (raw === "logged_out") return false;
     const parsed = JSON.parse(raw);
+    if (parsed && parsed.isConfigured === false) return false;
     return Boolean(parsed && parsed.name?.trim());
   } catch (e) {
-    return true;
+    return false;
   }
 }
 
 // Retrieve stored student data with automatic schema synchronization and sanitization
 export function getStoredStudentData() {
   try {
-    const raw = localStorage.getItem("jntu_student_profile");
+    if (typeof localStorage !== "undefined" && localStorage.getItem("jntu_student_logged_out") === "true") {
+      return { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
+    }
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem("jntu_student_profile") : null;
     if (raw) {
       if (raw === "logged_out") {
         return { ...EMPTY_STUDENT_DATA, isConfigured: false };
       }
       const parsed = JSON.parse(raw);
+      if (parsed && parsed.isConfigured === false) {
+        return { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
+      }
 
       // Validate core fields defensively
       const nameCheck = validateName(parsed.name);
@@ -331,6 +375,7 @@ export function saveStoredStudentData(data) {
     };
 
     if (typeof localStorage !== "undefined") {
+      localStorage.removeItem("jntu_student_logged_out");
       localStorage.setItem("jntu_student_profile", JSON.stringify(updated));
     }
     if (typeof window !== "undefined") {
@@ -349,9 +394,13 @@ export function saveStoredStudentData(data) {
 // Clear / Logout student profile from this device
 export function clearStoredStudentData() {
   try {
-    localStorage.removeItem("jntu_student_profile");
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("jntu_student_logged_out", "true");
+      localStorage.removeItem("jntu_student_profile");
+    }
+    const emptyProfile = { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
     if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
-      window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: DEFAULT_CHINNU_DATA }));
+      window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: emptyProfile }));
       window.dispatchEvent(new Event("studentProfileUpdated"));
     }
   } catch (e) {

@@ -575,7 +575,7 @@ export default function Calculator() {
                 value={universityNumber}
                 onChange={(e) => setUniversityNumber(e.target.value)}
                 aria-invalid={!universityNumberValidation.ok}
-                placeholder="e.g. 23B91A4201"
+                placeholder="Enter 10-digit Hall Ticket / USN"
                 className="calc-field-input"
               />
               {universityNumber && !universityNumberValidation.ok && (
@@ -1008,7 +1008,7 @@ export default function Calculator() {
                           disabled={!sem.active}
                           onChange={(e) => handleCgpaSemChange(idx, e.target.value)}
                           aria-invalid={Boolean(semVal?.hasError)}
-                          placeholder="e.g. 8.75"
+                          placeholder="SGPA (0.00 – 10.00)"
                           className="calc-input-sgpa"
                         />
                         {semVal?.hasError && (
