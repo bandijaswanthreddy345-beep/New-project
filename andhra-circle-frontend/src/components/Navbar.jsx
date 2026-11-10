@@ -428,16 +428,21 @@ function Navbar() {
                 className="nav-profile-avatar-img nav-mobile-avatar-img"
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
+                  if (e.currentTarget.nextElementSibling) {
+                    e.currentTarget.nextElementSibling.style.display = "flex";
+                  }
                 }}
               />
-            ) : (
-              <span className="nav-profile-fallback-icon nav-mobile-fallback-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-              </span>
-            )}
+            ) : null}
+            <span
+              className="nav-profile-fallback-icon nav-mobile-fallback-icon"
+              style={{ display: getStudentAvatar(student) ? "none" : "flex" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
             <span className="nav-profile-status-dot" />
           </div>
         </Link>
@@ -582,7 +587,10 @@ function Navbar() {
                           alt={studentName}
                           className="nav-profile-avatar-img"
                           onError={(e) => {
-                            e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
+                            e.currentTarget.style.display = "none";
+                            if (e.currentTarget.nextElementSibling) {
+                              e.currentTarget.nextElementSibling.style.display = "flex";
+                            }
                           }}
                         />
                       ) : null}

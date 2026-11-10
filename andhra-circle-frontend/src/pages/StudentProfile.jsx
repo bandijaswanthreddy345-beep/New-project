@@ -2319,14 +2319,46 @@ function StudentProfile() {
           <div className="sp-m-identity">
             <div className="sp-m-avatar-container">
               <div className="sp-m-avatar-ring">
-                <img
-                  src={activeAvatar || chinnuDefaultAvatar}
-                  alt={`Student Avatar - ${student.name || "Chinnu"}`}
-                  className="sp-m-avatar-img"
-                  onError={(e) => {
-                    e.currentTarget.src = profileImgDefault;
+                {activeAvatar ? (
+                  <img
+                    src={activeAvatar}
+                    alt={`Student Avatar - ${student.name || "Student"}`}
+                    className="sp-m-avatar-img"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      if (e.currentTarget.nextElementSibling) {
+                        e.currentTarget.nextElementSibling.style.display = "flex";
+                      }
+                    }}
+                  />
+                ) : null}
+                <div
+                  className="sp-m-avatar-placeholder"
+                  title="No Photo Set • Click to Upload Photo"
+                  onClick={() => (mobileEditFileInputRef.current || editFileInputRef.current)?.click()}
+                  style={{
+                    display: activeAvatar ? "none" : "flex",
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    background: "rgba(1, 62, 55, 0.95)",
+                    borderRadius: "16px",
                   }}
-                />
+                >
+                  <svg
+                    width="36"
+                    height="36"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#ffefb3"
+                    strokeWidth="1.8"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
                 <span className="sp-m-status-dot" title="Active Enrolled" />
               </div>
             </div>
