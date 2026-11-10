@@ -15,6 +15,23 @@ function securityHeaders(req, res, next) {
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=(), payment=()"
   );
+
+  // Strict-Transport-Security in production only (at least 15552000s = 180 days)
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=15552000; includeSubDomains"
+    );
+  }
+
+  // API responses get restrictive CSP without breaking static PDFs / images
+  if (req.path.startsWith("/api") || req.path === "/") {
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'none'; frame-ancestors 'none'"
+    );
+  }
+
   next();
 }
 

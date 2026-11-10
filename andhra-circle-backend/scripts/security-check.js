@@ -329,6 +329,148 @@ function reportAudit(raw) {
 }
 
 /* ---------------------------------------------------------
+   CHECK 6: Error handler hides details in production
+   --------------------------------------------------------- */
+function checkErrorHandler(serverSource) {
+  const server = serverSource !== undefined ? serverSource : read(path.join(ROOT, "server.js"));
+  const errHandlerMatch = server.match(
+    /app\.use\(\s*\(\s*err\s*,\s*req\s*,\s*res\s*,\s*next\s*\)\s*=>\s*\{([\s\S]*?)\}\s*\);/
+  );
+  if (!errHandlerMatch) {
+    add("HIGH", "E1", "Global error handler not found", "server.js must define app.use((err, req, res, next) => ...)");
+    return;
+  }
+  const handlerBody = errHandlerMatch[1];
+  const hasProdCheck = /NODE_ENV\s*===?\s*["']production["']|isProd/.test(handlerBody);
+  const returnsRawErr = /message\s*:\s*err\.message\b/.test(handlerBody);
+  if (returnsRawErr && !hasProdCheck) {
+    add(
+      "HIGH",
+      "E1",
+      "Error handler returns err.message unconditionally",
+      "In production, return a generic message ('Internal server error') and log details on the server."
+    );
+  }
+}
+
+/* ---------------------------------------------------------
+   CHECK 7: CORS_ORIGINS enforced in production
+   --------------------------------------------------------- */
+function checkCorsConfig(serverSource) {
+  const server = serverSource !== undefined ? serverSource : read(path.join(ROOT, "server.js"));
+  const hasCorsProdEnforcement =
+    /NODE_ENV\s*===?\s*["']production["'][\s\S]*?CORS_ORIGINS[\s\S]*?process\.exit\(1\)/.test(server) ||
+    /CORS_ORIGINS[\s\S]*?NODE_ENV\s*===?\s*["']production["'][\s\S]*?process\.exit\(1\)/.test(server);
+
+  if (!hasCorsProdEnforcement) {
+    add(
+      "HIGH",
+      "C1",
+      "CORS_ORIGINS is not enforced in production",
+      "In production, server.js must refuse to start (exit 1) if CORS_ORIGINS is unset or empty."
+    );
+  }
+}
+
+/* ---------------------------------------------------------
+   CHECK 8: Mass assignment in Mongoose updates (req.body directly)
+   --------------------------------------------------------- */
+function checkMongooseUpdates(controllersDir) {
+  const folder = controllersDir || path.join(ROOT, "controllers");
+  if (!fs.existsSync(folder)) return;
+
+  const updateWithReqBody = /\.(findByIdAndUpdate|updateOne|updateMany)\s*\(\s*[^,]+,\s*req\.body\b/;
+
+  for (const file of fs.readdirSync(folder)) {
+    if (!file.endsWith(".js")) continue;
+    const content = read(path.join(folder, file));
+    const lines = content.split(/\r?\n/);
+    lines.forEach((line, i) => {
+      if (updateWithReqBody.test(line)) {
+        add(
+          "HIGH",
+          "M1",
+          `Mongoose update using req.body directly: ${file}:${i + 1}`,
+          "Whitelist allowed fields instead of passing req.body directly to update."
+        );
+      }
+    });
+  }
+}
+
+/* ---------------------------------------------------------
+   CHECK 9: Admin routes have audit logging
+   --------------------------------------------------------- */
+function checkAdminAuditLogging(controllersDir) {
+  const ctrlFolder = controllersDir || path.join(ROOT, "controllers");
+  if (!fs.existsSync(ctrlFolder)) return;
+
+  const requiredAudits = [
+    { file: "paperController.js", actions: ["createPaper", "updatePaper", "deletePaper"] },
+    { file: "noteController.js", actions: ["createNote", "updateNote", "deleteNote"] },
+    { file: "syllabusController.js", actions: ["createSyllabus", "updateSyllabus", "deleteSyllabus"] },
+    { file: "labProgramController.js", actions: ["createLabProgram", "updateLabProgram", "deleteLabProgram"] },
+    { file: "notificationController.js", actions: ["createNotification", "updateNotification", "deleteNotification"] },
+    { file: "userController.js", actions: ["updateUserRole", "deleteUser"] },
+    { file: "commentController.js", actions: ["deleteComment"] },
+    { file: "userMaterialController.js", actions: ["deleteUserMaterial"] },
+  ];
+
+  for (const { file, actions } of requiredAudits) {
+    const fullPath = path.join(ctrlFolder, file);
+    if (!fs.existsSync(fullPath)) continue;
+    const content = read(fullPath);
+
+    for (const action of actions) {
+      const fnIdx = content.indexOf(`exports.${action}`);
+      if (fnIdx === -1) continue;
+      const nextFnIdx = content.indexOf(`exports.`, fnIdx + 8);
+      const fnEnd = nextFnIdx !== -1 ? nextFnIdx : content.length;
+      const fnBody = content.slice(fnIdx, fnEnd);
+      if (!fnBody.includes("recordAuditLog")) {
+        add(
+          "HIGH",
+          "A1",
+          `Admin action missing audit log: ${file} -> ${action}`,
+          "Write an entry to the AuditLog for every admin create, update, delete, or role change."
+        );
+      }
+    }
+  }
+}
+
+/* ---------------------------------------------------------
+   CHECK 10: TRUST_PROXY configuration and documentation
+   --------------------------------------------------------- */
+function checkTrustProxy(serverSource, envExampleSource) {
+  const server = serverSource !== undefined ? serverSource : read(path.join(ROOT, "server.js"));
+  const envExample = envExampleSource !== undefined ? envExampleSource : read(path.join(ROOT, ".env.example"));
+
+  const serverHasTrustProxy =
+    /process\.env\.TRUST_PROXY/.test(server) &&
+    /app\.set\(\s*["']trust proxy["']/.test(server);
+
+  if (!serverHasTrustProxy) {
+    add(
+      "MEDIUM",
+      "T1",
+      "TRUST_PROXY is not configurable in server.js",
+      "Configure app.set('trust proxy', ...) using process.env.TRUST_PROXY so rate limiting sees client IPs behind proxies."
+    );
+  }
+
+  const exampleHasTrustProxy = /TRUST_PROXY/.test(envExample);
+  if (!exampleHasTrustProxy) {
+    add(
+      "MEDIUM",
+      "T2",
+      "TRUST_PROXY note missing in .env.example",
+      "Document TRUST_PROXY in .env.example and explain its importance when running behind a reverse proxy."
+    );
+  }
+}
+
+/* ---------------------------------------------------------
    RUN + REPORT
    --------------------------------------------------------- */
 checkRoutes();
@@ -336,25 +478,51 @@ checkSecrets();
 checkLogging();
 checkUploads();
 checkDependencies();
+checkErrorHandler();
+checkCorsConfig();
+checkMongooseUpdates();
+checkAdminAuditLogging();
+checkTrustProxy();
 
-const order = { HIGH: 0, MEDIUM: 1, INFO: 2 };
-findings.sort((a, b) => order[a.severity] - order[b.severity]);
+module.exports = {
+  checkRoutes,
+  checkSecrets,
+  checkLogging,
+  checkUploads,
+  checkDependencies,
+  checkErrorHandler,
+  checkCorsConfig,
+  checkMongooseUpdates,
+  checkAdminAuditLogging,
+  checkTrustProxy,
+  findings,
+  add,
+};
 
-console.log("\nAndhra Circle security check\n" + "=".repeat(30));
-
-if (!findings.length) {
-  console.log("No problems found.");
+if (require.main === module) {
+  runReport();
 }
 
-for (const f of findings) {
-  console.log(`\n[${f.severity}] ${f.id}  ${f.title}\n      ${f.detail}`);
+function runReport() {
+  const order = { HIGH: 0, MEDIUM: 1, INFO: 2 };
+  findings.sort((a, b) => order[a.severity] - order[b.severity]);
+
+  console.log("\nAndhra Circle security check\n" + "=".repeat(30));
+
+  if (!findings.length) {
+    console.log("No problems found.");
+  }
+
+  for (const f of findings) {
+    console.log(`\n[${f.severity}] ${f.id}  ${f.title}\n      ${f.detail}`);
+  }
+
+  const high = findings.filter((f) => f.severity === "HIGH").length;
+  const medium = findings.filter((f) => f.severity === "MEDIUM").length;
+
+  console.log(
+    `\nResult: ${high} high, ${medium} medium, ${findings.length - high - medium} info\n`
+  );
+
+  process.exit(high > 0 ? 1 : 0);
 }
-
-const high = findings.filter((f) => f.severity === "HIGH").length;
-const medium = findings.filter((f) => f.severity === "MEDIUM").length;
-
-console.log(
-  `\nResult: ${high} high, ${medium} medium, ${findings.length - high - medium} info\n`
-);
-
-process.exit(high > 0 ? 1 : 0);

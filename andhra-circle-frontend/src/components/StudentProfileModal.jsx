@@ -10,8 +10,8 @@ import {
 } from "../data/studentData";
 
 function StudentProfileModal({ isOpen, onClose }) {
-  if (!isOpen) return null;
   const navigate = useNavigate();
+  if (!isOpen) return null;
 
   const student = getStoredStudentData();
   const isConfigured = Boolean(student && student.isConfigured && student.name?.trim());

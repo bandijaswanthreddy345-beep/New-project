@@ -1,4 +1,5 @@
 const Notification = require("../models/Notification");
+const { safeFetch } = require("./safeFetch");
 
 // Official JNTUA Examinations API Endpoint
 const JNTUA_EXAMS_BASE_URL =
@@ -87,12 +88,16 @@ async function syncJntuaNotifications(force = false) {
   try {
     console.log("🔄 [JNTUA Sync] Checking official JNTUA for B.Tech examination updates...");
 
-    // Clean up non-B.Tech notices from database to keep notifications pure
-    const allDbNotifs = await Notification.find();
+    // Clean up non-B.Tech notices in one batch to avoid blocking the DB
+    const allDbNotifs = await Notification.find({}, "_id title description").lean();
+    const nonBTechIds = [];
     for (const notif of allDbNotifs) {
       if (!isBTechNotification(notif.title, notif.description)) {
-        await Notification.findByIdAndDelete(notif._id);
+        nonBTechIds.push(notif._id);
       }
+    }
+    if (nonBTechIds.length > 0) {
+      await Notification.deleteMany({ _id: { $in: nonBTechIds } });
     }
 
     let newlyAdded = 0;
@@ -101,26 +106,33 @@ async function syncJntuaNotifications(force = false) {
 
     for (let page = 1; page <= maxPages; page++) {
       const pageUrl = `${JNTUA_EXAMS_BASE_URL}&pagination[page]=${page}`;
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 12000);
-
-      const response = await fetch(pageUrl, {
-        signal: controller.signal,
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          Accept: "application/json",
-        },
-      });
-
-      clearTimeout(timeout);
-
-      if (!response.ok) {
-        console.warn(`[JNTUA Sync] Page ${page} returned HTTP ${response.status}`);
+      let response;
+      try {
+        response = await safeFetch(pageUrl, {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/json",
+          },
+        });
+      } catch (fetchErr) {
+        console.warn(`[JNTUA Sync] Page ${page} safeFetch error:`, fetchErr.message);
         continue;
       }
 
-      const json = await response.json();
+      if (!response || !response.ok) {
+        console.warn(`[JNTUA Sync] Page ${page} returned HTTP ${response?.status || "error"}`);
+        continue;
+      }
+
+      let json;
+      try {
+        json = await response.json();
+      } catch (parseErr) {
+        console.warn(`[JNTUA Sync] Page ${page} JSON parse error:`, parseErr.message);
+        continue;
+      }
+
       const items = Array.isArray(json?.data) ? json.data : [];
 
       for (const item of items) {
@@ -142,8 +154,8 @@ async function syncJntuaNotifications(force = false) {
           const publishedDate = attrs.Publish_Date
             ? new Date(attrs.Publish_Date)
             : attrs.createdAt
-            ? new Date(attrs.createdAt)
-            : new Date();
+              ? new Date(attrs.createdAt)
+              : new Date();
 
           const directLink = extractLinkFromBody(attrs.Body, title);
 

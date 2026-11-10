@@ -358,6 +358,9 @@ function Navbar() {
             src="/jntu-circle-logo.png"
             alt="JNTU Circle Logo"
             className="logo-image"
+            width="48"
+            height="48"
+            decoding="async"
           />
 
           <div className="logo-text">
@@ -382,7 +385,7 @@ function Navbar() {
               setShowMobileNotifPopup(false);
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
@@ -494,9 +497,9 @@ function Navbar() {
           {navigationLinks.map((item) => {
             if (item.name === "Notifications") {
               return (
-                <li 
-                  key={item.path} 
-                  className="nav-item-notif" 
+                <li
+                  key={item.path}
+                  className="nav-item-notif"
                   ref={notifContainerRef}
                   onMouseEnter={handleNotifMouseEnter}
                   onMouseLeave={handleNotifMouseLeave}
@@ -536,8 +539,8 @@ function Navbar() {
                       </span>
 
                       {hasNewAlert ? (
-                        <span 
-                          className="nav-notif-alert-badge" 
+                        <span
+                          className="nav-notif-alert-badge"
                           title={`${unreadCount} New Notification${unreadCount > 1 ? "s" : ""} Available`}
                         >
                           <span className="pulse-beacon-ring" />
@@ -551,9 +554,9 @@ function Navbar() {
 
                     {/* Small Black Glass Notification Strip Tooltip */}
                     {latestAlert && (
-                      <div 
-                        className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`} 
-                        role="tooltip" 
+                      <div
+                        className={`nav-notif-dropdown ${showDropdown ? "is-open" : ""}`}
+                        role="tooltip"
                         aria-label="Notification Preview"
                         onMouseEnter={handleNotifMouseEnter}
                         onMouseLeave={handleNotifMouseLeave}
@@ -647,7 +650,7 @@ function Navbar() {
                             <img src={photoSrc} alt={displayName} />
                           ) : (
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
                             </svg>
                           )}
                         </div>

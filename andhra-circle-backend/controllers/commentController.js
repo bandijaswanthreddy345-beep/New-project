@@ -1,4 +1,5 @@
 const Comment = require("../models/Comment");
+const recordAuditLog = require("../services/auditLogger");
 
 // ==========================================
 // CREATE COMMENT
@@ -207,6 +208,17 @@ req.params.id
 if (!comment) {
   return res.status(404).json({
     message: "Comment not found",
+  });
+}
+
+if (req.user) {
+  await recordAuditLog({
+    adminId: req.user._id,
+    action: "delete",
+    resourceType: "Comment",
+    resourceId: req.params.id,
+    route: req.originalUrl,
+    ip: req.ip,
   });
 }
 

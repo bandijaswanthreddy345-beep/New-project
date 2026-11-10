@@ -3,6 +3,8 @@ const router = express.Router();
 
 const upload = require("../config/multer");
 const auth = require("../middleware/auth");
+const validateObjectId = require("../middleware/validateObjectId");
+const { verifyMagicBytes } = require("../middleware/validateUpload");
 
 const {
   createNote,
@@ -32,7 +34,7 @@ router.get("/branch-stats", getBranchStats);
 // GET SINGLE NOTE
 // ==========================================
 
-router.get("/:id", getNoteById);
+router.get("/:id", validateObjectId("id"), getNoteById);
 
 // ==========================================
 // CREATE NOTE
@@ -77,6 +79,7 @@ router.post(
       maxCount: 1,
     },
   ]),
+  verifyMagicBytes,
   createNote
 );
 
@@ -87,6 +90,7 @@ router.post(
 router.put(
   "/:id",
   auth,
+  validateObjectId("id"),
   upload.fields([
     {
       name: "pdf",
@@ -123,6 +127,7 @@ router.put(
       maxCount: 1,
     },
   ]),
+  verifyMagicBytes,
   updateNote
 );
 
@@ -130,24 +135,24 @@ router.put(
 // DELETE NOTE
 // ==========================================
 
-router.delete("/:id", auth, deleteNote);
+router.delete("/:id", auth, validateObjectId("id"), deleteNote);
 
 // ==========================================
 // LIKE NOTE
 // ==========================================
 
-router.put("/:id/like", likeNote);
+router.put("/:id/like", validateObjectId("id"), likeNote);
 
 // ==========================================
 // INCREASE VIEWS
 // ==========================================
 
-router.put("/:id/view", increaseViews);
+router.put("/:id/view", validateObjectId("id"), increaseViews);
 
 // ==========================================
 // INCREASE DOWNLOADS
 // ==========================================
 
-router.put("/:id/download", increaseDownloads);
+router.put("/:id/download", validateObjectId("id"), increaseDownloads);
 
 module.exports = router;

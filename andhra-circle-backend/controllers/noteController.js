@@ -1,4 +1,5 @@
 const Note = require("../models/note");
+const recordAuditLog = require("../services/auditLogger");
 
 // ==========================================
 // CREATE NOTE
@@ -37,23 +38,20 @@ exports.createNote = async (req, res) => {
     }
 
     const note = await Note.create({
-      title: req.body.title || "",
-      branch: req.body.branch || "",
-      semester: req.body.semester || "",
-      subject: req.body.subject || "",
-      subjectCode: req.body.subjectCode || "",
-      description: req.body.description || "",
+      title: String(req.body.title || "").trim().slice(0, 300),
+      branch: String(req.body.branch || "").trim().slice(0, 100),
+      semester: String(req.body.semester || "").trim().slice(0, 50),
+      subject: String(req.body.subject || "").trim().slice(0, 200),
+      subjectCode: String(req.body.subjectCode || "").trim().slice(0, 50),
+      description: String(req.body.description || "").trim().slice(0, 5000),
 
-      // ==========================
-      // CREDITS
-      // ==========================
-      credits: req.body.credits || "",
+      credits: String(req.body.credits || "").trim().slice(0, 50),
 
-      module1: req.body.module1 || "",
-      module2: req.body.module2 || "",
-      module3: req.body.module3 || "",
-      module4: req.body.module4 || "",
-      module5: req.body.module5 || "",
+      module1: String(req.body.module1 || "").trim().slice(0, 300),
+      module2: String(req.body.module2 || "").trim().slice(0, 300),
+      module3: String(req.body.module3 || "").trim().slice(0, 300),
+      module4: String(req.body.module4 || "").trim().slice(0, 300),
+      module5: String(req.body.module5 || "").trim().slice(0, 300),
 
       module1Pdf: module1Pdf
         ? `/uploads/${module1Pdf.filename}`
@@ -88,8 +86,16 @@ exports.createNote = async (req, res) => {
       downloads: 0,
     });
 
-    console.log("NOTE CREATED:");
-    console.log(note);
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "create",
+        resourceType: "Note",
+        resourceId: note._id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -113,10 +119,54 @@ exports.getNotes = async (req, res) => {
     if (require("mongoose").connection.readyState !== 1) {
       return res.status(200).json([]);
     }
-    const notes = await Note.find().sort({
-      createdAt: -1,
-    });
 
+    const { branch, semester, search, page, limit } = req.query;
+    const filter = {};
+    if (branch && branch !== "ALL") filter.branch = branch;
+    if (semester && semester !== "ALL") filter.semester = semester;
+    if (search && search.trim()) {
+      const term = search.trim();
+      filter.$or = [
+        { title: { $regex: term, $options: "i" } },
+        { subject: { $regex: term, $options: "i" } },
+        { subjectCode: { $regex: term, $options: "i" } },
+      ];
+    }
+
+    // Exclude heavy module outline text from list view
+    const listFields =
+      "_id title branch semester subject subjectCode imageUrl pdfUrl views downloads likes createdAt";
+
+    let query = Note.find(filter)
+      .select(listFields)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=60, stale-while-revalidate=120"
+    );
+
+    if (limit) {
+      const parsedLimit = Math.min(
+        Math.max(parseInt(limit, 10) || 20, 1),
+        100
+      );
+      const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+      const total = await Note.countDocuments(filter);
+      const notes = await query
+        .skip((parsedPage - 1) * parsedLimit)
+        .limit(parsedLimit);
+
+      return res.status(200).json({
+        notes,
+        total,
+        page: parsedPage,
+        totalPages: Math.ceil(total / parsedLimit),
+      });
+    }
+
+    const notes = await query;
     res.status(200).json(notes);
   } catch (error) {
     console.warn("Get Notes Warning:", error.message);
@@ -155,23 +205,23 @@ exports.getNoteById = async (req, res) => {
 exports.updateNote = async (req, res) => {
   try {
     const updateData = {
-      title: req.body.title || "",
-      branch: req.body.branch || "",
-      semester: req.body.semester || "",
-      subject: req.body.subject || "",
-      subjectCode: req.body.subjectCode || "",
-      description: req.body.description || "",
+      title: String(req.body.title || "").trim().slice(0, 300),
+      branch: String(req.body.branch || "").trim().slice(0, 100),
+      semester: String(req.body.semester || "").trim().slice(0, 50),
+      subject: String(req.body.subject || "").trim().slice(0, 200),
+      subjectCode: String(req.body.subjectCode || "").trim().slice(0, 50),
+      description: String(req.body.description || "").trim().slice(0, 5000),
 
       // ==========================
       // CREDITS
       // ==========================
-      credits: req.body.credits || "",
+      credits: String(req.body.credits || "").trim().slice(0, 50),
 
-      module1: req.body.module1 || "",
-      module2: req.body.module2 || "",
-      module3: req.body.module3 || "",
-      module4: req.body.module4 || "",
-      module5: req.body.module5 || "",
+      module1: String(req.body.module1 || "").trim().slice(0, 300),
+      module2: String(req.body.module2 || "").trim().slice(0, 300),
+      module3: String(req.body.module3 || "").trim().slice(0, 300),
+      module4: String(req.body.module4 || "").trim().slice(0, 300),
+      module5: String(req.body.module5 || "").trim().slice(0, 300),
     };
 
     if (req.files?.pdf?.[0]) {
@@ -211,7 +261,7 @@ exports.updateNote = async (req, res) => {
 
     const note = await Note.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      { $set: updateData },
       {
         new: true,
         runValidators: true,
@@ -221,6 +271,17 @@ exports.updateNote = async (req, res) => {
     if (!note) {
       return res.status(404).json({
         message: "Note not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "update",
+        resourceType: "Note",
+        resourceId: note._id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -245,6 +306,17 @@ exports.deleteNote = async (req, res) => {
     if (!note) {
       return res.status(404).json({
         message: "Note not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "delete",
+        resourceType: "Note",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -423,4 +495,4 @@ exports.getBranchStats = async (req, res) => {
       totalLabs: 0,
     });
   }
-};
+};
