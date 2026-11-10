@@ -24,6 +24,8 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const fetchCaptcha = useCallback(async () => {
     try {
@@ -56,8 +58,9 @@ function Register() {
     if (error) setError("");
   };
 
-  const handleToggleTerms = () => {
-    setForm((prev) => ({ ...prev, agreeTerms: !prev.agreeTerms }));
+  const handleToggleTerms = (e) => {
+    const isChecked = e && typeof e.target?.checked === "boolean" ? e.target.checked : !form.agreeTerms;
+    setForm((prev) => ({ ...prev, agreeTerms: isChecked }));
     if (error) setError("");
   };
 
@@ -497,31 +500,41 @@ function Register() {
           </div>
 
           {/* Terms & Privacy Agreement */}
-          <div className="signup-terms-agreement" onClick={handleToggleTerms}>
-            <label className="login-remember-label">
+          <div className="signup-terms-agreement">
+            <label className="login-remember-label" htmlFor="register-agree-terms">
               <input
+                id="register-agree-terms"
                 type="checkbox"
+                name="agreeTerms"
                 className="login-remember-checkbox"
                 checked={form.agreeTerms}
                 onChange={handleToggleTerms}
               />
               <span className="signup-terms-copy">
                 I agree to the{" "}
-                <Link
-                  to="/terms"
-                  className="signup-terms-hyperlink"
-                  onClick={(e) => e.stopPropagation()}
+                <button
+                  type="button"
+                  className="signup-terms-hyperlink signup-terms-btn-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowTermsModal(true);
+                  }}
                 >
                   Terms of Service
-                </Link>{" "}
+                </button>{" "}
                 and{" "}
-                <Link
-                  to="/privacy"
-                  className="signup-terms-hyperlink"
-                  onClick={(e) => e.stopPropagation()}
+                <button
+                  type="button"
+                  className="signup-terms-hyperlink signup-terms-btn-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowPrivacyModal(true);
+                  }}
                 >
                   Privacy Policy
-                </Link>
+                </button>
               </span>
             </label>
           </div>
@@ -562,6 +575,88 @@ function Register() {
           <span>Official JNTU Academic Portal · Secure Access</span>
         </div>
       </div>
+
+      {/* Terms of Service Informational Modal */}
+      {showTermsModal && (
+        <div className="signup-info-modal-backdrop" onClick={() => setShowTermsModal(false)} role="dialog" aria-modal="true">
+          <div className="signup-info-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="signup-info-modal-header">
+              <h3>📜 Terms of Service</h3>
+              <button
+                type="button"
+                className="signup-info-modal-close"
+                onClick={() => setShowTermsModal(false)}
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="signup-info-modal-body">
+              <p><strong>Welcome to JNTU Circle.</strong> By using this academic portal, you agree to:</p>
+              <ul>
+                <li>Use notes, question papers, and study resources strictly for personal educational purposes.</li>
+                <li>Maintain academic honesty and refrain from deploying scrapers or malicious scripts.</li>
+                <li>Keep your account password and security details confidential.</li>
+                <li>Respect university regulations and portal community guidelines.</li>
+              </ul>
+            </div>
+            <div className="signup-info-modal-footer">
+              <button
+                type="button"
+                className="signup-info-modal-btn"
+                onClick={() => {
+                  setForm((prev) => ({ ...prev, agreeTerms: true }));
+                  setShowTermsModal(false);
+                  if (error) setError("");
+                }}
+              >
+                ✓ I Agree & Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Privacy Policy Informational Modal */}
+      {showPrivacyModal && (
+        <div className="signup-info-modal-backdrop" onClick={() => setShowPrivacyModal(false)} role="dialog" aria-modal="true">
+          <div className="signup-info-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="signup-info-modal-header">
+              <h3>🔒 Privacy Policy</h3>
+              <button
+                type="button"
+                className="signup-info-modal-close"
+                onClick={() => setShowPrivacyModal(false)}
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="signup-info-modal-body">
+              <p><strong>Your Privacy at JNTU Circle:</strong></p>
+              <ul>
+                <li>We only collect your name, email, and academic details to personalize your student record.</li>
+                <li>Passwords are cryptographically salted and hashed using bcrypt; plain text is never stored.</li>
+                <li>We do not sell, rent, or distribute student records to external advertisers or third parties.</li>
+                <li>All sessions and stored academic indicators (SGPA, attendance) remain private to your login.</li>
+              </ul>
+            </div>
+            <div className="signup-info-modal-footer">
+              <button
+                type="button"
+                className="signup-info-modal-btn"
+                onClick={() => {
+                  setForm((prev) => ({ ...prev, agreeTerms: true }));
+                  setShowPrivacyModal(false);
+                  if (error) setError("");
+                }}
+              >
+                ✓ Understood
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
