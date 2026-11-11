@@ -85,20 +85,22 @@
 }
 
 .sidebar-brand-text h2 {
+  font-family: 'Montserrat', sans-serif !important;
   color: #ffffff;
   font-size: 17px;
   font-weight: 800;
   margin: 0;
   line-height: 1.15;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.02em;
 }
 
 .sidebar-brand-text h2 .font-deltha {
-  font-family: 'Deltha', 'Deltha Font', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif !important;
   color: #ffefb3;
 }
 
 .sidebar-brand-text span {
+  font-family: 'Montserrat', sans-serif !important;
   font-size: 11px;
   color: #a8d5cf;
   font-weight: 600;
@@ -457,27 +459,38 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
+  width: 28px;
+  height: 28px;
+}
+
+.notes-search-metal-wrap .metal-search-wrapper {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
 }
 
 .notes-metal-search-btn {
-  width: 32px !important;
-  height: 32px !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
 }
 
 .notes-metal-search-btn .metal-search-icon {
-  width: 15px !important;
-  height: 15px !important;
+  width: 13.5px !important;
+  height: 13.5px !important;
 }
 
 .notes-search-input {
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 38px 10px 48px;
+  padding: 8px 36px 8px 42px;
   border-radius: 12px;
-  min-height: 44px;
+  min-height: 42px;
   border: 1px solid #d4e5df;
   background: #fffdf8;
-  font-size: 13.5px;
+  font-size: 13px;
   color: #012622;
   outline: none;
   box-shadow: 0 2px 6px rgba(1, 62, 55, 0.03);
