@@ -769,7 +769,14 @@ function Notes({ initialType }) {
               {/* Search Box with Reactive Search Button */}
               <div className="notes-search-box">
                 <div className="notes-search-metal-wrap">
-                  {isWeak ? (
+                  <MetalFx
+                    ref={searchMetalRef}
+                    preset="chromatic"
+                    variant="circle"
+                    strength={1}
+                    innerShadow
+                    className="metal-search-wrapper"
+                  >
                     <button
                       type="button"
                       className="metal-search-btn notes-metal-search-btn"
@@ -793,40 +800,7 @@ function Notes({ initialType }) {
                         <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
                       </svg>
                     </button>
-                  ) : (
-                    <MetalFx
-                      ref={searchMetalRef}
-                      preset="chromatic"
-                      variant="circle"
-                      strength={1}
-                      innerShadow
-                      className="metal-search-wrapper"
-                    >
-                      <button
-                        type="button"
-                        className="metal-search-btn notes-metal-search-btn"
-                        onClick={handleExecuteSearch}
-                        title={`Search ${currentConfig.label}`}
-                        aria-label="Search"
-                      >
-                        <svg
-                          width="15"
-                          height="15"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="metal-search-icon"
-                          aria-hidden="true"
-                        >
-                          <circle cx="11" cy="11" r="7" />
-                          <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
-                        </svg>
-                      </button>
-                    </MetalFx>
-                  )}
+                  </MetalFx>
                 </div>
                 <input
                   ref={searchInputRef}
@@ -987,7 +961,15 @@ function Notes({ initialType }) {
 
                       {/* Action Buttons: View */}
                       <div className="folder-card-actions">
-                        {isWeak ? (
+                        <MetalFx
+                          preset="gold"
+                          variant="button"
+                          theme="dark"
+                          strength={1}
+                          innerShadow
+                          normalizeHostStyles={false}
+                          className="folder-view-metal-wrap"
+                        >
                           <button
                             type="button"
                             className="folder-view-btn"
@@ -996,26 +978,7 @@ function Notes({ initialType }) {
                           >
                             View
                           </button>
-                        ) : (
-                          <MetalFx
-                            preset="gold"
-                            variant="button"
-                            theme="dark"
-                            strength={1}
-                            innerShadow
-                            normalizeHostStyles={false}
-                            className="folder-view-metal-wrap"
-                          >
-                            <button
-                              type="button"
-                              className="folder-view-btn"
-                              onClick={() => handleViewItem(item)}
-                              title={`View ${item.title}`}
-                            >
-                              View
-                            </button>
-                          </MetalFx>
-                        )}
+                        </MetalFx>
                       </div>
                     </article>
                   ))}
