@@ -154,7 +154,6 @@ exports.updatePaper = async (req, res) => {
       req.params.id,
       { $set: updateData },
       {
-      {
         returnDocument: "after",
         runValidators: true,
       }
