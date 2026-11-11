@@ -219,6 +219,10 @@ function Notes({ initialType }) {
   const studentAvatar = getStudentAvatarUrl(studentData?.profilePhoto);
 
   const searchInputRef = useRef(null);
+  const searchMetalRef = useRef(null);
+
+  // Hook for cursor-driven liquid metal bend interaction
+  useMetalBend(searchMetalRef);
 
   // Profile synchronization listener
   useEffect(() => {
