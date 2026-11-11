@@ -69,8 +69,8 @@
 }
 
 .sidebar-logo-img {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
   border-radius: 50%;
   border: 1.5px solid rgba(255, 239, 179, 0.35);
@@ -87,7 +87,7 @@
 .sidebar-brand-text h2 {
   font-family: 'Montserrat', sans-serif !important;
   color: #ffffff;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 800;
   margin: 0;
   line-height: 1.15;
@@ -97,14 +97,18 @@
 .sidebar-brand-text h2 .font-deltha {
   font-family: 'Montserrat', sans-serif !important;
   color: #ffefb3;
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.01em;
 }
 
 .sidebar-brand-text span {
   font-family: 'Montserrat', sans-serif !important;
-  font-size: 11px;
+  font-size: 11.5px;
   color: #a8d5cf;
   font-weight: 600;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
 }
 
 /* Navigation Links */
