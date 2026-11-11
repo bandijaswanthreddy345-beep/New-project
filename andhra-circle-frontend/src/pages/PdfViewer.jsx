@@ -28,7 +28,7 @@ function PdfViewer() {
   // Determine raw URL
   const rawPdfUrl = useMemo(() => {
     if (customUrl) return /^https?:\/\//i.test(customUrl) ? customUrl : "";
-    if (fileName) {
+    if (fileName && fileName !== "undefined" && fileName.trim() !== "") {
       if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
         return fileName;
       }

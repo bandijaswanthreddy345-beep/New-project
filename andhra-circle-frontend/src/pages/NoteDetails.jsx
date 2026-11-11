@@ -253,24 +253,30 @@ function NoteDetails() {
   // =========================================================
 
   const getEmbedPdfUrl = (value) => {
-    if (!value || typeof value !== "string") {
+    if (!value || typeof value !== "string" || !value.trim() || value.trim() === "/") {
       return "";
     }
 
+    const trimmed = value.trim();
+
     // Local uploads: use same-origin relative path so it is always same-origin
-    if (value.includes("/uploads/")) {
-      const uploadPath = value.substring(value.indexOf("/uploads/"));
+    if (trimmed.includes("/uploads/")) {
+      const uploadPath = trimmed.substring(trimmed.indexOf("/uploads/"));
       return `${uploadPath}#toolbar=1&navpanes=0&view=FitH`;
     }
 
     // External URLs (Google Drive, university portals, etc.): proxy through backend
-    if (value.startsWith("http://") || value.startsWith("https://")) {
-      if (!value.includes("localhost:5000")) {
-        return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(value)}#toolbar=1&navpanes=0&view=FitH`;
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      if (!trimmed.includes("localhost:5000")) {
+        return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(trimmed)}#toolbar=1&navpanes=0&view=FitH`;
       }
+      return `${trimmed}#toolbar=1&navpanes=0&view=FitH`;
     }
 
-    const fullUrl = getBackendUrl(value);
+    const fullUrl = getBackendUrl(trimmed);
+    if (!fullUrl || fullUrl === `${BACKEND_URL}/` || fullUrl === BACKEND_URL) {
+      return "";
+    }
     return `${fullUrl}#toolbar=1&navpanes=0&view=FitH`;
   };
 
@@ -1230,16 +1236,20 @@ function NoteDetails() {
 
                           </div>
 
-                          <div className="unit-pdf-frame-wrapper">
-
-                            <iframe
-                              src={getEmbedPdfUrl(unit.pdf)}
-                              title={`Unit ${unit.number} PDF`}
-                              className="unit-pdf-frame"
-                              loading="lazy"
-                            />
-
-                          </div>
+                          {getEmbedPdfUrl(unit.pdf) ? (
+                            <div className="unit-pdf-frame-wrapper">
+                              <iframe
+                                src={getEmbedPdfUrl(unit.pdf)}
+                                title={`Unit ${unit.number} PDF`}
+                                className="unit-pdf-frame"
+                                loading="lazy"
+                              />
+                            </div>
+                          ) : (
+                            <div className="unit-pdf-frame-wrapper" style={{ padding: "40px 20px", textAlign: "center", color: "#64748b", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+                              <p style={{ margin: 0, fontWeight: "500" }}>PDF document for this unit is currently being uploaded or updated.</p>
+                            </div>
+                          )}
 
                           <div className="pdf-preview-bottom-bar">
                             <div className="pdf-preview-hint">

@@ -24,11 +24,31 @@ function securityHeaders(req, res, next) {
     );
   }
 
-  // API responses get restrictive CSP without breaking static PDFs / images
-  if (req.path.startsWith("/api") || req.path === "/") {
+  // Allow frontend origins (Vite dev server, localhost, and deployed domains)
+  // to embed PDFs, preview frames, and proxy documents in iframes.
+  const allowedFrameAncestors = [
+    "'self'",
+    "http://localhost:*",
+    "http://127.0.0.1:*",
+    "https://*.andhracircle.in",
+    "https://*.vercel.app",
+    "*"
+  ].join(" ");
+
+  // Dedicated endpoints for PDF streaming and uploads need permissive frame-ancestors
+  if (req.path === "/api/notifications/proxy-pdf" || req.path.startsWith("/uploads")) {
+    res.setHeader("Content-Security-Policy", "frame-ancestors *");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  } else if (req.path.startsWith("/api")) {
     res.setHeader(
       "Content-Security-Policy",
-      "default-src 'none'; frame-ancestors 'none'"
+      `default-src 'none'; frame-ancestors ${allowedFrameAncestors}`
+    );
+  } else if (req.path === "/") {
+    res.setHeader(
+      "Content-Security-Policy",
+      `frame-ancestors ${allowedFrameAncestors}`
     );
   }
 
