@@ -429,6 +429,9 @@ function LatestNotes({ search = "" }) {
                   }}
                 />
                 <div className="resource-image-overlay" />
+                <span className="read-time">
+                  Notes
+                </span>
               </div>
 
               {/* ==========================================

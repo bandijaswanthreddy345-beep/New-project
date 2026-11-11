@@ -5572,6 +5572,7 @@ textarea:focus-visible {
    Keep this section at the VERY END of index.css
    ========================================================= */
 
+.notes-section,
 .papers-section,
 .lab-programs-section,
 .notification-section {
@@ -5581,6 +5582,7 @@ textarea:focus-visible {
   box-sizing: border-box;
 }
 
+.notes-section .section-heading,
 .papers-section .section-heading,
 .lab-programs-section .section-heading,
 .notification-section .section-heading {
@@ -5591,6 +5593,7 @@ textarea:focus-visible {
   text-align: center;
 }
 
+.notes-section .section-heading .section-tag,
 .papers-section .section-heading .section-tag,
 .lab-programs-section .section-heading .section-tag,
 .notification-section .section-heading .section-tag {
@@ -5611,6 +5614,7 @@ textarea:focus-visible {
   text-transform: uppercase;
 }
 
+.notes-section .section-heading h2,
 .papers-section .section-heading h2,
 .lab-programs-section .section-heading h2,
 .notification-section .section-heading h2 {
@@ -5622,6 +5626,7 @@ textarea:focus-visible {
   letter-spacing: -0.5px;
 }
 
+.notes-section .section-heading h2::after,
 .papers-section .section-heading h2::after,
 .lab-programs-section .section-heading h2::after,
 .notification-section .section-heading h2::after {
