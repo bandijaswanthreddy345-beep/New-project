@@ -15,6 +15,24 @@ function securityHeaders(req, res, next) {
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=(), payment=()"
   );
+
+  // Strict-Transport-Security in production only (at least 15552000s = 180 days)
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=15552000; includeSubDomains"
+    );
+  }
+
+  // API responses get restrictive CSP without breaking static PDFs / images or iframe previews
+  if (req.path.startsWith("/api") || req.path === "/") {
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    res.setHeader(
+      "Content-Security-Policy",
+      `default-src 'none'; frame-ancestors 'self' http://localhost:5173 http://localhost:3000 ${frontendUrl}`
+    );
+  }
+
   next();
 }
 

@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useMemo } from "react";
+import { BACKEND_URL } from "../api/api";
 import "./PdfViewer.css";
 
 function PdfViewer() {
@@ -10,7 +11,6 @@ function PdfViewer() {
   const [downloading, setDownloading] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
   const customUrl = searchParams.get("url");
   const customTitle = searchParams.get("title");
   const source = searchParams.get("source");
@@ -41,8 +41,13 @@ function PdfViewer() {
   const embedUrl = useMemo(() => {
     if (!rawPdfUrl) return "";
 
+    // For local backend /uploads/, link directly without wrapping in external proxy-pdf
+    if (rawPdfUrl.includes("/uploads/")) {
+      return rawPdfUrl;
+    }
+
     // Direct proxy streaming gives 100% full-screen Chrome PDF reader with zero letterboxing
-    if (rawPdfUrl.startsWith("http") && !rawPdfUrl.includes(":5000/api")) {
+    if (rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/")) {
       return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`;
     }
 
@@ -95,7 +100,7 @@ function PdfViewer() {
 
       // 1. Try direct fetch blob download
       try {
-        const streamUrl = rawPdfUrl.startsWith("http") && !rawPdfUrl.includes(":5000/api")
+        const streamUrl = rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/")
           ? `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`
           : rawPdfUrl;
 
