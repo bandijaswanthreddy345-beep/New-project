@@ -1,0 +1,11 @@
+/* Universal Clickjacking and Frame Protection Headers */
+/* Netlify & Cloudflare _headers format */
+/* Placed in frontend dist root to safeguard deployed client */
+
+/*
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none';
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+*/
+

@@ -50,7 +50,7 @@ exports.registerUser = async (req, res) => {
     const captchaAnswer = asString(req.body?.captchaAnswer);
 
     // Verify security CAPTCHA
-    const captchaCheck = verifyCaptcha(captchaToken, captchaAnswer);
+    const captchaCheck = await verifyCaptcha(captchaToken, captchaAnswer);
     if (!captchaCheck.ok) {
       return res.status(400).json({
         message: captchaCheck.message,
@@ -78,7 +78,7 @@ exports.registerUser = async (req, res) => {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({
+      return res.status(409).json({
         message: "User already exists",
       });
     }
@@ -104,6 +104,12 @@ exports.registerUser = async (req, res) => {
       },
     });
   } catch (error) {
+    if (error && error.code === 11000) {
+      return res.status(409).json({
+        message: "User already exists",
+      });
+    }
+
     console.error("Register Error:", error);
 
     res.status(500).json({
@@ -134,7 +140,7 @@ exports.loginUser = async (req, res) => {
       });
 
     // Determine if CAPTCHA challenge is currently required for this client or email
-    const captchaRequired = isCaptchaRequired(clientIp, email);
+    const captchaRequired = await isCaptchaRequired(clientIp, email);
 
     if (captchaRequired) {
       // Must submit both captcha token and answer
@@ -143,7 +149,7 @@ exports.loginUser = async (req, res) => {
       }
 
       // Verify CAPTCHA
-      const captchaCheck = verifyCaptcha(captchaToken, captchaAnswer);
+      const captchaCheck = await verifyCaptcha(captchaToken, captchaAnswer);
       if (!captchaCheck.ok) {
         return res.status(400).json({
           message: captchaCheck.message,
@@ -153,26 +159,29 @@ exports.loginUser = async (req, res) => {
     }
 
     if (!email || !password) {
-      const nowRequired = recordFailedAttempt(clientIp, email);
+      await recordFailedAttempt(clientIp, email);
+      const nowRequired = await isCaptchaRequired(clientIp, email);
       return invalid(nowRequired);
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      const nowRequired = recordFailedAttempt(clientIp, email);
+      await recordFailedAttempt(clientIp, email);
+      const nowRequired = await isCaptchaRequired(clientIp, email);
       return invalid(nowRequired);
     }
 
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
-      const nowRequired = recordFailedAttempt(clientIp, email);
+      await recordFailedAttempt(clientIp, email);
+      const nowRequired = await isCaptchaRequired(clientIp, email);
       return invalid(nowRequired);
     }
 
     // Login successful: reset failed attempt counters for this client and email
-    clearFailedAttempts(clientIp, email);
+    await clearFailedAttempts(clientIp, email);
 
     // Generate JWT Token with Role, passwordChangedAt and tokenVersion
     const tokenPayload = {

@@ -213,25 +213,29 @@ exports.likeLabProgram = async (req, res) => {
     const { action } = req.body || {};
     const change = action === "unlike" ? -1 : 1;
 
-    const existing = await LabProgram.findById(req.params.id);
+    let labProgram;
+    if (change < 0) {
+      labProgram = await LabProgram.findOneAndUpdate(
+        { _id: req.params.id, likes: { $gt: 0 } },
+        { $inc: { likes: change } },
+        { new: true }
+      );
+      if (!labProgram) {
+        labProgram = await LabProgram.findById(req.params.id);
+      }
+    } else {
+      labProgram = await LabProgram.findByIdAndUpdate(
+        req.params.id,
+        { $inc: { likes: change } },
+        { new: true }
+      );
+    }
 
-    if (!existing) {
+    if (!labProgram) {
       return res.status(404).json({
         message: "Lab program not found",
       });
     }
-
-    const currentLikes =
-      typeof existing.likes === "number" && !isNaN(existing.likes)
-        ? existing.likes
-        : 0;
-    const targetLikes = Math.max(0, currentLikes + change);
-
-    const labProgram = await LabProgram.findByIdAndUpdate(
-      req.params.id,
-      { $set: { likes: targetLikes } },
-      { new: true }
-    );
 
     res.status(200).json(labProgram);
   } catch (error) {

@@ -64,6 +64,17 @@ const notificationSchema = new mongoose.Schema(
   }
 );
 
+notificationSchema.plugin(require("./plugins/softDelete"));
+
+notificationSchema.index(
+  {
+    category: 1,
+    deletedAt: 1,
+    publishedDate: -1,
+  },
+  { name: "NotificationCategoryDeletedDateIndex" }
+);
+
 notificationSchema.index(
   {
     title: "text",

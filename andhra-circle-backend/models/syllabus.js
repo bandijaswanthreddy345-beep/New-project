@@ -62,6 +62,18 @@ const syllabusSchema = new mongoose.Schema(
   }
 );
 
+syllabusSchema.plugin(require("./plugins/softDelete"));
+
+syllabusSchema.index(
+  {
+    branch: 1,
+    semester: 1,
+    deletedAt: 1,
+    createdAt: -1,
+  },
+  { name: "SyllabusBranchSemesterDeletedCreatedIndex" }
+);
+
 syllabusSchema.index(
   {
     title: "text",

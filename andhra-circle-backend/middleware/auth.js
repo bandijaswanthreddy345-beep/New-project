@@ -15,8 +15,21 @@ const auth = async (req, res, next) => {
     // Extract token
     const token = authHeader.split(" ")[1];
 
-    // Verify JWT
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Dual-secret verification for zero-downtime secret rotation
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (primaryErr) {
+      if (process.env.JWT_SECRET_PREVIOUS) {
+        try {
+          decoded = jwt.verify(token, process.env.JWT_SECRET_PREVIOUS);
+        } catch {
+          throw primaryErr;
+        }
+      } else {
+        throw primaryErr;
+      }
+    }
 
     // Find user in database
     const user = await User.findById(decoded.id).select(

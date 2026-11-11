@@ -10,6 +10,13 @@ const {
 
 const auth = require("../middleware/auth");
 const validateObjectId = require("../middleware/validateObjectId");
+const { exportUserData, deleteUserAccount } = require("../controllers/privacyController");
+
+// ==========================================
+// DPDP PRIVACY & DATA RIGHTS (USER SELF-SERVICE)
+// ==========================================
+router.get("/me/export", auth, exportUserData);
+router.delete("/me", auth, deleteUserAccount);
 
 // ==========================================
 // GET ALL USERS

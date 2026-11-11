@@ -234,25 +234,29 @@ exports.likePaper = async (req, res) => {
     const { action } = req.body || {};
     const change = action === "unlike" ? -1 : 1;
 
-    const existing = await Paper.findById(req.params.id);
+    let paper;
+    if (change < 0) {
+      paper = await Paper.findOneAndUpdate(
+        { _id: req.params.id, likes: { $gt: 0 } },
+        { $inc: { likes: change } },
+        { new: true }
+      );
+      if (!paper) {
+        paper = await Paper.findById(req.params.id);
+      }
+    } else {
+      paper = await Paper.findByIdAndUpdate(
+        req.params.id,
+        { $inc: { likes: change } },
+        { new: true }
+      );
+    }
 
-    if (!existing) {
+    if (!paper) {
       return res.status(404).json({
         message: "Paper not found",
       });
     }
-
-    const currentLikes =
-      typeof existing.likes === "number" && !isNaN(existing.likes)
-        ? existing.likes
-        : 0;
-    const targetLikes = Math.max(0, currentLikes + change);
-
-    const paper = await Paper.findByIdAndUpdate(
-      req.params.id,
-      { $set: { likes: targetLikes } },
-      { new: true }
-    );
 
     res.status(200).json(paper);
   } catch (error) {

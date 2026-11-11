@@ -1,0 +1,50 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: andhra_circle
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./andhra-circle-backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongodb:27017/andhra_circle
+      JWT_SECRET: please_change_this_to_a_random_32_char_secret_for_docker
+      CAPTCHA_SECRET: please_change_this_to_a_random_32_char_secret_for_docker
+      CORS_ORIGINS: http://localhost:8080,http://localhost:5173
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - backend-uploads:/usr/src/app/uploads
+
+  frontend:
+    build:
+      context: ./andhra-circle-frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
+  backend-uploads:
+

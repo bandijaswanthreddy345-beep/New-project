@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: JNTU Circle API
+  version: 2.0.0
+  description: >
+    Production backend REST API for JNTU Circle serving syllabus, notes, past papers,
+    official examination circulars, and RAG-powered student AI assistant.
+servers:
+  - url: https://jntucircle.com/api/v1
+    description: Production API
+  - url: http://localhost:5000/api/v1
+    description: Local Development Server
+
+paths:
+  /healthz:
+    get:
+      summary: Process Liveness Check
+      responses:
+        "200":
+          description: Process is running and healthy
+
+  /readyz:
+    get:
+      summary: Database Readiness Check
+      responses:
+        "200":
+          description: MongoDB connection is established
+        "503":
+          description: MongoDB connection unavailable
+
+  /auth/register:
+    post:
+      summary: Student/User Registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, captchaToken, captchaAnswer]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                captchaToken: { type: string }
+                captchaAnswer: { type: string }
+      responses:
+        "201":
+          description: User registered successfully
+        "400":
+          description: Invalid input or captcha failure
+        "409":
+          description: User with this email already exists
+
+  /auth/login:
+    post:
+      summary: User / Admin Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          description: Authenticated successfully returning JWT
+        "401":
+          description: Invalid credentials
+
+  /notes:
+    get:
+      summary: List filtered notes
+      parameters:
+        - name: branch
+          in: query
+          schema: { type: string }
+        - name: semester
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Array of notes (soft-deleted items excluded)
+    post:
+      summary: Create new note (Admin only)
+      responses:
+        "201":
+          description: Note created
+
+  /notes/{id}/restore:
+    patch:
+      summary: Restore soft-deleted note (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Note restored successfully
+
+  /notes/{id}/purge:
+    delete:
+      summary: Permanently purge note (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Note permanently purged
+
+  /chat:
+    post:
+      summary: Student RAG AI Query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string }
+                history: { type: array, items: { type: object } }
+      responses:
+        "200":
+          description: AI response with grounded portal context and verified sources
+        "503":
+          description: Daily quota reached
+

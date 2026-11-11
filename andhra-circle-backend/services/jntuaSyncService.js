@@ -1,5 +1,6 @@
 const Notification = require("../models/Notification");
-const { safeFetch } = require("./safeFetch");
+const { resilientFetch } = require("../utils/resilientFetch");
+const logger = require("../utils/logger");
 
 // Official JNTUA Examinations API Endpoint
 const JNTUA_EXAMS_BASE_URL =
@@ -108,15 +109,15 @@ async function syncJntuaNotifications(force = false) {
       const pageUrl = `${JNTUA_EXAMS_BASE_URL}&pagination[page]=${page}`;
       let response;
       try {
-        response = await safeFetch(pageUrl, {
+        response = await resilientFetch(pageUrl, {
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             Accept: "application/json",
           },
-        });
+        }, { breakerName: "jntua-api", timeoutMs: 10000 });
       } catch (fetchErr) {
-        console.warn(`[JNTUA Sync] Page ${page} safeFetch error:`, fetchErr.message);
+        logger.warn(`[JNTUA Sync] Page ${page} resilientFetch error: ${fetchErr.message}`);
         continue;
       }
 
@@ -199,12 +200,12 @@ async function syncJntuaNotifications(force = false) {
     }
 
     if (newlyAdded > 0) {
-      console.log(
-        `✅ [JNTUA Sync] Successfully imported ${newlyAdded} new official B.Tech notification(s)!`
+      logger.info(
+        `[JNTUA Sync] Successfully imported ${newlyAdded} new official B.Tech notification(s)!`
       );
     } else {
-      console.log(
-        "✨ [JNTUA Sync] Database is up to date with official B.Tech notifications."
+      logger.info(
+        "[JNTUA Sync] Database is up to date with official B.Tech notifications."
       );
     }
 
@@ -216,35 +217,47 @@ async function syncJntuaNotifications(force = false) {
       error.code === "ENOTFOUND" ||
       error.code === "ETIMEDOUT"
     ) {
-      console.warn(
-        "ℹ️ [JNTUA Sync Notice]: Official JNTUA portal temporarily unreachable (network blip). Will retry automatically."
+      logger.warn(
+        `[JNTUA Sync Notice]: Official JNTUA portal temporarily unreachable (${error.message}). Will retry automatically.`
       );
     } else {
-      console.error("⚠️ [JNTUA Sync Error]:", error.message);
+      logger.error("[JNTUA Sync Error]", { error: error.message });
     }
     return { synced: 0, error: error.message };
   }
 }
 
+let syncTimeoutId = null;
+let syncIntervalId = null;
+
 /**
  * Background auto-sync scheduler: runs on startup and every 10 minutes
  */
 function startJntuaAutoSync() {
-  setTimeout(() => {
+  syncTimeoutId = setTimeout(() => {
     syncJntuaNotifications(true).catch((err) =>
-      console.error("Initial JNTUA B.Tech sync error:", err)
+      logger.error("Initial JNTUA B.Tech sync error", { error: err.message })
     );
   }, 2000);
 
-  setInterval(() => {
+  syncIntervalId = setInterval(() => {
     syncJntuaNotifications().catch((err) =>
-      console.error("Periodic JNTUA B.Tech sync error:", err)
+      logger.error("Periodic JNTUA B.Tech sync error", { error: err.message })
     );
   }, 10 * 60 * 1000);
+}
+
+function stopJntuaAutoSync() {
+  if (syncTimeoutId) clearTimeout(syncTimeoutId);
+  if (syncIntervalId) clearInterval(syncIntervalId);
+  syncTimeoutId = null;
+  syncIntervalId = null;
+  logger.info("[JNTUA Sync] Background auto-sync scheduler stopped.");
 }
 
 module.exports = {
   syncJntuaNotifications,
   startJntuaAutoSync,
+  stopJntuaAutoSync,
   isBTechNotification,
 };

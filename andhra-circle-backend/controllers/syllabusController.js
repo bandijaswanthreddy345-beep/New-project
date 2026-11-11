@@ -201,25 +201,29 @@ exports.likeSyllabus = async (req, res) => {
     const { action } = req.body || {};
     const change = action === "unlike" ? -1 : 1;
 
-    const existing = await Syllabus.findById(req.params.id);
+    let syllabus;
+    if (change < 0) {
+      syllabus = await Syllabus.findOneAndUpdate(
+        { _id: req.params.id, likes: { $gt: 0 } },
+        { $inc: { likes: change } },
+        { new: true }
+      );
+      if (!syllabus) {
+        syllabus = await Syllabus.findById(req.params.id);
+      }
+    } else {
+      syllabus = await Syllabus.findByIdAndUpdate(
+        req.params.id,
+        { $inc: { likes: change } },
+        { new: true }
+      );
+    }
 
-    if (!existing) {
+    if (!syllabus) {
       return res.status(404).json({
         message: "Syllabus not found",
       });
     }
-
-    const currentLikes =
-      typeof existing.likes === "number" && !isNaN(existing.likes)
-        ? existing.likes
-        : 0;
-    const targetLikes = Math.max(0, currentLikes + change);
-
-    const syllabus = await Syllabus.findByIdAndUpdate(
-      req.params.id,
-      { $set: { likes: targetLikes } },
-      { new: true }
-    );
 
     res.status(200).json(syllabus);
   } catch (error) {

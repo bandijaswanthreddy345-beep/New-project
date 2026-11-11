@@ -5,6 +5,7 @@ const upload = require("../config/multer");
 const auth = require("../middleware/auth");
 const validateObjectId = require("../middleware/validateObjectId");
 const { verifyMagicBytes } = require("../middleware/validateUpload");
+const idempotency = require("../middleware/idempotency");
 
 const {
   createPaper,
@@ -33,6 +34,7 @@ router.get("/:id", validateObjectId("id"), getPaperById);
 router.post(
   "/",
   auth,
+  idempotency(),
   upload.single("file"),
   verifyMagicBytes,
   createPaper

@@ -5,7 +5,9 @@ const CHAR_SET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 const CAPTCHA_LENGTH = 6;
 const CAPTCHA_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-// In-memory replay prevention (nonces)
+const SecurityState = require("../models/SecurityState");
+
+// In-memory replay prevention (nonces) fallback
 const usedNonces = new Set();
 
 // Development ephemeral secret generated at startup if CAPTCHA_SECRET is absent
@@ -170,7 +172,7 @@ function createCaptcha() {
 /**
  * Verifies user input against the AES-256-GCM encrypted CAPTCHA token
  */
-function verifyCaptcha(captchaToken, userInput) {
+async function verifyCaptcha(captchaToken, userInput) {
   if (typeof captchaToken !== "string" || !captchaToken.trim()) {
     return { ok: false, message: "Security CAPTCHA verification token is missing." };
   }
@@ -210,8 +212,20 @@ function verifyCaptcha(captchaToken, userInput) {
       return { ok: false, message: "Security CAPTCHA code has expired. Please refresh for a new code." };
     }
 
-    if (usedNonces.has(payload.nonce)) {
-      return { ok: false, message: "Security CAPTCHA code has already been used. Please refresh." };
+    // Check persistent replay prevention
+    try {
+      const existing = await SecurityState.findOne({
+        key: `nonce:${payload.nonce}`,
+        type: "captcha_nonce",
+        expiresAt: { $gt: new Date() },
+      });
+      if (existing || usedNonces.has(payload.nonce)) {
+        return { ok: false, message: "Security CAPTCHA code has already been used. Please refresh." };
+      }
+    } catch (e) {
+      if (usedNonces.has(payload.nonce)) {
+        return { ok: false, message: "Security CAPTCHA code has already been used. Please refresh." };
+      }
     }
 
     const normalizedInput = userInput.trim().toLowerCase().replace(/[\s-_]+/g, "");
@@ -223,7 +237,20 @@ function verifyCaptcha(captchaToken, userInput) {
       return { ok: false, message: "Incorrect security CAPTCHA code. Please check the image and try again." };
     }
 
-    // Invalidate nonce to prevent replay attacks
+    // Invalidate nonce to prevent replay attacks (atomic MongoDB insert with TTL)
+    try {
+      await SecurityState.create({
+        key: `nonce:${payload.nonce}`,
+        type: "captcha_nonce",
+        expiresAt: new Date(Date.now() + CAPTCHA_TTL_MS + 60000),
+      });
+    } catch (e) {
+      // Memory fallback if DB unavailable or duplicate key race
+      if (e.code === 11000) {
+        return { ok: false, message: "Security CAPTCHA code has already been used. Please refresh." };
+      }
+    }
+
     usedNonces.add(payload.nonce);
     setTimeout(() => {
       usedNonces.delete(payload.nonce);

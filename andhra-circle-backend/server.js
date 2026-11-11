@@ -3,8 +3,12 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const compression = require("compression");
+const mongoose = require("mongoose");
 
 const connectDB = require("./config/db");
+const logger = require("./utils/logger");
+const requestId = require("./middleware/requestId");
+const { initErrorTracker, captureException } = require("./utils/errorTracker");
 
 const securityHeaders = require("./middleware/securityHeaders");
 const { rateLimit } = require("./middleware/rateLimit");
@@ -40,11 +44,11 @@ if (weakSecret) {
     "JWT_SECRET is missing or weak. Set a random value of at least 32 characters in .env";
 
   if (process.env.NODE_ENV === "production") {
-    console.error("FATAL: " + message);
+    logger.error("FATAL: " + message);
     process.exit(1);
   }
 
-  console.warn("WARNING: " + message);
+  logger.warn("WARNING: " + message);
 }
 
 // ==========================
@@ -58,6 +62,60 @@ connectDB();
 // ==========================
 
 const app = express();
+
+// Initialize optional error tracking
+initErrorTracker(app);
+
+// Request ID and structured request duration logging (first middleware)
+app.use(requestId);
+
+// ==========================
+// HEALTH ENDPOINTS (/healthz & /readyz)
+// ==========================
+
+// Process alive check (cheap, public, no sensitive data)
+app.get("/healthz", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// MongoDB readiness check with short 2s timeout
+app.get("/readyz", async (req, res) => {
+  const isConnected = mongoose.connection.readyState === 1;
+
+  if (!isConnected) {
+    return res.status(503).json({
+      status: "unavailable",
+      message: "Database connection not ready",
+      readyState: mongoose.connection.readyState,
+    });
+  }
+
+  // Ping database with 2-second timeout
+  try {
+    const adminDb = mongoose.connection.db.admin();
+    const pingPromise = adminDb.ping();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Database ping timed out")), 2000)
+    );
+
+    await Promise.race([pingPromise, timeoutPromise]);
+
+    return res.status(200).json({
+      status: "ready",
+      database: "connected",
+    });
+  } catch (err) {
+    logger.warn("Readiness check ping failed", { error: err.message });
+    return res.status(503).json({
+      status: "unavailable",
+      message: "Database ping failed",
+    });
+  }
+});
 
 // ==========================
 // MIDDLEWARE
@@ -107,7 +165,7 @@ const allowedOrigins = (process.env.CORS_ORIGINS || "")
   .filter(Boolean);
 
 if (process.env.NODE_ENV === "production" && allowedOrigins.length === 0) {
-  console.error(
+  logger.error(
     "FATAL: CORS_ORIGINS is missing or empty. Set your domain(s) in .env in production."
   );
   process.exit(1);
@@ -187,132 +245,28 @@ app.get("/", (req, res) => {
 });
 
 // ==========================
-// API ROUTES
+// API ROUTES (v1 & Backward-Compatible /api)
 // ==========================
 
-// ==========================
-// AUTHENTICATION
-// ==========================
+const apiRouter = express.Router();
 
-app.use(
-  "/api/auth",
-  require("./routes/authRoutes")
-);
+apiRouter.use("/auth", require("./routes/authRoutes"));
+apiRouter.use("/upload", require("./routes/uploadRoutes"));
+apiRouter.use("/notes", require("./routes/noteRoutes"));
+apiRouter.use("/papers", require("./routes/paperRoutes"));
+apiRouter.use("/notifications", require("./routes/notificationRoutes"));
+apiRouter.use("/syllabus", require("./routes/syllabusRoutes"));
+apiRouter.use("/lab-programs", require("./routes/labProgramRoutes"));
+apiRouter.use("/comments", commentRoutes);
+apiRouter.use("/user-materials", require("./routes/userMaterialRoutes"));
+apiRouter.use("/chat", require("./routes/chatRoutes"));
+apiRouter.use("/dashboard", auth, dashboardRoutes);
+apiRouter.use("/users", auth, userRoutes);
+apiRouter.use("/audit-logs", auth, auditRoutes);
 
-// ==========================
-// FILE UPLOAD
-// ==========================
-
-app.use(
-  "/api/upload",
-  require("./routes/uploadRoutes")
-);
-
-// ==========================
-// NOTES
-// ==========================
-
-app.use(
-  "/api/notes",
-  require("./routes/noteRoutes")
-);
-
-// ==========================
-// QUESTION PAPERS
-// ==========================
-
-app.use(
-  "/api/papers",
-  require("./routes/paperRoutes")
-);
-
-// ==========================
-// NOTIFICATIONS
-// ==========================
-
-app.use(
-  "/api/notifications",
-  require("./routes/notificationRoutes")
-);
-
-// ==========================
-// SYLLABUS
-// ==========================
-
-app.use(
-  "/api/syllabus",
-  require("./routes/syllabusRoutes")
-);
-
-// ==========================
-// LAB PROGRAMS
-// ==========================
-
-app.use(
-  "/api/lab-programs",
-  require("./routes/labProgramRoutes")
-);
-
-// ==========================
-// COMMENTS
-// ==========================
-
-app.use(
-  "/api/comments",
-  commentRoutes
-);
-
-// ==========================
-// USER POSTED MATERIALS
-// ==========================
-
-app.use(
-  "/api/user-materials",
-  require("./routes/userMaterialRoutes")
-);
-
-// ==========================
-// AI CHAT (Gemini)
-// ==========================
-
-app.use(
-  "/api/chat",
-  require("./routes/chatRoutes")
-);
-
-// ==========================
-// ADMIN ONLY ROUTES
-// ==========================
-
-// ==========================
-// DASHBOARD
-// ==========================
-
-app.use(
-  "/api/dashboard",
-  auth,
-  dashboardRoutes
-);
-
-// ==========================
-// MANAGE USERS
-// ==========================
-
-app.use(
-  "/api/users",
-  auth,
-  userRoutes
-);
-
-// ==========================
-// AUDIT LOGS (ADMIN ONLY)
-// ==========================
-
-app.use(
-  "/api/audit-logs",
-  auth,
-  auditRoutes
-);
+// Mount under both /api/v1 (recommended) and /api (legacy alias)
+app.use("/api/v1", apiRouter);
+app.use("/api", apiRouter);
 
 // ==========================
 // 404 HANDLER
@@ -330,7 +284,14 @@ app.use((req, res) => {
 // ==========================
 
 app.use((err, req, res, next) => {
-  console.error("SERVER ERROR:", err);
+  logger.error("SERVER ERROR", {
+    requestId: req.id,
+    route: req.originalUrl,
+    error: err.message,
+    stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+  });
+
+  captureException(err, { requestId: req.id, route: req.originalUrl });
 
   // Mongoose CastError (invalid ObjectId) returns clean 400
   if (err.name === "CastError" || err.kind === "ObjectId") {
@@ -355,19 +316,70 @@ app.use((err, req, res, next) => {
 });
 
 // ==========================
-// SERVER
+// SERVER WITH TIMEOUTS & GRACEFUL SHUTDOWN
 // ==========================
 
 const PORT = process.env.PORT || 5000;
+const { startJntuaAutoSync, stopJntuaAutoSync } = require("./services/jntuaSyncService");
 
-app.listen(PORT, () => {
-  console.log("=================================");
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌐 http://localhost:${PORT}`);
-  console.log("=================================");
+const server = app.listen(PORT, () => {
+  logger.info("Server started", {
+    port: PORT,
+    url: `http://localhost:${PORT}`,
+    env: process.env.NODE_ENV || "development",
+  });
 
   // Start background auto-sync for official JNTUA examination updates
-  const { startJntuaAutoSync } = require("./services/jntuaSyncService");
   startJntuaAutoSync();
 });
+
+// Enforce HTTP server timeouts to protect against slowloris & stalled sockets
+server.headersTimeout = 65000;    // Max 65s for headers (higher than keepAlive)
+server.requestTimeout = 60000;    // Max 60s for entire request
+server.keepAliveTimeout = 61000;  // 61s keep-alive
+
+// Graceful shutdown handler
+let isShuttingDown = false;
+
+function gracefulShutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  logger.warn(`Received ${signal}. Initiating graceful shutdown...`);
+
+  // Stop background sync intervals
+  try {
+    stopJntuaAutoSync();
+  } catch (err) {
+    logger.warn("Error stopping background sync", { error: err.message });
+  }
+
+  // Force shutdown timer (10 seconds max)
+  const forceExitTimer = setTimeout(() => {
+    logger.error("Graceful shutdown timed out after 10s. Forcing exit.");
+    process.exit(1);
+  }, 10000);
+  forceExitTimer.unref();
+
+  // Stop accepting new connections and finish in-flight requests
+  server.close(async () => {
+    logger.info("HTTP server closed. In-flight requests drained.");
+
+    try {
+      if (mongoose.connection.readyState !== 0) {
+        await mongoose.connection.close(false);
+        logger.info("Mongoose connection cleanly closed.");
+      }
+    } catch (dbErr) {
+      logger.error("Error closing Mongoose connection", { error: dbErr.message });
+    }
+
+    clearTimeout(forceExitTimer);
+    logger.info("Graceful shutdown completed successfully. Exiting.");
+    process.exit(0);
+  });
+}
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 

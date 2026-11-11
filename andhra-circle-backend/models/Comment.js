@@ -44,6 +44,8 @@ timestamps: true,
 }
 );
 
+commentSchema.plugin(require("./plugins/softDelete"));
+
 module.exports = mongoose.model(
 "Comment",
 commentSchema

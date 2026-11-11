@@ -5,6 +5,7 @@ const upload = require("../config/multer");
 const auth = require("../middleware/auth");
 const validateObjectId = require("../middleware/validateObjectId");
 const { verifyMagicBytes } = require("../middleware/validateUpload");
+const idempotency = require("../middleware/idempotency");
 
 const {
   createNote,
@@ -13,6 +14,8 @@ const {
   getNoteById,
   updateNote,
   deleteNote,
+  restoreNote,
+  purgeNote,
   likeNote,
   increaseViews,
   increaseDownloads,
@@ -43,6 +46,7 @@ router.get("/:id", validateObjectId("id"), getNoteById);
 router.post(
   "/",
   auth,
+  idempotency(),
   upload.fields([
     {
       name: "pdf",
@@ -136,6 +140,18 @@ router.put(
 // ==========================================
 
 router.delete("/:id", auth, validateObjectId("id"), deleteNote);
+
+// ==========================================
+// RESTORE NOTE (ADMIN ONLY)
+// ==========================================
+
+router.patch("/:id/restore", auth, validateObjectId("id"), restoreNote);
+
+// ==========================================
+// PURGE NOTE (ADMIN ONLY)
+// ==========================================
+
+router.delete("/:id/purge", auth, validateObjectId("id"), purgeNote);
 
 // ==========================================
 // LIKE NOTE

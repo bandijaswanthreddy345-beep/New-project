@@ -157,6 +157,18 @@ const noteSchema = new mongoose.Schema(
   }
 );
 
+noteSchema.plugin(require("./plugins/softDelete"));
+
+noteSchema.index(
+  {
+    branch: 1,
+    semester: 1,
+    deletedAt: 1,
+    createdAt: -1,
+  },
+  { name: "NoteBranchSemesterDeletedCreatedIndex" }
+);
+
 noteSchema.index(
   {
     title: "text",

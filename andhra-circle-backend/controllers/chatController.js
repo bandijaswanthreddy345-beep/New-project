@@ -13,6 +13,8 @@
 const crypto = require("crypto");
 const { retrieveContext } = require("../services/retrieval");
 const ChatFeedback = require("../models/ChatFeedback");
+const { resilientFetch } = require("../utils/resilientFetch");
+const logger = require("../utils/logger");
 
 const MAX_MESSAGE = 1000;
 const MAX_HISTORY = 6;
@@ -25,12 +27,15 @@ const DAILY_CAP = Number(process.env.CHAT_DAILY_CAP) || 800;
 // Cache hits do NOT count against the daily cap.
 // Never cache turns that depend on conversational history.
 // =========================================================
+const { getContentVersion } = require("../utils/contentVersion");
+
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 const MAX_CACHE_ENTRIES = 500;
 const answerCache = new Map();
 
-function getCachedAnswer(query) {
-  const normKey = query.toLowerCase().trim().replace(/\s+/g, " ");
+async function getCachedAnswer(query) {
+  const version = await getContentVersion();
+  const normKey = `v${version}:${query.toLowerCase().trim().replace(/\s+/g, " ")}`;
   const entry = answerCache.get(normKey);
   if (!entry) return null;
 
@@ -41,8 +46,9 @@ function getCachedAnswer(query) {
   return entry.data;
 }
 
-function setCachedAnswer(query, data) {
-  const normKey = query.toLowerCase().trim().replace(/\s+/g, " ");
+async function setCachedAnswer(query, data) {
+  const version = await getContentVersion();
+  const normKey = `v${version}:${query.toLowerCase().trim().replace(/\s+/g, " ")}`;
   if (answerCache.size >= MAX_CACHE_ENTRIES) {
     const oldestKey = answerCache.keys().next().value;
     if (oldestKey) answerCache.delete(oldestKey);
@@ -50,20 +56,41 @@ function setCachedAnswer(query, data) {
   answerCache.set(normKey, { data, timestamp: Date.now() });
 }
 
+const SecurityState = require("../models/SecurityState");
+
 // =========================================================
-// 2. Daily Quota Tracking
+// 2. Daily Quota Tracking (Persistent MongoDB TTL)
 // =========================================================
-let dayKey = "";
-let dayCount = 0;
-function underDailyCap() {
+let memDayKey = "";
+let memDayCount = 0;
+
+async function underDailyCap() {
   const today = new Date().toISOString().slice(0, 10);
-  if (today !== dayKey) {
-    dayKey = today;
-    dayCount = 0;
+  const key = `daily_cap:${today}`;
+  const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 hr TTL
+
+  try {
+    const doc = await SecurityState.findOneAndUpdate(
+      { key, type: "ai_daily_cap" },
+      {
+        $inc: { count: 1 },
+        $setOnInsert: { key, type: "ai_daily_cap" },
+        $set: { expiresAt },
+      },
+      { upsert: true, new: true }
+    );
+
+    return (doc.count <= DAILY_CAP);
+  } catch (err) {
+    // Memory fallback if DB is temporarily unreachable
+    if (today !== memDayKey) {
+      memDayKey = today;
+      memDayCount = 0;
+    }
+    if (memDayCount >= DAILY_CAP) return false;
+    memDayCount += 1;
+    return true;
   }
-  if (dayCount >= DAILY_CAP) return false;
-  dayCount += 1;
-  return true;
 }
 
 const SYSTEM_PROMPT = `You are the study assistant of JNTU Circle, a portal for JNTUA engineering students.
@@ -129,7 +156,7 @@ exports.chat = async (req, res) => {
 
   // 1. Check in-memory cache if no history is provided (single-turn query)
   if (!isHistoryTurn) {
-    const cached = getCachedAnswer(message);
+    const cached = await getCachedAnswer(message);
     if (cached) {
       return res.json({
         success: true,
@@ -164,7 +191,8 @@ exports.chat = async (req, res) => {
   }));
 
   // 4. Check daily rate cap (cache hits already returned above without consuming quota)
-  if (!underDailyCap()) {
+  const isAllowed = await underDailyCap();
+  if (!isAllowed) {
     return res.status(503).json({ success: false, message: "Daily AI limit reached" });
   }
 
@@ -208,7 +236,7 @@ exports.chat = async (req, res) => {
       triedOpenRouterModels.add(model);
 
       try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const response = await resilientFetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${openRouterApiKey}`,
@@ -222,11 +250,10 @@ exports.chat = async (req, res) => {
             temperature: 0.3,
             max_tokens: 800,
           }),
-          signal: AbortSignal.timeout(TIMEOUT_MS),
-        });
+        }, { breakerName: "openrouter", timeoutMs: TIMEOUT_MS });
 
         if (!response.ok) {
-          console.error(`OpenRouter failed for model ${model} with status ${response.status}`);
+          logger.error(`OpenRouter failed for model ${model} with status ${response.status}`);
           continue;
         }
 
@@ -289,7 +316,7 @@ exports.chat = async (req, res) => {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
     try {
-      const response = await fetch(url, {
+      const response = await resilientFetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": geminiApiKey },
         body: JSON.stringify({
@@ -297,8 +324,7 @@ exports.chat = async (req, res) => {
           contents,
           generationConfig: { temperature: 0.3, maxOutputTokens: 300 },
         }),
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-      });
+      }, { breakerName: "gemini", timeoutMs: TIMEOUT_MS });
 
       if (response.ok) {
         const data = await response.json();
