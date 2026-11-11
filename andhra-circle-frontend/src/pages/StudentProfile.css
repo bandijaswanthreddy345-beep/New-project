@@ -64,18 +64,22 @@
 }
 
 .sp-brand-title {
+  font-family: 'Montserrat', sans-serif !important;
   color: #ffffff;
   font-size: 17.5px;
   font-weight: 800;
+  letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.15;
 }
 
 .sp-brand-title .font-deltha {
+  font-family: 'Montserrat', sans-serif !important;
   color: #ffefb3;
 }
 
 .sp-brand-subtitle {
+  font-family: 'Montserrat', sans-serif !important;
   font-size: 11px;
   color: #a8d5cf;
   font-weight: 600;
@@ -1547,8 +1551,9 @@
   }
 
   .sp-m-portal-name {
+    font-family: 'Montserrat', sans-serif !important;
     font-size: 11px;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     font-weight: 800;
     text-transform: uppercase;
     color: #6ee7b7;

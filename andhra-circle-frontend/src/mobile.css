@@ -103,51 +103,67 @@
     margin-top: 1px !important;
   }
 
-  /* Compact mobile navbar action button */
+  /* Equalized mobile navbar action buttons (34px x 34px) */
   .nav-mobile-action-btn {
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 7px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    border-radius: 8px !important;
     padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   .nav-mobile-action-btn svg {
-    width: 14px !important;
-    height: 14px !important;
+    width: 17px !important;
+    height: 17px !important;
   }
 
   .nav-mobile-notif-ping {
-    top: 3px !important;
-    right: 3px !important;
-    width: 5px !important;
-    height: 5px !important;
+    top: 4px !important;
+    right: 4px !important;
+    width: 6px !important;
+    height: 6px !important;
   }
 
   .nav-mobile-toggle {
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 7px !important;
-    display: flex !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
     border: none !important;
     box-shadow: 0 1px 3px rgba(1, 58, 51, 0.25) !important;
     background: #013a33 !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   .nav-mobile-toggle svg {
-    width: 14px !important;
-    height: 14px !important;
+    width: 17px !important;
+    height: 17px !important;
     stroke-width: 2.2 !important;
   }
 
-  .nav-item-profile,
-  .nav-mobile-profile-btn {
+  .nav-item-profile {
     display: none !important;
   }
 
   .nav-mobile-actions {
+    display: flex !important;
+    align-items: center !important;
     gap: 8px !important;
   }
 
@@ -666,32 +682,51 @@
     box-sizing: border-box !important;
   }
 
-  /* Mobile Action Avatar (Student Profile) */
+  /* Mobile Action Avatar (Student Profile) - Equalized to 34px */
   .nav-mobile-profile-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
     padding: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     background: transparent !important;
     border: none !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   .nav-mobile-profile-avatar-wrapper {
-    width: 36px !important;
-    height: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    box-sizing: border-box !important;
   }
 
   .nav-mobile-avatar-img {
-    width: 36px !important;
-    height: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
     border-radius: 50% !important;
     border: 2px solid #087943 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) !important;
+    object-fit: cover !important;
+    box-sizing: border-box !important;
   }
 
   .nav-mobile-fallback-icon {
-    width: 36px !important;
-    height: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
     border-radius: 50% !important;
     background: rgba(8, 121, 67, 0.12) !important;
     border: 1.5px solid #087943 !important;
@@ -699,6 +734,12 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .nav-mobile-fallback-icon svg {
+    width: 17px !important;
+    height: 17px !important;
   }
 
   /* =========================================================
@@ -740,6 +781,7 @@
 
   .hero h1,
   .hero-title {
+    font-family: 'Montserrat', sans-serif !important;
     font-size: 28px !important;
     font-weight: 800 !important;
     letter-spacing: -0.03em !important;
