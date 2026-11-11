@@ -36,7 +36,6 @@ function StudentProfileModal({ isOpen, onClose, onProfileUpdated }) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
-
   if (!isOpen) return null;
 
   const isConfigured = Boolean(student && student.isConfigured && student.name?.trim());

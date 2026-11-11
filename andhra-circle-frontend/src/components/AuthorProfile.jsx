@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import API from "../api/api";
 import "./AuthorProfile.css";
-import bharathProfile from "../assets/bharath-profile.png";
-import jaswanthProfile from "../assets/jaswanth.png.png";
-import nagaSaiProfile from "../assets/naga-sai-profile.png";
-import vamsiKumarProfile from "../assets/vamsi-kumar-profile.png";
+import bharathProfile from "../assets/bharath-profile.webp";
+import jaswanthProfile from "../assets/jaswanth.webp";
+import nagaSaiProfile from "../assets/naga-sai-profile.webp";
+import vamsiKumarProfile from "../assets/vamsi-kumar-profile.webp";
 
 const developers = [
   {
@@ -183,7 +183,7 @@ function AuthorProfile() {
       <section className="author-section" aria-labelledby="developers-heading">
         <div className="author-section-heading">
           <span className="section-tag">THE TEAM</span>
-          
+
         </div>
 
         <div className="team-card">
@@ -206,21 +206,19 @@ function AuthorProfile() {
             aria-atomic="true"
           >
             <div
-              className={`developer-slide-image ${
-                developer.title === "PLATFORM CREATOR"
+              className={`developer-slide-image ${developer.title === "PLATFORM CREATOR"
                   ? "developer-slide-image--creator"
                   : "developer-slide-image--dev"
-              }`}
+                }`}
             >
               <img src={developer.image} alt="" />
             </div>
             <div className="developer-slide-copy">
               <span
-                className={`author-role-tag ${
-                  developer.title === "PLATFORM CREATOR"
+                className={`author-role-tag ${developer.title === "PLATFORM CREATOR"
                     ? "author-role-tag--creator"
                     : "author-role-tag--dev"
-                }`}
+                  }`}
               >
                 {developer.title}
               </span>

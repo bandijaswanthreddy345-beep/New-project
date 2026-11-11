@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./BranchSection.css";
-import aimlImg from "../assets/branches/aiml.jpg";
-import cseImg from "../assets/branches/cse.jpg";
-import eceImg from "../assets/branches/ece.jpg";
-import mechImg from "../assets/branches/mech.jpg";
-import civilImg from "../assets/branches/civil.jpg";
-import eeeImg from "../assets/branches/eee.jpg";
+import aimlImg from "../assets/branches/aiml.webp";
+import cseImg from "../assets/branches/cse.webp";
+import eceImg from "../assets/branches/ece.webp";
+import mechImg from "../assets/branches/mech.webp";
+import civilImg from "../assets/branches/civil.webp";
+import eeeImg from "../assets/branches/eee.webp";
 
 const BRANCHES = [
   {
@@ -387,7 +387,11 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
                   src={branch.image}
                   alt={branch.name}
                   className="branch-card-img"
-                  loading="lazy"
+                  width="360"
+                  height="360"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  fetchPriority={index === 0 ? "high" : "auto"}
+                  decoding="async"
                 />
 
                 {/* Dark Gradient Overlay for optimal legibility */}

@@ -1,9 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../api/api";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import API, { BACKEND_URL } from "../api/api";
+import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "../components/LikeReactionButton";
 import { normalizeSemester, normalizeScheme } from "../utils/semester";
+import { formatSemDisplay } from "../utils/validators";
+
+const getLabSnippet = (program) => {
+  if (program.description && program.description.trim().length > 10) {
+    return program.description.trim();
+  }
+  const branchText = program.branch ? `${program.branch} · ` : "";
+  const semText = program.semester ? `${formatSemDisplay(program.semester)} · ` : "";
+  const subName = program.subject || program.title || "Lab Practical";
+  return `Complete laboratory experiment codes, viva preparation questions & practical manual records for ${subName} (${branchText}${semText}JNTU Lab Course).`;
+};
 
 function LabPrograms({ search = "" }) {
   const navigate = useNavigate();
@@ -59,7 +70,7 @@ function LabPrograms({ search = "" }) {
 
   const filteredPrograms = labPrograms.filter((program) => {
     if (!searchText) return true;
-return (
+    return (
       String(program.title || "").toLowerCase().includes(searchText) ||
       String(program.subject || "").toLowerCase().includes(searchText) ||
       String(program.subjectCode || "").toLowerCase().includes(searchText) ||
@@ -117,11 +128,6 @@ return (
   // BACKEND BASE URL & PDF URL
   // =========================================================
 
-  const getBackendBaseUrl = () => {
-    const apiBaseUrl = API.defaults?.baseURL || "http://localhost:5000/api";
-    return apiBaseUrl.replace(/\/api\/?$/, "").replace(/\/$/, "");
-  };
-
   const getPdfUrl = (pdfUrl) => {
     if (!pdfUrl) return "";
     let value = String(pdfUrl).trim();
@@ -141,8 +147,7 @@ return (
       value = `/${value}`;
     }
 
-    const backendBaseUrl = getBackendBaseUrl();
-    return `${backendBaseUrl}${value}`;
+    return `${BACKEND_URL}${value}`;
   };
 
   const getPdfFileName = (pdfUrl) => {
@@ -225,7 +230,7 @@ return (
         }
         try {
           localStorage.setItem("andhra_liked_programs", JSON.stringify([...next]));
-        } catch {}
+        } catch { }
         return next;
       });
 

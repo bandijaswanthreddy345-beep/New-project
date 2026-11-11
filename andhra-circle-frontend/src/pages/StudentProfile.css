@@ -2966,11 +2966,49 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .sp-m-portal-badge {
+  .sp-m-topbar-left {
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
+  }
+
+  .sp-m-back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f1f5f9;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .sp-m-back-btn:hover {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .sp-m-back-btn:active {
+    transform: scale(0.92);
+    background: rgba(16, 185, 129, 0.25);
+    border-color: rgba(52, 211, 153, 0.45);
+    color: #6ee7b7;
+  }
+
+  .sp-m-portal-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    min-width: 0;
   }
 
   .sp-m-portal-icon {

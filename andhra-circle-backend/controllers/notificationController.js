@@ -3,6 +3,7 @@ const fs = require("fs");
 const Notification = require("../models/Notification");
 const { syncJntuaNotifications, isBTechNotification } = require("../services/jntuaSyncService");
 const { safeFetch } = require("../services/safeFetch");
+const recordAuditLog = require("../services/auditLogger");
 
 // ==========================================
 // SYNC NOTIFICATIONS FROM JNTUA OFFICIAL
@@ -36,12 +37,41 @@ exports.syncJntua = async (req, res) => {
 
 exports.createNotification = async (req, res) => {
   try {
+    const title = String(req.body.title || "").trim().slice(0, 500);
+    const description = String(req.body.description || "").trim().slice(0, 5000);
+    const link = String(req.body.link || "").trim().slice(0, 2048);
+    const category = String(req.body.category || "").trim().slice(0, 100);
+    const date = String(req.body.date || "").trim().slice(0, 100);
+    const isImportant = Boolean(req.body.isImportant);
+
+    if (!title) {
+      return res.status(400).json({
+        message: "Title is required",
+      });
+    }
+
     const notification = await Notification.create({
-      ...req.body,
+      title,
+      description,
+      link,
+      category,
+      date,
+      isImportant,
       likes: 0,
       views: 0,
       downloads: 0,
     });
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "create",
+        resourceType: "Notification",
+        resourceId: notification._id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
 
     res.status(201).json(notification);
   } catch (error) {
@@ -68,9 +98,16 @@ exports.getNotifications = async (req, res) => {
       console.warn("Background JNTUA sync warning:", err.message);
     });
 
-    const notifications = await Notification.find().sort({
-      createdAt: -1,
-    });
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=60, stale-while-revalidate=120"
+    );
+
+    const notifications = await Notification.find()
+      .sort({
+        createdAt: -1,
+      })
+      .lean();
 
     const btechNotifications = notifications.filter((n) =>
       isBTechNotification(n.title, n.description)
@@ -113,17 +150,37 @@ exports.getNotificationById = async (req, res) => {
 
 exports.updateNotification = async (req, res) => {
   try {
+    const updateData = {};
+    if (req.body.title !== undefined) updateData.title = String(req.body.title).trim().slice(0, 500);
+    if (req.body.description !== undefined) updateData.description = String(req.body.description).trim().slice(0, 5000);
+    if (req.body.link !== undefined) updateData.link = String(req.body.link).trim().slice(0, 2048);
+    if (req.body.category !== undefined) updateData.category = String(req.body.category).trim().slice(0, 100);
+    if (req.body.date !== undefined) updateData.date = String(req.body.date).trim().slice(0, 100);
+    if (req.body.isImportant !== undefined) updateData.isImportant = Boolean(req.body.isImportant);
+
     const notification = await Notification.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      { $set: updateData },
       {
         returnDocument: "after",
+        runValidators: true,
       }
     );
 
     if (!notification) {
       return res.status(404).json({
         message: "Notification not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "update",
+        resourceType: "Notification",
+        resourceId: notification._id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -148,6 +205,17 @@ exports.deleteNotification = async (req, res) => {
     if (!notification) {
       return res.status(404).json({
         message: "Notification not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "delete",
+        resourceType: "Notification",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 

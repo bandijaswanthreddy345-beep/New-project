@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import profileImgDefault from "../assets/jaswanth.webp";
 import {
   EMPTY_STUDENT_DATA,
   INITIAL_SEMESTERS,
@@ -914,46 +915,46 @@ function StudentProfile() {
             TOP NAVIGATION BAR (ANCHORED LOGO AT LEFT CORNER)
             ========================================================= */}
         <header className="sp-page-header">
-        <div className="sp-page-header-inner">
-          <div className="sp-header-left" onClick={() => navigate("/")} title="Return to Homepage">
-            <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sp-page-logo" />
-            <div>
-              <h2 className="sp-brand-title">
-                <span className="font-deltha">JNTU</span> Circle
-              </h2>
-              <span className="sp-brand-subtitle">Official Student Academic Identity</span>
+          <div className="sp-page-header-inner">
+            <div className="sp-header-left" onClick={() => navigate("/")} title="Return to Homepage">
+              <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sp-page-logo" />
+              <div>
+                <h2 className="sp-brand-title">
+                  <span className="font-deltha">JNTU</span> Circle
+                </h2>
+                <span className="sp-brand-subtitle">Official Student Academic Identity</span>
+              </div>
+            </div>
+
+            <div className="sp-header-right">
+              <button
+                type="button"
+                className="sp-header-close-btn"
+                onClick={() => navigate(-1)}
+                title="Close and Return"
+                aria-label="Close and Return"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
             </div>
           </div>
-
-          <div className="sp-header-right">
-            <button
-              type="button"
-              className="sp-header-close-btn"
-              onClick={() => navigate(-1)}
-              title="Close and Return"
-              aria-label="Close and Return"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* =========================================================
-          MAIN CONTAINER
-          ========================================================= */}
-      <main className="sp-page-main">
-        {saveSuccess && (
-          <div className="sp-floating-toast">
-            <span className="sp-toast-icon">✓</span>
-            <span>Profile successfully updated and saved securely!</span>
-          </div>
-        )}
+        </header>
 
         {/* =========================================================
+          MAIN CONTAINER
+          ========================================================= */}
+        <main className="sp-page-main">
+          {saveSuccess && (
+            <div className="sp-floating-toast">
+              <span className="sp-toast-icon">✓</span>
+              <span>Profile successfully updated and saved securely!</span>
+            </div>
+          )}
+
+          {/* =========================================================
             EXECUTIVE ACADEMIC DASHBOARD (ALWAYS RENDERED)
             Shows interactive '+ Add Details' prompts when fields are empty
             ========================================================= */}
@@ -1081,195 +1082,195 @@ function StudentProfile() {
                 )}
               </div>
 
-              <div className="sp-main-subtext">
-                {student.hallTicket?.trim() ? (
-                  <strong className="sp-main-roll">{student.hallTicket}</strong>
-                ) : (
-                  <button
-                    type="button"
-                    className="sp-inline-add-chip"
-                    onClick={() => setActiveTab("edit")}
-                    title="Add your Hall Ticket Number"
-                  >
-                    + Add Hall Ticket / USN
-                  </button>
-                )}
+                <div className="sp-main-subtext">
+                  {student.hallTicket?.trim() ? (
+                    <strong className="sp-main-roll">{student.hallTicket}</strong>
+                  ) : (
+                    <button
+                      type="button"
+                      className="sp-inline-add-chip"
+                      onClick={() => setActiveTab("edit")}
+                      title="Add your Hall Ticket Number"
+                    >
+                      + Add Hall Ticket / USN
+                    </button>
+                  )}
 
-                <span className="sp-dot-separator">•</span>
+                  <span className="sp-dot-separator">•</span>
 
-                {student.branch?.trim() ? (
-                  <span>{student.branch} {student.branchCode ? `(${student.branchCode})` : ""}</span>
-                ) : (
-                  <button
-                    type="button"
-                    className="sp-inline-add-chip"
-                    onClick={() => setActiveTab("edit")}
-                    title="Add your engineering branch"
-                  >
-                    + Add Branch
-                  </button>
-                )}
+                  {student.branch?.trim() ? (
+                    <span>{student.branch} {student.branchCode ? `(${student.branchCode})` : ""}</span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="sp-inline-add-chip"
+                      onClick={() => setActiveTab("edit")}
+                      title="Add your engineering branch"
+                    >
+                      + Add Branch
+                    </button>
+                  )}
 
-                <span className="sp-dot-separator">•</span>
+                  <span className="sp-dot-separator">•</span>
 
-                {student.semester?.trim() ? (
-                  <span className="sp-highlight-gold">
-                    {cleanSemester(student.semester)}
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    className="sp-inline-add-chip"
-                    onClick={() => setActiveTab("edit")}
-                    title="Add academic semester"
-                  >
-                    + Add Semester
-                  </button>
-                )}
-              </div>
-
-              <div className="sp-college-subtext">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sp-inst-icon">
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                  <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-                </svg>
-                {student.college?.trim() ? (
-                  <span>{cleanCollege(student.college)}</span>
-                ) : (
-                  <button
-                    type="button"
-                    className="sp-inline-add-chip"
-                    onClick={() => setActiveTab("edit")}
-                    title="Add college or campus name"
-                  >
-                    + Add College / Campus
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Metric KPI Cards (Styled with Bot Reference Colors) */}
-          <div className="sp-page-metrics">
-            <div className="sp-p-metric sp-metric-bot-theme">
-              <div className="sp-metric-header">
-                <span className="sp-pm-label">CUMULATIVE CGPA</span>
-                <div className="sp-pm-icon-wrap">
-                  <svg className="sp-metric-icon sp-icon-gold" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
+                  {student.semester?.trim() ? (
+                    <span className="sp-highlight-gold">
+                      {cleanSemester(student.semester)}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="sp-inline-add-chip"
+                      onClick={() => setActiveTab("edit")}
+                      title="Add academic semester"
+                    >
+                      + Add Semester
+                    </button>
+                  )}
                 </div>
-              </div>
-              <div className="sp-pm-val sp-gold">
-                {hasCgpa ? (
-                  <>
-                    {student.cgpa} <span className="sp-pm-max">/ 10.0</span>
-                  </>
-                ) : (
-                  <span className="sp-pm-empty">0.00 <span className="sp-pm-max">/ 10.0</span></span>
-                )}
-              </div>
-              <div className="sp-pm-desc sp-gold-sub">
-                {hasCgpa ? (
-                  Number(student.cgpa) >= 8.5
-                    ? "★ Distinction Standing"
-                    : Number(student.cgpa) >= 7.0
-                    ? "✓ First Class Standing"
-                    : "Active Academic Record"
-                ) : (
-                  <button
-                    type="button"
-                    className="sp-kpi-add-link"
-                    onClick={() => setActiveTab("edit")}
-                  >
-                    + Add SGPA Grades →
-                  </button>
-                )}
-              </div>
-            </div>
 
-            <div className={`sp-p-metric sp-metric-bot-theme ${hasAttendance ? attendanceStatus.class : ""}`}>
-              <div className="sp-metric-header">
-                <span className="sp-pm-label">TOTAL ATTENDANCE</span>
-                <div className="sp-pm-icon-wrap">
-                  <svg className="sp-metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
-                  </svg>
-                </div>
-              </div>
-              <div className="sp-pm-val sp-att-val">
-                {hasAttendance ? `${student.attendancePercentage}%` : "0%"}
-              </div>
-              <div className="sp-pm-desc">
-                {hasAttendance ? (
-                  <div className={`sp-pm-badge-pill ${attendanceStatus.class}`}>
-                    {attendanceStatus.icon} {currentAttendance >= 75 ? "Hall Ticket Eligible" : "Action Required"}
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="sp-kpi-add-link"
-                    onClick={() => setActiveTab("edit")}
-                  >
-                    + Set Attendance →
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="sp-p-metric sp-metric-bot-theme">
-              <div className="sp-metric-header">
-                <span className="sp-pm-label">COMPLETED CREDITS</span>
-                <div className="sp-pm-icon-wrap">
-                  <svg className="sp-metric-icon sp-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="sp-pm-val sp-credits-val">{student.credits || "0 / 160"}</div>
-              <div className="sp-pm-desc sp-credits-sub">
-                {hasCredits ? (
-                  "B.Tech Degree Requirement"
-                ) : (
-                  <button
-                    type="button"
-                    className="sp-kpi-add-link"
-                    onClick={() => setActiveTab("edit")}
-                  >
-                    + Track Credits →
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="sp-p-metric sp-metric-bot-theme">
-              <div className="sp-metric-header">
-                <span className="sp-pm-label">REGULATION & BATCH</span>
-                <div className="sp-pm-icon-wrap">
-                  <svg className="sp-metric-icon sp-icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="sp-college-subtext">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sp-inst-icon">
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
                   </svg>
+                  {student.college?.trim() ? (
+                    <span>{cleanCollege(student.college)}</span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="sp-inline-add-chip"
+                      onClick={() => setActiveTab("edit")}
+                      title="Add college or campus name"
+                    >
+                      + Add College / Campus
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="sp-pm-val sp-reg-val">{student.regulation || "R23 Regulation"}</div>
-              <div className="sp-pm-desc sp-reg-sub">
-                {student.branchCode ? (
-                  `${student.branchCode} Department`
-                ) : (
-                  <button
-                    type="button"
-                    className="sp-kpi-add-link"
-                    onClick={() => setActiveTab("edit")}
-                  >
-                    + Select Regulation →
-                  </button>
-                )}
+            </div>
+
+            {/* Metric KPI Cards (Styled with Bot Reference Colors) */}
+            <div className="sp-page-metrics">
+              <div className="sp-p-metric sp-metric-bot-theme">
+                <div className="sp-metric-header">
+                  <span className="sp-pm-label">CUMULATIVE CGPA</span>
+                  <div className="sp-pm-icon-wrap">
+                    <svg className="sp-metric-icon sp-icon-gold" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="sp-pm-val sp-gold">
+                  {hasCgpa ? (
+                    <>
+                      {student.cgpa} <span className="sp-pm-max">/ 10.0</span>
+                    </>
+                  ) : (
+                    <span className="sp-pm-empty">0.00 <span className="sp-pm-max">/ 10.0</span></span>
+                  )}
+                </div>
+                <div className="sp-pm-desc sp-gold-sub">
+                  {hasCgpa ? (
+                    Number(student.cgpa) >= 8.5
+                      ? "★ Distinction Standing"
+                      : Number(student.cgpa) >= 7.0
+                        ? "✓ First Class Standing"
+                        : "Active Academic Record"
+                  ) : (
+                    <button
+                      type="button"
+                      className="sp-kpi-add-link"
+                      onClick={() => setActiveTab("edit")}
+                    >
+                      + Add SGPA Grades →
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className={`sp-p-metric sp-metric-bot-theme ${hasAttendance ? attendanceStatus.class : ""}`}>
+                <div className="sp-metric-header">
+                  <span className="sp-pm-label">TOTAL ATTENDANCE</span>
+                  <div className="sp-pm-icon-wrap">
+                    <svg className="sp-metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="sp-pm-val sp-att-val">
+                  {hasAttendance ? `${student.attendancePercentage}%` : "0%"}
+                </div>
+                <div className="sp-pm-desc">
+                  {hasAttendance ? (
+                    <div className={`sp-pm-badge-pill ${attendanceStatus.class}`}>
+                      {attendanceStatus.icon} {currentAttendance >= 75 ? "Hall Ticket Eligible" : "Action Required"}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="sp-kpi-add-link"
+                      onClick={() => setActiveTab("edit")}
+                    >
+                      + Set Attendance →
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="sp-p-metric sp-metric-bot-theme">
+                <div className="sp-metric-header">
+                  <span className="sp-pm-label">COMPLETED CREDITS</span>
+                  <div className="sp-pm-icon-wrap">
+                    <svg className="sp-metric-icon sp-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="sp-pm-val sp-credits-val">{student.credits || "0 / 160"}</div>
+                <div className="sp-pm-desc sp-credits-sub">
+                  {hasCredits ? (
+                    "B.Tech Degree Requirement"
+                  ) : (
+                    <button
+                      type="button"
+                      className="sp-kpi-add-link"
+                      onClick={() => setActiveTab("edit")}
+                    >
+                      + Track Credits →
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="sp-p-metric sp-metric-bot-theme">
+                <div className="sp-metric-header">
+                  <span className="sp-pm-label">REGULATION & BATCH</span>
+                  <div className="sp-pm-icon-wrap">
+                    <svg className="sp-metric-icon sp-icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="sp-pm-val sp-reg-val">{student.regulation || "R23 Regulation"}</div>
+                <div className="sp-pm-desc sp-reg-sub">
+                  {student.branchCode ? (
+                    `${student.branchCode} Department`
+                  ) : (
+                    <button
+                      type="button"
+                      className="sp-kpi-add-link"
+                      onClick={() => setActiveTab("edit")}
+                    >
+                      + Select Regulation →
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
             {/* Tabs Navigation (Professional Minimalist, No Emojis) */}
             <div className="sp-page-tabs">
@@ -1491,20 +1492,19 @@ function StudentProfile() {
                               </td>
                               <td>
                                 <span
-                                  className={`sp-badge-status ${
-                                    hasScore && sgpaNum >= 8.5
+                                  className={`sp-badge-status ${hasScore && sgpaNum >= 8.5
                                       ? "gold"
                                       : hasScore
-                                      ? "completed"
-                                      : ""
-                                  }`}
+                                        ? "completed"
+                                        : ""
+                                    }`}
                                 >
                                   {hasScore
                                     ? sgpaNum >= 9.0
                                       ? "Outstanding (O)"
                                       : sgpaNum >= 8.0
-                                      ? "Excellent (A+)"
-                                      : "Cleared (Pass)"
+                                        ? "Excellent (A+)"
+                                        : "Cleared (Pass)"
                                     : "Pending"}
                                 </span>
                               </td>
@@ -1562,21 +1562,21 @@ function StudentProfile() {
 
                     <div className="sp-att-benchmarks">
                       <div className="sp-benchmark-item safe">
-                        
+
                         <div>
                           <strong>75% – 100%: Normal Eligibility</strong>
                           <p>Issued official examination hall ticket without penalty.</p>
                         </div>
                       </div>
                       <div className="sp-benchmark-item warn">
-                        
+
                         <div>
                           <strong>65% – 74%: Condonation Allowed</strong>
                           <p>Eligible upon payment of university condonation fee with medical proof.</p>
                         </div>
                       </div>
                       <div className="sp-benchmark-item danger">
-                        
+
                         <div>
                           <strong>Below 65%: Detained</strong>
                           <p>Not eligible for semester examinations; must repeat course.</p>
@@ -1935,16 +1935,36 @@ function StudentProfile() {
         <header className="sp-m-header">
           {/* Top Action Row */}
           <div className="sp-m-topbar">
-            <div className="sp-m-portal-badge" onClick={() => navigate("/")} title="JNTU Portal Home">
-              <div className="sp-m-portal-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                  <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+            <div className="sp-m-topbar-left">
+              <button
+                type="button"
+                className="sp-m-back-btn"
+                onClick={() => {
+                  if (window.history.length > 1) {
+                    navigate(-1);
+                  } else {
+                    navigate("/");
+                  }
+                }}
+                aria-label="Go Back"
+                title="Go Back"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
-              </div>
-              <div className="sp-m-portal-text">
-                <span className="sp-m-portal-name">JNTU PORTAL</span>
-                <span className="sp-m-portal-sub">Student Academic System</span>
+              </button>
+
+              <div className="sp-m-portal-badge" onClick={() => navigate("/")} title="JNTU Portal Home">
+                <div className="sp-m-portal-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                  </svg>
+                </div>
+                <div className="sp-m-portal-text">
+                  <span className="sp-m-portal-name">JNTU PORTAL</span>
+                  <span className="sp-m-portal-sub">Student Academic System</span>
+                </div>
               </div>
             </div>
 
@@ -1979,6 +1999,20 @@ function StudentProfile() {
 
                 {showMobileMenu && (
                   <div className="sp-m-menu-dropdown">
+                    <button
+                      type="button"
+                      className="sp-m-menu-item"
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        navigate("/");
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                      </svg>
+                      Back to Home
+                    </button>
                     <button
                       type="button"
                       className="sp-m-menu-item"

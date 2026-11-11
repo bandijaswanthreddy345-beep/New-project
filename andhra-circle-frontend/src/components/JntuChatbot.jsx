@@ -19,6 +19,7 @@ import {
   validateBranch,
   validateSemester,
   validateRegulation,
+  formatSemDisplay,
 } from "../utils/validators";
 import {
   performSearch,
@@ -243,7 +244,7 @@ function BranchHubView({ hub, onSelectQuery, onCloseModal }) {
                       <span className="chat-result-badge">Dept: {resItem.branch}</span>
                     )}
                     {resItem.semester && (
-                      <span className="chat-result-badge">Sem: {resItem.semester}</span>
+                      <span className="chat-result-badge">{formatSemDisplay(resItem.semester)}</span>
                     )}
                     {resItem.regulation && (
                       <span className="chat-result-badge">{resItem.regulation}</span>
@@ -931,7 +932,7 @@ function JntuChatbot() {
           message: rawQuery.slice(0, 1000),
           history: recentTurns,
         },
-        { timeout: 12000 }
+        { timeout: 30000 }
       );
 
       if (aiRes.data && aiRes.data.success && aiRes.data.reply) {
@@ -1520,7 +1521,7 @@ function JntuChatbot() {
                                         <span className="chat-result-badge">Dept: {resItem.branch}</span>
                                       )}
                                       {resItem.semester && (
-                                        <span className="chat-result-badge">Sem: {resItem.semester}</span>
+                                        <span className="chat-result-badge">{formatSemDisplay(resItem.semester)}</span>
                                       )}
                                       {resItem.regulation && (
                                         <span className="chat-result-badge">{resItem.regulation}</span>

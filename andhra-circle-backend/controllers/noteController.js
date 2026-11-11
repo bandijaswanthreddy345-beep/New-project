@@ -1,4 +1,5 @@
 const Note = require("../models/note");
+const recordAuditLog = require("../services/auditLogger");
 
 // ==========================================
 // CREATE NOTE
@@ -37,23 +38,20 @@ exports.createNote = async (req, res) => {
     }
 
     const note = await Note.create({
-      title: req.body.title || "",
-      branch: req.body.branch || "",
-      semester: req.body.semester || "",
-      subject: req.body.subject || "",
-      subjectCode: req.body.subjectCode || "",
-      description: req.body.description || "",
+      title: String(req.body.title || "").trim().slice(0, 300),
+      branch: String(req.body.branch || "").trim().slice(0, 100),
+      semester: String(req.body.semester || "").trim().slice(0, 50),
+      subject: String(req.body.subject || "").trim().slice(0, 200),
+      subjectCode: String(req.body.subjectCode || "").trim().slice(0, 50),
+      description: String(req.body.description || "").trim().slice(0, 5000),
 
-      // ==========================
-      // CREDITS
-      // ==========================
-      credits: req.body.credits || "",
+      credits: String(req.body.credits || "").trim().slice(0, 50),
 
-      module1: req.body.module1 || "",
-      module2: req.body.module2 || "",
-      module3: req.body.module3 || "",
-      module4: req.body.module4 || "",
-      module5: req.body.module5 || "",
+      module1: String(req.body.module1 || "").trim().slice(0, 300),
+      module2: String(req.body.module2 || "").trim().slice(0, 300),
+      module3: String(req.body.module3 || "").trim().slice(0, 300),
+      module4: String(req.body.module4 || "").trim().slice(0, 300),
+      module5: String(req.body.module5 || "").trim().slice(0, 300),
 
       module1Pdf: module1Pdf
         ? `/uploads/${module1Pdf.filename}`
@@ -88,8 +86,16 @@ exports.createNote = async (req, res) => {
       downloads: 0,
     });
 
-    console.log("NOTE CREATED:");
-    console.log(note);
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "create",
+        resourceType: "Note",
+        resourceId: note._id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -113,10 +119,54 @@ exports.getNotes = async (req, res) => {
     if (require("mongoose").connection.readyState !== 1) {
       return res.status(200).json([]);
     }
-    const notes = await Note.find().sort({
-      createdAt: -1,
-    });
 
+    const { branch, semester, search, page, limit } = req.query;
+    const filter = {};
+    if (branch && branch !== "ALL") filter.branch = branch;
+    if (semester && semester !== "ALL") filter.semester = semester;
+    if (search && search.trim()) {
+      const term = search.trim();
+      filter.$or = [
+        { title: { $regex: term, $options: "i" } },
+        { subject: { $regex: term, $options: "i" } },
+        { subjectCode: { $regex: term, $options: "i" } },
+      ];
+    }
+
+    // Exclude heavy module outline text from list view
+    const listFields =
+      "_id title branch semester subject subjectCode imageUrl pdfUrl views downloads likes createdAt";
+
+    let query = Note.find(filter)
+      .select(listFields)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=60, stale-while-revalidate=120"
+    );
+
+    if (limit) {
+      const parsedLimit = Math.min(
+        Math.max(parseInt(limit, 10) || 20, 1),
+        100
+      );
+      const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+      const total = await Note.countDocuments(filter);
+      const notes = await query
+        .skip((parsedPage - 1) * parsedLimit)
+        .limit(parsedLimit);
+
+      return res.status(200).json({
+        notes,
+        total,
+        page: parsedPage,
+        totalPages: Math.ceil(total / parsedLimit),
+      });
+    }
+
+    const notes = await query;
     res.status(200).json(notes);
   } catch (error) {
     console.warn("Get Notes Warning:", error.message);
@@ -155,23 +205,23 @@ exports.getNoteById = async (req, res) => {
 exports.updateNote = async (req, res) => {
   try {
     const updateData = {
-      title: req.body.title || "",
-      branch: req.body.branch || "",
-      semester: req.body.semester || "",
-      subject: req.body.subject || "",
-      subjectCode: req.body.subjectCode || "",
-      description: req.body.description || "",
+      title: String(req.body.title || "").trim().slice(0, 300),
+      branch: String(req.body.branch || "").trim().slice(0, 100),
+      semester: String(req.body.semester || "").trim().slice(0, 50),
+      subject: String(req.body.subject || "").trim().slice(0, 200),
+      subjectCode: String(req.body.subjectCode || "").trim().slice(0, 50),
+      description: String(req.body.description || "").trim().slice(0, 5000),
 
       // ==========================
       // CREDITS
       // ==========================
-      credits: req.body.credits || "",
+      credits: String(req.body.credits || "").trim().slice(0, 50),
 
-      module1: req.body.module1 || "",
-      module2: req.body.module2 || "",
-      module3: req.body.module3 || "",
-      module4: req.body.module4 || "",
-      module5: req.body.module5 || "",
+      module1: String(req.body.module1 || "").trim().slice(0, 300),
+      module2: String(req.body.module2 || "").trim().slice(0, 300),
+      module3: String(req.body.module3 || "").trim().slice(0, 300),
+      module4: String(req.body.module4 || "").trim().slice(0, 300),
+      module5: String(req.body.module5 || "").trim().slice(0, 300),
     };
 
     if (req.files?.pdf?.[0]) {
@@ -211,9 +261,9 @@ exports.updateNote = async (req, res) => {
 
     const note = await Note.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      { $set: updateData },
       {
-        returnDocument: "after",
+        new: true,
         runValidators: true,
       }
     );
@@ -221,6 +271,17 @@ exports.updateNote = async (req, res) => {
     if (!note) {
       return res.status(404).json({
         message: "Note not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "update",
+        resourceType: "Note",
+        resourceId: note._id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -245,6 +306,17 @@ exports.deleteNote = async (req, res) => {
     if (!note) {
       return res.status(404).json({
         message: "Note not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "delete",
+        resourceType: "Note",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -286,7 +358,7 @@ exports.likeNote = async (req, res) => {
     const note = await Note.findByIdAndUpdate(
       req.params.id,
       { $set: { likes: targetLikes } },
-      { returnDocument: "after" }
+      { new: true }
     );
 
     res.status(200).json(note);
@@ -308,7 +380,7 @@ exports.increaseViews = async (req, res) => {
     const note = await Note.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { returnDocument: "after" }
+      { new: true }
     );
 
     if (!note) {
@@ -336,7 +408,7 @@ exports.increaseDownloads = async (req, res) => {
     const note = await Note.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { returnDocument: "after" }
+      { new: true }
     );
 
     if (!note) {
@@ -356,7 +428,7 @@ exports.increaseDownloads = async (req, res) => {
 };
 
 // ==========================================
-// GET BRANCH STATS (FOR 3D CARDS & CATALOG) - AGGREGATION PIPELINE
+// GET BRANCH STATS (FOR 3D CARDS & CATALOG)
 // ==========================================
 
 exports.getBranchStats = async (req, res) => {
@@ -376,81 +448,41 @@ exports.getBranchStats = async (req, res) => {
     const Syllabus = require("../models/syllabus");
     const LabProgram = require("../models/LabProgram");
 
-    // High-performance MongoDB Aggregation Pipeline: executes grouping in DB engine
-    const branchAggregationPipeline = [
-      {
-        $match: {
-          branch: { $exists: true, $ne: "" },
-        },
-      },
-      {
-        $group: {
-          _id: { $trim: { input: "$branch" } },
-          count: { $sum: 1 },
-          views: { $sum: { $ifNull: ["$views", 0] } },
-          downloads: { $sum: { $ifNull: ["$downloads", 0] } },
-          likes: { $sum: { $ifNull: ["$likes", 0] } },
-        },
-      },
-      { $sort: { count: -1 } },
-    ];
-
-    const [notesAggr, papersAggr, syllabusAggr, labsAggr] = await Promise.all([
-      Note.aggregate(branchAggregationPipeline),
-      Paper.aggregate(branchAggregationPipeline),
-      Syllabus.aggregate(branchAggregationPipeline),
-      LabProgram.aggregate(branchAggregationPipeline),
+    const [notes, papers, syllabus, labs] = await Promise.all([
+      Note.find({}, "branch title"),
+      Paper.find({}, "branch title"),
+      Syllabus.find({}, "branch title"),
+      LabProgram.find({}, "branch title"),
     ]);
 
+    // Group stats by branch
     const stats = {};
-    let totalNotes = 0;
-    let totalPapers = 0;
-    let totalSyllabus = 0;
-    let totalLabs = 0;
 
-    const mergeStats = (items, type) => {
+    const addToStats = (items, type) => {
       items.forEach((item) => {
-        const rawBranch = item._id;
+        const rawBranch = String(item.branch || "").trim();
         if (!rawBranch) return;
 
         if (!stats[rawBranch]) {
-          stats[rawBranch] = {
-            notes: 0,
-            papers: 0,
-            syllabus: 0,
-            labs: 0,
-            total: 0,
-            views: 0,
-            downloads: 0,
-            likes: 0,
-          };
+          stats[rawBranch] = { notes: 0, papers: 0, syllabus: 0, labs: 0, total: 0 };
         }
-        stats[rawBranch][type] = item.count;
-        stats[rawBranch].total += item.count;
-        stats[rawBranch].views += item.views || 0;
-        stats[rawBranch].downloads += item.downloads || 0;
-        stats[rawBranch].likes += item.likes || 0;
-
-        if (type === "notes") totalNotes += item.count;
-        if (type === "papers") totalPapers += item.count;
-        if (type === "syllabus") totalSyllabus += item.count;
-        if (type === "labs") totalLabs += item.count;
+        stats[rawBranch][type] = (stats[rawBranch][type] || 0) + 1;
+        stats[rawBranch].total = (stats[rawBranch].total || 0) + 1;
       });
     };
 
-    mergeStats(notesAggr, "notes");
-    mergeStats(papersAggr, "papers");
-    mergeStats(syllabusAggr, "syllabus");
-    mergeStats(labsAggr, "labs");
+    addToStats(notes, "notes");
+    addToStats(papers, "papers");
+    addToStats(syllabus, "syllabus");
+    addToStats(labs, "labs");
 
     res.status(200).json({
       success: true,
       stats,
-      totalNotes,
-      totalPapers,
-      totalSyllabus,
-      totalLabs,
-      totalResources: totalNotes + totalPapers + totalSyllabus + totalLabs,
+      totalNotes: notes.length,
+      totalPapers: papers.length,
+      totalSyllabus: syllabus.length,
+      totalLabs: labs.length,
     });
   } catch (error) {
     console.warn("Get Branch Stats Warning:", error.message);
@@ -464,6 +496,7 @@ exports.getBranchStats = async (req, res) => {
     });
   }
 };
+
 
 // ==========================================
 // GET RELATED MATERIALS (AGGREGATION PIPELINE WITH $LOOKUP)
@@ -483,7 +516,6 @@ exports.getRelatedMaterials = async (req, res) => {
       return res.status(404).json({ message: "Note not found" });
     }
 
-    // Pipeline: match branch, compute popularity score, join comments count via $lookup
     const relatedNotes = await Note.aggregate([
       {
         $match: {
@@ -518,7 +550,7 @@ exports.getRelatedMaterials = async (req, res) => {
       { $limit: 6 },
       {
         $project: {
-          comments: 0, // exclude bulky array
+          comments: 0,
         },
       },
     ]);
@@ -591,4 +623,4 @@ exports.getTrendingMaterials = async (req, res) => {
     console.error("Get Trending Materials Error:", error);
     res.status(500).json({ message: error.message });
   }
-};
+};

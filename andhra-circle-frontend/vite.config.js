@@ -18,7 +18,29 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'border-beam', 'bot-avatars'],
+    include: ['react', 'react-dom'],
+  },
+  oxc: {
+    transform: {
+      drop: ['console', 'debugger'],
+    },
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react/') || id.includes('react-dom/') || id.includes('react-router-dom/')) {
+              return 'vendor-react';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-motion';
+            }
+          }
+        },
+      },
+    },
   },
   server: {
     host: true, // lets a phone on the same Wi-Fi open the dev site

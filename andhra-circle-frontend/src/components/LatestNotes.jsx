@@ -1,10 +1,21 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../api/api";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import API, { BACKEND_URL } from "../api/api";
+import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import { normalizeSemester, normalizeScheme } from "../utils/semester";
+import { formatSemDisplay } from "../utils/validators";
+
+const getSubjectSnippet = (item) => {
+  if (item.description && item.description.trim().length > 10) {
+    return item.description.trim();
+  }
+  const branchText = item.branch ? `${item.branch} · ` : "";
+  const semText = item.semester ? `${formatSemDisplay(item.semester)} · ` : "";
+  const subName = item.subject || item.title || "Subject";
+  return `Comprehensive study notes, module-wise topics, derivations & question banks for ${subName} (${branchText}${semText}JNTU Curriculum).`;
+};
 
 function LatestNotes({ search = "" }) {
   const navigate = useNavigate();
@@ -151,7 +162,7 @@ function LatestNotes({ search = "" }) {
 
   const filteredNotes = notes.filter((note) => {
     if (!searchText) return true;
-return (
+    return (
       String(note.title || "")
         .toLowerCase()
         .includes(searchText) ||
@@ -189,7 +200,7 @@ return (
       return imageUrl;
     }
 
-    return `${import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`}${imageUrl}`;
+    return `${BACKEND_URL}${imageUrl}`;
   };
 
   // ==========================================
@@ -216,14 +227,14 @@ return (
   const handleView = async (note) => {
     setBlinkingNoteId(note._id);
     try {
-      API.put(`/notes/${note._id}/view`).catch(() => {});
+      API.put(`/notes/${note._id}/view`).catch(() => { });
       setNotes((prev) =>
         prev.map((item) =>
           item._id === note._id
             ? {
-                ...item,
-                views: (item.views || 0) + 1,
-              }
+              ...item,
+              views: (item.views || 0) + 1,
+            }
             : item
         )
       );
@@ -258,9 +269,9 @@ return (
 
       const pdfUrl =
         pdfPath.startsWith("http://") ||
-        pdfPath.startsWith("https://")
+          pdfPath.startsWith("https://")
           ? pdfPath
-          : `${import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`}${pdfPath}`;
+          : `${BACKEND_URL}${pdfPath}`;
 
       const response = await fetch(pdfUrl);
 
@@ -298,10 +309,10 @@ return (
         prev.map((item) =>
           item._id === note._id
             ? {
-                ...item,
-                downloads:
-                  (item.downloads || 0) + 1,
-              }
+              ...item,
+              downloads:
+                (item.downloads || 0) + 1,
+            }
             : item
         )
       );
@@ -333,7 +344,7 @@ return (
     return subj.split(/\s+/).map(formatWord).join(" ");
   };
 
-    const getSubjectName = (note) => {
+  const getSubjectName = (note) => {
     const subj = (note.subject || "").trim();
     if (subj) {
       return formatSubject(subj);
@@ -346,7 +357,7 @@ return (
     return "Academic Study Notes";
   };
 
-const getDisplayTitle = (note) => {
+  const getDisplayTitle = (note) => {
     const raw = (note.title || "").trim();
     const subj = (note.subject || "").trim();
     if (!raw || raw.toLowerCase() === "notes" || raw.toLowerCase() === "untitled notes") {
@@ -374,7 +385,7 @@ const getDisplayTitle = (note) => {
         <div className="notes-loading">
           Loading Notes...
         </div>
-    </section>
+      </section>
     );
   }
 

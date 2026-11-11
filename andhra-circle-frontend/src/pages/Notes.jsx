@@ -1,10 +1,13 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { MetalFx, useMetalBend } from "metal-fx";
+import { isLowPowerDevice } from "../utils/devicePerf";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
-import API from "../api/api";
+import API, { BACKEND_URL } from "../api/api";
 import StudentProfileModal from "../components/StudentProfileModal";
 import { getStoredStudentData, getStudentAvatar, getStudentAvatarUrl } from "../data/studentData";
 import AuthorProfile from "../components/AuthorProfile";
 import { normalizeSemester, normalizeScheme } from "../utils/semester";
+import { formatSemDisplay } from "../utils/validators";
 import "./Notes.css";
 
 // Branch definitions matching requested engineering departments: CSE, AIML, ME, CE, ECE, EEE
@@ -188,6 +191,18 @@ function Notes({ initialType }) {
   const [activeBranch, setActiveBranch] = useState(matchedTab ? matchedTab.code : "CSE");
   const [selectedSemester, setSelectedSemester] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [visibleCount, setVisibleCount] = useState(16);
+  const isWeak = useMemo(() => isLowPowerDevice(), []);
+
+  // Debounce search query (~250ms)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setVisibleCount(16);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
 
   // Academic Resource Data Stores
   const [notesData, setNotesData] = useState([]);
@@ -252,10 +267,10 @@ function Notes({ initialType }) {
           const data = Array.isArray(res.data)
             ? res.data
             : Array.isArray(res.data?.notes)
-            ? res.data.notes
-            : Array.isArray(res.data?.data)
-            ? res.data.data
-            : [];
+              ? res.data.notes
+              : Array.isArray(res.data?.data)
+                ? res.data.data
+                : [];
           setNotesData(data);
         }
 
@@ -265,10 +280,10 @@ function Notes({ initialType }) {
           const data = Array.isArray(res.data)
             ? res.data
             : Array.isArray(res.data?.papers)
-            ? res.data.papers
-            : Array.isArray(res.data?.data)
-            ? res.data.data
-            : [];
+              ? res.data.papers
+              : Array.isArray(res.data?.data)
+                ? res.data.data
+                : [];
           setPapersData(data);
         }
 
@@ -278,10 +293,10 @@ function Notes({ initialType }) {
           const data = Array.isArray(res.data)
             ? res.data
             : Array.isArray(res.data?.syllabus)
-            ? res.data.syllabus
-            : Array.isArray(res.data?.data)
-            ? res.data.data
-            : [];
+              ? res.data.syllabus
+              : Array.isArray(res.data?.data)
+                ? res.data.data
+                : [];
           setSyllabusData(data);
         }
 
@@ -291,10 +306,10 @@ function Notes({ initialType }) {
           const data = Array.isArray(res.data)
             ? res.data
             : Array.isArray(res.data?.programs)
-            ? res.data.programs
-            : Array.isArray(res.data?.data)
-            ? res.data.data
-            : [];
+              ? res.data.programs
+              : Array.isArray(res.data?.data)
+                ? res.data.data
+                : [];
           setLabsData(data);
         }
       } catch (err) {
@@ -312,11 +327,6 @@ function Notes({ initialType }) {
   }, []);
 
   // Helper: Backend upload URL resolution
-  const getBackendBaseUrl = useCallback(() => {
-    const apiBaseUrl = API.defaults?.baseURL || "http://localhost:5000/api";
-    return apiBaseUrl.replace(/\/api\/?$/, "").replace(/\/$/, "");
-  }, []);
-
   const getPdfUrl = useCallback((pdfUrl) => {
     if (!pdfUrl) return "";
     let value = String(pdfUrl).trim();
@@ -333,8 +343,8 @@ function Notes({ initialType }) {
     if (!value.startsWith("/")) {
       value = `/${value}`;
     }
-    return `${getBackendBaseUrl()}${value}`;
-  }, [getBackendBaseUrl]);
+    return `${BACKEND_URL}${value}`;
+  }, []);
 
   const getPdfFileName = useCallback((pdfUrl) => {
     if (!pdfUrl) return "";
@@ -364,7 +374,7 @@ function Notes({ initialType }) {
         if (title.toLowerCase() === "notes" && n.subject) {
           title = n.subject;
         }
-        const sem = normalizeSemester(n.semester);
+        const sem = normalizeSemester(n.semester) || (n.semester ? formatSemDisplay(n.semester) : "");
         return {
           id: n._id,
           title: formatTitle(title),
@@ -396,7 +406,7 @@ function Notes({ initialType }) {
           displayTitle = formatTitle(rawTitle || subj || "Question Paper");
         }
 
-        const sem = normalizeSemester(p.semester);
+        const sem = normalizeSemester(p.semester) || (p.semester ? formatSemDisplay(p.semester) : "");
         const metaItems = [];
         if (p.year) metaItems.push(p.year);
         if (p.examType && !displayTitle.toLowerCase().includes(p.examType.toLowerCase())) {
@@ -432,7 +442,7 @@ function Notes({ initialType }) {
           title = formatTitle(title);
         }
 
-        const sem = normalizeSemester(s.semester);
+        const sem = normalizeSemester(s.semester) || (s.semester ? formatSemDisplay(s.semester) : "");
         const metaItems = [];
         if (s.subjectCode) metaItems.push(s.subjectCode);
 
@@ -463,7 +473,7 @@ function Notes({ initialType }) {
           title = formatTitle(title || subj || "Lab Program");
         }
 
-        const sem = normalizeSemester(l.semester);
+        const sem = normalizeSemester(l.semester) || (l.semester ? formatSemDisplay(l.semester) : "");
         const metaItems = [];
         if (l.subjectCode) metaItems.push(l.subjectCode);
 
@@ -488,9 +498,9 @@ function Notes({ initialType }) {
     else if (activeResource === "syllabus") list = mappedSyllabus;
     else if (activeResource === "labs") list = mappedLabs;
 
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+    // Filter by debounced search query
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
       list = list.filter(
         (item) =>
           item.title.toLowerCase().includes(q) ||
@@ -502,11 +512,21 @@ function Notes({ initialType }) {
 
     // Filter by semester dropdown
     if (selectedSemester !== "ALL") {
-      list = list.filter((item) => normalizeSemester(item.semester) === selectedSemester);
+      const target = selectedSemester.toLowerCase();
+      list = list.filter((item) => {
+        const norm = (normalizeSemester(item.semester) || "").toLowerCase();
+        const fmt = formatSemDisplay(item.semester).toLowerCase();
+        const raw = String(item.semester || "").toLowerCase();
+        return norm === target || fmt === target || raw.includes(target);
+      });
     }
 
     return list;
-  }, [activeResource, mappedNotes, mappedPapers, mappedSyllabus, mappedLabs, searchQuery, selectedSemester]);
+  }, [activeResource, mappedNotes, mappedPapers, mappedSyllabus, mappedLabs, debouncedSearch, selectedSemester]);
+
+  const paginatedItems = useMemo(() => {
+    return displayItems.slice(0, visibleCount);
+  }, [displayItems, visibleCount]);
 
   // Switch between academic resource types (Notes, Question Papers, Syllabus, Lab Programs)
   const handleSwitchResource = (type) => {
@@ -552,11 +572,11 @@ function Notes({ initialType }) {
 
     // Record view counts on backend
     if (item.resourceType === "papers") {
-      API.put(`/papers/${item.id}/view`).catch(() => {});
+      API.put(`/papers/${item.id}/view`).catch(() => { });
     } else if (item.resourceType === "syllabus") {
-      API.put(`/syllabus/${item.id}/view`).catch(() => {});
+      API.put(`/syllabus/${item.id}/view`).catch(() => { });
     } else if (item.resourceType === "labs") {
-      API.put(`/lab-programs/${item.id}/view`).catch(() => {});
+      API.put(`/lab-programs/${item.id}/view`).catch(() => { });
     }
 
     const fileName = getPdfFileName(item.pdfUrl);
@@ -587,11 +607,11 @@ function Notes({ initialType }) {
 
       // Increment download counter
       if (item.resourceType === "papers") {
-        API.put(`/papers/${item.id}/download`).catch(() => {});
+        API.put(`/papers/${item.id}/download`).catch(() => { });
       } else if (item.resourceType === "syllabus") {
-        API.put(`/syllabus/${item.id}/download`).catch(() => {});
+        API.put(`/syllabus/${item.id}/download`).catch(() => { });
       } else if (item.resourceType === "labs") {
-        API.put(`/lab-programs/${item.id}/download`).catch(() => {});
+        API.put(`/lab-programs/${item.id}/download`).catch(() => { });
       }
 
       const response = await fetch(fullUrl);
@@ -777,29 +797,64 @@ function Notes({ initialType }) {
               {/* Search Box with Reactive Search Button */}
               <div className="notes-search-box">
                 <div className="notes-search-metal-wrap">
-                  <button
-                    type="button"
-                    className="notes-metal-search-btn"
-                    onClick={handleExecuteSearch}
-                    title={`Search ${currentConfig.label}`}
-                    aria-label="Search"
-                  >
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="metal-search-icon"
-                      aria-hidden="true"
+                  {isWeak ? (
+                    <button
+                      type="button"
+                      className="metal-search-btn notes-metal-search-btn"
+                      onClick={handleExecuteSearch}
+                      title={`Search ${currentConfig.label}`}
+                      aria-label="Search"
                     >
-                      <circle cx="11" cy="11" r="7" />
-                      <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
-                    </svg>
-                  </button>
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="metal-search-icon"
+                        aria-hidden="true"
+                      >
+                        <circle cx="11" cy="11" r="7" />
+                        <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
+                      </svg>
+                    </button>
+                  ) : (
+                    <MetalFx
+                      ref={searchMetalRef}
+                      preset="chromatic"
+                      variant="circle"
+                      strength={1}
+                      innerShadow
+                      className="metal-search-wrapper"
+                    >
+                      <button
+                        type="button"
+                        className="metal-search-btn notes-metal-search-btn"
+                        onClick={handleExecuteSearch}
+                        title={`Search ${currentConfig.label}`}
+                        aria-label="Search"
+                      >
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="metal-search-icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="11" cy="11" r="7" />
+                          <line x1="16.5" y1="16.5" x2="21.5" y2="21.5" />
+                        </svg>
+                      </button>
+                    </MetalFx>
+                  )}
                 </div>
                 <input
                   ref={searchInputRef}
@@ -880,7 +935,7 @@ function Notes({ initialType }) {
             </div>
 
             {/* Right Column: Unified Subject Folder Cards List */}
-            <div 
+            <div
               key={`${activeResource}-${activeBranch}-${selectedSemester}-${searchQuery}`}
               className="notes-cards-container"
             >
@@ -911,71 +966,106 @@ function Notes({ initialType }) {
                   </button>
                 </div>
               ) : (
-                displayItems.map((item) => (
-                  <article key={item.id} className="notes-folder-card">
-                    {/* Folder Icon & Resource Details */}
-                    <div className="folder-card-left">
-                      {/* Deep Emerald & Sunbeam Dual-Tone Folder Icon */}
-                      <svg
-                        className="folder-svg-icon"
-                        viewBox="0 0 48 40"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M4 8C4 5.79086 5.79086 4 8 4H18.2426C19.3035 4 20.3209 4.42143 21.0711 5.17157L24.8284 8.92893C25.5786 9.67907 26.596 10.1005 27.6569 10.1005H40C42.2091 10.1005 44 11.8914 44 14.1005V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z"
-                          fill="#002924"
-                        />
-                        <path
-                          d="M4 14.5C4 12.567 5.567 11 7.5 11H40.5C42.433 11 44 12.567 44 14.5V32.5C44 34.433 42.433 36 40.5 36H7.5C5.567 36 4 34.433 4 32.5V14.5Z"
-                          fill="#013e37"
-                        />
-                        <path
-                          d="M4 16.5C4 14.8431 5.34315 13.5 7 13.5H41C42.6569 13.5 44 14.8431 44 16.5V32.5C44 34.433 42.433 36 40.5 36H7.5C5.567 36 4 34.433 4 32.5V16.5Z"
-                          fill="#02594f"
-                        />
-                        <circle cx="39" cy="9.5" r="2.5" fill="#d9a726" />
-                      </svg>
+                <>
+                  {paginatedItems.map((item) => (
+                    <article key={item.id} className="notes-folder-card">
+                      {/* Folder Icon & Resource Details */}
+                      <div className="folder-card-left">
+                        {/* Deep Emerald & Sunbeam Dual-Tone Folder Icon */}
+                        <svg
+                          className="folder-svg-icon"
+                          viewBox="0 0 48 40"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M4 8C4 5.79086 5.79086 4 8 4H18.2426C19.3035 4 20.3209 4.42143 21.0711 5.17157L24.8284 8.92893C25.5786 9.67907 26.596 10.1005 27.6569 10.1005H40C42.2091 10.1005 44 11.8914 44 14.1005V32C44 34.2091 42.2091 36 40 36H8C5.79086 36 4 34.2091 4 32V8Z"
+                            fill="#002924"
+                          />
+                          <path
+                            d="M4 14.5C4 12.567 5.567 11 7.5 11H40.5C42.433 11 44 12.567 44 14.5V32.5C44 34.433 42.433 36 40.5 36H7.5C5.567 36 4 34.433 4 32.5V14.5Z"
+                            fill="#013e37"
+                          />
+                          <path
+                            d="M4 16.5C4 14.8431 5.34315 13.5 7 13.5H41C42.6569 13.5 44 14.8431 44 16.5V32.5C44 34.433 42.433 36 40.5 36H7.5C5.567 36 4 34.433 4 32.5V16.5Z"
+                            fill="#02594f"
+                          />
+                          <circle cx="39" cy="9.5" r="2.5" fill="#d9a726" />
+                        </svg>
 
-                      <div className="folder-card-meta">
-                        <h3 className="folder-card-title">{item.title}</h3>
-                        <p className="folder-card-sub">
-                          <span className="folder-branch-tag">{item.branchCode}</span>
-                          {item.semester && (
-                            <>
-                              <span>•</span>
-                              <span>{item.semester}</span>
-                            </>
-                          )}
-                          {item.scheme && (
-                            <>
-                              <span>•</span>
-                              <span className="folder-scheme-tag">{item.scheme} Scheme</span>
-                            </>
-                          )}
-                          {item.extraBadge && (
-                            <>
-                              <span>•</span>
-                              <span>{item.extraBadge}</span>
-                            </>
-                          )}
-                        </p>
+                        <div className="folder-card-meta">
+                          <h3 className="folder-card-title">{item.title}</h3>
+                          <p className="folder-card-sub">
+                            <span className="folder-branch-tag">{item.branchCode}</span>
+                            {item.semester && (
+                              <>
+                                <span>•</span>
+                                <span>{formatSemDisplay(item.semester)}</span>
+                              </>
+                            )}
+                            {item.scheme && (
+                              <>
+                                <span>•</span>
+                                <span className="folder-scheme-tag">{item.scheme} Scheme</span>
+                              </>
+                            )}
+                            {item.extraBadge && (
+                              <>
+                                <span>•</span>
+                                <span>{item.extraBadge}</span>
+                              </>
+                            )}
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Action Buttons: View */}
-                    <div className="folder-card-actions">
+                      {/* Action Buttons: View */}
+                      <div className="folder-card-actions">
+                        {isWeak ? (
+                          <button
+                            type="button"
+                            className="folder-view-btn"
+                            onClick={() => handleViewItem(item)}
+                            title={`View ${item.title}`}
+                          >
+                            View
+                          </button>
+                        ) : (
+                          <MetalFx
+                            preset="gold"
+                            variant="button"
+                            theme="dark"
+                            strength={1}
+                            innerShadow
+                            normalizeHostStyles={false}
+                            className="folder-view-metal-wrap"
+                          >
+                            <button
+                              type="button"
+                              className="folder-view-btn"
+                              onClick={() => handleViewItem(item)}
+                              title={`View ${item.title}`}
+                            >
+                              View
+                            </button>
+                          </MetalFx>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+
+                  {displayItems.length > visibleCount && (
+                    <div style={{ textAlign: "center", margin: "1.5rem 0" }}>
                       <button
                         type="button"
-                        className="folder-view-btn"
-                        onClick={() => handleViewItem(item)}
-                        title={`View ${item.title}`}
+                        className="empty-reset-btn"
+                        onClick={() => setVisibleCount((prev) => prev + 16)}
                       >
-                        View
+                        Load More ({displayItems.length - visibleCount} remaining) ↓
                       </button>
                     </div>
-                  </article>
-                ))
+                  )}
+                </>
               )}
             </div>
           </div>

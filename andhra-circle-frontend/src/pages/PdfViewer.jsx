@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useMemo } from "react";
+import { BACKEND_URL } from "../api/api";
 import "./PdfViewer.css";
 
 function PdfViewer() {
@@ -10,7 +11,6 @@ function PdfViewer() {
   const [downloading, setDownloading] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
   const customUrl = searchParams.get("url");
   const customTitle = searchParams.get("title");
   const source = searchParams.get("source");
@@ -44,7 +44,7 @@ function PdfViewer() {
     const isLocalUpload = rawPdfUrl.includes("/uploads/");
 
     // Direct proxy streaming gives 100% full-screen Chrome PDF reader with zero letterboxing for external links
-    if (rawPdfUrl.startsWith("http") && !rawPdfUrl.includes(":5000/api") && !isLocalUpload) {
+    if (rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/") && !isLocalUpload) {
       return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`;
     }
 
@@ -99,7 +99,7 @@ function PdfViewer() {
       try {
         const isLocalUpload = rawPdfUrl.includes("/uploads/");
         const streamUrl =
-          rawPdfUrl.startsWith("http") && !rawPdfUrl.includes(":5000/api") && !isLocalUpload
+          rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/") && !isLocalUpload
             ? `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`
             : rawPdfUrl;
 

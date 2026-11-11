@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import API from "../api/api";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import API, { BACKEND_URL } from "../api/api";
+import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "../components/LikeReactionButton";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { normalizeSemester, normalizeScheme } from "../utils/semester";
+import { formatSemDisplay } from "../utils/validators";
 import "./Syllabus.css";
 
 // Branch definitions matching homepage engineering departments
@@ -29,8 +30,6 @@ const SEMESTER_OPTIONS = [
   { value: "3-2", label: "3-2" },
   { value: "4-1", label: "4-1" },
   { value: "4-2", label: "4-2" },
-];
-
 function Syllabus({ search: propSearch = "" }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -129,7 +128,12 @@ function Syllabus({ search: propSearch = "" }) {
 
       // 3. Semester Filter
       if (activeSemester !== "ALL") {
-        if (normalizeSemester(item.semester) !== activeSemester) {
+        const itemSem = (normalizeSemester(item.semester) || formatSemDisplay(item.semester)).toLowerCase();
+        const targetSem = activeSemester.toLowerCase();
+        const rawSem = String(item.semester || "").toLowerCase();
+        if (itemSem !== targetSem && !rawSem.includes(targetSem)) {
+          return false;
+        }
           return false;
         }
       }
@@ -164,11 +168,6 @@ function Syllabus({ search: propSearch = "" }) {
     return "";
   };
 
-  const getBackendBaseUrl = () => {
-    const apiBaseUrl = API.defaults?.baseURL || "http://localhost:5000/api";
-    return apiBaseUrl.replace(/\/api\/?$/, "").replace(/\/$/, "");
-  };
-
   const getPdfUrl = (pdfUrl) => {
     if (!pdfUrl) return "";
     let value = String(pdfUrl).trim();
@@ -178,8 +177,7 @@ function Syllabus({ search: propSearch = "" }) {
     if (!value.startsWith("/")) {
       value = `/${value}`;
     }
-    const backendBaseUrl = getBackendBaseUrl();
-    return `${backendBaseUrl}${value}`;
+    return `${BACKEND_URL}${value}`;
   };
 
   const getPdfFileName = (pdfUrl) => {
@@ -273,7 +271,7 @@ function Syllabus({ search: propSearch = "" }) {
         }
         try {
           localStorage.setItem("andhra_liked_syllabus", JSON.stringify([...next]));
-        } catch {}
+        } catch { }
         return next;
       });
 
@@ -363,7 +361,7 @@ function Syllabus({ search: propSearch = "" }) {
   // ==========================================
   const renderTopBar = () => {
     if (!isStandalonePage) return null;
-return (
+    return (
       <div className="papers-page-topbar">
         <button
           type="button"
@@ -405,7 +403,7 @@ return (
           </button>
           <span className="papers-breadcrumb-slash">/</span>
           <span className="papers-breadcrumb-current">
-                        Syllabus
+            Syllabus
           </span>
         </div>
       </div>
@@ -471,13 +469,13 @@ return (
                   branch.key === "ALL"
                     ? syllabusList.length
                     : syllabusList.filter((item) => {
-                        const itemBranch = String(item.branch || "").toLowerCase();
-                        return (
-                          branch.matchTerms?.some((term) =>
-                            itemBranch.includes(term)
-                          ) || itemBranch.includes(branch.label.toLowerCase())
-                        );
-                      }).length;
+                      const itemBranch = String(item.branch || "").toLowerCase();
+                      return (
+                        branch.matchTerms?.some((term) =>
+                          itemBranch.includes(term)
+                        ) || itemBranch.includes(branch.label.toLowerCase())
+                      );
+                    }).length;
 
                 return (
                   <button
@@ -581,54 +579,54 @@ return (
               {(activeBranch !== "ALL" ||
                 activeSemester !== "ALL" ||
                 searchQuery) && (
-                <div className="syllabus-active-tags-row">
-                  <span className="active-tags-label">Active:</span>
-                  {activeBranch !== "ALL" && (
+                  <div className="syllabus-active-tags-row">
+                    <span className="active-tags-label">Active:</span>
+                    {activeBranch !== "ALL" && (
+                      <button
+                        type="button"
+                        className="active-filter-tag"
+                        onClick={() => setActiveBranch("ALL")}
+                        title="Clear branch filter"
+                      >
+                        <span>Branch: {activeBranchObj.label}</span>
+                        <span className="tag-remove-x" aria-hidden="true">✕</span>
+                      </button>
+                    )}
+                    {activeSemester !== "ALL" && (
+                      <button
+                        type="button"
+                        className="active-filter-tag"
+                        onClick={() => setActiveSemester("ALL")}
+                        title="Clear semester filter"
+                      >
+                        <span>Semester: {activeSemester}</span>
+                        <span className="tag-remove-x" aria-hidden="true">✕</span>
+                      </button>
+                    )}
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        className="active-filter-tag"
+                        onClick={() => setSearchQuery("")}
+                        title="Clear search query"
+                      >
+                        <span>Search: "{searchQuery}"</span>
+                        <span className="tag-remove-x" aria-hidden="true">✕</span>
+                      </button>
+                    )}
                     <button
                       type="button"
-                      className="active-filter-tag"
-                      onClick={() => setActiveBranch("ALL")}
-                      title="Clear branch filter"
+                      className="clear-all-filters-btn"
+                      onClick={() => {
+                        setActiveBranch("ALL");
+                        setActiveSemester("ALL");
+                        setSearchQuery("");
+                      }}
                     >
-                      <span>Branch: {activeBranchObj.label}</span>
-                      <span className="tag-remove-x" aria-hidden="true">✕</span>
+                      Clear All
                     </button>
-                  )}
-                  {activeSemester !== "ALL" && (
-                    <button
-                      type="button"
-                      className="active-filter-tag"
-                      onClick={() => setActiveSemester("ALL")}
-                      title="Clear semester filter"
-                    >
-                      <span>Semester: {activeSemester}</span>
-                      <span className="tag-remove-x" aria-hidden="true">✕</span>
-                    </button>
-                  )}
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      className="active-filter-tag"
-                      onClick={() => setSearchQuery("")}
-                      title="Clear search query"
-                    >
-                      <span>Search: "{searchQuery}"</span>
-                      <span className="tag-remove-x" aria-hidden="true">✕</span>
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="clear-all-filters-btn"
-                    onClick={() => {
-                      setActiveBranch("ALL");
-                      setActiveSemester("ALL");
-                      setSearchQuery("");
-                    }}
-                  >
-                    Clear All
-                  </button>
-                </div>
-              )}
+                  </div>
+                )}
             </div>
           </div>
 
@@ -841,7 +839,145 @@ return (
             </article>
           ))}
         </div>
-      )}
+      )
+                    </span>
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="resource-content">
+                    {/* Subject Code Badge */}
+                    {item.subjectCode && (
+                      <div className="card-code-row">
+                        <span className="card-code-badge" title={`Subject Code: ${item.subjectCode}`}>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                            <line x1="7" y1="7" x2="7.01" y2="7" />
+                          </svg>
+                          {item.subjectCode}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Subject Name */}
+                    <h3 className="resource-title" title={getSyllabusDisplayTitle(item)}>
+                      {getSyllabusDisplayTitle(item)}
+                    </h3>
+
+                    {/* Subject Description in the gap */}
+                    <p className="card-subject-snippet" title={getSyllabusSnippet(item)}>
+                      {getSyllabusSnippet(item)}
+                    </p>
+
+                    {/* Spacer */}
+                    <div className="resource-content-spacer" />
+
+                    {/* Professional Metrics Bar & Like Section */}
+                    <div className="resource-stats">
+                      <div className="resource-stats-left">
+                        <span
+                          className="stat-chip stat-chip-views"
+                          title={`${item.views || 0} Total Views`}
+                        >
+                          <svg
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                          <span className="stat-count">{item.views || 0}</span>
+                        </span>
+
+                        <span
+                          className="stat-chip stat-chip-downloads"
+                          title={`${item.downloads || 0} Total Downloads`}
+                        >
+                          <svg
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                          </svg>
+                          <span className="stat-count">{item.downloads || 0}</span>
+                        </span>
+                      </div>
+
+                      <LikeReactionButton
+                        isLiked={likedSyllabusIds.has(item._id)}
+                        count={item.likes || 0}
+                        onToggle={(e) => handleToggleLike(item, e)}
+                        title={
+                          likedSyllabusIds.has(item._id)
+                            ? "Liked"
+                            : "Like syllabus copy"
+                        }
+                      />
+                    </div>
+
+                    {/* Action Buttons: View PDF & Download */}
+                    <div className="resource-buttons">
+                      <button
+                        type="button"
+                        className="view-pdf-button"
+                        onClick={() => handleView(item)}
+                      >
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        View PDF
+                      </button>
+
+                      <button
+                        type="button"
+                        className="download-pdf-button"
+                        onClick={() => handleDownload(item)}
+                      >
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="7 10 12 15 17 10" />
+                          <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

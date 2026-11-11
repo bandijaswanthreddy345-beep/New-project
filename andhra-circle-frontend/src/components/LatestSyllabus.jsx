@@ -1,9 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../api/api";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import API, { BACKEND_URL } from "../api/api";
+import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import { normalizeSemester, normalizeScheme } from "../utils/semester";
+import { formatSemDisplay } from "../utils/validators";
+
+const getSyllabusSnippet = (item) => {
+  if (item.description && item.description.trim().length > 10) {
+    return item.description.trim();
+  }
+  const branchText = item.branch ? `${item.branch} · ` : "";
+  const semText = item.semester ? `${formatSemDisplay(item.semester)} · ` : "";
+  const subName = item.subject || item.title || "Curriculum";
+  return `Official course curriculum, unit breakdown, learning objectives & prescribed references for ${subName} (${branchText}${semText}Academic Regulations).`;
+};
 
 function LatestSyllabus({ search = "" }) {
   const navigate = useNavigate();
@@ -50,7 +61,7 @@ function LatestSyllabus({ search = "" }) {
 
   const filteredSyllabus = syllabus.filter((item) => {
     if (!searchText) return true;
-return (
+    return (
       String(item.title || "").toLowerCase().includes(searchText) ||
       String(item.branch || "").toLowerCase().includes(searchText) ||
       String(item.semester || "").toLowerCase().includes(searchText) ||
@@ -85,11 +96,6 @@ return (
     return "";
   };
 
-  const getBackendBaseUrl = () => {
-    const apiBaseUrl = API.defaults?.baseURL || "http://localhost:5000/api";
-    return apiBaseUrl.replace(/\/api\/?$/, "").replace(/\/$/, "");
-  };
-
   const getPdfUrl = (pdfUrl) => {
     if (!pdfUrl) return "";
     let value = String(pdfUrl).trim();
@@ -99,8 +105,7 @@ return (
     if (!value.startsWith("/")) {
       value = `/${value}`;
     }
-    const backendBaseUrl = getBackendBaseUrl();
-    return `${backendBaseUrl}${value}`;
+    return `${BACKEND_URL}${value}`;
   };
 
   const getPdfFileName = (pdfUrl) => {
@@ -194,7 +199,7 @@ return (
         }
         try {
           localStorage.setItem("andhra_liked_syllabus", JSON.stringify([...next]));
-        } catch {}
+        } catch { }
         return next;
       });
 

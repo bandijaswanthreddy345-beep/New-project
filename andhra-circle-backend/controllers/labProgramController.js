@@ -1,4 +1,5 @@
 const LabProgram = require("../models/LabProgram");
+const recordAuditLog = require("../services/auditLogger");
 
 // ==========================================
 // CREATE LAB PROGRAM
@@ -11,15 +12,39 @@ exports.createLabProgram = async (req, res) => {
       });
     }
 
+    const title = String(req.body.title || "").trim().slice(0, 300);
+    const branch = String(req.body.branch || "").trim().slice(0, 100);
+    const semester = String(req.body.semester || "").trim().slice(0, 50);
+    const subject = String(req.body.subject || "").trim().slice(0, 200);
+    const subjectCode = String(req.body.subjectCode || "").trim().slice(0, 50);
+    const description = String(req.body.description || "").trim().slice(0, 5000);
+
+    if (!title) {
+      return res.status(400).json({
+        message: "Title is required",
+      });
+    }
+
     const labProgram = await LabProgram.create({
-      title: req.body.title,
-      branch: req.body.branch,
-      semester: req.body.semester,
-      subject: req.body.subject,
-      subjectCode: req.body.subjectCode,
-      description: req.body.description,
+      title,
+      branch,
+      semester,
+      subject,
+      subjectCode,
+      description,
       pdfUrl: `/uploads/${req.file.filename}`,
     });
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "create",
+        resourceType: "LabProgram",
+        resourceId: labProgram._id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
 
     res.status(201).json(labProgram);
   } catch (error) {
@@ -83,17 +108,22 @@ exports.getLabProgramById = async (req, res) => {
 // ==========================================
 exports.updateLabProgram = async (req, res) => {
   try {
+    const updateData = {};
+    if (req.body.title !== undefined) updateData.title = String(req.body.title).trim().slice(0, 300);
+    if (req.body.branch !== undefined) updateData.branch = String(req.body.branch).trim().slice(0, 100);
+    if (req.body.semester !== undefined) updateData.semester = String(req.body.semester).trim().slice(0, 50);
+    if (req.body.subject !== undefined) updateData.subject = String(req.body.subject).trim().slice(0, 200);
+    if (req.body.subjectCode !== undefined) updateData.subjectCode = String(req.body.subjectCode).trim().slice(0, 50);
+    if (req.body.description !== undefined) updateData.description = String(req.body.description).trim().slice(0, 5000);
+
+    if (req.file) {
+      updateData.pdfUrl = `/uploads/${req.file.filename}`;
+    }
+
     const labProgram =
       await LabProgram.findByIdAndUpdate(
         req.params.id,
-        {
-          title: req.body.title,
-          branch: req.body.branch,
-          semester: req.body.semester,
-          subject: req.body.subject,
-          subjectCode: req.body.subjectCode,
-          description: req.body.description,
-        },
+        { $set: updateData },
         {
           returnDocument: "after",
           runValidators: true,
@@ -103,6 +133,17 @@ exports.updateLabProgram = async (req, res) => {
     if (!labProgram) {
       return res.status(404).json({
         message: "Lab program not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "update",
+        resourceType: "LabProgram",
+        resourceId: labProgram._id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -135,6 +176,17 @@ exports.deleteLabProgram = async (req, res) => {
     if (!labProgram) {
       return res.status(404).json({
         message: "Lab program not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "delete",
+        resourceType: "LabProgram",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 

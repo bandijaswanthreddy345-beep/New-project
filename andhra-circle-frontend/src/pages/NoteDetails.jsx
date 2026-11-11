@@ -1,24 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import API from "../api/api";
+import API, { BACKEND_URL } from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
 import { normalizeSemester } from "../utils/semester";
 import { getStoredStudentData } from "../data/studentData";
+import { formatSemDisplay } from "../utils/validators";
 import "./NoteDetails.css";
 
 function formatFriendlySemester(sem) {
-  if (!sem) return "";
-  const clean = String(sem).trim();
-  if (clean === "1-1") return "Semester 1";
-  if (clean === "1-2") return "Semester 2";
-  if (clean === "2-1") return "Semester 3";
-  if (clean === "2-2") return "Semester 4";
-  if (clean === "3-1") return "Semester 5";
-  if (clean === "3-2") return "Semester 6";
-  if (clean === "4-1") return "Semester 7";
-  if (clean === "4-2") return "Semester 8";
-  if (/^[1-8]$/.test(clean)) return "Semester " + clean;
-  return clean;
+  return formatSemDisplay(sem);
 }
 
 
@@ -108,8 +98,6 @@ function NoteDetails() {
       window.removeEventListener("focus", syncIdentity);
     };
   }, []);
-
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
   // =========================================================
   // FETCH NOTE
