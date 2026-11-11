@@ -153,10 +153,7 @@ exports.updatePaper = async (req, res) => {
     const paper = await Paper.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
-      {
-        returnDocument: "after",
-        runValidators: true,
-      }
+      { returnDocument: "after", runValidators: true }
     );
 
     if (!paper) {

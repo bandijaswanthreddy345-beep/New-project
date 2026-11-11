@@ -8,8 +8,6 @@ const {
 } = require("../controllers/dashboardController");
 
 router.get("/stats", auth, getDashboardStats);
-if (typeof getDashboardAnalytics === "function") {
-  router.get("/analytics", auth, getDashboardAnalytics);
-}
+router.get("/analytics", auth, getDashboardAnalytics);
 
 module.exports = router;
