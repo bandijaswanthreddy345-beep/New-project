@@ -143,7 +143,7 @@ ul {
   justify-content: space-between;
 
   min-height: 72px;
-  padding: 10px 56px;
+  padding: 10px 24px;
 
   background: #ffffff;
   color: var(--text-primary);
@@ -238,7 +238,7 @@ ul {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -254,11 +254,11 @@ ul {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 14px;
+  gap: 8px;
+  padding: 9px 16px;
   border-radius: 9999px;
   color: #243E38;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 550;
   letter-spacing: -0.01em;
   text-decoration: none;
