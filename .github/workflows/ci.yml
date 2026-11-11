@@ -29,6 +29,9 @@ jobs:
         run: npm ci
 
       - name: Security Check
+        env:
+          JWT_SECRET: ci_test_random_super_secret_jwt_at_least_32_characters_long
+          CAPTCHA_SECRET: ci_test_random_super_secret_captcha_32_chars
         run: npm run security:check
 
       - name: NPM Audit

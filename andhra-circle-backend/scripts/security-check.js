@@ -158,7 +158,8 @@ function checkSecrets() {
     if (m) values[m[1]] = m[2];
   }
 
-  const secret = values.JWT_SECRET || "";
+  // Fallback to process.env if .env file is not present (e.g. in CI environments)
+  const secret = values.JWT_SECRET || process.env.JWT_SECRET || "";
   if (!secret) {
     add("HIGH", "S1", "JWT_SECRET is not set", "Logins cannot be trusted without it.");
   } else if (
@@ -173,7 +174,8 @@ function checkSecrets() {
     );
   }
 
-  if (!values.EMAILJS_SERVICE_ID) {
+  const emailJsId = values.EMAILJS_SERVICE_ID || process.env.EMAILJS_SERVICE_ID || "";
+  if (!emailJsId) {
     add(
       "MEDIUM",
       "S2",
