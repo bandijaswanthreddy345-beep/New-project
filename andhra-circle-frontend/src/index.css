@@ -64,8 +64,8 @@
   --shadow-lg: 0 16px 40px rgba(0, 41, 36, 0.15);
   --shadow-ghost: 0 10px 30px -5px rgba(217, 167, 38, 0.25);
 
-  --font-family: 'Nexo Kora', 'Nexo', 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-title: 'Deltha', 'Deltha Font', 'Nexo Kora', 'Plus Jakarta Sans', sans-serif;
+  --font-family: 'Montserrat', 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-title: 'Montserrat', sans-serif;
 
   --transition: 0.25s ease;
 }
@@ -75,8 +75,8 @@
 ========================================================= */
 
 .font-deltha {
-  font-family: var(--font-title);
-  letter-spacing: 0.02em;
+  font-family: 'Montserrat', sans-serif !important;
+  letter-spacing: -0.02em;
 }
 
 /* =========================================================
@@ -145,12 +145,12 @@ ul {
   min-height: 72px;
   padding: 10px 56px;
 
-  background: rgba(255, 255, 255, 0.96);
+  background: #ffffff;
   color: var(--text-primary);
 
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid #013A33;
 
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 2px 10px rgba(1, 58, 51, 0.05);
 
   backdrop-filter: blur(12px);
 }
@@ -167,8 +167,8 @@ ul {
 .logo a {
   display: flex;
   align-items: center;
-  gap: 11px;
-
+  gap: 12px;
+  text-decoration: none;
   color: var(--text-primary);
 }
 
@@ -179,19 +179,48 @@ ul {
   object-fit: contain;
 
   border-radius: 50%;
-  background: transparent;
+  background: #ffffff;
 
-  border: 1px solid var(--border);
+  border: 1.5px solid rgba(13, 69, 60, 0.16);
   padding: 3px;
 
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 4px rgba(1, 58, 51, 0.06);
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.logo h2 {
-  font-size: 23px;
-  font-weight: 750;
-  letter-spacing: -0.3px;
-  color: var(--primary-dark);
+.logo a:hover .logo-image {
+  border-color: rgba(13, 69, 60, 0.32);
+  transform: scale(1.02);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.logo h2,
+.logo h2 .font-deltha {
+  font-family: "Montserrat", sans-serif !important;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #013A33;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.logo-text span {
+  font-family: "Montserrat", sans-serif !important;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  color: #2D6A5F;
+  margin-top: 2px;
+  line-height: 1.2;
 }
 
 /* =========================================================
@@ -221,13 +250,14 @@ ul {
 }
 
 .nav-links a {
+  font-family: "Montserrat", sans-serif !important;
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 7px;
   padding: 8px 14px;
   border-radius: 9999px;
-  color: #334155;
+  color: #243E38;
   font-size: 13.5px;
   font-weight: 550;
   letter-spacing: -0.01em;
@@ -243,18 +273,18 @@ ul {
 }
 
 .nav-links a:hover {
-  color: var(--primary);
-  background: rgba(13, 69, 60, 0.08);
-  border-color: rgba(13, 69, 60, 0.18);
+  color: #013A33;
+  background: rgba(13, 69, 60, 0.06);
+  border-color: rgba(13, 69, 60, 0.15);
   transform: translateY(-1px);
 }
 
 .nav-links a.active {
-  color: var(--primary);
-  background: rgba(13, 69, 60, 0.12);
-  border-color: rgba(13, 69, 60, 0.24);
-  font-weight: 650;
-  box-shadow: 0 1px 3px rgba(13, 69, 60, 0.08);
+  color: #013A33;
+  background: rgba(13, 69, 60, 0.1);
+  border-color: rgba(13, 69, 60, 0.22);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(13, 69, 60, 0.06);
 }
 
 .nav-link-with-icon {
@@ -304,28 +334,30 @@ ul {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #1e2433 0%, #131722 62%, #090c13 100%);
-  color: #f1f5f9;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: radial-gradient(circle at 35% 30%, #07574c 0%, #01352f 62%, #00241f 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 239, 179, 0.45);
   box-shadow:
-    0 3px 12px rgba(0, 0, 0, 0.28),
+    0 3px 10px rgba(0, 36, 31, 0.35),
     0 1px 3px rgba(0, 0, 0, 0.2),
     inset 0 1px 1px rgba(255, 255, 255, 0.35),
-    inset 0 -1px 1.5px rgba(0, 0, 0, 0.45);
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   padding: 0;
   margin: 0;
   outline: none;
   position: relative;
   z-index: 1;
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, color 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, background 0.2s ease;
 }
 
 .metal-search-btn:hover {
+  background: radial-gradient(circle at 35% 30%, #09685a 0%, #013e37 62%, #00241f 100%);
   color: #ffffff;
+  border-color: #ffefb3;
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.35),
-    0 0 14px rgba(139, 92, 246, 0.25),
+    0 4px 14px rgba(0, 36, 31, 0.45),
+    0 0 10px rgba(255, 239, 179, 0.3),
     inset 0 1px 1.5px rgba(255, 255, 255, 0.45);
   transform: translateY(-1px);
 }
@@ -333,7 +365,7 @@ ul {
 .metal-search-btn:active {
   transform: translateY(1px) scale(0.96);
   box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.28),
+    0 2px 6px rgba(0, 36, 31, 0.3),
     inset 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
@@ -429,6 +461,7 @@ ul {
 }
 
 @media (min-width: 993px) {
+
   .nav-item-profile:hover .nav-profile-dropdown,
   .nav-profile-dropdown:hover {
     display: block;
@@ -440,6 +473,7 @@ ul {
     opacity: 0;
     transform: translateY(-8px) scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -631,6 +665,7 @@ ul {
 
 .hero h1,
 .hero-title {
+  font-family: 'Montserrat', sans-serif !important;
   margin: 0 0 10px 0;
 
   font-size: clamp(38px, 4.8vw, 56px);
@@ -4422,12 +4457,18 @@ mark {
 }
 
 .footer-brand-text h2 {
+  font-family: 'Montserrat', sans-serif !important;
   margin: 0;
   color: #ffffff;
   font-size: 21px;
-  font-weight: 750;
-  letter-spacing: -0.3px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   line-height: 1.15;
+}
+
+.footer-brand-text h2 .font-deltha {
+  font-family: 'Montserrat', sans-serif !important;
+  color: #ffefb3;
 }
 
 .footer-brand-text span {
@@ -8148,18 +8189,22 @@ textarea:focus-visible {
 }
 
 .notif-brand-title {
+  font-family: 'Montserrat', sans-serif !important;
   color: #ffffff;
   font-size: 17.5px;
   font-weight: 800;
+  letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.15;
 }
 
 .notif-brand-title .font-deltha {
+  font-family: 'Montserrat', sans-serif !important;
   color: #ffefb3;
 }
 
 .notif-brand-subtitle {
+  font-family: 'Montserrat', sans-serif !important;
   font-size: 11px;
   color: #a8d5cf;
   font-weight: 600;
@@ -8407,7 +8452,9 @@ body {
     z-index: 1000 !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    background: rgba(255, 255, 255, 0.98) !important;
+    background: #ffffff !important;
+    border-bottom: 2px solid #013A33 !important;
+    box-shadow: 0 2px 10px rgba(1, 58, 51, 0.05) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
   }
@@ -8424,15 +8471,33 @@ body {
   .logo-image {
     width: 38px !important;
     height: 38px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid rgba(13, 69, 60, 0.16) !important;
+    background: #ffffff !important;
+    padding: 2.5px !important;
+    box-shadow: 0 1px 4px rgba(1, 58, 51, 0.06) !important;
+    object-fit: contain !important;
   }
 
-  .logo h2 {
-    font-size: 19px !important;
+  .logo h2,
+  .logo h2 .font-deltha {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    color: #013A33 !important;
+    line-height: 1.15 !important;
     margin: 0 !important;
   }
 
-  .logo span {
-    font-size: 11px !important;
+  .logo-text span {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 10.5px !important;
+    font-weight: 500 !important;
+    color: #2D6A5F !important;
+    letter-spacing: 0.015em !important;
+    line-height: 1.2 !important;
+    margin-top: 1px !important;
   }
 
   .nav-item-profile,
@@ -8450,9 +8515,9 @@ body {
 
   .nav-mobile-action-btn {
     position: relative;
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -8470,10 +8535,10 @@ body {
 
   .nav-mobile-notif-ping {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
+    top: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #e11d48;
     box-shadow: 0 0 6px #e11d48;
@@ -8483,9 +8548,9 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 10px !important;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
     background: #013a33 !important;
     border: 1px solid #013a33 !important;
     color: #ffffff !important;

@@ -1,10 +1,14 @@
 const fs = require("fs/promises");
 const path = require("path");
 const UserMaterial = require("../models/userMaterial");
+const recordAuditLog = require("../services/auditLogger");
 
 exports.createUserMaterial = async (req, res) => {
   try {
-    const { materialType, comment, name, email } = req.body;
+    const materialType = String(req.body.materialType || "").trim().slice(0, 50);
+    const comment = String(req.body.comment || "").trim().slice(0, 2000);
+    const name = String(req.body.name || "").trim().slice(0, 100);
+    const email = String(req.body.email || "").trim().slice(0, 254);
 
     if (!materialType) {
       return res.status(400).json({
@@ -12,13 +16,13 @@ exports.createUserMaterial = async (req, res) => {
       });
     }
 
-    if (!name || !name.trim()) {
+    if (!name) {
       return res.status(400).json({
         message: "Name is required",
       });
     }
 
-    if (!email || !email.trim()) {
+    if (!email) {
       return res.status(400).json({
         message: "Email is required",
       });
@@ -32,11 +36,11 @@ exports.createUserMaterial = async (req, res) => {
 
     const userMaterial = await UserMaterial.create({
       materialType,
-      comment: comment || "",
-      name: name.trim(),
-      email: email.trim(),
+      comment,
+      name,
+      email,
       fileUrl: req.file ? `/uploads/${req.file.filename}` : "",
-      fileName: req.file ? req.file.originalname : "",
+      fileName: req.file ? req.file.originalname.slice(0, 255) : "",
     });
 
     res.status(201).json({
@@ -100,6 +104,17 @@ exports.deleteUserMaterial = async (req, res) => {
           cleanupWarning = "The submission was deleted, but its uploaded file could not be removed.";
         }
       }
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "delete",
+        resourceType: "UserMaterial",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
     }
 
     res.status(200).json({

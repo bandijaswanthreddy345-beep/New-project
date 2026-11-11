@@ -427,6 +427,67 @@ export function validateSemester(semester) {
   };
 }
 
+/**
+ * Canonical helper to format any semester representation (1-1, 1-2, 2-1, 2-2, etc.)
+ * into friendly "1st sem, 2nd sem etc" format as requested.
+ */
+export function formatSemDisplay(sem) {
+  if (!sem) return "";
+  const clean = String(sem).trim();
+
+  const SEM_ORDINALS = ["", "1st sem", "2nd sem", "3rd sem", "4th sem", "5th sem", "6th sem", "7th sem", "8th sem"];
+
+  // Direct JNTU year-sem code matching: e.g. "1-1" -> "1st sem", "1-2" -> "2nd sem", "2-2" -> "4th sem"
+  const codeMatch = clean.match(/^([1-4])\s*[-.]\s*([1-2])$/);
+  if (codeMatch) {
+    const yr = parseInt(codeMatch[1], 10);
+    const sm = parseInt(codeMatch[2], 10);
+    const semNum = (yr - 1) * 2 + sm;
+    return SEM_ORDINALS[semNum] || `${semNum}th sem`;
+  }
+
+  // Ordinal and common alias mappings
+  const ordinalMap = {
+    "1st": "1st sem",
+    "2nd": "2nd sem",
+    "3rd": "3rd sem",
+    "4th": "4th sem",
+    "5th": "5th sem",
+    "6th": "6th sem",
+    "7th": "7th sem",
+    "8th": "8th sem",
+    "1": "1st sem",
+    "2": "2nd sem",
+    "3": "3rd sem",
+    "4": "4th sem",
+    "5": "5th sem",
+    "6": "6th sem",
+    "7": "7th sem",
+    "8": "8th sem",
+  };
+  const lower = clean.toLowerCase();
+  for (const [key, val] of Object.entries(ordinalMap)) {
+    if (
+      lower === key ||
+      lower === `${key} sem` ||
+      lower === `${key} semester` ||
+      lower === `sem ${key}` ||
+      lower === `semester ${key}` ||
+      lower === `sem-${key}`
+    ) {
+      return val;
+    }
+  }
+
+  const numMatch = lower.match(/(?:sem(?:ester)?\s*)?([1-8])(?:st|nd|rd|th)?(?:\s*sem(?:ester)?)?/);
+  if (numMatch && numMatch[1]) {
+    const n = parseInt(numMatch[1], 10);
+    return SEM_ORDINALS[n] || `${n}th sem`;
+  }
+
+  return clean;
+}
+
 // Canonical Branch list aligned with BRANCH_DIRECTORY in searchEngine.js
 export const CANONICAL_BRANCHES = [
   {

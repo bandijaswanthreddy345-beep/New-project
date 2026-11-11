@@ -1,4 +1,5 @@
 const Comment = require("../models/Comment");
+const recordAuditLog = require("../services/auditLogger");
 
 // ==========================================
 // CREATE COMMENT
@@ -127,34 +128,25 @@ res.status(500).json({
 // ==========================================
 
 exports.likeComment = async (req, res) => {
-try {
-const comment =
-await Comment.findById(
-req.params.id
-);
+  try {
+    const comment = await Comment.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likes: 1 } },
+      { new: true }
+    ).select("-email");
 
+    if (!comment) {
+      return res.status(404).json({
+        message: "Comment not found",
+      });
+    }
 
-if (!comment) {
-  return res.status(404).json({
-    message: "Comment not found",
-  });
-}
-
-comment.likes += 1;
-
-await comment.save();
-
-const likedComment = comment.toObject();
-delete likedComment.email;
-
-res.status(200).json(likedComment);
-
-
-} catch (error) {
-res.status(500).json({
-message: error.message,
-});
-}
+    res.status(200).json(comment);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
@@ -162,34 +154,25 @@ message: error.message,
 // ==========================================
 
 exports.dislikeComment = async (req, res) => {
-try {
-const comment =
-await Comment.findById(
-req.params.id
-);
+  try {
+    const comment = await Comment.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { dislikes: 1 } },
+      { new: true }
+    ).select("-email");
 
+    if (!comment) {
+      return res.status(404).json({
+        message: "Comment not found",
+      });
+    }
 
-if (!comment) {
-  return res.status(404).json({
-    message: "Comment not found",
-  });
-}
-
-comment.dislikes += 1;
-
-await comment.save();
-
-const dislikedComment = comment.toObject();
-delete dislikedComment.email;
-
-res.status(200).json(dislikedComment);
-
-
-} catch (error) {
-res.status(500).json({
-message: error.message,
-});
-}
+    res.status(200).json(comment);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
@@ -207,6 +190,17 @@ req.params.id
 if (!comment) {
   return res.status(404).json({
     message: "Comment not found",
+  });
+}
+
+if (req.user) {
+  await recordAuditLog({
+    adminId: req.user._id,
+    action: "delete",
+    resourceType: "Comment",
+    resourceId: req.params.id,
+    route: req.originalUrl,
+    ip: req.ip,
   });
 }
 

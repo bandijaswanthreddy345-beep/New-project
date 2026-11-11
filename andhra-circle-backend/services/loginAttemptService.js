@@ -1,29 +1,16 @@
 // ==========================================
 // Failed Login Attempt Tracker
-//
-// Tracks failed login attempts per IP address and per email address
-// to enforce CAPTCHA challenges after repeated failures (default >= 3).
-//
-// In-memory with TTL cleanup, bounded size to prevent memory exhaustion.
+// Persistent MongoDB TTL storage with in-memory fast fallback
 // ==========================================
 
+const SecurityState = require("../models/SecurityState");
+const logger = require("../utils/logger");
+
 const FAILED_ATTEMPT_THRESHOLD = 3;
-const WINDOW_MS = 15 * 60 * 1000; // 15 minutes (matches login rate limiter)
-const MAX_ENTRIES = 10000;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
-// key -> { count: number, resetAt: number }
-const attempts = new Map();
-
-// Periodic cleanup every 60 seconds
-const cleaner = setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of attempts) {
-    if (entry.resetAt <= now) {
-      attempts.delete(key);
-    }
-  }
-}, 60 * 1000);
-cleaner.unref();
+// In-memory fallback if MongoDB is not reachable
+const memAttempts = new Map();
 
 function normalizeIp(ip) {
   if (typeof ip !== "string") return "unknown";
@@ -38,20 +25,37 @@ function normalizeEmail(email) {
 /**
  * Checks whether CAPTCHA is required for this IP or email
  */
-function isCaptchaRequired(ip, email) {
-  const now = Date.now();
+async function isCaptchaRequired(ip, email) {
   const cleanIp = normalizeIp(ip);
   const cleanEmail = normalizeEmail(email);
 
-  const ipEntry = attempts.get(`ip:${cleanIp}`);
-  if (ipEntry && ipEntry.resetAt > now && ipEntry.count >= FAILED_ATTEMPT_THRESHOLD) {
-    return true;
-  }
+  try {
+    const keys = [`ip:${cleanIp}`];
+    if (cleanEmail) keys.push(`email:${cleanEmail}`);
 
-  if (cleanEmail) {
-    const emailEntry = attempts.get(`email:${cleanEmail}`);
-    if (emailEntry && emailEntry.resetAt > now && emailEntry.count >= FAILED_ATTEMPT_THRESHOLD) {
+    const docs = await SecurityState.find({
+      key: { $in: keys },
+      type: "login_attempt",
+      expiresAt: { $gt: new Date() },
+    }).lean();
+
+    for (const doc of docs) {
+      if (doc.count >= FAILED_ATTEMPT_THRESHOLD) {
+        return true;
+      }
+    }
+  } catch (err) {
+    // Memory fallback
+    const now = Date.now();
+    const ipEntry = memAttempts.get(`ip:${cleanIp}`);
+    if (ipEntry && ipEntry.resetAt > now && ipEntry.count >= FAILED_ATTEMPT_THRESHOLD) {
       return true;
+    }
+    if (cleanEmail) {
+      const emailEntry = memAttempts.get(`email:${cleanEmail}`);
+      if (emailEntry && emailEntry.resetAt > now && emailEntry.count >= FAILED_ATTEMPT_THRESHOLD) {
+        return true;
+      }
     }
   }
 
@@ -59,98 +63,58 @@ function isCaptchaRequired(ip, email) {
 }
 
 /**
- * Records a failed login attempt for IP and email
- * Returns boolean indicating if CAPTCHA is now required
+ * Records a failed login attempt for the given IP and email
  */
-function recordFailedAttempt(ip, email) {
-  const now = Date.now();
+async function recordFailedAttempt(ip, email) {
   const cleanIp = normalizeIp(ip);
   const cleanEmail = normalizeEmail(email);
+  const expiresAt = new Date(Date.now() + WINDOW_MS);
 
-  // Safeguard memory size
-  if (attempts.size >= MAX_ENTRIES) {
-    for (const [key, entry] of attempts) {
-      if (entry.resetAt <= now) attempts.delete(key);
-    }
-    if (attempts.size >= MAX_ENTRIES) {
-      // Clear oldest entry if still full
-      const firstKey = attempts.keys().next().value;
-      if (firstKey) attempts.delete(firstKey);
-    }
-  }
+  const keys = [`ip:${cleanIp}`];
+  if (cleanEmail) keys.push(`email:${cleanEmail}`);
 
-  // Increment IP failures
-  const ipKey = `ip:${cleanIp}`;
-  let ipEntry = attempts.get(ipKey);
-  if (!ipEntry || ipEntry.resetAt <= now) {
-    ipEntry = { count: 0, resetAt: now + WINDOW_MS };
-    attempts.set(ipKey, ipEntry);
-  }
-  ipEntry.count += 1;
-
-  // Increment Email failures if provided
-  let emailCount = 0;
-  if (cleanEmail) {
-    const emailKey = `email:${cleanEmail}`;
-    let emailEntry = attempts.get(emailKey);
-    if (!emailEntry || emailEntry.resetAt <= now) {
-      emailEntry = { count: 0, resetAt: now + WINDOW_MS };
-      attempts.set(emailKey, emailEntry);
-    }
-    emailEntry.count += 1;
-    emailCount = emailEntry.count;
-  }
-
-  return ipEntry.count >= FAILED_ATTEMPT_THRESHOLD || emailCount >= FAILED_ATTEMPT_THRESHOLD;
-}
-
-/**
- * Clears failed attempts upon successful login
- */
-function clearFailedAttempts(ip, email) {
-  const cleanIp = normalizeIp(ip);
-  const cleanEmail = normalizeEmail(email);
-
-  if (cleanEmail) {
-    attempts.delete(`email:${cleanEmail}`);
-  }
-
-  const ipKey = `ip:${cleanIp}`;
-  const ipEntry = attempts.get(ipKey);
-  if (ipEntry) {
-    // Decrement or clear IP count on successful login
-    if (ipEntry.count <= FAILED_ATTEMPT_THRESHOLD) {
-      attempts.delete(ipKey);
-    } else {
-      ipEntry.count -= FAILED_ATTEMPT_THRESHOLD;
+  for (const key of keys) {
+    try {
+      await SecurityState.findOneAndUpdate(
+        { key, type: "login_attempt" },
+        {
+          $inc: { count: 1 },
+          $setOnInsert: { key, type: "login_attempt" },
+          $set: { expiresAt },
+        },
+        { upsert: true, new: true }
+      );
+    } catch (err) {
+      // Memory fallback
+      const current = memAttempts.get(key);
+      const count = (current && current.resetAt > Date.now()) ? current.count + 1 : 1;
+      memAttempts.set(key, { count, resetAt: Date.now() + WINDOW_MS });
     }
   }
 }
 
 /**
- * Helper to get current attempt counters (useful for inspection/tests)
+ * Clears failed attempt tracking on successful login
  */
-function getFailedCount(ip, email) {
-  const now = Date.now();
+async function clearFailedAttempts(ip, email) {
   const cleanIp = normalizeIp(ip);
   const cleanEmail = normalizeEmail(email);
 
-  const ipEntry = attempts.get(`ip:${cleanIp}`);
-  const ipCount = ipEntry && ipEntry.resetAt > now ? ipEntry.count : 0;
+  const keys = [`ip:${cleanIp}`];
+  if (cleanEmail) keys.push(`email:${cleanEmail}`);
 
-  let emailCount = 0;
-  if (cleanEmail) {
-    const emailEntry = attempts.get(`email:${cleanEmail}`);
-    emailCount = emailEntry && emailEntry.resetAt > now ? emailEntry.count : 0;
+  try {
+    await SecurityState.deleteMany({ key: { $in: keys }, type: "login_attempt" });
+  } catch (err) {
+    // Memory fallback
+    keys.forEach((k) => memAttempts.delete(k));
   }
-
-  return Math.max(ipCount, emailCount);
 }
 
 module.exports = {
+  FAILED_ATTEMPT_THRESHOLD,
+  WINDOW_MS,
   isCaptchaRequired,
   recordFailedAttempt,
   clearFailedAttempts,
-  getFailedCount,
-  FAILED_ATTEMPT_THRESHOLD,
 };

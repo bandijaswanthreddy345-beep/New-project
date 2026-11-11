@@ -123,13 +123,16 @@
 }
 
 .pdf-brand-title {
+  font-family: 'Montserrat', sans-serif !important;
   color: #ffffff;
   font-size: 15.5px;
   font-weight: 800;
+  letter-spacing: -0.02em;
   line-height: 1.15;
 }
 
 .pdf-brand-title .font-deltha {
+  font-family: 'Montserrat', sans-serif !important;
   color: #ffefb3;
 }
 

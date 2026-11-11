@@ -35,6 +35,22 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
 
+    // Admin Two-Factor Authentication (TOTP)
+    twoFactorEnabled: {
+      type: Boolean,
+      default: false,
+    },
+
+    twoFactorSecret: {
+      type: String,
+      default: null,
+    },
+
+    twoFactorRecoveryCodes: {
+      type: [String],
+      default: [],
+    },
+
     // Forgot Password
     resetPasswordToken: {
       type: String,

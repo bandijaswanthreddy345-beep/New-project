@@ -219,8 +219,17 @@
   letter-spacing: -0.4px;
 }
 
+.login-brand-name {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 23px;
+  font-weight: 850;
+  color: #002420;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
 .login-brand-name .font-deltha {
-  font-family: 'Deltha', 'Deltha Font', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif !important;
   color: #b5830a;
 }
 

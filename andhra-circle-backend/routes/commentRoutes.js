@@ -4,6 +4,7 @@ const router = express.Router();
 
 const auth = require("../middleware/auth");
 const { rateLimit } = require("../middleware/rateLimit");
+const validateObjectId = require("../middleware/validateObjectId");
 
 const {
   createComment,
@@ -31,20 +32,20 @@ router.post(
 // GET COMMENTS FOR NOTE
 // ==========================================
 
-router.get("/note/:noteId", getComments);
+router.get("/note/:noteId", validateObjectId("noteId"), getComments);
 
 // ==========================================
 // LIKE / DISLIKE COMMENT
 // ==========================================
 
-router.put("/:id/like", likeComment);
+router.put("/:id/like", validateObjectId("id"), likeComment);
 
-router.put("/:id/dislike", dislikeComment);
+router.put("/:id/dislike", validateObjectId("id"), dislikeComment);
 
 // ==========================================
 // DELETE COMMENT (admin only)
 // ==========================================
 
-router.delete("/:id", auth, deleteComment);
+router.delete("/:id", auth, validateObjectId("id"), deleteComment);
 
 module.exports = router;

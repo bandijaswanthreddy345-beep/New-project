@@ -68,6 +68,18 @@ const paperSchema = new mongoose.Schema(
   }
 );
 
+paperSchema.plugin(require("./plugins/softDelete"));
+
+paperSchema.index(
+  {
+    branch: 1,
+    semester: 1,
+    deletedAt: 1,
+    createdAt: -1,
+  },
+  { name: "PaperBranchSemesterDeletedCreatedIndex" }
+);
+
 paperSchema.index(
   {
     title: "text",

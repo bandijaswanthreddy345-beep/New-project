@@ -3,6 +3,9 @@ const router = express.Router();
 
 const upload = require("../config/multer");
 const auth = require("../middleware/auth");
+const validateObjectId = require("../middleware/validateObjectId");
+const { verifyMagicBytes } = require("../middleware/validateUpload");
+const idempotency = require("../middleware/idempotency");
 
 const {
   createPaper,
@@ -23,7 +26,7 @@ router.get("/", getPapers);
 // ==========================================
 // GET SINGLE PAPER
 // ==========================================
-router.get("/:id", getPaperById);
+router.get("/:id", validateObjectId("id"), getPaperById);
 
 // ==========================================
 // CREATE PAPER
@@ -31,7 +34,9 @@ router.get("/:id", getPaperById);
 router.post(
   "/",
   auth,
+  idempotency(),
   upload.single("file"),
+  verifyMagicBytes,
   createPaper
 );
 
@@ -41,7 +46,9 @@ router.post(
 router.put(
   "/:id",
   auth,
+  validateObjectId("id"),
   upload.single("file"),
+  verifyMagicBytes,
   updatePaper
 );
 
@@ -51,23 +58,24 @@ router.put(
 router.delete(
   "/:id",
   auth,
+  validateObjectId("id"),
   deletePaper
 );
 
 // ==========================================
 // LIKE PAPER
 // ==========================================
-router.put("/:id/like", likePaper);
+router.put("/:id/like", validateObjectId("id"), likePaper);
 
 // ==========================================
 // INCREASE VIEW COUNT
 // ==========================================
-router.put("/:id/view", increaseViews);
+router.put("/:id/view", validateObjectId("id"), increaseViews);
 
 // ==========================================
 // INCREASE DOWNLOAD COUNT
 // ==========================================
-router.put("/:id/download", increaseDownloads);
+router.put("/:id/download", validateObjectId("id"), increaseDownloads);
 
 module.exports = router;
 

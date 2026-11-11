@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
+    "migrate": "node migrations/runner.js",
+    "test": "node --test tests/integration.test.js",
     "build:indexes": "node scripts/build-indexes.js",
     "security:check": "node scripts/security-check.js"
   },
@@ -16,6 +18,7 @@
   "dependencies": {
     "@emailjs/nodejs": "^5.0.2",
     "bcryptjs": "^3.0.3",
+    "compression": "^1.8.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

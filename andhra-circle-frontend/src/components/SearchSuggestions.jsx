@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import API from "../api/api";
+import API, { BACKEND_URL } from "../api/api";
 
 function NoteDetails() {
   const { id } = useParams();
@@ -200,8 +200,6 @@ function NoteDetails() {
   // =========================================================
   // BACKEND FILE URL
   // =========================================================
-
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
   const getFileUrl = (url) => {
     if (!url || typeof url !== "string") {

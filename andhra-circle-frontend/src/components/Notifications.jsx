@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import API from "../api/api";
-import defaultBanner from "../assets/banner.jpg.jpg.jpg";
+import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import Footer from "./Footer";
 import AuthorProfile from "./AuthorProfile";
@@ -274,7 +274,7 @@ function Notifications({ search = "" }) {
     if (link.includes("docs.google.com/viewer")) {
       return link;
     }
-    if (link.startsWith("http") && !link.includes(":5000")) {
+    if (link.startsWith("http") && !link.includes("/api/") && !link.includes("/uploads/")) {
       return `https://docs.google.com/viewer?url=${encodeURIComponent(link)}&embedded=true`;
     }
     return link;
@@ -330,7 +330,7 @@ function Notifications({ search = "" }) {
     }
   };
 
-    const handleToggleLike = async (notification, e) => {
+  const handleToggleLike = async (notification, e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -396,7 +396,7 @@ function Notifications({ search = "" }) {
         }
         try {
           localStorage.setItem("andhra_liked_notifications", JSON.stringify([...next]));
-        } catch {}
+        } catch { }
         return next;
       });
 
@@ -447,7 +447,7 @@ function Notifications({ search = "" }) {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="pdf-floating-toast">
-                    <span>{toastMessage}</span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
@@ -490,474 +490,474 @@ function Notifications({ search = "" }) {
         {/* ===== LEFT COLUMN: Main notifications content ===== */}
         <main className="notif-left-column">
 
-      <section id="notifications-section" className="notification-section">
-        {/* Enhanced Section Heading */}
-        <div className="section-heading notif-section-heading">
-          <span className="section-tag">
-            <span className="notif-tag-pulse" aria-hidden="true" />
-            B.TECH UNIVERSITY ANNOUNCEMENTS
-          </span>
-          <h2>B.Tech Notifications & Circulars</h2>
-        </div>
+          <section id="notifications-section" className="notification-section">
+            {/* Enhanced Section Heading */}
+            <div className="section-heading notif-section-heading">
+              <span className="section-tag">
+                <span className="notif-tag-pulse" aria-hidden="true" />
+                B.TECH UNIVERSITY ANNOUNCEMENTS
+              </span>
+              <h2>B.Tech Notifications & Circulars</h2>
+            </div>
 
-      {/* =========================================================
+            {/* =========================================================
           NEW PORTION: QUICK NOTICE SUMMARY / LIVE UPDATES COUNTER
           ========================================================= */}
-      <div className="notifications-summary-hub">
-        <div className="summary-hub-header">
-          <div className="summary-hub-title-group">
-            <span className="live-status-pill">
-                            LIVE JNTU B.TECH CIRCULARS
-            </span>
-            <h3 className="summary-hub-heading">B.Tech Notice Summary & Live Updates Counter</h3>
-            <p className="summary-hub-sub">
-              Real-time feed of official B.Tech examination timetables, semester circulars, and university updates.
-            </p>
-          </div>
-
-          <div className="summary-hub-refresh">
-            <button
-              type="button"
-              className={`summary-refresh-btn ${isRefreshing ? "refreshing" : ""}`}
-              onClick={handleManualRefresh}
-              title="Sync with live university announcements"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="refresh-icon">
-                <polyline points="23 4 23 10 17 10" />
-                <polyline points="1 20 1 14 7 14" />
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-              </svg>
-              <span>{isRefreshing ? "Syncing..." : "Live Sync"}</span>
-            </button>
-            <span className="live-timestamp">Updated {formatTimeAgo(lastUpdated)}</span>
-          </div>
-        </div>
-
-        {/* 4 Responsive Stat Counter Cards */}
-        <div className="summary-metrics-grid">
-          {/* Stat 1: Total Active Notices */}
-          <div className="summary-stat-card">
-            <div className="stat-card-icon stat-icon-emerald">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
-            </div>
-            <div className="stat-card-data">
-              <span className="stat-card-number">{metrics.total}</span>
-              <span className="stat-card-label">Active Notices</span>
-            </div>
-          </div>
-
-          {/* Stat 2: Exam Circulars & Timetables */}
-          <div className="summary-stat-card">
-            <div className="stat-card-icon stat-icon-amber">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-            </div>
-            <div className="stat-card-data">
-              <span className="stat-card-number">{metrics.exams}</span>
-              <span className="stat-card-label">Exam Circulars</span>
-            </div>
-          </div>
-
-          {/* Stat 3: University Academic Circulars */}
-          <div className="summary-stat-card">
-            <div className="stat-card-icon stat-icon-cyan">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-            </div>
-            <div className="stat-card-data">
-              <span className="stat-card-number">{metrics.circulars}</span>
-              <span className="stat-card-label">Academic Circulars</span>
-            </div>
-          </div>
-
-          {/* Stat 4: Total Student Reads / Engagements */}
-          <div className="summary-stat-card">
-            <div className="stat-card-icon stat-icon-gold">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </div>
-            <div className="stat-card-data">
-              <span className="stat-card-number">
-                {metrics.totalViews > 999 ? `${(metrics.totalViews / 1000).toFixed(1)}k` : metrics.totalViews}
-              </span>
-              <span className="stat-card-label">Student Reads</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Breaking / Latest Bulletin Ticker */}
-        {latestNotice && (
-          <div className="summary-latest-ticker">
-            <div className="ticker-badge">
-              <span className="ticker-badge-pulse" />
-              LATEST BULLETIN
-            </div>
-            <div className="ticker-content">
-              <span className="ticker-title">{latestNotice.title}</span>
-              <span className="ticker-date">Published {formatDate(latestNotice.publishedDate)}</span>
-            </div>
-            <button
-              type="button"
-              className="ticker-action-link"
-              onClick={() => handleOpenNotice(latestNotice)}
-              style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-            >
-              View Circular →
-            </button>
-          </div>
-        )}
-
-        {/* Category Filter Pills */}
-        <div className="summary-filter-pills">
-          {categoryFilters.map((cat) => (
-            <button
-              key={cat.key}
-              type="button"
-              className={`summary-pill-btn ${activeCategory === cat.key ? "active" : ""}`}
-              onClick={() => setActiveCategory(cat.key)}
-            >
-              <span>{cat.label}</span>
-              <span className="pill-badge">{cat.count}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* =========================================================
-          NOTIFICATIONS GRID
-          ========================================================= */}
-      {loading ? (
-        <div className="papers-loading">Loading live notifications...</div>
-      ) : error ? (
-        <div className="error-state">
-          <p>{error}</p>
-          <button onClick={fetchNotifications}>Try Again</button>
-        </div>
-      ) : displayedNotifications.length === 0 ? (
-        <div className="empty-state">No notifications found matching your selection.</div>
-      ) : (
-        <div className="papers-grid">
-          {displayedNotifications.map((notification) => (
-            <article className="resource-card" key={notification._id}>
-              <div 
-                className="resource-image"
-                style={{ cursor: "pointer" }}
-                onClick={() => handleOpenNotice(notification)}
-                title="Click to view notification details"
-              >
-                <img src={defaultBanner} alt={notification.title} />
-                <span className="read-time">
-                  {notification.category || "Notification"}
-                </span>
-              </div>
-
-              <div className="resource-content">
-                <div className="resource-badge-row">
-                  <span className="resource-badge">
-                                        {notification.category || "GENERAL"}
+            <div className="notifications-summary-hub">
+              <div className="summary-hub-header">
+                <div className="summary-hub-title-group">
+                  <span className="live-status-pill">
+                    LIVE JNTU B.TECH CIRCULARS
                   </span>
+                  <h3 className="summary-hub-heading">B.Tech Notice Summary & Live Updates Counter</h3>
+                  <p className="summary-hub-sub">
+                    Real-time feed of official B.Tech examination timetables, semester circulars, and university updates.
+                  </p>
                 </div>
 
-                <h3 
-                  className="resource-title" 
-                  title={notification.title}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleOpenNotice(notification)}
-                >
-                  {notification.title}
-                </h3>
+                <div className="summary-hub-refresh">
+                  <button
+                    type="button"
+                    className={`summary-refresh-btn ${isRefreshing ? "refreshing" : ""}`}
+                    onClick={handleManualRefresh}
+                    title="Sync with live university announcements"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="refresh-icon">
+                      <polyline points="23 4 23 10 17 10" />
+                      <polyline points="1 20 1 14 7 14" />
+                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                    </svg>
+                    <span>{isRefreshing ? "Syncing..." : "Live Sync"}</span>
+                  </button>
+                  <span className="live-timestamp">Updated {formatTimeAgo(lastUpdated)}</span>
+                </div>
+              </div>
 
-                <p className="resource-desc">
-                  {notification.description || "Official circular published by JNTU administrative board."}
-                </p>
+              {/* 4 Responsive Stat Counter Cards */}
+              <div className="summary-metrics-grid">
+                {/* Stat 1: Total Active Notices */}
+                <div className="summary-stat-card">
+                  <div className="stat-card-icon stat-icon-emerald">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                      <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                  </div>
+                  <div className="stat-card-data">
+                    <span className="stat-card-number">{metrics.total}</span>
+                    <span className="stat-card-label">Active Notices</span>
+                  </div>
+                </div>
 
-                <div className="resource-meta-chips">
-                  <span className="meta-chip meta-chip-date" title="Publish Date">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Stat 2: Exam Circulars & Timetables */}
+                <div className="summary-stat-card">
+                  <div className="stat-card-icon stat-icon-amber">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                       <line x1="16" y1="2" x2="16" y2="6" />
                       <line x1="8" y1="2" x2="8" y2="6" />
                       <line x1="3" y1="10" x2="21" y2="10" />
                     </svg>
-                    {formatDate(notification.publishedDate)}
-                  </span>
-
-                  <span className="meta-chip meta-chip-category" title="Circular Category">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-                      <line x1="7" y1="7" x2="7.01" y2="7" />
-                    </svg>
-                    {notification.category || "General"}
-                  </span>
-                </div>
-
-                <div className="resource-stats">
-                  <div className="resource-stats-left">
-                    <span className="stat-chip stat-chip-views" title={`${notification.views || 0} Total Views`}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                      <span className="stat-count">{notification.views || 0}</span>
-                    </span>
-
-                    <span className="stat-chip stat-chip-downloads" title={`${notification.downloads || 0} Total Downloads`}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
-                      </svg>
-                      <span className="stat-count">{notification.downloads || 0}</span>
-                    </span>
                   </div>
-
-                  <LikeReactionButton
-                    isLiked={likedNotifIds.has(notification._id)}
-                    count={notification.likes || 0}
-                    onToggle={(e) => handleToggleLike(notification, e)}
-                    title={likedNotifIds.has(notification._id) ? "Liked" : "Like notification"}
-                  />
+                  <div className="stat-card-data">
+                    <span className="stat-card-number">{metrics.exams}</span>
+                    <span className="stat-card-label">Exam Circulars</span>
+                  </div>
                 </div>
 
-                <div className="resource-buttons">
-                  <button
-                    type="button"
-                    className="view-pdf-button"
-                    onClick={() => handleOpenNotice(notification)}
-                    title="View notification details"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Stat 3: University Academic Circulars */}
+                <div className="summary-stat-card">
+                  <div className="stat-card-icon stat-icon-cyan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                  </div>
+                  <div className="stat-card-data">
+                    <span className="stat-card-number">{metrics.circulars}</span>
+                    <span className="stat-card-label">Academic Circulars</span>
+                  </div>
+                </div>
+
+                {/* Stat 4: Total Student Reads / Engagements */}
+                <div className="summary-stat-card">
+                  <div className="stat-card-icon stat-icon-gold">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
-                    View Details
-                  </button>
+                  </div>
+                  <div className="stat-card-data">
+                    <span className="stat-card-number">
+                      {metrics.totalViews > 999 ? `${(metrics.totalViews / 1000).toFixed(1)}k` : metrics.totalViews}
+                    </span>
+                    <span className="stat-card-label">Student Reads</span>
+                  </div>
+                </div>
+              </div>
 
+              {/* Breaking / Latest Bulletin Ticker */}
+              {latestNotice && (
+                <div className="summary-latest-ticker">
+                  <div className="ticker-badge">
+                    <span className="ticker-badge-pulse" />
+                    LATEST BULLETIN
+                  </div>
+                  <div className="ticker-content">
+                    <span className="ticker-title">{latestNotice.title}</span>
+                    <span className="ticker-date">Published {formatDate(latestNotice.publishedDate)}</span>
+                  </div>
                   <button
                     type="button"
-                    className="download-pdf-button"
-                    onClick={() => handleDownload(notification)}
+                    className="ticker-action-link"
+                    onClick={() => handleOpenNotice(latestNotice)}
+                    style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" />
-                      <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    Download
+                    View Circular →
                   </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-
-      {/* =========================================================
-          IN-APP NOTIFICATION DETAIL VIEWER (WITH PROMINENT BACK OPTION)
-          ========================================================= */}
-      {viewingNotice && (
-        <div 
-          className="notif-modal-backdrop" 
-          onClick={handleCloseNotice}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Notification details"
-        >
-          <div 
-            className="notif-modal-card" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Top Header */}
-            <div className="notif-modal-header">
-              <div className="notif-modal-header-left">
-                <span className="notif-modal-badge">
-                  Official JNTU University Circular
-                </span>
-              </div>
-
-              <button
-                type="button"
-                className="notif-modal-close-btn"
-                onClick={handleCloseNotice}
-                title="Close"
-                aria-label="Close modal"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="notif-modal-body">
-              <div className="notif-modal-meta-row">
-                <span className="notif-modal-category-chip">
-                                    {viewingNotice.category || "GENERAL"}
-                </span>
-
-                <span className="notif-modal-date-chip">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                  </svg>
-                  Published {formatDate(viewingNotice.publishedDate || viewingNotice.createdAt)} · {formatTimeAgo(viewingNotice.publishedDate || viewingNotice.createdAt)}
-                </span>
-              </div>
-
-              <h2 className="notif-modal-title">
-                {viewingNotice.title}
-              </h2>
-
-              {/* Official University Verification Alert Banner */}
-              <div className="notif-modal-verified-banner">
-                <div className="verified-seal-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    <polyline points="9 12 11 14 15 10" />
-                  </svg>
-                </div>
-                <div className="verified-seal-text">
-                  <strong>Official University Examination Announcement</strong>
-                  <span>Directly synchronized from Jawaharlal Nehru Technological University Official Portal (jntua.ac.in).</span>
-                </div>
-              </div>
-
-              {/* Notice Description Details */}
-              <div className="notif-modal-description-box">
-                <h4 className="description-box-heading">Circular Details & Instructions</h4>
-                <p className="description-box-text">
-                  {viewingNotice.description || "Official circular issued for B.Tech regular & supplementary examinations. Students are advised to verify timelines and download attached schedules."}
-                </p>
-              </div>
-
-              {/* Embedded Document Preview with Direct Full-Screen in Project Reader */}
-              {viewingNotice.link && (
-                <div className="notif-modal-doc-preview-container">
-                  <div className="notif-preview-toolbar">
-                    <span className="notif-preview-title">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                      </svg>
-                      Official Attached Circular Document
-                    </span>
-                    <button
-                      type="button"
-                      className="notif-preview-fullscreen-btn"
-                      onClick={() => {
-                        navigate(`/pdf/circular.pdf?url=${encodeURIComponent(viewingNotice.link)}&title=${encodeURIComponent(viewingNotice.title)}&source=notifications`);
-                      }}
-                      title="Open full-screen in Project PDF Reader with Back to Project button"
-                    >
-                      <span>Open Full-Screen in Project Viewer →</span>
-                    </button>
-                  </div>
-                  <iframe
-                    src={getEmbedUrl(viewingNotice.link)}
-                    title={viewingNotice.title}
-                    className="notif-preview-iframe"
-                  />
                 </div>
               )}
 
-              {/* Notice Live Metrics & Like Reactions */}
-              <div className="notif-modal-stats-row">
-                <div className="modal-stats-group">
-                  <span className="modal-stat-pill" title="Total Views">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                    <strong>{viewingNotice.views || 0}</strong> views
-                  </span>
-
-                  <span className="modal-stat-pill" title="Total Downloads">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" />
-                      <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    <strong>{viewingNotice.downloads || 0}</strong> dls
-                  </span>
-                </div>
-
-                <LikeReactionButton
-                  isLiked={likedNotifIds.has(viewingNotice._id)}
-                  count={viewingNotice.likes || 0}
-                  onToggle={(e) => handleToggleLike(viewingNotice, e)}
-                  title={likedNotifIds.has(viewingNotice._id) ? "Liked" : "Like notification"}
-                />
-              </div>
-            </div>
-
-            {/* Modal Bottom Footer with Back Action & External Link */}
-            <div className="notif-modal-footer">
-              <button
-                type="button"
-                className="notif-btn-back-action"
-                onClick={handleCloseNotice}
-                title="Return to notifications list"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="19" y1="12" x2="5" y2="12" />
-                  <polyline points="12 19 5 12 12 5" />
-                </svg>
-                <span>← Back</span>
-              </button>
-
-              <div className="notif-modal-footer-right">
-                {viewingNotice.link && (
+              {/* Category Filter Pills */}
+              <div className="summary-filter-pills">
+                {categoryFilters.map((cat) => (
                   <button
+                    key={cat.key}
                     type="button"
-                    className="notif-btn-external"
-                    onClick={() => {
-                      navigate(`/pdf/circular.pdf?url=${encodeURIComponent(viewingNotice.link)}&title=${encodeURIComponent(viewingNotice.title)}&source=notifications`);
-                    }}
-                    title="Read in Project PDF Reader with Back Option"
+                    className={`summary-pill-btn ${activeCategory === cat.key ? "active" : ""}`}
+                    onClick={() => setActiveCategory(cat.key)}
                   >
-                    <span>Read in Project PDF Reader</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                      <polyline points="12 5 19 12 12 19" />
-                    </svg>
+                    <span>{cat.label}</span>
+                    <span className="pill-badge">{cat.count}</span>
                   </button>
-                )}
-
-                <button
-                  type="button"
-                  className="notif-btn-download"
-                  onClick={() => handleDownload(viewingNotice)}
-                  title="Download attached circular"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                  <span>Download</span>
-                </button>
+                ))}
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </section>
+
+            {/* =========================================================
+          NOTIFICATIONS GRID
+          ========================================================= */}
+            {loading ? (
+              <div className="papers-loading">Loading live notifications...</div>
+            ) : error ? (
+              <div className="error-state">
+                <p>{error}</p>
+                <button onClick={fetchNotifications}>Try Again</button>
+              </div>
+            ) : displayedNotifications.length === 0 ? (
+              <div className="empty-state">No notifications found matching your selection.</div>
+            ) : (
+              <div className="papers-grid">
+                {displayedNotifications.map((notification) => (
+                  <article className="resource-card" key={notification._id}>
+                    <div
+                      className="resource-image"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleOpenNotice(notification)}
+                      title="Click to view notification details"
+                    >
+                      <img src={defaultBanner} alt={notification.title} />
+                      <span className="read-time">
+                        {notification.category || "Notification"}
+                      </span>
+                    </div>
+
+                    <div className="resource-content">
+                      <div className="resource-badge-row">
+                        <span className="resource-badge">
+                          {notification.category || "GENERAL"}
+                        </span>
+                      </div>
+
+                      <h3
+                        className="resource-title"
+                        title={notification.title}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleOpenNotice(notification)}
+                      >
+                        {notification.title}
+                      </h3>
+
+                      <p className="resource-desc">
+                        {notification.description || "Official circular published by JNTU administrative board."}
+                      </p>
+
+                      <div className="resource-meta-chips">
+                        <span className="meta-chip meta-chip-date" title="Publish Date">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                          </svg>
+                          {formatDate(notification.publishedDate)}
+                        </span>
+
+                        <span className="meta-chip meta-chip-category" title="Circular Category">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                            <line x1="7" y1="7" x2="7.01" y2="7" />
+                          </svg>
+                          {notification.category || "General"}
+                        </span>
+                      </div>
+
+                      <div className="resource-stats">
+                        <div className="resource-stats-left">
+                          <span className="stat-chip stat-chip-views" title={`${notification.views || 0} Total Views`}>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <span className="stat-count">{notification.views || 0}</span>
+                          </span>
+
+                          <span className="stat-chip stat-chip-downloads" title={`${notification.downloads || 0} Total Downloads`}>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                              <polyline points="7 10 12 15 17 10" />
+                              <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span className="stat-count">{notification.downloads || 0}</span>
+                          </span>
+                        </div>
+
+                        <LikeReactionButton
+                          isLiked={likedNotifIds.has(notification._id)}
+                          count={notification.likes || 0}
+                          onToggle={(e) => handleToggleLike(notification, e)}
+                          title={likedNotifIds.has(notification._id) ? "Liked" : "Like notification"}
+                        />
+                      </div>
+
+                      <div className="resource-buttons">
+                        <button
+                          type="button"
+                          className="view-pdf-button"
+                          onClick={() => handleOpenNotice(notification)}
+                          title="View notification details"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                          View Details
+                        </button>
+
+                        <button
+                          type="button"
+                          className="download-pdf-button"
+                          onClick={() => handleDownload(notification)}
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                          </svg>
+                          Download
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+
+            {/* =========================================================
+          IN-APP NOTIFICATION DETAIL VIEWER (WITH PROMINENT BACK OPTION)
+          ========================================================= */}
+            {viewingNotice && (
+              <div
+                className="notif-modal-backdrop"
+                onClick={handleCloseNotice}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Notification details"
+              >
+                <div
+                  className="notif-modal-card"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Modal Top Header */}
+                  <div className="notif-modal-header">
+                    <div className="notif-modal-header-left">
+                      <span className="notif-modal-badge">
+                        Official JNTU University Circular
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="notif-modal-close-btn"
+                      onClick={handleCloseNotice}
+                      title="Close"
+                      aria-label="Close modal"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="notif-modal-body">
+                    <div className="notif-modal-meta-row">
+                      <span className="notif-modal-category-chip">
+                        {viewingNotice.category || "GENERAL"}
+                      </span>
+
+                      <span className="notif-modal-date-chip">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                          <line x1="16" y1="2" x2="16" y2="6" />
+                          <line x1="8" y1="2" x2="8" y2="6" />
+                          <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        Published {formatDate(viewingNotice.publishedDate || viewingNotice.createdAt)} · {formatTimeAgo(viewingNotice.publishedDate || viewingNotice.createdAt)}
+                      </span>
+                    </div>
+
+                    <h2 className="notif-modal-title">
+                      {viewingNotice.title}
+                    </h2>
+
+                    {/* Official University Verification Alert Banner */}
+                    <div className="notif-modal-verified-banner">
+                      <div className="verified-seal-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                          <polyline points="9 12 11 14 15 10" />
+                        </svg>
+                      </div>
+                      <div className="verified-seal-text">
+                        <strong>Official University Examination Announcement</strong>
+                        <span>Directly synchronized from Jawaharlal Nehru Technological University Official Portal (jntua.ac.in).</span>
+                      </div>
+                    </div>
+
+                    {/* Notice Description Details */}
+                    <div className="notif-modal-description-box">
+                      <h4 className="description-box-heading">Circular Details & Instructions</h4>
+                      <p className="description-box-text">
+                        {viewingNotice.description || "Official circular issued for B.Tech regular & supplementary examinations. Students are advised to verify timelines and download attached schedules."}
+                      </p>
+                    </div>
+
+                    {/* Embedded Document Preview with Direct Full-Screen in Project Reader */}
+                    {viewingNotice.link && (
+                      <div className="notif-modal-doc-preview-container">
+                        <div className="notif-preview-toolbar">
+                          <span className="notif-preview-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
+                              <line x1="16" y1="13" x2="8" y2="13" />
+                              <line x1="16" y1="17" x2="8" y2="17" />
+                            </svg>
+                            Official Attached Circular Document
+                          </span>
+                          <button
+                            type="button"
+                            className="notif-preview-fullscreen-btn"
+                            onClick={() => {
+                              navigate(`/pdf/circular.pdf?url=${encodeURIComponent(viewingNotice.link)}&title=${encodeURIComponent(viewingNotice.title)}&source=notifications`);
+                            }}
+                            title="Open full-screen in Project PDF Reader with Back to Project button"
+                          >
+                            <span>Open Full-Screen in Project Viewer →</span>
+                          </button>
+                        </div>
+                        <iframe
+                          src={getEmbedUrl(viewingNotice.link)}
+                          title={viewingNotice.title}
+                          className="notif-preview-iframe"
+                        />
+                      </div>
+                    )}
+
+                    {/* Notice Live Metrics & Like Reactions */}
+                    <div className="notif-modal-stats-row">
+                      <div className="modal-stats-group">
+                        <span className="modal-stat-pill" title="Total Views">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                          <strong>{viewingNotice.views || 0}</strong> views
+                        </span>
+
+                        <span className="modal-stat-pill" title="Total Downloads">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                          </svg>
+                          <strong>{viewingNotice.downloads || 0}</strong> dls
+                        </span>
+                      </div>
+
+                      <LikeReactionButton
+                        isLiked={likedNotifIds.has(viewingNotice._id)}
+                        count={viewingNotice.likes || 0}
+                        onToggle={(e) => handleToggleLike(viewingNotice, e)}
+                        title={likedNotifIds.has(viewingNotice._id) ? "Liked" : "Like notification"}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Modal Bottom Footer with Back Action & External Link */}
+                  <div className="notif-modal-footer">
+                    <button
+                      type="button"
+                      className="notif-btn-back-action"
+                      onClick={handleCloseNotice}
+                      title="Return to notifications list"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12" />
+                        <polyline points="12 19 5 12 12 5" />
+                      </svg>
+                      <span>← Back</span>
+                    </button>
+
+                    <div className="notif-modal-footer-right">
+                      {viewingNotice.link && (
+                        <button
+                          type="button"
+                          className="notif-btn-external"
+                          onClick={() => {
+                            navigate(`/pdf/circular.pdf?url=${encodeURIComponent(viewingNotice.link)}&title=${encodeURIComponent(viewingNotice.title)}&source=notifications`);
+                          }}
+                          title="Read in Project PDF Reader with Back Option"
+                        >
+                          <span>Read in Project PDF Reader</span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                          </svg>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        className="notif-btn-download"
+                        onClick={() => handleDownload(viewingNotice)}
+                        title="Download attached circular"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="7 10 12 15 17 10" />
+                          <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        <span>Download</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
 
         </main>{/* end notif-left-column */}
 

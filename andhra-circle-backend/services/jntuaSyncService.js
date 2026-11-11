@@ -1,4 +1,6 @@
 const Notification = require("../models/Notification");
+const { resilientFetch } = require("../utils/resilientFetch");
+const logger = require("../utils/logger");
 
 // Official JNTUA Examinations API Endpoint
 const JNTUA_EXAMS_BASE_URL =
@@ -87,12 +89,16 @@ async function syncJntuaNotifications(force = false) {
   try {
     console.log("🔄 [JNTUA Sync] Checking official JNTUA for B.Tech examination updates...");
 
-    // Clean up non-B.Tech notices from database to keep notifications pure
-    const allDbNotifs = await Notification.find();
+    // Clean up non-B.Tech notices in one batch to avoid blocking the DB
+    const allDbNotifs = await Notification.find({}, "_id title description").lean();
+    const nonBTechIds = [];
     for (const notif of allDbNotifs) {
       if (!isBTechNotification(notif.title, notif.description)) {
-        await Notification.findByIdAndDelete(notif._id);
+        nonBTechIds.push(notif._id);
       }
+    }
+    if (nonBTechIds.length > 0) {
+      await Notification.deleteMany({ _id: { $in: nonBTechIds } });
     }
 
     let newlyAdded = 0;
@@ -101,26 +107,33 @@ async function syncJntuaNotifications(force = false) {
 
     for (let page = 1; page <= maxPages; page++) {
       const pageUrl = `${JNTUA_EXAMS_BASE_URL}&pagination[page]=${page}`;
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 12000);
-
-      const response = await fetch(pageUrl, {
-        signal: controller.signal,
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          Accept: "application/json",
-        },
-      });
-
-      clearTimeout(timeout);
-
-      if (!response.ok) {
-        console.warn(`[JNTUA Sync] Page ${page} returned HTTP ${response.status}`);
+      let response;
+      try {
+        response = await resilientFetch(pageUrl, {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "application/json",
+          },
+        }, { breakerName: "jntua-api", timeoutMs: 10000 });
+      } catch (fetchErr) {
+        logger.warn(`[JNTUA Sync] Page ${page} resilientFetch error: ${fetchErr.message}`);
         continue;
       }
 
-      const json = await response.json();
+      if (!response || !response.ok) {
+        console.warn(`[JNTUA Sync] Page ${page} returned HTTP ${response?.status || "error"}`);
+        continue;
+      }
+
+      let json;
+      try {
+        json = await response.json();
+      } catch (parseErr) {
+        console.warn(`[JNTUA Sync] Page ${page} JSON parse error:`, parseErr.message);
+        continue;
+      }
+
       const items = Array.isArray(json?.data) ? json.data : [];
 
       for (const item of items) {
@@ -142,8 +155,8 @@ async function syncJntuaNotifications(force = false) {
           const publishedDate = attrs.Publish_Date
             ? new Date(attrs.Publish_Date)
             : attrs.createdAt
-            ? new Date(attrs.createdAt)
-            : new Date();
+              ? new Date(attrs.createdAt)
+              : new Date();
 
           const directLink = extractLinkFromBody(attrs.Body, title);
 
@@ -187,12 +200,12 @@ async function syncJntuaNotifications(force = false) {
     }
 
     if (newlyAdded > 0) {
-      console.log(
-        `✅ [JNTUA Sync] Successfully imported ${newlyAdded} new official B.Tech notification(s)!`
+      logger.info(
+        `[JNTUA Sync] Successfully imported ${newlyAdded} new official B.Tech notification(s)!`
       );
     } else {
-      console.log(
-        "✨ [JNTUA Sync] Database is up to date with official B.Tech notifications."
+      logger.info(
+        "[JNTUA Sync] Database is up to date with official B.Tech notifications."
       );
     }
 
@@ -204,35 +217,47 @@ async function syncJntuaNotifications(force = false) {
       error.code === "ENOTFOUND" ||
       error.code === "ETIMEDOUT"
     ) {
-      console.warn(
-        "ℹ️ [JNTUA Sync Notice]: Official JNTUA portal temporarily unreachable (network blip). Will retry automatically."
+      logger.warn(
+        `[JNTUA Sync Notice]: Official JNTUA portal temporarily unreachable (${error.message}). Will retry automatically.`
       );
     } else {
-      console.error("⚠️ [JNTUA Sync Error]:", error.message);
+      logger.error("[JNTUA Sync Error]", { error: error.message });
     }
     return { synced: 0, error: error.message };
   }
 }
 
+let syncTimeoutId = null;
+let syncIntervalId = null;
+
 /**
  * Background auto-sync scheduler: runs on startup and every 10 minutes
  */
 function startJntuaAutoSync() {
-  setTimeout(() => {
+  syncTimeoutId = setTimeout(() => {
     syncJntuaNotifications(true).catch((err) =>
-      console.error("Initial JNTUA B.Tech sync error:", err)
+      logger.error("Initial JNTUA B.Tech sync error", { error: err.message })
     );
   }, 2000);
 
-  setInterval(() => {
+  syncIntervalId = setInterval(() => {
     syncJntuaNotifications().catch((err) =>
-      console.error("Periodic JNTUA B.Tech sync error:", err)
+      logger.error("Periodic JNTUA B.Tech sync error", { error: err.message })
     );
   }, 10 * 60 * 1000);
+}
+
+function stopJntuaAutoSync() {
+  if (syncTimeoutId) clearTimeout(syncTimeoutId);
+  if (syncIntervalId) clearInterval(syncIntervalId);
+  syncTimeoutId = null;
+  syncIntervalId = null;
+  logger.info("[JNTUA Sync] Background auto-sync scheduler stopped.");
 }
 
 module.exports = {
   syncJntuaNotifications,
   startJntuaAutoSync,
+  stopJntuaAutoSync,
   isBTechNotification,
 };

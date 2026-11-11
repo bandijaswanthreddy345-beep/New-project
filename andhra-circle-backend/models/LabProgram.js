@@ -63,6 +63,18 @@ const labProgramSchema = new mongoose.Schema(
   }
 );
 
+labProgramSchema.plugin(require("./plugins/softDelete"));
+
+labProgramSchema.index(
+  {
+    branch: 1,
+    semester: 1,
+    deletedAt: 1,
+    createdAt: -1,
+  },
+  { name: "LabProgramBranchSemesterDeletedCreatedIndex" }
+);
+
 labProgramSchema.index(
   {
     title: "text",

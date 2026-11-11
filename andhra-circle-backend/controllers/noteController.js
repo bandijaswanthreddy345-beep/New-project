@@ -1,4 +1,6 @@
 const Note = require("../models/note");
+const recordAuditLog = require("../services/auditLogger");
+const { bumpContentVersion } = require("../utils/contentVersion");
 
 // ==========================================
 // CREATE NOTE
@@ -37,23 +39,20 @@ exports.createNote = async (req, res) => {
     }
 
     const note = await Note.create({
-      title: req.body.title || "",
-      branch: req.body.branch || "",
-      semester: req.body.semester || "",
-      subject: req.body.subject || "",
-      subjectCode: req.body.subjectCode || "",
-      description: req.body.description || "",
+      title: String(req.body.title || "").trim().slice(0, 300),
+      branch: String(req.body.branch || "").trim().slice(0, 100),
+      semester: String(req.body.semester || "").trim().slice(0, 50),
+      subject: String(req.body.subject || "").trim().slice(0, 200),
+      subjectCode: String(req.body.subjectCode || "").trim().slice(0, 50),
+      description: String(req.body.description || "").trim().slice(0, 5000),
 
-      // ==========================
-      // CREDITS
-      // ==========================
-      credits: req.body.credits || "",
+      credits: String(req.body.credits || "").trim().slice(0, 50),
 
-      module1: req.body.module1 || "",
-      module2: req.body.module2 || "",
-      module3: req.body.module3 || "",
-      module4: req.body.module4 || "",
-      module5: req.body.module5 || "",
+      module1: String(req.body.module1 || "").trim().slice(0, 300),
+      module2: String(req.body.module2 || "").trim().slice(0, 300),
+      module3: String(req.body.module3 || "").trim().slice(0, 300),
+      module4: String(req.body.module4 || "").trim().slice(0, 300),
+      module5: String(req.body.module5 || "").trim().slice(0, 300),
 
       module1Pdf: module1Pdf
         ? `/uploads/${module1Pdf.filename}`
@@ -88,8 +87,16 @@ exports.createNote = async (req, res) => {
       downloads: 0,
     });
 
-    console.log("NOTE CREATED:");
-    console.log(note);
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "create",
+        resourceType: "Note",
+        resourceId: note._id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -113,10 +120,54 @@ exports.getNotes = async (req, res) => {
     if (require("mongoose").connection.readyState !== 1) {
       return res.status(200).json([]);
     }
-    const notes = await Note.find().sort({
-      createdAt: -1,
-    });
 
+    const { branch, semester, search, page, limit } = req.query;
+    const filter = {};
+    if (branch && branch !== "ALL") filter.branch = branch;
+    if (semester && semester !== "ALL") filter.semester = semester;
+    if (search && search.trim()) {
+      const term = search.trim();
+      filter.$or = [
+        { title: { $regex: term, $options: "i" } },
+        { subject: { $regex: term, $options: "i" } },
+        { subjectCode: { $regex: term, $options: "i" } },
+      ];
+    }
+
+    // Exclude heavy module outline text from list view
+    const listFields =
+      "_id title branch semester subject subjectCode imageUrl pdfUrl views downloads likes createdAt";
+
+    let query = Note.find(filter)
+      .select(listFields)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=60, stale-while-revalidate=120"
+    );
+
+    if (limit) {
+      const parsedLimit = Math.min(
+        Math.max(parseInt(limit, 10) || 20, 1),
+        100
+      );
+      const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+      const total = await Note.countDocuments(filter);
+      const notes = await query
+        .skip((parsedPage - 1) * parsedLimit)
+        .limit(parsedLimit);
+
+      return res.status(200).json({
+        notes,
+        total,
+        page: parsedPage,
+        totalPages: Math.ceil(total / parsedLimit),
+      });
+    }
+
+    const notes = await query;
     res.status(200).json(notes);
   } catch (error) {
     console.warn("Get Notes Warning:", error.message);
@@ -155,23 +206,23 @@ exports.getNoteById = async (req, res) => {
 exports.updateNote = async (req, res) => {
   try {
     const updateData = {
-      title: req.body.title || "",
-      branch: req.body.branch || "",
-      semester: req.body.semester || "",
-      subject: req.body.subject || "",
-      subjectCode: req.body.subjectCode || "",
-      description: req.body.description || "",
+      title: String(req.body.title || "").trim().slice(0, 300),
+      branch: String(req.body.branch || "").trim().slice(0, 100),
+      semester: String(req.body.semester || "").trim().slice(0, 50),
+      subject: String(req.body.subject || "").trim().slice(0, 200),
+      subjectCode: String(req.body.subjectCode || "").trim().slice(0, 50),
+      description: String(req.body.description || "").trim().slice(0, 5000),
 
       // ==========================
       // CREDITS
       // ==========================
-      credits: req.body.credits || "",
+      credits: String(req.body.credits || "").trim().slice(0, 50),
 
-      module1: req.body.module1 || "",
-      module2: req.body.module2 || "",
-      module3: req.body.module3 || "",
-      module4: req.body.module4 || "",
-      module5: req.body.module5 || "",
+      module1: String(req.body.module1 || "").trim().slice(0, 300),
+      module2: String(req.body.module2 || "").trim().slice(0, 300),
+      module3: String(req.body.module3 || "").trim().slice(0, 300),
+      module4: String(req.body.module4 || "").trim().slice(0, 300),
+      module5: String(req.body.module5 || "").trim().slice(0, 300),
     };
 
     if (req.files?.pdf?.[0]) {
@@ -211,7 +262,7 @@ exports.updateNote = async (req, res) => {
 
     const note = await Note.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      { $set: updateData },
       {
         new: true,
         runValidators: true,
@@ -221,6 +272,17 @@ exports.updateNote = async (req, res) => {
     if (!note) {
       return res.status(404).json({
         message: "Note not found",
+      });
+    }
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "update",
+        resourceType: "Note",
+        resourceId: note._id,
+        route: req.originalUrl,
+        ip: req.ip,
       });
     }
 
@@ -240,7 +302,7 @@ exports.updateNote = async (req, res) => {
 
 exports.deleteNote = async (req, res) => {
   try {
-    const note = await Note.findByIdAndDelete(req.params.id);
+    const note = await Note.findById(req.params.id);
 
     if (!note) {
       return res.status(404).json({
@@ -248,8 +310,23 @@ exports.deleteNote = async (req, res) => {
       });
     }
 
+    // Soft delete
+    await note.softDelete(req.user?._id);
+    await bumpContentVersion();
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "soft_delete",
+        resourceType: "Note",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
+
     res.status(200).json({
-      message: "Note deleted successfully",
+      message: "Note soft-deleted successfully",
     });
   } catch (error) {
     console.error("Delete Note Error:", error);
@@ -257,6 +334,80 @@ exports.deleteNote = async (req, res) => {
     res.status(500).json({
       message: error.message,
     });
+  }
+};
+
+// ==========================================
+// RESTORE NOTE (ADMIN ONLY)
+// ==========================================
+
+exports.restoreNote = async (req, res) => {
+  try {
+    const note = await Note.findOne({ _id: req.params.id }, null, { includeDeleted: true });
+
+    if (!note) {
+      return res.status(404).json({
+        message: "Note not found",
+      });
+    }
+
+    await note.restore();
+    await bumpContentVersion();
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "restore",
+        resourceType: "Note",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
+
+    res.status(200).json({
+      message: "Note restored successfully",
+      note,
+    });
+  } catch (error) {
+    console.error("Restore Note Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ==========================================
+// PERMANENT PURGE NOTE (ADMIN ONLY)
+// ==========================================
+
+exports.purgeNote = async (req, res) => {
+  try {
+    const note = await Note.findOneAndDelete({ _id: req.params.id });
+
+    if (!note) {
+      return res.status(404).json({
+        message: "Note not found",
+      });
+    }
+
+    await bumpContentVersion();
+
+    if (req.user) {
+      await recordAuditLog({
+        adminId: req.user._id,
+        action: "permanent_purge",
+        resourceType: "Note",
+        resourceId: req.params.id,
+        route: req.originalUrl,
+        ip: req.ip,
+      });
+    }
+
+    res.status(200).json({
+      message: "Note permanently purged",
+    });
+  } catch (error) {
+    console.error("Purge Note Error:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -269,25 +420,31 @@ exports.likeNote = async (req, res) => {
     const { action } = req.body || {};
     const change = action === "unlike" ? -1 : 1;
 
-    const existing = await Note.findById(req.params.id);
+    // Use atomic $inc to prevent lost updates under race conditions.
+    // If unliking, prevent likes from dropping below 0 with query condition.
+    let note;
+    if (change < 0) {
+      note = await Note.findOneAndUpdate(
+        { _id: req.params.id, likes: { $gt: 0 } },
+        { $inc: { likes: change } },
+        { new: true }
+      );
+      if (!note) {
+        note = await Note.findById(req.params.id);
+      }
+    } else {
+      note = await Note.findByIdAndUpdate(
+        req.params.id,
+        { $inc: { likes: change } },
+        { new: true }
+      );
+    }
 
-    if (!existing) {
+    if (!note) {
       return res.status(404).json({
         message: "Note not found",
       });
     }
-
-    const currentLikes =
-      typeof existing.likes === "number" && !isNaN(existing.likes)
-        ? existing.likes
-        : 0;
-    const targetLikes = Math.max(0, currentLikes + change);
-
-    const note = await Note.findByIdAndUpdate(
-      req.params.id,
-      { $set: { likes: targetLikes } },
-      { new: true }
-    );
 
     res.status(200).json(note);
   } catch (error) {
@@ -423,4 +580,4 @@ exports.getBranchStats = async (req, res) => {
       totalLabs: 0,
     });
   }
-};
+};

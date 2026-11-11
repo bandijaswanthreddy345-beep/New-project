@@ -1,9 +1,8 @@
-import chatbotAvatar from "../assets/chatbot-avatar.png";
 import "./JntuBotAvatar.css";
 
 /**
  * JNTU Circle AI assistant mark:
- * Features the signature 3D metallic golden planetary/orbital chat bubble design.
+ * Features the official JNTU logo framed in a signature golden circular badge.
  *
  * Props:
  *  - size: pixel size (square), default 32
@@ -23,11 +22,11 @@ function JntuBotAvatar({ size = 32, state = "default", className = "" }) {
         minHeight: `${size}px`,
       }}
       role="img"
-      aria-label="JNTU Circle AI Assistant"
+      aria-label="JNTU Circle Assistant"
     >
       <img
-        src={chatbotAvatar}
-        alt="JNTU AI Chatbot"
+        src="/jntu-circle-logo.png"
+        alt="JNTU Logo"
         className="jb-avatar-img"
         loading="eager"
         draggable={false}

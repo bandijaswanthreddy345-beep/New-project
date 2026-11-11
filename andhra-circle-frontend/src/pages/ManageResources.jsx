@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
+import { formatSemDisplay } from "../utils/validators";
 import "./ManageResources.css";
 
 function ManageResources() {
@@ -205,7 +206,7 @@ function ManageResources() {
 
                   <p>
                     <strong>Semester</strong>
-                    <span>{note.semester}</span>
+                    <span>{formatSemDisplay(note.semester)}</span>
                   </p>
 
                   {note.subject && (
@@ -299,7 +300,7 @@ function ManageResources() {
 
                   <p>
                     <strong>Semester</strong>
-                    <span>{paper.semester}</span>
+                    <span>{formatSemDisplay(paper.semester)}</span>
                   </p>
 
                 </div>
@@ -388,7 +389,7 @@ function ManageResources() {
 
                   <p>
                     <strong>Semester</strong>
-                    <span>{item.semester}</span>
+                    <span>{formatSemDisplay(item.semester)}</span>
                   </p>
 
                 </div>
@@ -570,7 +571,7 @@ function ManageResources() {
 
                   <p>
                     <strong>Semester</strong>
-                    <span>{item.semester}</span>
+                    <span>{formatSemDisplay(item.semester)}</span>
                   </p>
 
                 </div>
