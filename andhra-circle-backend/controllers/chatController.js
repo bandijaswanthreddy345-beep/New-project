@@ -110,10 +110,11 @@ function formatPortalContext(items) {
 }
 
 exports.chat = async (req, res) => {
+  const groqApiKey = process.env.GROQ_API_KEY;
   const openRouterApiKey = process.env.OPENROUTER_API_KEY;
   const geminiApiKey = process.env.GEMINI_API_KEY;
 
-  if (!openRouterApiKey && !geminiApiKey) {
+  if (!groqApiKey && !openRouterApiKey && !geminiApiKey) {
     return res.status(503).json({ success: false, message: "AI is not configured" });
   }
 
@@ -175,7 +176,68 @@ exports.chat = async (req, res) => {
     : message;
 
   // =========================================================
-  // 5. OpenRouter Free Model Integration (Primary Choice)
+  // 5. Groq High-Speed LLM Integration (Primary Choice if configured)
+  // =========================================================
+  if (groqApiKey) {
+    const groqMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+    ];
+
+    for (const turn of rawHistory.slice(-MAX_HISTORY)) {
+      const text = asString(turn && turn.text).trim().slice(0, MAX_HISTORY_TEXT);
+      if (!text) continue;
+      const role = (turn.role === "model" || turn.role === "assistant") ? "assistant" : "user";
+      groqMessages.push({ role, content: text });
+    }
+
+    groqMessages.push({ role: "user", content: userPromptText });
+
+    const groqModel = process.env.GROQ_MODEL || "qwen/qwen3.8-27b";
+
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${groqApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: groqModel,
+          messages: groqMessages,
+          temperature: 0.3,
+          max_tokens: 800,
+        }),
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        let reply = data?.choices?.[0]?.message?.content || "";
+        if (reply) {
+          reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+          const payload = {
+            success: true,
+            reply: reply.slice(0, 4000),
+            sources,
+            suggestedQuestions,
+            provider: "groq",
+            model: groqModel,
+          };
+          if (!isHistoryTurn) {
+            setCachedAnswer(message, payload);
+          }
+          return res.json(payload);
+        }
+      } else {
+        console.error(`Groq request failed with status ${response.status}`);
+      }
+    } catch (err) {
+      console.error("Groq error:", err.name || err.message);
+    }
+  }
+
+  // =========================================================
+  // 5. OpenRouter Free Model Integration (Secondary Choice)
   // =========================================================
   if (openRouterApiKey) {
     const openRouterMessages = [
