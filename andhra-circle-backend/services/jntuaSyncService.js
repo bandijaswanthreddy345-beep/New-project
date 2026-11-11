@@ -106,9 +106,9 @@ async function syncJntuaNotifications(force = false) {
 
     for (let page = 1; page <= maxPages; page++) {
       const pageUrl = `${JNTUA_EXAMS_BASE_URL}&pagination[page]=${page}`;
-      let response;
+      let fetchResult;
       try {
-        response = await safeFetch(pageUrl, {
+        fetchResult = await safeFetch(pageUrl, {
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -120,6 +120,9 @@ async function syncJntuaNotifications(force = false) {
         continue;
       }
 
+      const response = fetchResult?.response;
+      const buffer = fetchResult?.buffer;
+
       if (!response || !response.ok) {
         console.warn(`[JNTUA Sync] Page ${page} returned HTTP ${response?.status || "error"}`);
         continue;
@@ -127,7 +130,7 @@ async function syncJntuaNotifications(force = false) {
 
       let json;
       try {
-        json = await response.json();
+        json = JSON.parse(buffer ? buffer.toString("utf8") : "{}");
       } catch (parseErr) {
         console.warn(`[JNTUA Sync] Page ${page} JSON parse error:`, parseErr.message);
         continue;
