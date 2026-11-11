@@ -379,7 +379,6 @@ function LatestNotes({ search = "" }) {
         <div className="section-heading">
           <span className="section-tag">STUDY MATERIALS</span>
           <h2>Latest Notes</h2>
-          <p>Explore and download curated semester lecture notes & study materials.</p>
         </div>
 
         <div className="notes-loading">
@@ -401,7 +400,6 @@ function LatestNotes({ search = "" }) {
       <div className="section-heading">
         <span className="section-tag">STUDY MATERIALS</span>
         <h2>Latest Notes</h2>
-        <p>Explore and download curated semester lecture notes & study materials.</p>
       </div>
 
       {/* ==========================================
