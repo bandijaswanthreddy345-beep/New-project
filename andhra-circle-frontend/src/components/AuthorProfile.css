@@ -23,16 +23,17 @@
 .section-tag {
   display: inline-flex;
   align-items: center;
-  padding: 5px 13px;
-  margin-bottom: 8px;
+  padding: 6px 14px;
+  margin-bottom: 12px;
   border-radius: 999px;
-  background: rgba(255, 239, 179, 0.15);
-  border: 1px solid rgba(255, 239, 179, 0.38);
-  color: #ffefb3;
+  background: #ffefb3;
+  border: 1px solid #d9a726;
+  color: #002420;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 850;
   letter-spacing: 1.2px;
   text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .author-section-heading h2 {
@@ -629,5 +630,90 @@
   .upload-modal {
     padding: 24px 18px;
     border-radius: 20px;
+  }
+}
+
+/* =========================================================
+   MOBILE-ONLY FIXES — Author Profile / Team Card
+   Scoped strictly to mobile; desktop is untouched
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .team-card {
+    padding: 18px 14px;
+    border-radius: 16px;
+    gap: 14px;
+  }
+
+  .team-quote {
+    padding: 12px 12px 12px 16px;
+  }
+
+  .team-quote p {
+    font-size: 12px;
+  }
+
+  .team-quote cite {
+    font-size: 10px;
+  }
+
+  .developer-slide-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+  }
+
+  .developer-slide-copy h3 {
+    font-size: 17px;
+  }
+
+  .developer-slide-copy p {
+    font-size: 12px;
+  }
+
+  /* Upload button: comfortable tap target */
+  .jntu-upload-button {
+    padding: 14px 16px;
+    min-height: 48px;
+    font-size: 14px;
+  }
+
+  /* Modal: full-screen bottom-sheet on mobile */
+  .upload-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .upload-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 95dvh;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 16px;
+  }
+
+  /* Inputs: prevent iOS auto-zoom (font-size >= 16px) */
+  .upload-select,
+  .upload-comment-input,
+  .upload-input-row input {
+    font-size: 16px !important;
+  }
+
+  /* Submit button: big tap target */
+  .upload-submit-button {
+    padding: 15px 20px;
+    font-size: 15px;
+    min-height: 50px;
+  }
+}
+
+@media (max-width: 400px) {
+  .developer-slide-image {
+    width: 88px;
+    height: 88px;
+  }
+
+  .developer-slide-copy h3 {
+    font-size: 15px;
   }
 }

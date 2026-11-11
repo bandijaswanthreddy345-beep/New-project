@@ -1,0 +1,479 @@
+/* =========================================================
+   3D COVERFLOW BRANCHES CAROUSEL
+   Canvas: Exact Webpage Background (#F9FCFB)
+   Pill Tag: Butter Cream (#FAF6D2) with Gold Text (#c8961e)
+   Smooth Continuous Rotation & Crisp Non-Washed 3D Depth
+   ========================================================= */
+
+.branch-carousel-section {
+  position: relative;
+  width: 100%;
+  padding: 55px 0 70px;
+  background: var(--background, #F9FCFB);
+  border-top: 1px solid var(--border, #BCE0D8);
+  border-bottom: 1px solid var(--border, #BCE0D8);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Subtle, clean ambient lighting (no yellow smudges or stains) */
+.branch-carousel-ambient-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse 800px 360px at 50% 50%,
+    rgba(217, 167, 38, 0.05) 0%,
+    transparent 70%
+  );
+}
+
+/* Section Header - Matching Latest Notes Heading Structure */
+.branch-carousel-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto 38px;
+  padding: 0 16px;
+}
+
+/* Eyebrow Pill Tag - EXACT Match to "STUDY MATERIALS" (#FAF6D2 / Butter Cream) */
+.branch-carousel-eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 18px;
+  border-radius: 9999px;
+  background: #ffefb3;
+  border: 1px solid #d9a726;
+  box-shadow: 0 0 18px rgba(217, 167, 38, 0.45), 0 2px 8px rgba(0, 36, 32, 0.1);
+  margin-bottom: 14px;
+}
+
+.branch-carousel-eyebrow-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 850;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #002420; /* High contrast dark emerald */
+}
+
+/* Section Title - EXACT Match to "Latest Notes" heading */
+.branch-carousel-title {
+  font-family: var(--font-family, 'Plus Jakarta Sans', sans-serif);
+  font-size: clamp(26px, 3.6vw, 34px);
+  font-weight: 750;
+  color: var(--text-primary, #012A25);
+  letter-spacing: -0.6px;
+  line-height: 1.25;
+  margin: 0 0 12px 0;
+}
+
+/* Underline Pill Bar - EXACT Match to h2::after (50px x 3.5px) */
+.branch-carousel-title-underline {
+  display: block;
+  width: 50px;
+  height: 3.5px;
+  margin: 0 auto;
+  border-radius: 10px;
+  background: var(--primary, #0D453C);
+}
+
+/* 3D Rotating Stage */
+.branch-carousel-stage {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 440px;
+  perspective: 1200px;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 10;
+  overflow: visible;
+}
+
+.branch-carousel-world {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+
+/* Individual 3D Card - Crisp Dark Cyber Architecture on Light Canvas */
+.branch-3d-card {
+  position: absolute;
+  top: 0;
+  width: 410px;
+  height: 330px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: #090B10;
+  border: 1.5px solid rgba(13, 69, 60, 0.16);
+  cursor: pointer;
+  will-change: transform, opacity, filter;
+  transition: all 0.85s cubic-bezier(0.25, 1, 0.45, 1);
+  transform-origin: center center;
+  box-shadow: 0 16px 36px rgba(1, 42, 35, 0.12), 0 4px 12px rgba(0, 0, 0, 0.14);
+}
+
+/* Center Active Card: Sunbeam Gold Halo */
+.branch-3d-card.is-center {
+  border-color: #d9a726 !important;
+  box-shadow:
+    0 24px 50px rgba(1, 42, 35, 0.22),
+    0 0 32px rgba(217, 167, 38, 0.45),
+    inset 0 1px 0 rgba(255, 239, 179, 0.4) !important;
+}
+
+.branch-3d-card:not(.is-center):hover {
+  border-color: #d9a726;
+  box-shadow: 0 20px 42px rgba(1, 42, 35, 0.18);
+}
+
+/* Visual Image Background - Crisp & Clear */
+.branch-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.5s ease;
+  pointer-events: none;
+}
+
+.branch-3d-card.is-center .branch-card-img {
+  opacity: 0.92;
+  transform: scale(1.05);
+}
+
+.branch-3d-card:not(.is-center) .branch-card-img {
+  opacity: 0.65;
+  transform: scale(1);
+}
+
+/* Dark Gradient Overlay for legibility */
+.branch-card-overlay {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.branch-3d-card.is-center .branch-card-overlay {
+  background: linear-gradient(
+    to top,
+    #090B10 0%,
+    rgba(9, 11, 16, 0.65) 45%,
+    rgba(9, 11, 16, 0.15) 100%
+  );
+}
+
+.branch-3d-card:not(.is-center) .branch-card-overlay {
+  background: linear-gradient(
+    to top,
+    #090B10 0%,
+    rgba(9, 11, 16, 0.78) 55%,
+    rgba(9, 11, 16, 0.35) 100%
+  );
+}
+
+/* Card Content Container */
+.branch-card-inner {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+/* Top Pill Badge */
+.branch-top-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  background: rgba(15, 17, 23, 0.88);
+  border: 1px solid rgba(217, 167, 38, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  align-self: flex-start;
+}
+
+.branch-badge-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #ffefb3; /* Butter Cream */
+}
+
+/* Middle / Bottom Content */
+.branch-bottom-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.branch-card-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.branch-card-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  margin: 0;
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+}
+
+.branch-3d-card:hover .branch-card-name {
+  color: #ffefb3;
+}
+
+/* Bottom CTA Row */
+.branch-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.branch-explore-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.branch-explore-link:hover {
+  transform: translateX(3px);
+  text-decoration: underline;
+}
+
+/* Navigation Controls & Pagination Dots */
+.branch-carousel-controls {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.branch-nav-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.branch-nav-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid var(--border, #BCE0D8);
+  color: var(--primary, #0D453C);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(1, 58, 51, 0.08);
+}
+
+.branch-nav-btn:hover {
+  color: #ffffff;
+  border-color: #d9a726;
+  background: #d9a726;
+  box-shadow: 0 4px 14px rgba(217, 167, 38, 0.35);
+  transform: scale(1.06);
+}
+
+.branch-nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* Dots */
+.branch-dots-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.branch-dot {
+  height: 8px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.branch-dot.is-active {
+  width: 28px;
+  background: #d9a726;
+  box-shadow: 0 0 10px rgba(217, 167, 38, 0.5);
+}
+
+.branch-dot:not(.is-active) {
+  width: 8px;
+  background: #cfe2dc;
+}
+
+.branch-dot:not(.is-active):hover {
+  background: #d9a726;
+}
+
+/* Mobile Responsive - 3D Coverflow geometry strictly under @media (max-width: 768px) */
+@media (max-width: 768px) {
+  .branch-3d-card {
+    width: 240px;
+    height: 300px;
+    border-radius: 24px;
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    transform-origin: center center;
+    backface-visibility: hidden;
+    will-change: transform, opacity, z-index;
+  }
+  .branch-carousel-stage {
+    min-height: 330px;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+  }
+  .branch-carousel-world {
+    height: 310px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 768px) {
+  .branch-3d-card {
+    width: 250px;
+    height: 310px;
+  }
+}
+
+
+/* Ultra-polished mobile response for small devices (320px - 480px) */
+@media (max-width: 480px) {
+  .branch-carousel-section {
+    padding: 36px 0 44px;
+  }
+  .branch-carousel-header {
+    padding: 0 16px;
+    margin-bottom: 18px;
+  }
+  .branch-carousel-tag {
+    font-size: 10px;
+    padding: 4px 11px;
+    letter-spacing: 0.8px;
+  }
+  .branch-carousel-title {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+  .branch-3d-card {
+    width: 230px;
+    height: 290px;
+    border-radius: 20px;
+  }
+  .branch-card-inner {
+    padding: 16px 16px;
+  }
+  .branch-card-name {
+    font-size: 18px;
+  }
+  .branch-card-tag {
+    font-size: 9.5px;
+  }
+  .branch-explore-link {
+    font-size: 11px;
+  }
+  .branch-carousel-stage {
+    min-height: 320px;
+  }
+  .branch-carousel-world {
+    height: 295px;
+  }
+  .branch-carousel-controls {
+    margin-top: 16px;
+    gap: 12px;
+  }
+  .branch-nav-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 360px) {
+  .branch-3d-card {
+    width: 215px;
+    height: 270px;
+  }
+  .branch-carousel-title {
+    font-size: 18px;
+  }
+  .branch-carousel-stage {
+    min-height: 290px;
+  }
+  .branch-carousel-world {
+    height: 275px;
+  }
+}
+
+/* =========================================================
+   MOBILE-ONLY FIXES — Branch Section
+   Floating buttons are on the RIGHT side, so only add right-side padding
+   to prevent card content from being clipped behind them.
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .branch-carousel-header {
+    padding: 0 16px;
+    max-width: 100%;
+  }
+
+  .branch-carousel-title {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+
+  .branch-carousel-stage {
+    overflow: visible;
+  }
+}

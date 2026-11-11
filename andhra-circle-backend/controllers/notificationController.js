@@ -1,13 +1,19 @@
 const Notification = require("../models/Notification");
 const { syncJntuaNotifications, isBTechNotification } = require("../services/jntuaSyncService");
+const { safeFetch } = require("../services/safeFetch");
 
 // ==========================================
 // SYNC NOTIFICATIONS FROM JNTUA OFFICIAL
+//
+// GET  /sync  public (the Notifications page calls it) and throttled:
+//             the service only runs it once every 3 minutes.
+// POST /sync  admin only, forces an immediate sync.
 // ==========================================
 
 exports.syncJntua = async (req, res) => {
   try {
-    const result = await syncJntuaNotifications(true);
+    const forced = req.method === "POST";
+    const result = await syncJntuaNotifications(forced);
     res.status(200).json({
       success: true,
       message: "Synced with official JNTUA examinations portal",
@@ -17,38 +23,32 @@ exports.syncJntua = async (req, res) => {
     console.error("Manual JNTUA Sync Error:", error);
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Unable to sync notifications right now",
     });
   }
 };
 
 // ==========================================
-// CREATE NOTIFICATION
+// CREATE NOTIFICATION (admin only, see routes)
 // ==========================================
 
 exports.createNotification = async (req, res) => {
-try {
-const notification = await Notification.create({
-...req.body,
-likes: 0,
-views: 0,
-downloads: 0,
-});
+  try {
+    const notification = await Notification.create({
+      ...req.body,
+      likes: 0,
+      views: 0,
+      downloads: 0,
+    });
 
+    res.status(201).json(notification);
+  } catch (error) {
+    console.error("Create Notification Error:", error);
 
-res.status(201).json(notification);
-
-
-} catch (error) {
-console.error("Create Notification Error:", error);
-
-
-res.status(500).json({
-  message: error.message,
-});
-
-
-}
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
@@ -56,29 +56,29 @@ res.status(500).json({
 // ==========================================
 
 exports.getNotifications = async (req, res) => {
-try {
-  if (require("mongoose").connection.readyState !== 1) {
-    return res.status(200).json([]);
+  try {
+    if (require("mongoose").connection.readyState !== 1) {
+      return res.status(200).json([]);
+    }
+
+    // Non-blocking background sync with official JNTUA updates
+    syncJntuaNotifications(false).catch((err) => {
+      console.warn("Background JNTUA sync warning:", err.message);
+    });
+
+    const notifications = await Notification.find().sort({
+      createdAt: -1,
+    });
+
+    const btechNotifications = notifications.filter((n) =>
+      isBTechNotification(n.title, n.description)
+    );
+
+    res.status(200).json(btechNotifications);
+  } catch (error) {
+    console.warn("Get Notifications Warning:", error.message);
+    res.status(200).json([]);
   }
-
-  // Non-blocking background sync with official JNTUA updates
-  syncJntuaNotifications(false).catch((err) => {
-    console.warn("Background JNTUA sync warning:", err.message);
-  });
-
-  const notifications = await Notification.find().sort({
-    createdAt: -1,
-  });
-
-  const btechNotifications = notifications.filter((n) =>
-    isBTechNotification(n.title, n.description)
-  );
-
-  res.status(200).json(btechNotifications);
-} catch (error) {
-  console.warn("Get Notifications Warning:", error.message);
-  res.status(200).json([]);
-}
 };
 
 // ==========================================
@@ -86,103 +86,79 @@ try {
 // ==========================================
 
 exports.getNotificationById = async (req, res) => {
-try {
-const notification = await Notification.findById(
-req.params.id
-);
+  try {
+    const notification = await Notification.findById(req.params.id);
 
+    if (!notification) {
+      return res.status(404).json({
+        message: "Notification not found",
+      });
+    }
 
-if (!notification) {
-  return res.status(404).json({
-    message: "Notification not found",
-  });
-}
+    res.status(200).json(notification);
+  } catch (error) {
+    console.error("Get Notification Error:", error);
 
-res.status(200).json(notification);
-
-
-} catch (error) {
-console.error("Get Notification Error:", error);
-
-
-res.status(500).json({
-  message: error.message,
-});
-
-
-}
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
-// UPDATE NOTIFICATION
+// UPDATE NOTIFICATION (admin only, see routes)
 // ==========================================
 
 exports.updateNotification = async (req, res) => {
-try {
-const notification =
-await Notification.findByIdAndUpdate(
-req.params.id,
-req.body,
-{
-returnDocument: "after",
-}
-);
+  try {
+    const notification = await Notification.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        returnDocument: "after",
+      }
+    );
 
+    if (!notification) {
+      return res.status(404).json({
+        message: "Notification not found",
+      });
+    }
 
-if (!notification) {
-  return res.status(404).json({
-    message: "Notification not found",
-  });
-}
+    res.status(200).json(notification);
+  } catch (error) {
+    console.error("Update Notification Error:", error);
 
-res.status(200).json(notification);
-
-
-} catch (error) {
-console.error("Update Notification Error:", error);
-
-
-res.status(500).json({
-  message: error.message,
-});
-
-
-}
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
-// DELETE NOTIFICATION
+// DELETE NOTIFICATION (admin only, see routes)
 // ==========================================
 
 exports.deleteNotification = async (req, res) => {
-try {
-const notification =
-await Notification.findByIdAndDelete(
-req.params.id
-);
+  try {
+    const notification = await Notification.findByIdAndDelete(req.params.id);
 
+    if (!notification) {
+      return res.status(404).json({
+        message: "Notification not found",
+      });
+    }
 
-if (!notification) {
-  return res.status(404).json({
-    message: "Notification not found",
-  });
-}
+    res.status(200).json({
+      message: "Notification deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete Notification Error:", error);
 
-res.status(200).json({
-  message: "Notification deleted successfully",
-});
-
-
-} catch (error) {
-console.error("Delete Notification Error:", error);
-
-
-res.status(500).json({
-  message: error.message,
-});
-
-
-}
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 // ==========================================
@@ -277,5 +253,62 @@ exports.increaseDownloads = async (req, res) => {
     res.status(500).json({
       message: error.message,
     });
+  }
+};
+
+// ==========================================
+// STREAM / PROXY PDF FROM GOOGLE DRIVE / DIRECT URLS
+//
+// Public on purpose (students open notification PDFs through it), so it is
+// hardened against SSRF: see services/safeFetch.js.
+// ==========================================
+
+exports.proxyPdf = async (req, res) => {
+  const { url } = req.query;
+
+  if (!url || typeof url !== "string") {
+    return res.status(400).send("No document URL provided");
+  }
+
+  try {
+    let targetUrl = url;
+
+    // Handle Google Drive links
+    const driveMatch =
+      url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+      url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+
+    if (driveMatch) {
+      const fileId = driveMatch[1];
+      targetUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    }
+
+    const { response, buffer } = await safeFetch(targetUrl, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).send("Failed to stream document");
+    }
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'inline; filename="document.pdf"');
+    res.setHeader("X-Content-Type-Options", "nosniff");
+
+    res.send(buffer);
+  } catch (error) {
+    console.warn("Proxy PDF blocked/failed:", error.message);
+
+    const blocked =
+      /not allowed|Invalid URL|Only http|Only standard|credentials|too large|redirect/i.test(
+        error.message
+      );
+
+    res
+      .status(blocked ? 400 : 502)
+      .send(blocked ? "This document link cannot be loaded" : "Error streaming PDF document");
   }
 };

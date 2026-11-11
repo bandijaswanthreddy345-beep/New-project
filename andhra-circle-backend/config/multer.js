@@ -8,6 +8,14 @@ const fs = require("fs");
 
 const uploadDir = "uploads";
 
+const SAFE_EXTENSIONS = {
+  "application/pdf": ".pdf",
+  "image/jpeg": ".jpg",
+  "image/jpg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+};
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, {
     recursive: true,
@@ -24,9 +32,11 @@ const storage = multer.diskStorage({
   },
 
   filename: (req, file, cb) => {
-    const extension = path.extname(
-      file.originalname
-    );
+    // SECURITY: never trust the uploaded file's own name/extension.
+    // Derive it from the (filtered) mimetype so nobody can store
+    // "evil.html" under an allowed content type.
+    const extension =
+      SAFE_EXTENSIONS[file.mimetype] || "";
 
     const uniqueName =
       Date.now() +

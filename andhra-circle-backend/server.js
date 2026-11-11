@@ -5,6 +5,9 @@ const path = require("path");
 
 const connectDB = require("./config/db");
 
+const securityHeaders = require("./middleware/securityHeaders");
+const { rateLimit } = require("./middleware/rateLimit");
+
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const userRoutes = require("./routes/userRoutes");
 const commentRoutes = require("./routes/commentRoutes");
@@ -17,6 +20,29 @@ const auth = require("./middleware/auth");
 // ==========================
 
 dotenv.config();
+
+// ==========================
+// SECURITY: REFUSE TO RUN WITH A WEAK JWT SECRET
+// A guessable secret lets anyone forge an admin login token.
+// Generate one with:
+//   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+// ==========================
+
+const jwtSecret = process.env.JWT_SECRET || "";
+const weakSecret =
+  jwtSecret.length < 32 || /my_super_secret|changeme|secret_key/i.test(jwtSecret);
+
+if (weakSecret) {
+  const message =
+    "JWT_SECRET is missing or weak. Set a random value of at least 32 characters in .env";
+
+  if (process.env.NODE_ENV === "production") {
+    console.error("FATAL: " + message);
+    process.exit(1);
+  }
+
+  console.warn("WARNING: " + message);
+}
 
 // ==========================
 // CONNECT DATABASE
@@ -34,11 +60,44 @@ const app = express();
 // MIDDLEWARE
 // ==========================
 
-// Enable CORS
-app.use(cors());
+// Do not advertise the framework to scanners
+app.disable("x-powered-by");
 
-// Parse JSON requests
-app.use(express.json());
+// If this runs behind a reverse proxy (Nginx, Render, Railway...), uncomment
+// so rate limits see each visitor's real IP instead of the proxy's:
+// app.set("trust proxy", 1);
+
+app.use(securityHeaders);
+
+// Enable CORS.
+// In production set CORS_ORIGINS in .env to your website address(es),
+// comma separated, e.g. CORS_ORIGINS=https://jntucircle.com
+// When it is not set every origin is allowed (needed for local/phone testing).
+const allowedOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors(
+    allowedOrigins.length
+      ? { origin: allowedOrigins }
+      : undefined
+  )
+);
+
+// Overall limit per IP (stops simple floods). Generous on purpose: many
+// students can share one campus Wi-Fi address. Image/PDF files are exempt.
+app.use(
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 600,
+    skip: (req) => req.path.startsWith("/uploads"),
+  })
+);
+
+// Parse JSON requests (small body limit; uploads use multer, not JSON)
+app.use(express.json({ limit: "1mb" }));
 
 // Parse URL-encoded requests
 app.use(
@@ -54,9 +113,30 @@ app.use(
 // Uploaded files are accessible through:
 // http://localhost:5000/uploads/filename.pdf
 
+const SAFE_UPLOAD_TYPES = new Set([
+  ".pdf",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+]);
+
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "uploads"))
+  express.static(path.join(__dirname, "uploads"), {
+    dotfiles: "deny",
+    index: false,
+    setHeaders: (res, filePath) => {
+      res.setHeader("X-Content-Type-Options", "nosniff");
+
+      // Anything that is not a plain PDF/image (e.g. an old .html upload)
+      // is forced to download so it can never run as a web page.
+      if (!SAFE_UPLOAD_TYPES.has(path.extname(filePath).toLowerCase())) {
+        res.setHeader("Content-Type", "application/octet-stream");
+        res.setHeader("Content-Disposition", "attachment");
+      }
+    },
+  })
 );
 
 // ==========================
@@ -150,6 +230,15 @@ app.use(
 app.use(
   "/api/user-materials",
   require("./routes/userMaterialRoutes")
+);
+
+// ==========================
+// AI CHAT (Gemini)
+// ==========================
+
+app.use(
+  "/api/chat",
+  require("./routes/chatRoutes")
 );
 
 // ==========================

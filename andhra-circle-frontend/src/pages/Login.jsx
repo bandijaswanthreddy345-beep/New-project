@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import API from "../api/api";
 import "./Login.css";
+import "./Register.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -19,6 +20,30 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // CAPTCHA challenge state (only activated on repeated failed login attempts)
+  const [requireCaptcha, setRequireCaptcha] = useState(false);
+  const [captchaData, setCaptchaData] = useState({ token: "", svg: "" });
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [captchaLoading, setCaptchaLoading] = useState(false);
+
+  const fetchCaptcha = useCallback(async () => {
+    try {
+      setCaptchaLoading(true);
+      const res = await API.get("/auth/captcha");
+      if (res.data?.success) {
+        setCaptchaData({
+          token: res.data.captchaToken,
+          svg: res.data.captchaSvg,
+        });
+        setCaptchaInput("");
+      }
+    } catch (err) {
+      console.error("Failed to load security CAPTCHA challenge:", err);
+    } finally {
+      setCaptchaLoading(false);
+    }
+  }, []);
+
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -31,11 +56,26 @@ function Login() {
     e.preventDefault();
     setError("");
 
+    if (requireCaptcha && !captchaInput.trim()) {
+      setError("Please enter the 6-character security CAPTCHA verification code.");
+      return;
+    }
+
     try {
       setLoading(true);
 
+      const payload = {
+        email: form.email,
+        password: form.password,
+      };
+
+      if (requireCaptcha) {
+        payload.captchaToken = captchaData.token;
+        payload.captchaAnswer = captchaInput.trim();
+      }
+
       // Login request
-      const res = await API.post("/auth/login", form);
+      const res = await API.post("/auth/login", payload);
 
       // Get token and user details
       const { token, user } = res.data;
@@ -49,10 +89,7 @@ function Login() {
       // Save JWT token & user information
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
-      console.log("Login successful");
-      console.log("User:", user);
-      console.log("Token saved:", token);
+      window.dispatchEvent(new Event("authChanged"));
 
       // Role based redirection
       if (user.role === "admin") {
@@ -66,6 +103,14 @@ function Login() {
         err.response?.data?.message ||
         "Invalid email or password. Please verify your credentials and try again.";
       setError(errMsg);
+
+      // If backend reports repeated failures requiring CAPTCHA
+      if (err.response?.data?.requireCaptcha) {
+        setRequireCaptcha(true);
+        fetchCaptcha();
+      } else if (requireCaptcha) {
+        fetchCaptcha();
+      }
     } finally {
       setLoading(false);
     }
@@ -193,7 +238,7 @@ function Login() {
                 id="login-email"
                 type="email"
                 name="email"
-                placeholder="name@example.com"
+                placeholder="Enter your registered email"
                 className="login-text-input"
                 value={form.email}
                 onChange={handleChange}
@@ -226,7 +271,7 @@ function Login() {
                 id="login-password"
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="••••••••••••"
+                placeholder="Enter your password"
                 className="login-text-input login-password-input"
                 value={form.password}
                 onChange={handleChange}
@@ -254,6 +299,95 @@ function Login() {
               </button>
             </div>
           </div>
+
+          {/* Security Verification (CAPTCHA) - Only shown after repeated login failures */}
+          {requireCaptcha && (
+            <div className="login-field-group signup-captcha-section">
+              <div className="signup-label-between">
+                <label className="login-field-label" htmlFor="login-captcha">
+                  <span>Security Verification</span>
+                  <span className="login-required-star">*</span>
+                </label>
+                <span className="signup-helper-text">Case-insensitive</span>
+              </div>
+
+              <div className="signup-captcha-box">
+                <div className="signup-captcha-visual-row">
+                  {captchaData.svg ? (
+                    <div className="signup-captcha-svg-container">
+                      <img
+                        src={`data:image/svg+xml;utf8,${encodeURIComponent(captchaData.svg)}`}
+                        alt="Security verification challenge"
+                        className="signup-captcha-image"
+                      />
+                    </div>
+                  ) : (
+                    <div className="signup-captcha-placeholder">
+                      <span className="login-spinner" />
+                      <span>Loading challenge...</span>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    className="signup-captcha-reload-btn"
+                    onClick={fetchCaptcha}
+                    disabled={captchaLoading}
+                    title="Generate a new security challenge"
+                    aria-label="Refresh security challenge"
+                  >
+                    <svg
+                      width="17"
+                      height="17"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={captchaLoading ? "signup-spin" : ""}
+                    >
+                      <polyline points="23 4 23 10 17 10" />
+                      <polyline points="1 20 1 14 7 14" />
+                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="login-input-wrapper">
+                  <svg
+                    className="login-input-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                    <path d="M9 10h6" />
+                    <path d="M12 10v4" />
+                  </svg>
+                  <input
+                    id="login-captcha"
+                    type="text"
+                    name="captchaInput"
+                    value={captchaInput}
+                    onChange={(e) => {
+                      setCaptchaInput(e.target.value.toUpperCase());
+                      if (error) setError("");
+                    }}
+                    placeholder="Enter 6-character code"
+                    className="login-text-input signup-captcha-text-input"
+                    maxLength={6}
+                    autoComplete="off"
+                    spellCheck="false"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Utility Row: Remember Me & Forgot Password */}
           <div className="login-utility-row">

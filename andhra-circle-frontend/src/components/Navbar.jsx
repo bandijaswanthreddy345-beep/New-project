@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
+import { getStoredStudentData, getStudentAvatar, DEFAULT_STUDENT_AVATAR } from "../data/studentData";
 
 // Standard fallback notices for the pop-up preview
 const FALLBACK_NOTICES = [
@@ -32,6 +33,12 @@ const FALLBACK_NOTICES = [
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
   const notifContainerRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
 
@@ -41,6 +48,44 @@ function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showToastAlert, setShowToastAlert] = useState(false);
   const [activeAlertItem, setActiveAlertItem] = useState(null);
+  const [student, setStudent] = useState(getStoredStudentData());
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Mobile auto-popping notification states
+  const [mobileNotifIndex, setMobileNotifIndex] = useState(0);
+  const [showMobileNotifPopup, setShowMobileNotifPopup] = useState(false);
+  const mobileNotifRef = useRef(null);
+
+  useEffect(() => {
+    const handleProfileSync = () => {
+      setStudent(getStoredStudentData());
+    };
+    const handleAuthSync = () => {
+      try {
+        const raw = localStorage.getItem("user");
+        setCurrentUser(raw ? JSON.parse(raw) : null);
+      } catch {
+        setCurrentUser(null);
+      }
+    };
+    window.addEventListener("studentProfileUpdated", handleProfileSync);
+    window.addEventListener("storage", handleProfileSync);
+    window.addEventListener("storage", handleAuthSync);
+    window.addEventListener("authChanged", handleAuthSync);
+    return () => {
+      window.removeEventListener("studentProfileUpdated", handleProfileSync);
+      window.removeEventListener("storage", handleProfileSync);
+      window.removeEventListener("storage", handleAuthSync);
+      window.removeEventListener("authChanged", handleAuthSync);
+    };
+  }, []);
 
   const isBTechNotice = (n) => {
     if (!n) return false;
@@ -171,6 +216,9 @@ function Navbar() {
       if (notifContainerRef.current && !notifContainerRef.current.contains(e.target)) {
         setShowDropdown(false);
       }
+      if (mobileNotifRef.current && !mobileNotifRef.current.contains(e.target)) {
+        setShowMobileNotifPopup(false);
+      }
     };
     document.addEventListener("mousedown", handleOutsideClick);
     document.addEventListener("touchstart", handleOutsideClick);
@@ -179,6 +227,51 @@ function Navbar() {
       document.removeEventListener("touchstart", handleOutsideClick);
     };
   }, []);
+
+  // Automatic mobile notification pop-up every 5 seconds (touch screen fallback for no cursor hover)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let initialTimeout = null;
+    let cycleInterval = null;
+
+    const runMobileCycle = () => {
+      if (window.innerWidth <= 768 && notificationsList && notificationsList.length > 0) {
+        // Initial popup after brief delay
+        initialTimeout = setTimeout(() => {
+          setShowMobileNotifPopup(true);
+        }, 1200);
+
+        // Continuous 5-second automatic popup cycle
+        cycleInterval = setInterval(() => {
+          if (window.innerWidth <= 768 && notificationsList.length > 0) {
+            setShowMobileNotifPopup(false);
+            setTimeout(() => {
+              setMobileNotifIndex((prev) => (prev + 1) % notificationsList.length);
+              setShowMobileNotifPopup(true);
+            }, 300);
+          }
+        }, 5000);
+      }
+    };
+
+    runMobileCycle();
+
+    const handleMobileResize = () => {
+      if (window.innerWidth > 768) {
+        setShowMobileNotifPopup(false);
+        if (initialTimeout) clearTimeout(initialTimeout);
+        if (cycleInterval) clearInterval(cycleInterval);
+      }
+    };
+
+    window.addEventListener("resize", handleMobileResize);
+    return () => {
+      if (initialTimeout) clearTimeout(initialTimeout);
+      if (cycleInterval) clearInterval(cycleInterval);
+      window.removeEventListener("resize", handleMobileResize);
+    };
+  }, [notificationsList]);
 
   const formatTimeAgo = (dateStr) => {
     if (!dateStr) return "Recent";
@@ -204,19 +297,8 @@ function Navbar() {
       ),
     },
     {
-      name: "Notes",
-      path: "/notes",
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
-          <path d="M6 6h10" />
-          <path d="M6 10h10" />
-        </svg>
-      ),
-    },
-    {
-      name: "CGPA & SGPA Calculator",
-      path: "/calculator",
+      name: "CGPA Calculator",
+      path: "/cgpa-calculator",
       icon: (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect width="16" height="20" x="4" y="2" rx="2" />
@@ -233,6 +315,15 @@ function Navbar() {
       ),
     },
     {
+      name: "SGPA Calculator",
+      path: "/sgpa-calculator",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+        </svg>
+      ),
+    },
+    {
       name: "Upload Materials",
       path: "/upload-materials",
       icon: (
@@ -244,18 +335,13 @@ function Navbar() {
       ),
     },
     {
-      name: "Student Profile",
-      path: "/profile",
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-          <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-        </svg>
-      ),
-    },
-    {
       name: "Notifications",
       path: "/notifications",
+    },
+    {
+      name: "Student Profile",
+      path: "/profile",
+      isProfile: true,
     },
   ];
 
@@ -282,10 +368,127 @@ function Navbar() {
       </div>
 
       {/* ==========================================
-          NAVIGATION
+          MOBILE ACTIONS (VISIBLE <= 768px)
+      ========================================== */}
+      <div className="nav-mobile-actions">
+        <div className="nav-mobile-notif-wrapper" ref={mobileNotifRef}>
+          <Link
+            to="/notifications"
+            className="nav-mobile-action-btn"
+            title="Notifications"
+            aria-label="View notifications"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              setShowMobileNotifPopup(false);
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            {hasNewAlert && <span className="nav-mobile-notif-ping" />}
+          </Link>
+
+          {/* Auto-popping mobile notification preview strip (pops up every 5 seconds) */}
+          {notificationsList && notificationsList.length > 0 && (
+            <div
+              className={`nav-mobile-notif-popup ${showMobileNotifPopup ? "is-visible" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMobileNotifPopup(false);
+                handleOpenNotifications();
+                const activeNotice = notificationsList[mobileNotifIndex] || latestAlert;
+                if (activeNotice?._id) {
+                  navigate(`/notifications?view=${encodeURIComponent(activeNotice._id)}`);
+                } else {
+                  navigate("/notifications");
+                }
+              }}
+              role="alert"
+              aria-live="polite"
+              title="Click to view full notification"
+            >
+              <div className="nav-mobile-notif-arrow" />
+              <div className="nav-mobile-notif-body">
+                <span className="nav-mobile-notif-text">
+                  {(notificationsList[mobileNotifIndex] || latestAlert)?.title}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="nav-mobile-notif-dismiss"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMobileNotifPopup(false);
+                }}
+                aria-label="Dismiss notification popup"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Student Profile Quick Avatar */}
+        <Link
+          to="/student-profile"
+          className="nav-mobile-action-btn nav-mobile-profile-btn"
+          title={student?.isConfigured && student?.name ? `Student Profile • ${student.name}` : "Student Profile"}
+          aria-label="Student Profile"
+          onClick={() => {
+            setMobileMenuOpen(false);
+            setShowMobileNotifPopup(false);
+          }}
+        >
+          <div className="nav-profile-avatar-wrapper nav-mobile-profile-avatar-wrapper">
+            {getStudentAvatar(student) ? (
+              <img
+                src={getStudentAvatar(student)}
+                alt={student?.name || "Student"}
+                className="nav-profile-avatar-img nav-mobile-avatar-img"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
+                }}
+              />
+            ) : (
+              <span className="nav-profile-fallback-icon nav-mobile-fallback-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
+            )}
+            <span className="nav-profile-status-dot" />
+          </div>
+        </Link>
+
+        <button
+          type="button"
+          className={`nav-mobile-toggle ${mobileMenuOpen ? "is-open" : ""}`}
+          onClick={() => setMobileMenuOpen((prev) => !prev)}
+          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      {/* ==========================================
+          NAVIGATION (DESKTOP & MOBILE DRAWER)
       ========================================== */}
 
-      <nav>
+      <nav className={`nav-container ${mobileMenuOpen ? "is-mobile-open" : ""}`}>
         <ul className="nav-links">
 
           {navigationLinks.map((item) => {
@@ -376,10 +579,135 @@ function Navbar() {
               );
             }
 
+            if (item.isProfile || item.name === "Student Profile") {
+              const isConfigured = Boolean(student?.isConfigured && student?.name);
+              const displayName = currentUser?.name || (isConfigured ? student.name : "Student Scholar");
+              const photoSrc = getStudentAvatar(student);
+
+              return (
+                <li key={item.path} className="nav-item-profile">
+                  <button
+                    type="button"
+                    className="nav-profile-btn"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (!currentUser) {
+                        navigate("/login");
+                      } else {
+                        navigate("/profile");
+                      }
+                    }}
+                    title={currentUser ? `Student Dashboard • ${displayName}` : "Sign In or Sign Up"}
+                    aria-label={currentUser ? `Student Dashboard (${displayName})` : "Sign In or Sign Up"}
+                  >
+                    <div className="nav-profile-avatar-wrapper">
+                      {photoSrc ? (
+                        <img
+                          src={photoSrc}
+                          alt={displayName}
+                          className="nav-profile-avatar-img"
+                          onError={(e) => {
+                            e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
+                          }}
+                        />
+                      ) : null}
+                      <span
+                        className="nav-profile-fallback-icon"
+                        style={{ display: photoSrc ? "none" : "flex" }}
+                      >
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      </span>
+                      <span className={`nav-profile-status-dot ${currentUser ? "is-online" : ""}`} title={currentUser ? "Account Online" : "Sign In or Sign Up"} />
+                    </div>
+                  </button>
+
+                  {/* Profile & Account Dropdown Menu (only when signed in, shown on hover/active) */}
+                  {currentUser && (
+                    <div className="nav-profile-dropdown" role="menu">
+                      <Link
+                        to="/profile"
+                        className="nav-profile-dd-header"
+                        onClick={() => setMobileMenuOpen(false)}
+                        title="Open Student Dashboard"
+                      >
+                        <div className="nav-profile-dd-avatar">
+                          {photoSrc ? (
+                            <img src={photoSrc} alt={displayName} />
+                          ) : (
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            </svg>
+                          )}
+                        </div>
+                        <div className="nav-profile-dd-info">
+                          <span className="nav-profile-dd-name">{displayName}</span>
+                          <span className="nav-profile-dd-role">
+                            {currentUser?.email || (isConfigured ? `${student.branch || "JNTU"} • ${student.hallTicket || ""}` : "Student Account")}
+                          </span>
+                        </div>
+                      </Link>
+
+                      <div className="nav-profile-dd-divider" />
+
+                      <div className="nav-profile-dd-actions">
+                        {currentUser?.role === "admin" && (
+                          <Link
+                            to="/dashboard"
+                            className="nav-profile-dd-link"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect width="7" height="9" x="3" y="3" rx="1" />
+                              <rect width="7" height="5" x="14" y="3" rx="1" />
+                              <rect width="7" height="9" x="14" y="12" rx="1" />
+                              <rect width="7" height="5" x="3" y="16" rx="1" />
+                            </svg>
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        )}
+
+                        <button
+                          type="button"
+                          className="nav-profile-dd-link nav-profile-dd-signout"
+                          onClick={() => {
+                            localStorage.removeItem("token");
+                            localStorage.removeItem("user");
+                            setCurrentUser(null);
+                            window.dispatchEvent(new Event("authChanged"));
+                            navigate("/login");
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                          </svg>
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              );
+            }
+
             return (
               <li key={item.path}>
                 <NavLink
                   to={item.path}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) =>
                     isActive
                       ? "nav-link active nav-link-with-icon"
@@ -393,71 +721,16 @@ function Navbar() {
             );
           })}
 
-          {/* ==========================================
-              LOGIN BUTTON
-          ========================================== */}
-
-          <li>
-            <Link
-              to="/login"
-              className="nav-login-button"
-            >
-              <span>Login</span>
-              <span className="login-arrow">→</span>
-            </Link>
-          </li>
-
         </ul>
       </nav>
 
-      {/* ==========================================
-          REAL-TIME NEW B.TECH NOTIFICATION TOAST ALERT
-      ========================================== */}
-      {showToastAlert && activeAlertItem && (
-        <div 
-          className="notif-toast-alert"
-          onClick={() => {
-            handleOpenNotifications();
-            if (activeAlertItem._id) {
-              navigate(`/notifications?view=${encodeURIComponent(activeAlertItem._id)}`);
-            } else {
-              navigate("/notifications");
-            }
-          }}
-          role="alert"
-          aria-live="polite"
-        >
-          <div className="notif-toast-icon">
-            🔔
-          </div>
-          <div className="notif-toast-body">
-            <div className="notif-toast-header">
-              <span className="notif-toast-tag">
-                B.TECH {activeAlertItem.category || "EXAM"}
-              </span>
-              <span className="notif-toast-time">
-                {formatTimeAgo(activeAlertItem.publishedDate || activeAlertItem.createdAt)}
-              </span>
-            </div>
-            <div className="notif-toast-title">
-              {activeAlertItem.title}
-            </div>
-            <div className="notif-toast-action">
-              View Notice Details →
-            </div>
-          </div>
-          <button 
-            type="button" 
-            className="notif-toast-close"
-            onClick={handleDismissToast}
-            title="Dismiss alert"
-            aria-label="Dismiss alert"
-          >
-            ✕
-          </button>
-        </div>
+      {mobileMenuOpen && (
+        <div
+          className="nav-mobile-backdrop"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
       )}
-
     </header>
   );
 }

@@ -1,255 +1,332 @@
 /* =========================================================
-   PDF VIEWER
-   PROFESSIONAL GREEN DESIGN
-========================================================= */
+   PDF & DOCUMENT VIEWER — JNTU CIRCLE
+   Executive Forest Green Top Bar (#013a33, #01221e)
+   Sunbeam Gold (#ffefb3, #fed866), Luminous Emerald (#34d399)
+   Edge-To-Edge Fullscreen Reader (No letterbox black voids)
+   ========================================================= */
 
 .pdf-viewer-page {
-  width: 100%;
-  min-height: 100vh;
-
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-
-  background: #f4f8f5;
-  color: #10251a;
-
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  background: #141f1c;
+  color: #f1f7f5;
+  font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 /* =========================================================
-   HEADER
-========================================================= */
+   FLOATING TOAST
+   ========================================================= */
+
+.pdf-floating-toast {
+  position: fixed;
+  top: 70px;
+  right: 28px;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #013a33;
+  color: #ffffff;
+  border: 1.5px solid #ffefb3;
+  padding: 10px 22px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  font-size: 13.5px;
+  font-weight: 700;
+  animation: pdfToastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399;
+}
+
+@keyframes pdfToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   TOP EXECUTIVE HEADER BAR (FOREST GREEN & GOLD)
+   Anchored Brand Logo in Far Left Corner
+   ========================================================= */
 
 .pdf-viewer-header {
   position: relative;
-  z-index: 10;
-
+  z-index: 100;
   width: 100%;
-  min-height: 72px;
-
+  height: 60px;
+  min-height: 60px;
+  max-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  gap: 20px;
-
-  padding: 14px 28px;
-
+  gap: 16px;
+  padding: 0 28px;
   box-sizing: border-box;
-
-  border-bottom: 1px solid #dcebe3;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 4px 18px rgba(10, 58, 37, 0.06);
+  background: #013a33;
+  border-bottom: 1.5px solid rgba(255, 239, 179, 0.22);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
 }
 
-/* =========================================================
-   BACK BUTTON
-========================================================= */
-
-.pdf-back-button {
-  display: inline-flex;
+.pdf-header-left {
+  display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
 
-  padding: 11px 18px;
-
-  border: 1px solid #cde4d6;
-  border-radius: 9px;
-
-  background: #f3faf5;
-  color: #087943;
-
-  font-size: 14px;
-  font-weight: 800;
-
+/* Brand Anchor in Left Corner */
+.pdf-brand-anchor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  min-width: 0;
+  transition: opacity 0.2s ease;
 }
 
-.pdf-back-button:hover {
-  background: #087943;
+.pdf-brand-anchor:hover {
+  opacity: 0.92;
+}
+
+.pdf-brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 239, 179, 0.5);
+  background: #0d453c;
+  padding: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(255, 239, 179, 0.28);
+}
+
+.pdf-brand-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pdf-brand-title {
   color: #ffffff;
-
-  transform: translateX(-2px);
-
-  box-shadow:
-    0 6px 18px rgba(8, 121, 67, 0.18);
+  font-size: 15.5px;
+  font-weight: 800;
+  line-height: 1.15;
 }
 
-.pdf-back-icon {
-  font-size: 18px;
-  line-height: 1;
+.pdf-brand-title .font-deltha {
+  color: #ffefb3;
 }
 
-/* =========================================================
-   DOWNLOAD BUTTON
-========================================================= */
+.pdf-doc-title {
+  font-size: 11px;
+  color: #a8d5cf;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 520px;
+}
 
+/* Header Right Actions */
+.pdf-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Download PDF Button */
 .pdf-download-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
-
-  min-height: 42px;
-
-  padding: 10px 18px;
-
-  border: 1px solid #087943;
+  gap: 7px;
+  padding: 8px 16px;
   border-radius: 9px;
-
-  background: #087943;
-  color: #ffffff;
-
-  font-size: 13px;
+  background: #10b981;
+  border: 1.5px solid #34d399;
+  color: #01221e;
+  font-size: 12.5px;
   font-weight: 800;
-
   cursor: pointer;
-
-  box-shadow:
-    0 6px 16px rgba(8, 121, 67, 0.15);
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
 }
 
 .pdf-download-button:hover:not(:disabled) {
-  background: #066337;
-
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 9px 22px rgba(8, 121, 67, 0.22);
-}
-
-.pdf-download-button:active:not(:disabled) {
-  transform: translateY(0);
+  background: #34d399;
+  border-color: #34d399;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(52, 211, 153, 0.45);
 }
 
 .pdf-download-button:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
-  opacity: 0.65;
+}
+
+/* Close (✕) Return Button */
+.pdf-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 239, 179, 0.35);
+  color: #ffefb3;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 15px;
+}
+
+.pdf-close-btn:hover {
+  background: #ffefb3;
+  color: #013a33;
+  border-color: #ffefb3;
+  transform: scale(1.08) rotate(90deg);
+  box-shadow: 0 0 14px rgba(255, 239, 179, 0.45);
 }
 
 /* =========================================================
-   MAIN
-========================================================= */
+   EDGE-TO-EDGE FULL-SCREEN CONTAINER (NO MARGINS, NO BLACK BARS)
+   ========================================================= */
 
 .pdf-viewer-main {
   flex: 1;
-
-  width: 100%;
-
-  padding: 20px;
-
+  width: 100vw;
+  height: calc(100vh - 60px);
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  background: #2b2b2b;
 }
-
-/* =========================================================
-   PDF CONTAINER
-========================================================= */
 
 .pdf-viewer-container {
   width: 100%;
-  height: calc(100vh - 112px);
-
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: #2b2b2b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   overflow: hidden;
-
-  border: 1px solid #d8e8df;
-  border-radius: 12px;
-
-  background: #292929;
-
-  box-shadow:
-    0 10px 35px rgba(10, 58, 37, 0.10);
 }
 
-/* =========================================================
-   PDF FRAME
-========================================================= */
-
-.pdf-frame {
-  display: block;
-
+.pdf-frame-wrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: #2b2b2b;
+}
 
-  border: 0;
+.pdf-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #2b2b2b;
+  display: block;
+}
 
-  background: #292929;
+/* Clean rotation when user presses Rotate to adjust orientation */
+.pdf-rot-0 .pdf-frame {
+  width: 100%;
+  height: 100%;
+  transform: none;
+}
+
+.pdf-rot-90 .pdf-frame {
+  transform: rotate(90deg);
+  transform-origin: center center;
+  width: calc(100vh - 60px);
+  height: 100vw;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: calc(-1 * 100vw / 2);
+  margin-left: calc(-1 * (100vh - 60px) / 2);
+}
+
+.pdf-rot-180 .pdf-frame {
+  transform: rotate(180deg);
+  width: 100%;
+  height: 100%;
+}
+
+.pdf-rot-270 .pdf-frame {
+  transform: rotate(270deg);
+  transform-origin: center center;
+  width: calc(100vh - 60px);
+  height: 100vw;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: calc(-1 * 100vw / 2);
+  margin-left: calc(-1 * (100vh - 60px) / 2);
+}
+
+.pdf-viewer-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #cfe2dc;
+  text-align: center;
+  gap: 12px;
+  padding: 40px;
+}
+
+.pdf-viewer-empty-state h3 {
+  font-size: 20px;
+  color: #fed866;
+  margin: 0;
 }
 
 /* =========================================================
-   TABLET
-========================================================= */
+   RESPONSIVE DESIGN
+   ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .pdf-viewer-header {
-    min-height: 66px;
-
-    padding: 12px 20px;
+    padding: 0 14px;
+    gap: 8px;
   }
-
-  .pdf-viewer-main {
-    padding: 15px;
+  .pdf-doc-title {
+    max-width: 180px;
   }
-
-  .pdf-viewer-container {
-    height: calc(100vh - 96px);
+  .pdf-download-button span {
+    display: none;
   }
-}
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 600px) {
-  .pdf-viewer-header {
-    min-height: 62px;
-
-    padding: 10px 14px;
-
-    gap: 10px;
-  }
-
-  .pdf-back-button {
-    padding: 10px 13px;
-
-    font-size: 12px;
-  }
-
   .pdf-download-button {
-    min-height: 40px;
-
-    padding: 9px 12px;
-
-    font-size: 12px;
-  }
-
-  .pdf-viewer-main {
-    padding: 10px;
-  }
-
-  .pdf-viewer-container {
-    height: calc(100vh - 82px);
-
-    border-radius: 8px;
+    padding: 8px 10px;
   }
 }

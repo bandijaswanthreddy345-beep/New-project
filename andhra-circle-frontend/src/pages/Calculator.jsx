@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getStoredStudentData, saveStoredStudentData } from "../data/studentData";
 import {
   R23_SUBJECTS_BY_BRANCH_SEM,
@@ -7,43 +7,50 @@ import {
   detectSubjectCredits,
   getR23PresetSubjects,
 } from "../data/r23Subjects";
-import Navbar from "../components/Navbar";
+import {
+  validateName,
+  validateHallTicket,
+  validateGradePoint,
+  validateSubjectMarks,
+  validateSubjectCredits,
+} from "../utils/validators";
 import Footer from "../components/Footer";
 import "./Calculator.css";
 
-// Standard JNTU Grade Points Mapping
-const GRADE_POINTS = {
-  O: 10,
-  "A+": 9,
-  A: 8,
-  "B+": 7,
-  B: 6,
-  C: 5,
-  P: 4,
-  F: 0,
-  AB: 0,
-};
-
 // JNTU 10-Point Absolute Grading Scale: Marks to Grade & Points Converter
-export function getGradeInfoFromMarks(marks) {
+function getGradeInfoFromMarks(marks) {
   if (marks === "" || marks === null || marks === undefined) {
-    return { grade: "", points: 0, hasMarks: false, desc: "Awaiting Marks", color: "#94a3b8" };
+    return { grade: "", points: 0, hasMarks: false, isValid: true, desc: "Awaiting Marks", color: "#8fa39c" };
   }
-  const m = parseFloat(marks);
-  if (isNaN(m) || m < 0) {
-    return { grade: "", points: 0, hasMarks: false, desc: "Invalid Marks", color: "#94a3b8" };
+  const check = validateSubjectMarks(marks);
+  if (!check.ok) {
+    return { grade: "", points: 0, hasMarks: false, isValid: false, desc: check.message, color: "#dc2626" };
   }
-  if (m >= 90) return { grade: "O", points: 10, hasMarks: true, desc: "Outstanding", color: "#10b981" };
-  if (m >= 80) return { grade: "A+", points: 9, hasMarks: true, desc: "Excellent", color: "#06b6d4" };
-  if (m >= 70) return { grade: "A", points: 8, hasMarks: true, desc: "Very Good", color: "#3b82f6" };
-  if (m >= 60) return { grade: "B+", points: 7, hasMarks: true, desc: "Good", color: "#8b5cf6" };
-  if (m >= 50) return { grade: "B", points: 6, hasMarks: true, desc: "Above Average", color: "#f59e0b" };
-  if (m >= 40) return { grade: "C", points: 5, hasMarks: true, desc: "Pass", color: "#ea580c" };
-  return { grade: "F", points: 0, hasMarks: true, desc: "Fail / Arrear", color: "#ef4444" };
+  const m = check.value;
+  if (m >= 90) return { grade: "O", points: 10, hasMarks: true, isValid: true, desc: "Outstanding", color: "#10b981" };
+  if (m >= 80) return { grade: "A+", points: 9, hasMarks: true, isValid: true, desc: "Excellent", color: "#0d9488" };
+  if (m >= 70) return { grade: "A", points: 8, hasMarks: true, isValid: true, desc: "Very Good", color: "#0284c7" };
+  if (m >= 60) return { grade: "B+", points: 7, hasMarks: true, isValid: true, desc: "Good", color: "#6366f1" };
+  if (m >= 50) return { grade: "B", points: 6, hasMarks: true, isValid: true, desc: "Above Average", color: "#d97706" };
+  if (m >= 40) return { grade: "C", points: 5, hasMarks: true, isValid: true, desc: "Pass", color: "#ea580c" };
+  return { grade: "F", points: 0, hasMarks: true, isValid: true, desc: "Fail / Arrear", color: "#dc2626" };
 }
 
 export default function Calculator() {
-  const [activeTab, setActiveTab] = useState("sgpa"); // "sgpa" | "cgpa"
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(() => {
+    if (location.pathname.includes("cgpa")) return "cgpa";
+    return "sgpa";
+  });
+
+  useEffect(() => {
+    if (location.pathname.includes("cgpa")) {
+      setActiveTab("cgpa");
+    } else if (location.pathname.includes("sgpa")) {
+      setActiveTab("sgpa");
+    }
+  }, [location.pathname]);
   
   // Student Profile Data
   const [studentData, setStudentData] = useState(getStoredStudentData());
@@ -149,16 +156,61 @@ export default function Calculator() {
     ]);
     setTaskCompleted(false);
     setCompletedReport(null);
-    setSaveSuccessMsg("✨ Portal ready for next student! All fields and marks reset fresh.");
+    setSaveSuccessMsg("Portal ready for next student! All fields and marks reset fresh.");
     setTimeout(() => setSaveSuccessMsg(""), 5000);
   };
 
+  const studentNameValidation = useMemo(() => {
+    if (!studentName || !studentName.trim()) return { ok: true, message: "" };
+    return validateName(studentName);
+  }, [studentName]);
+
+  const universityNumberValidation = useMemo(() => {
+    if (!universityNumber || !universityNumber.trim()) return { ok: true, message: "" };
+    return validateHallTicket(universityNumber);
+  }, [universityNumber]);
+
+  // Validation per row in SGPA table
+  const sgpaRowValidation = useMemo(() => {
+    return sgpaSubjects.map((sub) => {
+      const hasEnteredMarks = sub.marks !== "" && sub.marks !== undefined;
+      const markCheck = hasEnteredMarks
+        ? validateSubjectMarks(sub.marks)
+        : { ok: true, message: "" };
+      const creditCheck = validateSubjectCredits(sub.credits, 0.5, 16);
+      return {
+        markError: markCheck.ok ? "" : markCheck.message,
+        creditError: creditCheck.ok ? "" : creditCheck.message,
+        hasError: !markCheck.ok || !creditCheck.ok,
+        hasEnteredMarks,
+      };
+    });
+  }, [sgpaSubjects]);
+
+  const hasSgpaErrors = useMemo(() => {
+    return sgpaRowValidation.some((r) => r.hasError);
+  }, [sgpaRowValidation]);
+
   const handleCompleteTask = () => {
+    if (hasSgpaErrors) {
+      alert("Please fix invalid marks or credits in the table before completing evaluation.");
+      return;
+    }
+
     const enteredCount = sgpaSubjects.filter(
-      (s) => s.marks !== "" && s.marks !== undefined && !isNaN(parseFloat(s.marks))
+      (s) => s.marks !== "" && s.marks !== undefined && validateSubjectMarks(s.marks).ok
     ).length;
     if (enteredCount === 0) {
       alert("Please enter subject marks (0–100) before completing the evaluation.");
+      return;
+    }
+
+    if (!studentNameValidation.ok) {
+      alert(studentNameValidation.message);
+      return;
+    }
+    if (!universityNumberValidation.ok) {
+      alert(universityNumberValidation.message);
       return;
     }
 
@@ -182,6 +234,24 @@ export default function Calculator() {
   };
 
   const sgpaResult = useMemo(() => {
+    if (hasSgpaErrors) {
+      return {
+        sgpa: "--",
+        rawSgpa: "0.00",
+        subjectCount: sgpaSubjects.length,
+        enteredCount: 0,
+        averageMarks: "0.0",
+        isAwaiting: false,
+        hasError: true,
+        errorMessage: "Invalid inputs detected. Please enter valid marks (0–100) and credits (0.5–16).",
+        totalCredits: "0.0",
+        totalGradePointsMultiplied: "0.0",
+        percentage: "0.0",
+        classification: "Invalid Input Detected",
+        hasFail: false,
+      };
+    }
+
     let totalGradePointsMultiplied = 0;
     let totalCredits = 0;
     let totalMarks = 0;
@@ -192,7 +262,7 @@ export default function Calculator() {
     sgpaSubjects.forEach((sub) => {
       subjectCount++;
       const info = getGradeInfoFromMarks(sub.marks);
-      if (info.hasMarks) {
+      if (info.hasMarks && info.isValid) {
         const creds = parseFloat(sub.credits) || 3;
         if (info.grade === "F") hasFail = true;
         totalGradePointsMultiplied += info.points * creds;
@@ -204,7 +274,8 @@ export default function Calculator() {
 
     const isAwaiting = enteredCount === 0;
     const calculatedSgpa = totalCredits > 0 ? (totalGradePointsMultiplied / totalCredits).toFixed(2) : "0.00";
-    const percentage = totalCredits > 0 ? ((parseFloat(calculatedSgpa) - 0.75) * 10).toFixed(1) : "0.0";
+    const rawPct = totalCredits > 0 ? ((parseFloat(calculatedSgpa) - 0.75) * 10) : 0;
+    const percentage = isAwaiting ? "0.0" : Math.max(0, isNaN(rawPct) ? 0 : rawPct).toFixed(1);
     const averageMarks = enteredCount > 0 ? (totalMarks / enteredCount).toFixed(1) : "0.0";
 
     let classification = "First Class with Distinction";
@@ -224,13 +295,14 @@ export default function Calculator() {
       enteredCount,
       averageMarks,
       isAwaiting,
+      hasError: false,
       totalCredits: totalCredits.toFixed(1),
       totalGradePointsMultiplied: totalGradePointsMultiplied.toFixed(1),
-      percentage: isAwaiting ? "0.0" : Math.max(0, parseFloat(percentage)).toFixed(1),
+      percentage,
       classification,
       hasFail,
     };
-  }, [sgpaSubjects]);
+  }, [sgpaSubjects, hasSgpaErrors]);
 
   // -------------------------------------------------------------
   // CGPA STATE & LOGIC (NO CREDITS REQUIRED)
@@ -262,23 +334,70 @@ export default function Calculator() {
     });
   };
 
+  // Validation for CGPA semesters
+  const cgpaValidation = useMemo(() => {
+    return cgpaSemesters.map((sem) => {
+      if (!sem.active) return { error: "", hasError: false };
+      if (sem.sgpa === "" || sem.sgpa === undefined) {
+        return { error: "SGPA required (0.00–10.00)", hasError: true };
+      }
+      const check = validateGradePoint(sem.sgpa, "SGPA");
+      return {
+        error: check.ok ? "" : check.message,
+        hasError: !check.ok,
+      };
+    });
+  }, [cgpaSemesters]);
+
+  const hasCgpaErrors = useMemo(() => {
+    return cgpaValidation.some((v) => v.hasError);
+  }, [cgpaValidation]);
+
   const cgpaResult = useMemo(() => {
+    if (hasCgpaErrors) {
+      return {
+        cgpa: "--",
+        activeSemCount: 0,
+        jntuPercentage: "0.00",
+        aictePercentage: "0.00",
+        hasError: true,
+        errorMessage: "Please enter valid SGPA values (0.00 – 10.00) for all active semesters.",
+        standing: "Invalid Input Detected",
+      };
+    }
+
     let totalSgpa = 0;
     let activeSemCount = 0;
 
     cgpaSemesters.forEach((sem) => {
-      if (sem.active && sem.sgpa && !isNaN(parseFloat(sem.sgpa))) {
-        totalSgpa += parseFloat(sem.sgpa);
-        activeSemCount++;
+      if (sem.active) {
+        const check = validateGradePoint(sem.sgpa);
+        if (check.ok) {
+          totalSgpa += check.numeric;
+          activeSemCount++;
+        }
       }
     });
 
-    const calculatedCgpa = activeSemCount > 0 ? (totalSgpa / activeSemCount).toFixed(2) : "0.00";
-    const jntuPercentage = activeSemCount > 0 ? ((parseFloat(calculatedCgpa) - 0.75) * 10).toFixed(2) : "0.00";
-    const aictePercentage = activeSemCount > 0 ? (parseFloat(calculatedCgpa) * 9.5).toFixed(2) : "0.00";
+    if (activeSemCount === 0) {
+      return {
+        cgpa: "--",
+        activeSemCount: 0,
+        jntuPercentage: "0.00",
+        aictePercentage: "0.00",
+        hasError: false,
+        standing: "Awaiting Semester SGPAs",
+      };
+    }
+
+    const calculatedCgpa = (totalSgpa / activeSemCount).toFixed(2);
+    const numCgpa = parseFloat(calculatedCgpa);
+    const jntuRaw = ((numCgpa - 0.75) * 10);
+    const jntuPercentage = Math.max(0, isNaN(jntuRaw) ? 0 : jntuRaw).toFixed(2);
+    const aicteRaw = (numCgpa * 9.5);
+    const aictePercentage = Math.max(0, isNaN(aicteRaw) ? 0 : aicteRaw).toFixed(2);
 
     let standing = "First Class with Distinction";
-    const numCgpa = parseFloat(calculatedCgpa);
     if (numCgpa >= 7.75) standing = "First Class with Distinction (Honors Grade)";
     else if (numCgpa >= 6.75) standing = "First Class";
     else if (numCgpa >= 5.75) standing = "Second Class";
@@ -288,18 +407,31 @@ export default function Calculator() {
     return {
       cgpa: calculatedCgpa,
       activeSemCount,
-      jntuPercentage: Math.max(0, parseFloat(jntuPercentage)).toFixed(2),
-      aictePercentage: Math.max(0, parseFloat(aictePercentage)).toFixed(2),
+      jntuPercentage,
+      aictePercentage,
+      hasError: false,
       standing,
     };
-  }, [cgpaSemesters]);
+  }, [cgpaSemesters, hasCgpaErrors]);
 
   // Save CGPA to Profile
   const handleSaveCgpaToProfile = () => {
+    if (activeTab === "sgpa") {
+      if (hasSgpaErrors || sgpaResult.isAwaiting) {
+        alert("Cannot save: please enter valid subject marks.");
+        return;
+      }
+    } else {
+      if (hasCgpaErrors || cgpaResult.activeSemCount === 0) {
+        alert("Cannot save: please provide valid SGPA values (0.00–10.00) for active semesters.");
+        return;
+      }
+    }
+
     const updated = {
       ...studentData,
-      name: studentName || studentData.name,
-      hallTicket: universityNumber || studentData.hallTicket,
+      name: studentNameValidation.ok && studentName ? studentName.trim() : studentData.name,
+      hallTicket: universityNumberValidation.ok && universityNumber ? universityNumber.trim().toUpperCase() : studentData.hallTicket,
       branchCode: branch,
       regulation: `${regulation} Scheme`,
       semester: `Semester ${semester}`,
@@ -314,24 +446,51 @@ export default function Calculator() {
 
   return (
     <div className="calc-page-wrapper">
-      <Navbar />
+      {/* =========================================================
+          TOP NAVIGATION BAR (MATCHING STUDENT PROFILE FOREST GREEN)
+          ========================================================= */}
+      <header className="calc-page-header">
+        <div className="calc-page-header-inner">
+          <div className="calc-header-left" onClick={() => navigate("/")} title="Return to Homepage">
+            <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="calc-page-logo" />
+            <div>
+              <h2 className="calc-brand-title">
+                <span className="font-deltha">JNTU</span> Circle
+              </h2>
+              <span className="calc-brand-subtitle">Official Academic Evaluation Portal</span>
+            </div>
+          </div>
+
+          <div className="calc-header-right">
+            <button
+              type="button"
+              className="calc-header-close-btn"
+              onClick={() => navigate(-1)}
+              title="Close and Return"
+              aria-label="Close and Return"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
 
       <main className="calc-main-container">
-        {/* Top Header Hero */}
+        {/* Top Tab Switcher */}
         <section className="calc-header-hero">
-          <h1 className="calc-hero-title">CGPA & SGPA Calculator</h1>
-          <p className="calc-hero-subtitle">
-            Fast, accurate grade point calculator and graduation honors planner tailored for JNTU R23, R20, R19 & R16 syllabus regulations.
-          </p>
-
-          {/* Quick Tab Switcher */}
           <div className="calc-tab-nav" role="tablist">
             <button
               type="button"
               className={`calc-tab-btn ${activeTab === "sgpa" ? "active" : ""}`}
               onClick={() => setActiveTab("sgpa")}
             >
-              <span className="tab-icon">🎯</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="tab-svg">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
               <span>SGPA Calculator</span>
             </button>
             <button
@@ -339,7 +498,11 @@ export default function Calculator() {
               className={`calc-tab-btn ${activeTab === "cgpa" ? "active" : ""}`}
               onClick={() => setActiveTab("cgpa")}
             >
-              <span className="tab-icon">📊</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="tab-svg">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
               <span>CGPA Calculator</span>
             </button>
           </div>
@@ -387,9 +550,13 @@ export default function Calculator() {
                 type="text"
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
+                aria-invalid={!studentNameValidation.ok}
                 placeholder="Enter Student Full Name..."
                 className="calc-field-input"
               />
+              {studentName && !studentNameValidation.ok && (
+                <span className="calc-field-error" role="alert">{studentNameValidation.message}</span>
+              )}
             </div>
 
             {/* 2. University Number */}
@@ -407,9 +574,13 @@ export default function Calculator() {
                 type="text"
                 value={universityNumber}
                 onChange={(e) => setUniversityNumber(e.target.value)}
-                placeholder="e.g. 23B91A4201"
+                aria-invalid={!universityNumberValidation.ok}
+                placeholder="Enter 10-digit Hall Ticket / USN"
                 className="calc-field-input"
               />
+              {universityNumber && !universityNumberValidation.ok && (
+                <span className="calc-field-error" role="alert">{universityNumberValidation.message}</span>
+              )}
             </div>
 
             {/* 3. Respective Branch */}
@@ -433,6 +604,7 @@ export default function Calculator() {
                 <option value="AIML">AI & Machine Learning (AIML)</option>
                 <option value="CSE">Computer Science (CSE)</option>
                 <option value="ECE">Electronics & Comm (ECE)</option>
+                <option value="EEE">Electrical & Electronics (EEE)</option>
                 <option value="ME">Mechanical Engg (ME)</option>
                 <option value="CE">Civil Engg (CE)</option>
               </select>
@@ -504,6 +676,11 @@ export default function Calculator() {
               </div>
 
               {/* Subject Table with Automated Credits & Subject Marks Input */}
+              {hasSgpaErrors && (
+                <div className="calc-warning-banner" role="alert">
+                  <span>⚠️ {sgpaResult.errorMessage}</span>
+                </div>
+              )}
               <div className="calc-table-wrapper">
                 <table className="calc-table">
                   <thead>
@@ -518,6 +695,7 @@ export default function Calculator() {
                   <tbody>
                     {sgpaSubjects.map((sub, idx) => {
                       const gradeInfo = getGradeInfoFromMarks(sub.marks);
+                      const rowVal = sgpaRowValidation[idx];
                       return (
                         <tr key={idx}>
                           <td className="text-center-cell">{idx + 1}</td>
@@ -540,10 +718,14 @@ export default function Calculator() {
                                 max="16"
                                 value={sub.credits}
                                 onChange={(e) => handleSubjectChange(idx, "credits", e.target.value)}
+                                aria-invalid={Boolean(rowVal?.creditError)}
                                 className="calc-input-credit"
                               />
                               <span className="calc-auto-pill">AUTO</span>
                             </div>
+                            {rowVal?.creditError && (
+                              <span className="calc-row-error" role="alert">{rowVal.creditError}</span>
+                            )}
                           </td>
                           <td>
                             <div className="calc-marks-input-wrapper">
@@ -554,10 +736,11 @@ export default function Calculator() {
                                 step="1"
                                 value={sub.marks !== undefined ? sub.marks : ""}
                                 onChange={(e) => handleSubjectChange(idx, "marks", e.target.value)}
+                                aria-invalid={Boolean(rowVal?.markError)}
                                 className="calc-input-marks"
                                 placeholder="Marks (0–100)"
                               />
-                              {gradeInfo.hasMarks && (
+                              {gradeInfo.hasMarks && gradeInfo.isValid && (
                                 <span
                                   className="calc-marks-grade-badge"
                                   style={{
@@ -571,6 +754,9 @@ export default function Calculator() {
                                 </span>
                               )}
                             </div>
+                            {rowVal?.markError && (
+                              <span className="calc-row-error" role="alert">{rowVal.markError}</span>
+                            )}
                           </td>
                           <td className="text-center-cell">
                             <button
@@ -631,7 +817,14 @@ export default function Calculator() {
                     className="calc-btn-complete-task"
                     style={{ margin: 0, width: "auto", padding: "9px 18px" }}
                     onClick={handleCompleteTask}
-                    title="Complete evaluation task for this student"
+                    disabled={hasSgpaErrors || sgpaResult.isAwaiting || !studentNameValidation.ok || !universityNumberValidation.ok}
+                    title={
+                      hasSgpaErrors
+                        ? "Fix invalid marks or credits in table first"
+                        : sgpaResult.isAwaiting
+                          ? "Enter subject marks first"
+                          : "Complete evaluation task for this student"
+                    }
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
                       <polyline points="20 6 9 17 4 12" />
@@ -711,16 +904,11 @@ export default function Calculator() {
                   </div>
                 </div>
 
-                <div className="calc-formula-note">
-                  <p><strong>Marks Scale:</strong> ≥90: O (10), ≥80: A+ (9), ≥70: A (8), ≥60: B+ (7), ≥50: B (6), ≥40: C (5), &lt;40: F (0)</p>
-                  <p><strong>Official Evaluation:</strong> SGPA = Σ(Grade Points × Credits) / Σ(Credits)</p>
-                  <p><strong>JNTU Percentage:</strong> (SGPA - 0.75) × 10%</p>
-                </div>
-
                 <button
                   type="button"
                   className="calc-btn-complete-task"
                   onClick={handleCompleteTask}
+                  disabled={hasSgpaErrors || sgpaResult.isAwaiting || !studentNameValidation.ok || !universityNumberValidation.ok}
                   title="Finalize evaluation and view result slip"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
@@ -734,6 +922,7 @@ export default function Calculator() {
                   className="calc-btn-save-profile"
                   style={{ marginBottom: "10px" }}
                   onClick={handleSaveCgpaToProfile}
+                  disabled={hasSgpaErrors || sgpaResult.isAwaiting}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
@@ -775,39 +964,51 @@ export default function Calculator() {
               </div>
 
               {/* Semesters Grid (No Credits Input) */}
+              {hasCgpaErrors && (
+                <div className="calc-warning-banner" role="alert">
+                  <span>⚠️ {cgpaResult.errorMessage}</span>
+                </div>
+              )}
               <div className="calc-cgpa-grid">
-                {cgpaSemesters.map((sem, idx) => (
-                  <div key={idx} className={`calc-cgpa-sem-box ${sem.active ? "is-active" : "is-inactive"}`}>
-                    <div className="calc-sem-toggle-row">
-                      <label className="calc-checkbox-container">
-                        <input
-                          type="checkbox"
-                          checked={sem.active}
-                          onChange={() => toggleSemesterActive(idx)}
-                        />
-                        <span className="calc-sem-title">{sem.sem}</span>
-                      </label>
-                      <span className="calc-sem-status-tag">
-                        {sem.active ? "Active" : "Excluded"}
-                      </span>
-                    </div>
+                {cgpaSemesters.map((sem, idx) => {
+                  const semVal = cgpaValidation[idx];
+                  return (
+                    <div key={idx} className={`calc-cgpa-sem-box ${sem.active ? "is-active" : "is-inactive"}`}>
+                      <div className="calc-sem-toggle-row">
+                        <label className="calc-checkbox-container">
+                          <input
+                            type="checkbox"
+                            checked={sem.active}
+                            onChange={() => toggleSemesterActive(idx)}
+                          />
+                          <span className="calc-sem-title">{sem.sem}</span>
+                        </label>
+                        <span className="calc-sem-status-tag">
+                          {sem.active ? "Active" : "Excluded"}
+                        </span>
+                      </div>
 
-                    <div className="calc-cgpa-inputs-row-simple">
-                      <label className="calc-simple-label">Semester SGPA (0.00 – 10.00):</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="10"
-                        value={sem.sgpa}
-                        disabled={!sem.active}
-                        onChange={(e) => handleCgpaSemChange(idx, e.target.value)}
-                        placeholder="e.g. 8.75"
-                        className="calc-input-sgpa"
-                      />
+                      <div className="calc-cgpa-inputs-row-simple">
+                        <label className="calc-simple-label">Semester SGPA (0.00 – 10.00):</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max="10"
+                          value={sem.sgpa}
+                          disabled={!sem.active}
+                          onChange={(e) => handleCgpaSemChange(idx, e.target.value)}
+                          aria-invalid={Boolean(semVal?.hasError)}
+                          placeholder="SGPA (0.00 – 10.00)"
+                          className="calc-input-sgpa"
+                        />
+                        {semVal?.hasError && (
+                          <span className="calc-row-error" role="alert">{semVal.error}</span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -861,6 +1062,14 @@ export default function Calculator() {
                   type="button"
                   className="calc-btn-save-profile"
                   onClick={handleSaveCgpaToProfile}
+                  disabled={hasCgpaErrors || cgpaResult.activeSemCount === 0 || !studentNameValidation.ok || !universityNumberValidation.ok}
+                  title={
+                    hasCgpaErrors
+                      ? "Enter valid SGPA for all active semesters"
+                      : cgpaResult.activeSemCount === 0
+                        ? "Select at least 1 semester"
+                        : "Save academic CGPA to student profile"
+                  }
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />

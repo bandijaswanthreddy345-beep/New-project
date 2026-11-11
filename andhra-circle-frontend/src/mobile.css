@@ -1,0 +1,1370 @@
+/* =========================================================
+   JNTU CIRCLE — MOBILE-ONLY IMPROVEMENTS
+   Loaded LAST (see main.jsx). Every rule lives inside a
+   phone-width media query, so desktop is never affected.
+   ========================================================= */
+
+/* ---------- Phones & small tablets (<= 768px) ---------- */
+@media (max-width: 768px) {
+
+  /* Stop iOS from inflating text, remove 300ms tap delay */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  label {
+    touch-action: manipulation;
+  }
+
+  /* Media never wider than the screen */
+  img,
+  video,
+  canvas,
+  iframe,
+  svg {
+    max-width: 100%;
+  }
+
+  img {
+    height: auto;
+  }
+
+  /* Wide tables scroll sideways inside themselves, not the page */
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Notch / rounded-corner safe areas for the sticky navbar */
+  .navbar {
+    padding-left: max(16px, env(safe-area-inset-left)) !important;
+    padding-right: max(16px, env(safe-area-inset-right)) !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+  }
+
+  /* Logo branding exact to Stitch Mobile */
+  .logo a {
+    gap: 10px !important;
+    text-decoration: none !important;
+  }
+
+  .logo-image {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid rgba(13, 69, 60, 0.25) !important;
+    background: #eaf4f1 !important;
+    padding: 2.5px !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(13, 69, 60, 0.08) !important;
+    object-fit: contain !important;
+  }
+
+  .logo-text {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    text-align: left !important;
+    line-height: 1 !important;
+  }
+
+  .logo h2 {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    color: #0f172a !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  .logo h2 .font-deltha {
+    font-family: inherit !important;
+    letter-spacing: -0.01em !important;
+    font-weight: 800 !important;
+  }
+
+  .logo-text span {
+    font-size: 11px !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1.25 !important;
+    margin-top: 1px !important;
+  }
+
+  /* Comfortable 44px minimum tap targets */
+  .nav-mobile-action-btn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .nav-mobile-toggle {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .nav-item-profile,
+  .nav-mobile-profile-btn {
+    display: none !important;
+  }
+
+  .nav-mobile-actions {
+    gap: 8px !important;
+  }
+
+  /* Long drawer menus scroll instead of running off-screen */
+  .nav-container.is-mobile-open {
+    max-height: calc(100dvh - 64px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Section padding: the late desktop override (48px 56px) was
+     winning over the old mobile rule and squeezing content */
+  .papers-section,
+  .lab-programs-section,
+  .notification-section {
+    padding: 36px 16px 48px !important;
+  }
+
+  /* "Tag" pill sat absolutely on the left and collided with the
+     title; on phones it sits centered above the heading */
+  .papers-section .section-heading .section-tag,
+  .lab-programs-section .section-heading .section-tag,
+  .notification-section .section-heading .section-tag {
+    position: static !important;
+    display: inline-flex;
+    margin-bottom: 12px;
+  }
+
+  .papers-section .section-heading,
+  .lab-programs-section .section-heading,
+  .notification-section .section-heading {
+    margin-bottom: 24px !important;
+  }
+
+  /* Floating contact buttons: smaller, tighter, tooltips hidden
+     (tooltips are hover-only and do nothing on touch screens) */
+  .floating-whatsapp-btn,
+  .floating-instagram-btn,
+  .floating-email-btn {
+    width: 46px !important;
+    height: 46px !important;
+    right: max(14px, env(safe-area-inset-right)) !important;
+  }
+
+  .floating-whatsapp-btn {
+    bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .floating-instagram-btn {
+    bottom: calc(68px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .floating-email-btn {
+    bottom: calc(122px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .floating-whatsapp-icon,
+  .floating-instagram-icon,
+  .floating-email-icon {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .floating-whatsapp-tooltip,
+  .floating-instagram-tooltip,
+  .floating-email-tooltip {
+    display: none !important;
+  }
+
+  /* Drawer: fully solid so page content never shows through the links */
+  .nav-container.is-mobile-open {
+    background: #ffffff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Bell + profile are icon-only on desktop. In the phone drawer they
+     get text labels so every row reads the same as Home / Notes. */
+  .nav-container.is-mobile-open .nav-notif-btn,
+  .nav-container.is-mobile-open .nav-profile-btn {
+    justify-content: flex-start !important;
+  }
+
+  .nav-container.is-mobile-open .nav-notif-btn .nav-notif-bell-icon-wrapper {
+    order: 0;
+  }
+
+  .nav-container.is-mobile-open .nav-notif-btn::after {
+    content: "Notifications";
+    order: 1;
+  }
+
+  .nav-container.is-mobile-open .nav-notif-btn .nav-notif-new-tag,
+  .nav-container.is-mobile-open .nav-notif-btn .nav-notif-alert-badge {
+    order: 2;
+  }
+
+  .nav-container.is-mobile-open .nav-profile-btn::after {
+    content: "Student Profile";
+  }
+
+  /* Preview tooltip is a desktop hover feature; hide it in the drawer */
+  .nav-container.is-mobile-open .nav-notif-dropdown {
+    display: none !important;
+  }
+
+  /* Footer: leave room so floating buttons never cover the text */
+  .footer {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* ---------- Phones (<= 600px) ---------- */
+@media (max-width: 600px) {
+
+  /* Branch cards were a fixed 320px wide and overflowed on
+     320px-wide phones; now they scale with the screen */
+  .orbit-item,
+  .branch-card {
+    width: min(320px, calc(100vw - 32px)) !important;
+    height: auto !important;
+    aspect-ratio: 8 / 5;
+  }
+
+  .branch-card-bg-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+}
+
+/* ---------- Notes: branch filter pills (<= 768px) ---------- */
+@media (max-width: 768px) {
+
+  /* Swipeable row: no scrollbar, snaps to pills, soft fade on the right
+     edge hints that more branches (EEE, Civil...) are off-screen */
+  .notes-branch-sidebar {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    padding-right: 28px;
+  }
+
+  .notes-branch-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .branch-nav-pill {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-height: 40px;
+  }
+
+  /* Download / View buttons: comfortable thumb size */
+  .folder-card-actions button,
+  .folder-card-actions a {
+    min-height: 40px;
+  }
+
+  /* Auto-popping mobile notification preview strip (pops up every 5s) */
+  .nav-mobile-notif-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-mobile-notif-popup {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: -100px;
+    left: auto;
+    width: 215px;
+    max-width: calc(100vw - 24px);
+    padding: 6px 9px;
+    box-sizing: border-box;
+    background: rgba(6, 10, 20, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(254, 216, 102, 0.4);
+    border-radius: 9px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 10px rgba(254, 216, 102, 0.18);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 1050;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-4px) scale(0.96);
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s;
+  }
+
+  .nav-mobile-notif-popup.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .nav-mobile-notif-popup:active {
+    transform: scale(0.98);
+  }
+
+  .nav-mobile-notif-arrow {
+    position: absolute;
+    top: -4px;
+    right: 118px;
+    left: auto;
+    width: 7px;
+    height: 7px;
+    background: rgba(6, 10, 20, 0.96);
+    border-top: 1px solid rgba(254, 216, 102, 0.4);
+    border-left: 1px solid rgba(254, 216, 102, 0.4);
+    transform: rotate(45deg);
+    border-radius: 1px 0 0 0;
+  }
+
+  .nav-mobile-notif-body {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .nav-mobile-notif-text {
+    font-size: 11px;
+    font-weight: 550;
+    color: #f8fafc;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
+
+  .nav-mobile-notif-dismiss {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #94a3b8;
+    font-size: 9px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: all 0.15s ease;
+  }
+
+  .nav-mobile-notif-dismiss:active {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+  }
+
+  /* ---------- Note Details Hero Card Mobile Redesign ---------- */
+  .note-hero-content {
+    width: calc(100% - 12px) !important;
+    padding-top: 10px !important;
+    padding-bottom: 8px !important;
+  }
+
+  .hero-main {
+    padding: 16px 14px 14px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(1, 62, 55, 0.12) !important;
+    box-shadow: 0 10px 30px rgba(0, 20, 17, 0.07) !important;
+    background: #ffffff !important;
+  }
+
+  .hero-main::before {
+    width: 5px !important;
+    border-radius: 18px 0 0 18px !important;
+    background: #d9a726 !important;
+  }
+
+  .hero-heading-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .hero-title-block {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    margin-bottom: 4px !important;
+    gap: 8px !important;
+  }
+
+  .study-badge {
+    margin-bottom: 0 !important;
+    padding: 3px 8px !important;
+    font-size: 9.5px !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.06em !important;
+    border-radius: 999px !important;
+    background: #fdf6e2 !important;
+    border: 1px solid rgba(217, 167, 38, 0.45) !important;
+    color: #8a6815 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .note-hero h1 {
+    font-size: 24px !important;
+    font-weight: 850 !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+    color: #012b25 !important;
+    text-align: left !important;
+  }
+
+  .hero-subject-details {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 8px 0 !important;
+    border-top: 1px solid rgba(1, 62, 55, 0.08) !important;
+    border-bottom: 1px solid rgba(1, 62, 55, 0.08) !important;
+    margin-top: 4px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .hero-subject-item {
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: left !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .hero-subject-item>span {
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
+    color: #718d88 !important;
+    margin-bottom: 2px !important;
+    text-transform: uppercase !important;
+  }
+
+  .hero-subject-item strong {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    color: #012b25 !important;
+    word-break: break-word !important;
+  }
+
+  .hero-subject-code {
+    flex: 0 0 auto !important;
+    padding-left: 12px !important;
+    border-left: 1px solid rgba(1, 62, 55, 0.1) !important;
+    padding-top: 0 !important;
+    border-top: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+
+  .hero-subject-code>span {
+    margin-bottom: 2px !important;
+  }
+
+  .hero-subject-code strong {
+    font-size: 15px !important;
+    letter-spacing: 0.04em !important;
+    color: #013a33 !important;
+    white-space: nowrap !important;
+  }
+
+  .hero-unified-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: none !important;
+  }
+
+  .hero-tags {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .hero-tag {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding: 6px 11px !important;
+    border-radius: 9px !important;
+    background: #f4f9f7 !important;
+    border: 1px solid rgba(1, 62, 55, 0.09) !important;
+    min-width: 0 !important;
+    width: auto !important;
+    box-sizing: border-box !important;
+    gap: 2px !important;
+  }
+
+  .hero-tag-label {
+    display: block !important;
+    font-size: 8.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
+    color: #8a6815 !important;
+    margin: 0 !important;
+    line-height: 1.1 !important;
+  }
+
+  .hero-tag strong,
+  .hero-tag-value {
+    display: block !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #012b25 !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  .hero-credits-integrated {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 14px !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #fffdf8 0%, #fef8e7 100%) !important;
+    border: 1px solid rgba(217, 167, 38, 0.4) !important;
+    box-shadow: 0 2px 8px rgba(217, 167, 38, 0.08) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .hero-credits-icon {
+    width: 32px !important;
+    height: 32px !important;
+    flex: 0 0 32px !important;
+    border-radius: 8px !important;
+    background: #eaf4f1 !important;
+    border: 1px solid #d5e5e0 !important;
+  }
+
+  .hero-credits-icon svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .hero-credits-copy {
+    flex: 1 !important;
+    margin-left: 10px !important;
+    text-align: left !important;
+  }
+
+  .hero-credits-label {
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
+    color: #8a6815 !important;
+  }
+
+  .hero-credits-desc {
+    font-size: 10.5px !important;
+    color: #65847f !important;
+  }
+
+  .hero-credits-value {
+    font-size: 22px !important;
+    font-weight: 900 !important;
+    color: #012b25 !important;
+    padding-left: 14px !important;
+    border-left: 1px solid rgba(217, 167, 38, 0.25) !important;
+  }
+
+  /* Module Resource PDF Box: Clean single-column layout */
+  .module-resource-grid {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .module-pdf-box {
+    width: 100% !important;
+    padding: 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .pdf-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-top: 14px !important;
+  }
+
+  .open-pdf-button,
+  .download-pdf-button {
+    width: 100% !important;
+    justify-content: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 10px 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Mobile Action Avatar (Student Profile) */
+  .nav-mobile-profile-btn {
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+  }
+
+  .nav-mobile-profile-avatar-wrapper {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .nav-mobile-avatar-img {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    border: 2px solid #087943 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .nav-mobile-fallback-icon {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: rgba(8, 121, 67, 0.12) !important;
+    border: 1.5px solid #087943 !important;
+    color: #087943 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* =========================================================
+     STITCH MOBILE SCREEN IMPLEMENTATION (<= 768px ONLY)
+     Screen: 630f6ae72df547e2bf6f79ed5c056184
+     Includes:
+     1. Hero Section: Rich curved emerald gradient, 2.5rem rounded bottom,
+        refined typography, and ambient lighting glow
+     2. AI Search & Prompt Bar: Dark translucent glass pill, gold voice icon,
+        and high-contrast gold submit button
+     3. Horizontal scrolling quick branch filter chips with gold "Build Student Profile"
+     4. Quick Resource Cards (Notes, Question Papers, Syllabus):
+        Stacked vertical cards, emerald icons, crisp borders and chevron arrows
+     5. 3D Rotating Coverflow Carousel & Controls:
+        Centered card active styling, smooth transitions, circular arrow buttons
+        and active amber pagination indicator dots
+     ========================================================= */
+
+  /* 1. Hero Container & Typography */
+  .hero {
+    background: #013a33 !important;
+    border-bottom-left-radius: 2.5rem !important;
+    border-bottom-right-radius: 2.5rem !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45) !important;
+    padding: 32px 16px 44px 16px !important;
+    min-height: auto !important;
+    overflow: hidden !important;
+  }
+
+  .hero-ambient-glow {
+    display: none !important;
+  }
+
+  .hero-content {
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  .hero h1,
+  .hero-title {
+    font-size: 28px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
+    line-height: 1.15 !important;
+    color: #ffffff !important;
+    margin-bottom: 8px !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .hero-slogan {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #e2e8f0 !important;
+    margin-bottom: 6px !important;
+  }
+
+  .hero-slogan .slogan-gold {
+    color: #fcd34d !important;
+    font-weight: 700 !important;
+  }
+
+  .hero-subtitle,
+  .hero-content>p:not(.hero-slogan) {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    color: rgba(209, 250, 229, 0.85) !important;
+    max-width: 320px !important;
+    margin: 0 auto 20px auto !important;
+  }
+
+  /* 2. Mobile AI Search / Command Bar */
+  .hero-ai-container {
+    width: 100% !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
+  }
+
+  .hero-ai-bar {
+    width: 100% !important;
+    height: 48px !important;
+    background: rgba(6, 32, 27, 0.82) !important;
+    border: 1px solid rgba(16, 185, 129, 0.42) !important;
+    border-radius: 9999px !important;
+    padding: 4px 6px 4px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+
+  .hero-ai-avatar-desktop {
+    display: none !important;
+  }
+
+  .hero-ai-avatar-mobile-mic {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .hero-ai-avatar-badge {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 9999px !important;
+    background: #fbbf24 !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    flex-shrink: 0 !important;
+    color: #020617 !important;
+    padding: 0 !important;
+  }
+
+  .hero-ai-avatar-mobile-mic svg {
+    width: 15px !important;
+    height: 15px !important;
+    color: #0f172a !important;
+    stroke: #0f172a !important;
+  }
+
+  .hero-ai-input {
+    font-size: 12px !important;
+    color: #ffffff !important;
+    font-weight: 450 !important;
+    line-height: 52px !important;
+    height: 52px !important;
+    display: block !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+  }
+
+  .hero-ai-input::placeholder {
+    color: rgba(167, 243, 208, 0.65) !important;
+    font-size: 11.5px !important;
+  }
+
+  .hero-ai-send-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 9999px !important;
+    background: #fbbf24 !important;
+    border: none !important;
+    color: #020617 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4) !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.15s ease, opacity 0.15s ease !important;
+  }
+
+  .hero-ai-send-btn:active {
+    transform: scale(0.92) !important;
+  }
+
+  .hero-ai-send-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+    stroke-width: 2.5 !important;
+    color: #020617 !important;
+    stroke: #020617 !important;
+  }
+
+  /* 3. Horizontal Scrollable Quick Branch Chips */
+  .hero-ai-starter-chips {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 8px !important;
+    padding: 4px 4px 6px 4px !important;
+    margin-top: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  .hero-ai-starter-chips::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .hero-ai-starter-pill {
+    flex-shrink: 0 !important;
+    height: 32px !important;
+    padding: 0 14px !important;
+    border-radius: 9999px !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.02em !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+  }
+
+  .starter-pill-highlight {
+    background: rgba(0, 0, 0, 0.45) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .starter-pill-highlight:active {
+    transform: scale(0.95) !important;
+  }
+
+  .starter-pill-sparkle {
+    display: none !important;
+  }
+
+  .hero-ai-quick-pill {
+    flex-shrink: 0 !important;
+    height: 32px !important;
+    padding: 0 13px !important;
+    border-radius: 9999px !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: 650 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+  }
+
+  .hero-ai-quick-pill .hero-ai-pill-icon {
+    display: none !important;
+  }
+
+  .hero-ai-quick-pill:hover,
+  .hero-ai-quick-pill:active {
+    background: rgba(0, 0, 0, 0.65) !important;
+    color: #ffffff !important;
+    border-color: rgba(16, 185, 129, 0.55) !important;
+    transform: scale(0.96) !important;
+  }
+
+  /* 4. Quick Resource Cards (Notes, Question Papers, Syllabus) */
+  .resource-highlights {
+    width: 100% !important;
+    margin-top: 18px !important;
+  }
+
+  .resource-highlights-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .resource-highlight-card {
+    min-height: 64px !important;
+    background: rgba(6, 32, 27, 0.9) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+    gap: 12px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transition: transform 0.15s ease, border-color 0.15s ease !important;
+  }
+
+  .resource-highlight-card:active {
+    transform: scale(0.985) !important;
+    border-color: rgba(52, 211, 153, 0.6) !important;
+  }
+
+  .resource-highlight-icon {
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    background: #061a15 !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    color: #6ee7b7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .resource-highlight-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke-width: 1.8 !important;
+  }
+
+  .resource-highlight-copy {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    gap: 2px !important;
+    flex: 1 !important;
+  }
+
+  .resource-highlight-title {
+    font-size: 13.5px !important;
+    font-weight: 750 !important;
+    color: #ffffff !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .resource-highlight-description {
+    display: block !important;
+    font-size: 11px !important;
+    color: rgba(167, 243, 208, 0.75) !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+  }
+
+  .resource-highlight-arrow {
+    display: block !important;
+    flex: 0 0 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    color: #34d399 !important;
+    margin-left: auto !important;
+  }
+
+  /* 5. Branch Carousel Section & 3D Coverflow */
+  .branch-carousel-section {
+    padding: 38px 0 48px !important;
+    background: #f8fafc !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    overflow: hidden !important;
+  }
+
+  .branch-carousel-header {
+    margin-bottom: 24px !important;
+    padding: 0 16px !important;
+  }
+
+  .branch-carousel-eyebrow-pill {
+    background: #fef3c7 !important;
+    border: 1px solid rgba(252, 211, 77, 0.7) !important;
+    box-shadow: 0 1px 4px rgba(245, 158, 11, 0.12) !important;
+    padding: 4px 14px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .branch-carousel-eyebrow-text {
+    font-size: 10px !important;
+    font-weight: 850 !important;
+    letter-spacing: 0.1em !important;
+    color: #92400e !important;
+  }
+
+  .branch-carousel-title {
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.02em !important;
+    max-width: 320px !important;
+    margin: 0 auto 10px auto !important;
+  }
+
+  .branch-carousel-title-underline {
+    width: 40px !important;
+    height: 4px !important;
+    background: #047857 !important;
+    border-radius: 9999px !important;
+  }
+
+  /* 3D Perspective Stage */
+  .branch-carousel-stage {
+    min-height: 330px !important;
+    perspective: 1200px !important;
+    transform-style: preserve-3d !important;
+    overflow: hidden !important;
+    padding: 10px 0 !important;
+  }
+
+  .branch-carousel-world {
+    height: 310px !important;
+    transform-style: preserve-3d !important;
+  }
+
+  .branch-3d-card {
+    width: 240px !important;
+    height: 300px !important;
+    border-radius: 24px !important;
+    background: #090b10 !important;
+    border: 1px solid rgba(251, 191, 36, 0.35) !important;
+    box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.14) !important;
+    transform-origin: center center !important;
+    backface-visibility: hidden !important;
+    will-change: transform, opacity, z-index !important;
+    overflow: hidden !important;
+    opacity: 1 !important;
+  }
+
+  .branch-3d-card.is-center {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 10px 24px -6px rgba(15, 23, 42, 0.16), 0 0 16px rgba(251, 191, 36, 0.15) !important;
+  }
+
+  .branch-3d-card:not(.is-center) {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  /* Curved bottom shadow that curves organically with the rounded card base */
+  .branch-card-mobile-ground-shadow {
+    position: absolute !important;
+    bottom: -10px !important;
+    left: 8% !important;
+    right: 8% !important;
+    height: 22px !important;
+    border-radius: 50% !important;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.08) 55%, transparent 75%) !important;
+    filter: blur(6px) !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+
+  .branch-3d-card .branch-card-img {
+    opacity: 0.92 !important;
+  }
+
+  .branch-3d-card:not(.is-center) .branch-card-img {
+    opacity: 0.8 !important;
+  }
+
+  .branch-3d-card .branch-card-overlay {
+    background: linear-gradient(to top,
+        #090b10 0%,
+        rgba(9, 11, 16, 0.88) 45%,
+        rgba(9, 11, 16, 0.4) 100%) !important;
+  }
+
+  .branch-card-inner {
+    padding: 18px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+
+  .branch-top-badge {
+    padding: 3px 10px !important;
+    background: rgba(0, 0, 0, 0.65) !important;
+    border: 1px solid rgba(251, 191, 36, 0.45) !important;
+  }
+
+  .branch-badge-code {
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    color: #fef08a !important;
+  }
+
+  .branch-card-tag {
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
+    margin-bottom: 2px !important;
+  }
+
+  .branch-card-name {
+    font-size: 20px !important;
+    font-weight: 850 !important;
+    line-height: 1.15 !important;
+    color: #ffffff !important;
+  }
+
+  .branch-action-row {
+    margin-top: 8px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .branch-explore-link {
+    font-size: 12px !important;
+    font-weight: 750 !important;
+  }
+
+  /* Carousel Navigation Buttons & Pagination Dots */
+  .branch-carousel-controls {
+    margin-top: 22px !important;
+    gap: 12px !important;
+  }
+
+  .branch-nav-buttons {
+    gap: 16px !important;
+  }
+
+  .branch-nav-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 9999px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+    color: #334155 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .branch-nav-btn:active {
+    transform: scale(0.9) !important;
+    border-color: #047857 !important;
+    color: #047857 !important;
+  }
+
+  .branch-nav-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    stroke-width: 2.5 !important;
+  }
+
+  .branch-dots-row {
+    gap: 7px !important;
+    padding-top: 4px !important;
+  }
+
+  .branch-dot {
+    height: 6px !important;
+    border-radius: 9999px !important;
+    background: #cbd5e1 !important;
+    width: 8px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .branch-dot.is-active {
+    width: 24px !important;
+    background: #f59e0b !important;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important;
+  }
+
+  /* 6. Mobile JNTU AI Chatbot Modal & Overlay */
+  .chat-modal-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .chat-modal-card {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .chat-modal-header {
+    padding: 12px 14px !important;
+    border-bottom: 1px solid rgba(255, 239, 179, 0.2) !important;
+  }
+
+  .chat-modal-title {
+    font-size: 14.5px !important;
+  }
+
+  .chat-modal-subtitle {
+    font-size: 11px !important;
+  }
+
+  .chat-modal-close-btn {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
+  }
+
+  .chat-modal-body {
+    padding: 12px 10px !important;
+    gap: 10px !important;
+  }
+
+  .hero-ai-user-card {
+    max-width: 88% !important;
+    padding: 8px 12px !important;
+  }
+
+  .hero-ai-assistant-card {
+    max-width: 98% !important;
+    padding: 10px 12px !important;
+  }
+
+  .hero-ai-assistant-card .hero-ai-text,
+  .hero-ai-user-card .hero-ai-user-text {
+    font-size: 12.5px !important;
+  }
+
+  .chat-modal-footer {
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) 10px !important;
+  }
+
+  .chat-modal-input-bar {
+    padding: 4px 6px 4px 12px !important;
+    border-radius: 9999px !important;
+  }
+
+  .chat-modal-input-field {
+    font-size: 13px !important;
+  }
+
+  .chat-modal-send-btn {
+    width: 34px !important;
+    height: 34px !important;
+    background: #fbbf24 !important;
+    border: none !important;
+    color: #020617 !important;
+  }
+
+  .chat-modal-send-btn svg {
+    stroke: #020617 !important;
+  }
+
+  .chat-modal-mic-btn {
+    width: 34px !important;
+    height: 34px !important;
+    background: rgba(251, 191, 36, 0.15) !important;
+    border: 1px solid rgba(251, 191, 36, 0.4) !important;
+    color: #fbbf24 !important;
+  }
+
+  .chat-modal-mic-btn svg {
+    stroke: #fbbf24 !important;
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .hero-ai-mic-btn {
+    width: 32px !important;
+    height: 32px !important;
+    background: rgba(251, 191, 36, 0.15) !important;
+    border: 1px solid rgba(251, 191, 36, 0.4) !important;
+    color: #fbbf24 !important;
+  }
+
+  .hero-ai-mic-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+    stroke: #fbbf24 !important;
+  }
+
+  .chat-modal-empty-state {
+    padding: 16px 8px !important;
+  }
+
+  .chat-sem-curriculum-card {
+    padding: 10px !important;
+  }
+
+  .chat-sem-course-item {
+    padding: 6px 8px !important;
+  }
+
+  .chat-sem-course-name {
+    font-size: 11.5px !important;
+  }
+}
+
+/* ---------- Respect "reduce motion" on phones (battery + comfort) ---------- */
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+
+  .orbit-item,
+  .floating-email-pulse,
+  .floating-instagram-pulse,
+  .floating-whatsapp-pulse {
+    animation: none !important;
+  }
+}
+/* ---------- Student Profile Stitch Mobile Layout (<= 768px) ---------- */
+@media (max-width: 768px) {
+  .sp-desktop-only {
+    display: none !important;
+  }
+  .sp-mobile-stitch-container {
+    display: block !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .sp-mobile-stitch-container {
+    display: none !important;
+  }
+  .sp-desktop-only {
+    display: block !important;
+  }
+}

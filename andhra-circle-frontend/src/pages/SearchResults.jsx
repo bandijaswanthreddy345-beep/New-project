@@ -56,7 +56,7 @@ function SearchResults() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const BACKEND_URL = "http://localhost:5000";
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
   // =========================================================
   // PERFORM SEARCH

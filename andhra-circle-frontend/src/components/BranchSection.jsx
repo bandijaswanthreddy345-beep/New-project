@@ -1,336 +1,489 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import ReferenceGlassShatter from "./ReferenceGlassShatter";
+import "./BranchSection.css";
+import aimlImg from "../assets/branches/aiml.jpg";
+import cseImg from "../assets/branches/cse.jpg";
+import eceImg from "../assets/branches/ece.jpg";
+import mechImg from "../assets/branches/mech.jpg";
+import civilImg from "../assets/branches/civil.jpg";
+import eeeImg from "../assets/branches/eee.jpg";
 
-
-
-// Department cards matching reference image layout and tags:
-// 0: CSE, 1: ECE, 2: AIML, 3: MECH, 4: CIVIL
 const BRANCHES = [
   {
     id: "01",
-    name: "Computer Science Engineering",
-    code: "CSE",
-    tag: "SOFTWARE SYSTEMS",
-    image: "/branches/cse.jpg",
-    accent: "#00d4ff",
-    filterQuery: "Computer Science",
-  },
-  {
-    id: "02",
-    name: "Electronics & Communication",
-    code: "ECE",
-    tag: "VLSI & EMBEDDED SYSTEMS",
-    image: "/branches/ece.jpg",
-    accent: "#00e5ff",
-    filterQuery: "Electronics",
-  },
-  {
-    id: "03",
     name: "AI & Machine Learning",
     code: "AIML",
     tag: "NEURAL NETS & DATA SCIENCE",
-    image: "/branches/aiml.jpg",
-    accent: "#00d4ff",
-    filterQuery: "Artificial Intelligence",
+    image: aimlImg,
+    color: "#5eead4",
+    watermark: "AI",
+  },
+  {
+    id: "02",
+    name: "Computer Science Engineering",
+    code: "CSE",
+    tag: "SOFTWARE & ALGORITHMS",
+    image: cseImg,
+    color: "#38bdf8",
+    watermark: "CS",
+  },
+  {
+    id: "03",
+    name: "Electronics & Communication",
+    code: "ECE",
+    tag: "VLSI & EMBEDDED SYSTEMS",
+    image: eceImg,
+    color: "#ffefb3",
+    watermark: "EC",
   },
   {
     id: "04",
     name: "Mechanical Engineering",
     code: "MECH",
     tag: "ROBOTICS & AUTOMATION",
-    image: "/branches/mech.jpg",
-    accent: "#00d4ff",
-    filterQuery: "Mechanical",
+    image: mechImg,
+    color: "#fbbf24",
+    watermark: "ME",
   },
   {
     id: "05",
     name: "Civil Engineering",
     code: "CIVIL",
     tag: "SMART INFRASTRUCTURE",
-    image: "/branches/civil.jpg",
-    accent: "#00d4ff",
-    filterQuery: "Civil",
+    image: civilImg,
+    color: "#f5bd3f",
+    watermark: "CE",
+  },
+  {
+    id: "06",
+    name: "Electrical & Electronics",
+    code: "EEE",
+    tag: "POWER & ENERGY SYSTEMS",
+    image: eeeImg,
+    color: "#baf46a",
+    watermark: "EE",
   },
 ];
 
 function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(false);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [shatteringBranch, setShatteringBranch] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1280
+  );
+  const dragStartRef = useRef(null);
 
-  const containerRef = useRef(null);
-  const sceneRef = useRef(null);
-  const cardRefs = useRef([]);
-
-  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
-  const angleRef = useRef(Math.PI / 10);
-  const hoveredIndexRef = useRef(null);
-  const shatteringRef = useRef(null);
-
+  // Responsive breakpoint tracking
   useEffect(() => {
-    hoveredIndexRef.current = hoveredIndex;
-  }, [hoveredIndex]);
-
-  useEffect(() => {
-    shatteringRef.current = shatteringBranch;
-  }, [shatteringBranch]);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 640);
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
     };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleMouseMove = (e) => {
-    if (isMobile || !containerRef.current || shatteringBranch) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const normX = (e.clientX - centerX) / (rect.width / 2);
-    const normY = (e.clientY - centerY) / (rect.height / 2);
-
-    mouseRef.current.targetX = normX * 8;
-    mouseRef.current.targetY = -normY * 6;
-  };
-
-  const handleMouseLeave = () => {
-    mouseRef.current.targetX = 0;
-    mouseRef.current.targetY = 0;
-    setHoveredIndex(null);
-  };
-
+  // Synchronize if selectedBranch prop changes externally or via select-branch event
   useEffect(() => {
-    if (isMobile) return;
-
-    let animId;
-
-    const animate = () => {
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
-
-      if (sceneRef.current) {
-        sceneRef.current.style.transform = `rotateX(${mouseRef.current.y.toFixed(2)}deg) rotateY(${mouseRef.current.x.toFixed(2)}deg)`;
-      }
-
-      const currentHovered = hoveredIndexRef.current;
-      const isShatteringActive = shatteringRef.current !== null;
-      // Freeze rotation during shatter explosion so the camera stays locked on the shattering card
-      const speed = isShatteringActive ? 0 : (currentHovered !== null ? 0.0004 : 0.0016);
-      angleRef.current = (angleRef.current + speed) % (Math.PI * 2);
-
-      const width = window.innerWidth;
-      let rx = 310;
-      let ry = 18;
-      let rz = 160;
-
-      if (width <= 1100) {
-        rx = 255;
-        ry = 15;
-        rz = 130;
-      }
-
-      const total = BRANCHES.length;
-
-      BRANCHES.forEach((_, index) => {
-        const cardEl = cardRefs.current[index];
-        if (!cardEl) return;
-
-        const isHovered = currentHovered === index;
-        const baseAngle = angleRef.current + (index * Math.PI * 2) / total;
-
-        const x = Math.cos(baseAngle) * rx;
-        const z = Math.sin(baseAngle) * rz;
-        const y = -Math.sin(baseAngle) * ry;
-
-        const normZ = z / rz; // -1 (back) to +1 (front center)
-
-        // Smooth yaw: front center faces camera (rotY = 0), side cards subtly angle along curve
-        const rotY = isHovered ? 0 : -(x / rx) * 16;
-
-        let scale = 0.88 + normZ * 0.16; // 0.72 (back) to 1.04 (front)
-        let zIndex = Math.round(90 + normZ * 60); // 30 to 150
-
-        if (isHovered) {
-          scale = 1.12;
-          zIndex = 300;
-        }
-
-        const shadowBlur = Math.round(16 + normZ * 16);
-        const shadowY = Math.round(8 + normZ * 8);
-        const shadowAlpha = (0.2 + Math.max(0, normZ) * 0.35).toFixed(3);
-
-        cardEl.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${rotY.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
-        cardEl.style.opacity = "1";
-        cardEl.style.zIndex = zIndex;
-
-        if (isHovered) {
-          cardEl.style.boxShadow = "0 28px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 229, 255, 0.45)";
-        } else {
-          cardEl.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha}), 0 0 ${Math.round(Math.max(0, normZ) * 16)}px rgba(0, 229, 255, ${(Math.max(0, normZ) * 0.25).toFixed(2)})`;
-        }
+    const handleSelect = (branchCode) => {
+      if (!branchCode) return;
+      const idx = BRANCHES.findIndex((b) => {
+        const bCode = b.code.toLowerCase();
+        const sCode = branchCode.toLowerCase();
+        return (
+          bCode === sCode ||
+          (sCode === "me" && bCode === "mech") ||
+          (sCode === "mech" && bCode === "me") ||
+          (sCode === "civil" && (bCode === "civil" || bCode === "ce")) ||
+          (sCode === "ce" && bCode === "civil")
+        );
       });
-
-      animId = requestAnimationFrame(animate);
+      if (idx !== -1) {
+        setActiveIndex(idx);
+      }
     };
 
-    animId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animId);
-  }, [isMobile]);
-
-  const hasNavigatedRef = useRef(false);
-
-  const triggerBranchNavigation = (item) => {
-    if (hasNavigatedRef.current) return;
-    hasNavigatedRef.current = true;
-    if (onSelectBranch) {
-      onSelectBranch(item.code, item.name);
-    } else {
-      navigate(`/notes?branch=${encodeURIComponent(item.code)}`);
+    if (selectedBranch) {
+      handleSelect(selectedBranch);
     }
+
+    const onCustomSelect = (e) => {
+      if (e?.detail) handleSelect(e.detail);
+    };
+    window.addEventListener("select-branch", onCustomSelect);
+    return () => window.removeEventListener("select-branch", onCustomSelect);
+  }, [selectedBranch]);
+
+  // Smooth continuous auto-rotation: paused on touch/interaction
+  useEffect(() => {
+    let pauseUntil = 0;
+    const onSelectEvent = (e) => {
+      if (e?.detail) {
+        pauseUntil = Date.now() + 8000;
+      }
+    };
+    window.addEventListener('select-branch', onSelectEvent);
+    const timer = setInterval(() => {
+      if (Date.now() < pauseUntil) return;
+      setActiveIndex((prev) => (prev + 1) % BRANCHES.length);
+    }, 3600);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('select-branch', onSelectEvent);
+    };
+  }, []);
+
+  const prevBranch = () => {
+    setActiveIndex((prev) => (prev - 1 + BRANCHES.length) % BRANCHES.length);
   };
 
-  const activeShatteringItem = BRANCHES.find((b) => b.code === shatteringBranch);
+  const nextBranch = () => {
+    setActiveIndex((prev) => (prev + 1) % BRANCHES.length);
+  };
+
+  const handleBranchClick = (branch, isCenter, index) => {
+    // If user clicks a side card on mobile, smoothly bring it to the center first!
+    if (!isCenter && windowWidth < 768) {
+      setActiveIndex(index);
+      return;
+    }
+    if (onSelectBranch) {
+      onSelectBranch(branch.code);
+    }
+    navigate(`/notes?branch=${encodeURIComponent(branch.code)}`);
+  };
+
+  // Drag and touch handlers for 3D gesture swiping
+  const handleTouchStart = (e) => {
+    dragStartRef.current = e.touches ? e.touches[0].clientX : e.clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (dragStartRef.current === null) return;
+    const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const diff = clientX - dragStartRef.current;
+    if (diff > 45) {
+      prevBranch();
+    } else if (diff < -45) {
+      nextBranch();
+    }
+    dragStartRef.current = null;
+  };
+
+  // Calculate 3D circular transformation for each card - Crisp, Solid, and Non-Washed on light canvas
+  const getCardStyle = (index) => {
+    const total = BRANCHES.length;
+    let offset = (index - activeIndex) % total;
+    if (offset > total / 2) offset -= total;
+    if (offset < -total / 2) offset += total;
+
+    const absOffset = Math.abs(offset);
+
+    if (absOffset > 2) {
+      return {
+        transform: "translate3d(0, 0, -400px) scale(0.5)",
+        opacity: 0,
+        zIndex: 0,
+        pointerEvents: "none",
+        visibility: "hidden",
+      };
+    }
+
+    // 1. Mobile screen (< 768px) - High-fidelity 3D Coverflow geometry with smooth, natural shadows
+    if (windowWidth < 768) {
+      if (offset === 0) {
+        return {
+          transform: "translateX(0) translateZ(40px) scale(1.02) rotateY(0deg)",
+          zIndex: 30,
+          opacity: 1,
+          filter: "none",
+          boxShadow:
+            "0 14px 28px -6px rgba(15, 23, 42, 0.18), 0 6px 14px -4px rgba(15, 23, 42, 0.12)",
+          pointerEvents: "auto",
+        };
+      }
+      if (offset === -1) {
+        return {
+          transform:
+            "translateX(-64%) translateZ(-30px) scale(0.85) rotateY(20deg)",
+          zIndex: 20,
+          opacity: 1,
+          filter: "brightness(0.65)",
+          boxShadow:
+            "0 10px 22px -6px rgba(15, 23, 42, 0.15)",
+          pointerEvents: "auto",
+        };
+      }
+      if (offset < -1) {
+        return {
+          transform:
+            "translateX(-110%) translateZ(-80px) scale(0.72) rotateY(28deg)",
+          zIndex: 10,
+          opacity: 0,
+          filter: "brightness(0.4)",
+          pointerEvents: "none",
+        };
+      }
+      if (offset === 1) {
+        return {
+          transform:
+            "translateX(64%) translateZ(-30px) scale(0.85) rotateY(-20deg)",
+          zIndex: 20,
+          opacity: 1,
+          filter: "brightness(0.65)",
+          boxShadow:
+            "0 10px 22px -6px rgba(15, 23, 42, 0.15)",
+          pointerEvents: "auto",
+        };
+      }
+      if (offset > 1) {
+        return {
+          transform:
+            "translateX(110%) translateZ(-80px) scale(0.72) rotateY(-28deg)",
+          zIndex: 10,
+          opacity: 0,
+          filter: "brightness(0.4)",
+          pointerEvents: "none",
+        };
+      }
+      return {
+        transform: "translateX(0) translateZ(-160px) scale(0.6)",
+        zIndex: 0,
+        opacity: 0,
+        pointerEvents: "none",
+      };
+    }
+
+    // 2. Tablets / Smaller Laptops (768px - 1180px)
+    if (windowWidth < 1180) {
+      if (offset === 0) {
+        return {
+          transform: "translate3d(0, 0, 80px) rotateY(0deg) scale(1.04)",
+          zIndex: 30,
+          opacity: 1,
+          filter: "brightness(1) drop-shadow(0 20px 40px rgba(1, 42, 35, 0.22))",
+          pointerEvents: "auto",
+        };
+      }
+      if (absOffset === 1) {
+        const xTranslate = offset === -1 ? -240 : 240;
+        const yRotate = offset === -1 ? 22 : -22;
+        return {
+          transform: `translate3d(${xTranslate}px, 0, -30px) rotateY(${yRotate}deg) scale(0.86)`,
+          zIndex: 20,
+          opacity: 0.96,
+          filter: "brightness(0.85)",
+          pointerEvents: "auto",
+        };
+      }
+      if (absOffset === 2) {
+        const xTranslate = offset === -2 ? -420 : 420;
+        const yRotate = offset === -2 ? 34 : -34;
+        return {
+          transform: `translate3d(${xTranslate}px, 0, -90px) rotateY(${yRotate}deg) scale(0.72)`,
+          zIndex: 10,
+          opacity: 0.88,
+          filter: "brightness(0.72)",
+          pointerEvents: "auto",
+        };
+      }
+    }
+
+    // 3. Desktop (>= 1180px) - Perfectly proportioned spread without clipping on laptop screens
+    if (offset === 0) {
+      return {
+        transform: "translate3d(0, 0, 100px) rotateY(0deg) scale(1.06)",
+        zIndex: 30,
+        opacity: 1,
+        filter: "brightness(1) drop-shadow(0 24px 45px rgba(1, 42, 35, 0.22))",
+        pointerEvents: "auto",
+      };
+    }
+
+    if (absOffset === 1) {
+      const xTranslate = offset === -1 ? -300 : 300;
+      const yRotate = offset === -1 ? 24 : -24;
+      return {
+        transform: `translate3d(${xTranslate}px, 0, -30px) rotateY(${yRotate}deg) scale(0.88)`,
+        zIndex: 20,
+        opacity: 0.96,
+        filter: "brightness(0.85)",
+        pointerEvents: "auto",
+      };
+    }
+
+    if (absOffset === 2) {
+      const xTranslate = offset === -2 ? -520 : 520;
+      const yRotate = offset === -2 ? 38 : -38;
+      return {
+        transform: `translate3d(${xTranslate}px, 0, -100px) rotateY(${yRotate}deg) scale(0.74)`,
+        zIndex: 10,
+        opacity: 0.90,
+        filter: "brightness(0.72)",
+        pointerEvents: "auto",
+      };
+    }
+
+    return {
+      transform: "translate3d(0, 0, -300px) scale(0.5)",
+      opacity: 0,
+      zIndex: 0,
+      pointerEvents: "none",
+    };
+  };
 
   return (
-    <section 
-      className="branches-section" 
-      ref={containerRef} 
-      onMouseMove={handleMouseMove} 
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className="branches-container">
+    <section className="branch-carousel-section" id="departments">
+      {/* Subtle clean ambient light */}
+      <div className="branch-carousel-ambient-glow" />
 
-        {/* Section Header: "— Browse by Branch —" + Subtitle */}
-        <div className="branches-header">
-          <div className="branches-eyebrow-wrapper">
-            <span className="branches-eyebrow-line" />
-            <span className="branches-eyebrow">Browse by Branch</span>
-            <span className="branches-eyebrow-line" />
-          </div>
-          <h2 className="branches-title">
-            Explore academic resources by engineering department
-          </h2>
+      {/* Section Header - Matching Latest Notes Structure */}
+      <div className="branch-carousel-header">
+        <div className="branch-carousel-eyebrow-pill">
+          <span className="branch-carousel-eyebrow-text">BROWSE BY BRANCH</span>
         </div>
+        <h2 className="branch-carousel-title">
+          Explore Academic Resources by Engineering Department
+        </h2>
+        <span className="branch-carousel-title-underline" />
+      </div>
 
-        {/* 3D Orbit Layout */}
-        <div className="orbit-scene">
+      {/* 3D Rotating Stage */}
+      <div
+        className="branch-carousel-stage"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleTouchStart}
+        onMouseUp={handleTouchEnd}
+      >
+        <div className="branch-carousel-world">
+          {BRANCHES.map((branch, index) => {
+            const isCenter = index === activeIndex;
+            const style3D = getCardStyle(index);
 
-          {/* Luminous Floor Light Pool under Center Card */}
-          <div className="orbit-ground-glow" />
+            return (
+              <div
+                key={branch.code}
+                onClick={() => handleBranchClick(branch, isCenter, index)}
+                style={{
+                  ...style3D,
+                  transition:
+                    windowWidth < 768
+                      ? "transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease, filter 0.45s ease"
+                      : "all 0.85s cubic-bezier(0.25, 1, 0.45, 1)",
+                }}
+                className={`branch-3d-card ${isCenter ? "is-center" : ""}`}
+                title={`Explore ${branch.name}`}
+              >
+                {/* Visual Image */}
+                <img
+                  src={branch.image}
+                  alt={branch.name}
+                  className="branch-card-img"
+                  loading="lazy"
+                />
 
-          {/* ====================================================
-              FULLSCREEN GLASS SHATTER DISPERSAL (ONLY PIECES)
-              ==================================================== */}
-          {activeShatteringItem && (
-            <ReferenceGlassShatter
-              onComplete={() => triggerBranchNavigation(activeShatteringItem)}
-            />
-          )}
+                {/* Dark Gradient Overlay for optimal legibility */}
+                <div className="branch-card-overlay" />
 
-          {/* ====================================================
-              3D CAROUSEL WORLD (Cards suspended in 3D Space)
-              Hidden immediately during shatter so no cards are visible
-              ==================================================== */}
-          <div 
-            className="orbit-world" 
-            ref={sceneRef}
-            style={{ 
-              display: activeShatteringItem ? "none" : "flex",
-              opacity: activeShatteringItem ? 0 : 1, 
-              pointerEvents: activeShatteringItem ? "none" : "auto",
-            }}
-          >
-            {BRANCHES.map((item, index) => {
-              const isSelected = Boolean(
-                selectedBranch &&
-                (selectedBranch.toLowerCase() === item.filterQuery.toLowerCase() ||
-                 selectedBranch.toLowerCase() === item.name.toLowerCase() ||
-                 selectedBranch.toLowerCase() === item.code.toLowerCase())
-              );
-              const isShattering = shatteringBranch === item.code;
+                {/* Curved Mobile Ground Ambient Reflection / Pod */}
+                <div className="branch-card-mobile-ground-shadow" aria-hidden="true" />
 
-              const handleCardClick = (e) => {
-                e.preventDefault();
-                if (shatteringBranch) return; // Prevent double trigger while shattering
+                {/* Card Content */}
+                <div className="branch-card-inner">
+                  {/* Top Badge (clean branch code) */}
+                  <div className="branch-top-badge">
+                    <span className="branch-badge-code">
+                      {branch.code}
+                    </span>
+                  </div>
 
-                hasNavigatedRef.current = false;
-                setShatteringBranch(item.code);
-                // Sound removed as requested
+                  {/* Middle / Bottom Content */}
+                  <div className="branch-bottom-content">
+                    <span
+                      className="branch-card-tag"
+                      style={{ color: branch.color }}
+                    >
+                      {branch.tag}
+                    </span>
 
-                // Failsafe timer: navigate after 1150ms if onComplete hasn't fired yet
-                window.setTimeout(() => {
-                  triggerBranchNavigation(item);
-                }, 1150);
-              };
+                    <h3 className="branch-card-name">
+                      {branch.name}
+                    </h3>
 
-              return (
-                <div
-                  key={item.id}
-                  ref={(el) => (cardRefs.current[index] = el)}
-                  className={`orbit-item ${hoveredIndex === index ? "is-hovered" : ""} ${isSelected ? "is-selected" : ""} ${isShattering ? "is-shattering" : ""}`}
-                  style={{ "--index": index, "--accent": item.accent }}
-                  onMouseEnter={() => !shatteringBranch && setHoveredIndex(index)}
-                  onMouseLeave={() => !shatteringBranch && setHoveredIndex(null)}
-                  onClick={handleCardClick}
-                  title={`View ${item.name} notes & resources`}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <article className="branch-card">
-                    {/* Background Graphics */}
-                    <img 
-                      src={item.image} 
-                      alt={item.name} 
-                      className="branch-card-bg-img"
-                      loading="eager"
-                    />
-
-                    {/* Dark Glass Overlay */}
-                    <div className="branch-card-gradient" />
-
-                    {/* Ambient Accent Glow */}
-                    <div className="branch-card-glow" />
-
-                    {/* Top Pill Badge: ● CODE */}
-                    <div className="branch-card-top">
-                      <span className="branch-code-badge">
-                        <span className="badge-dot" />
-                        {item.code}
+                    {/* Bottom CTA Row: Explore -> */}
+                    <div className="branch-action-row">
+                      <span
+                        className="branch-explore-link"
+                        style={{ color: branch.color }}
+                      >
+                        Explore →
                       </span>
-
-                      {isSelected && (
-                        <span className="branch-active-pill">
-                          ● ACTIVE
-                        </span>
-                      )}
                     </div>
-
-                    {/* Bottom Content: Tag, Title, Glowing Line */}
-                    <div className="branch-body">
-                      <div className="branch-tag-row">
-                        <span className="branch-tag">
-                          {item.tag}
-                        </span>
-                      </div>
-
-                      <h3 className="branch-name">{item.name}</h3>
-
-                      <span className="branch-line" />
-                    </div>
-                  </article>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
+      {/* 3D Carousel Navigation & Pagination Dots */}
+      <div className="branch-carousel-controls">
+        <div className="branch-nav-buttons">
+          <button
+            type="button"
+            onClick={prevBranch}
+            aria-label="Previous department"
+            className="branch-nav-btn"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            onClick={nextBranch}
+            aria-label="Next department"
+            className="branch-nav-btn"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
         </div>
 
+        {/* Interactive Dots for direct jump */}
+        <div className="branch-dots-row">
+          {BRANCHES.map((b, i) => (
+            <button
+              key={b.code}
+              type="button"
+              onClick={() => setActiveIndex(i)}
+              aria-label={`Go to ${b.name}`}
+              className={`branch-dot ${i === activeIndex ? "is-active" : ""}`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

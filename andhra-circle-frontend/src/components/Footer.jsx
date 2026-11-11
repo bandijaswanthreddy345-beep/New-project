@@ -1,22 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Footer() {
-  const navigate = useNavigate();
-
-  const handleAdminDashboardClick = (e) => {
-    e.preventDefault();
-    // Clear stored admin credentials so fresh login is always required
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    navigate("/login", {
-      state: {
-        adminPrompt: true,
-        message: "Admin authentication required. Please sign in to access the Admin Dashboard.",
-      },
-    });
-  };
-
   const quickLinks = [
     { name: "Home", path: "/" },
     { name: "CGPA & SGPA Calculator", path: "/calculator" },
@@ -30,7 +14,6 @@ function Footer() {
     { name: "Syllabus Copies", path: "/syllabus" },
     { name: "Lab Programs", path: "/lab-programs" },
     { name: "Search Resources", path: "/search" },
-    { name: "Admin Dashboard", path: "/dashboard" },
   ];
 
   return (
@@ -84,18 +67,7 @@ function Footer() {
           <ul className="footer-links">
             {resourceLinks.map((link) => (
               <li key={link.path}>
-                {link.path === "/dashboard" ? (
-                  <a
-                    href="/login"
-                    onClick={handleAdminDashboardClick}
-                    className="footer-admin-link"
-                    title="Sign in to Admin Dashboard"
-                  >
-                    {link.name}
-                  </a>
-                ) : (
-                  <Link to={link.path}>{link.name}</Link>
-                )}
+                <Link to={link.path}>{link.name}</Link>
               </li>
             ))}
           </ul>

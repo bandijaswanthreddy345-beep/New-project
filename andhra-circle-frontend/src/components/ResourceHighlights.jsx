@@ -5,7 +5,7 @@ const RESOURCES = [
   {
     path: "/notes",
     title: "Notes",
-    description: "Well organized and easy to study",
+    description: "Easy to study",
     className: "resource-highlight-notes",
     icon: (
       <>
@@ -69,9 +69,11 @@ function ResourceHighlights() {
             </span>
             <span className="resource-highlight-copy">
               <span className="resource-highlight-title">{resource.title}</span>
-              <span className="resource-highlight-description">
-                {resource.description}
-              </span>
+              {resource.description ? (
+                <span className="resource-highlight-description">
+                  {resource.description}
+                </span>
+              ) : null}
             </span>
             <svg
               className="resource-highlight-arrow"

@@ -1,5 +1,6 @@
 
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 // =========================
 // Public Pages
@@ -70,6 +71,13 @@ import AdminRoute from "./components/AdminRoute";
 import PdfViewer from "./pages/PdfViewer";
 
 function App() {
+  // Every page change starts at the top; otherwise a short page opened from
+  // a long scrolled list shows up as a blank white screen.
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <>
       <Routes>
@@ -90,9 +98,13 @@ function App() {
         element={<Login />}
       />
 
-      {/* Register */}
+      {/* Register & Signup */}
       <Route
         path="/register"
+        element={<Register />}
+      />
+      <Route
+        path="/signup"
         element={<Register />}
       />
 

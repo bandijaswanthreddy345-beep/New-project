@@ -1,20 +1,21 @@
 /* =========================================================
-   JNTU CIRCLE — STUDENT PROFILE MODAL
-   Harmonized with Deep Emerald, Sunbeam Gold & Soft Canvas
+   JNTU CIRCLE — STUDENT PROFILE QUICK PREVIEW MODAL
+   Minimalist, professional, easy-to-understand card design.
+   Deep Obsidian Emerald, Sunbeam Gold & Crisp White Typography.
    ========================================================= */
 
 .sp-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  background: rgba(0, 18, 16, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  z-index: 99999;
+  background: rgba(1, 18, 15, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  animation: spFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 16px;
+  animation: spFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
 
@@ -27,24 +28,29 @@
   }
 }
 
-.sp-modal-container {
+/* Compact, clean preview card */
+.sp-preview-card {
   width: 100%;
-  max-width: 820px;
-  max-height: 90vh;
-  background: #ffffff;
-  border-radius: 22px;
-  box-shadow: 0 25px 60px -15px rgba(0, 36, 32, 0.5), 0 0 0 1px rgba(255, 239, 179, 0.2);
+  max-width: 500px;
+  background: linear-gradient(180deg, #052620 0%, #021a15 100%);
+  border: 1px solid rgba(255, 239, 179, 0.28);
+  border-radius: 20px;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.65),
+    0 0 25px rgba(254, 216, 102, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: spSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: spSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #012622;
+  color: #ffffff;
+  box-sizing: border-box;
 }
 
 @keyframes spSlideUp {
   from {
-    transform: translateY(24px) scale(0.97);
+    transform: translateY(16px) scale(0.97);
     opacity: 0;
   }
   to {
@@ -53,808 +59,326 @@
   }
 }
 
-/* =========================================================
-   TOP DECORATIVE BANNER
-   ========================================================= */
-
-.sp-modal-banner {
-  position: relative;
-  background: linear-gradient(135deg, #002420 0%, #013e37 60%, #02594f 100%);
-  padding: 18px 26px;
-  color: #ffffff;
-  overflow: hidden;
+/* Card Header */
+.sp-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(1, 30, 25, 0.7);
   border-bottom: 1px solid rgba(255, 239, 179, 0.15);
 }
 
-.sp-banner-glow {
-  position: absolute;
-  top: -60px;
-  right: -40px;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(217, 167, 38, 0.35) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.sp-banner-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sp-banner-brand {
+.sp-preview-brand {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.sp-banner-logo {
-  width: 36px;
-  height: 36px;
+.sp-preview-logo {
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 239, 179, 0.4);
-  background: #013e37;
+  object-fit: contain;
+  background: #ffffff;
   padding: 2px;
+  border: 1.5px solid rgba(255, 239, 179, 0.55);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
 }
 
-.sp-banner-title {
-  display: block;
+.sp-preview-portal {
   font-size: 13.5px;
-  font-weight: 850;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   color: #ffefb3;
-}
-
-.sp-banner-tag {
   display: block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  color: #a8d5cf;
+  line-height: 1.15;
 }
 
-.sp-banner-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.sp-preview-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #cbd5e1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.sp-banner-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 239, 179, 0.3);
-  color: #ffefb3;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sp-banner-btn:hover {
-  background: rgba(217, 167, 38, 0.25);
-  color: #ffffff;
-}
-
-.sp-close-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  width: 32px;
-  height: 32px;
+.sp-preview-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 700;
   transition: all 0.2s ease;
 }
 
-.sp-close-btn:hover {
-  background: rgba(220, 38, 38, 0.85);
-  border-color: rgba(220, 38, 38, 0.9);
-  transform: rotate(90deg);
+.sp-preview-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
-/* =========================================================
-   STUDENT IDENTITY CARD BAR
-   ========================================================= */
-
-.sp-identity-card {
-  padding: 22px 28px 16px;
+/* User Identity Section */
+.sp-preview-user-row {
   display: flex;
   align-items: center;
-  gap: 20px;
-  background: #fffdf8;
-  border-bottom: 1px solid #eef4f1;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.sp-avatar-wrapper {
+.sp-preview-avatar-wrap {
   position: relative;
-  width: 76px;
-  height: 76px;
-  flex-shrink: 0;
-}
-
-.sp-avatar-img {
-  width: 76px;
-  height: 76px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #013e37;
-  box-shadow: 0 6px 18px rgba(1, 62, 55, 0.25);
-  background: #013e37;
+  flex-shrink: 0;
+  border: 2px solid #fed866;
+  box-shadow: 0 0 14px rgba(254, 216, 102, 0.35);
+  background: #011d19;
 }
 
-.sp-status-indicator {
+.sp-preview-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.sp-preview-status-dot {
   position: absolute;
   bottom: 2px;
   right: 2px;
-  width: 16px;
-  height: 16px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: #10b981;
-  border: 3px solid #ffffff;
+  border: 2px solid #021a15;
 }
 
-.sp-identity-text {
+.sp-preview-user-meta {
   flex: 1;
+  min-width: 0;
 }
 
-.sp-name-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 5px;
-}
-
-.sp-student-name {
-  font-size: 21px;
-  font-weight: 850;
-  color: #012622;
-  margin: 0;
-  letter-spacing: -0.3px;
-}
-
-.sp-verified-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(1, 62, 55, 0.08);
-  border: 1px solid rgba(1, 62, 55, 0.18);
-  color: #013e37;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 750;
-}
-
-.sp-verified-badge svg {
-  width: 14px;
-  height: 14px;
-  color: #d9a726;
-}
-
-.sp-sub-info {
+.sp-preview-name-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
-  margin: 0;
-  font-size: 13px;
-  color: #2d544f;
-  font-weight: 550;
+  margin-bottom: 3px;
 }
 
-.sp-roll-pill {
-  font-family: monospace;
-  background: #eef6f3;
-  color: #013e37;
+.sp-preview-name {
+  font-size: 17px;
   font-weight: 750;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  border: 1px solid #d0e7df;
-}
-
-.sp-dot-sep {
-  color: #cbd5e1;
-}
-
-.sp-year-badge {
-  color: #d9a726;
-  font-weight: 750;
-}
-
-.sp-edit-toggle-btn {
-  background: #ffffff;
-  border: 1px solid #c8ded7;
-  color: #013e37;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(1, 62, 55, 0.04);
-}
-
-.sp-edit-toggle-btn:hover,
-.sp-edit-toggle-btn.active {
-  background: #013e37;
   color: #ffffff;
-  border-color: #013e37;
-  box-shadow: 0 4px 12px rgba(1, 62, 55, 0.2);
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
-/* =========================================================
-   KEY ACADEMIC METRICS (TILES)
-   ========================================================= */
-
-.sp-metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  padding: 16px 28px;
-  background: #fbfdfc;
-  border-bottom: 1px solid #eef4f1;
-}
-
-.sp-metric-tile {
-  background: #ffffff;
-  border: 1px solid #e2efe9;
-  border-radius: 14px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 2px 8px rgba(1, 62, 55, 0.03);
-}
-
-.sp-metric-label {
-  font-size: 10.5px;
-  font-weight: 800;
-  color: #597b76;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.sp-metric-val {
-  font-size: 20px;
-  font-weight: 850;
-  color: #012622;
-  line-height: 1.15;
-  margin-bottom: 4px;
-}
-
-.sp-metric-val.sp-gold {
-  color: #b3861b;
-}
-
-.sp-metric-val.sp-emerald {
-  color: #059669;
-}
-
-.sp-metric-val.sp-reg {
-  font-size: 16.5px;
-  color: #013e37;
-}
-
-.sp-metric-max {
-  font-size: 12px;
+.sp-preview-verified {
+  font-size: 10px;
   font-weight: 600;
-  color: #597b76;
-}
-
-.sp-metric-sub {
-  font-size: 11px;
-  color: #597b76;
-  font-weight: 500;
-}
-
-/* =========================================================
-   TABS NAVIGATION
-   ========================================================= */
-
-.sp-tabs-nav {
-  display: flex;
-  gap: 8px;
-  padding: 12px 28px 0;
-  background: #ffffff;
-  border-bottom: 1px solid #e2efe9;
-  overflow-x: auto;
-}
-
-.sp-tab-btn {
-  padding: 10px 18px;
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  font-size: 13.5px;
-  font-weight: 650;
-  color: #597b76;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  color: #fed866;
+  background: rgba(254, 216, 102, 0.12);
+  border: 1px solid rgba(254, 216, 102, 0.3);
+  padding: 2px 7px;
+  border-radius: 999px;
   white-space: nowrap;
 }
 
-.sp-tab-btn:hover {
-  color: #013e37;
+.sp-preview-branch {
+  font-size: 12.5px;
+  color: #e2e8f0;
+  margin: 0 0 4px 0;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
-.sp-tab-btn.active {
-  color: #013e37;
-  border-bottom-color: #d9a726;
-  font-weight: 800;
+.sp-preview-academic-meta {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-/* =========================================================
-   MODAL BODY PANELS
-   ========================================================= */
-
-.sp-modal-body {
-  flex: 1;
-  padding: 24px 28px;
-  overflow-y: auto;
-  background: #fffdf8;
-  max-height: 420px;
+.sp-meta-sep {
+  color: #475569;
 }
 
-.sp-modal-body::-webkit-scrollbar {
-  width: 6px;
-}
-.sp-modal-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-.sp-modal-body::-webkit-scrollbar-thumb {
-  background: #c3d9d3;
-  border-radius: 10px;
+.sp-meta-ht {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: #cbd5e1;
+  font-weight: 600;
 }
 
-.sp-tab-panel {
-  animation: spFadeIn 0.2s ease;
-}
-
-/* Tab 1: Details Grid */
-.sp-details-grid {
+/* Metric Highlights (3-Column Clean Grid) */
+.sp-preview-metrics {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px 24px;
-  background: #ffffff;
-  border: 1px solid #e5efe9;
-  border-radius: 16px;
-  padding: 22px 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 14px 20px;
+  background: rgba(2, 20, 16, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.sp-detail-row {
+.sp-preview-metric-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: center;
 }
 
-.sp-label {
-  font-size: 11.5px;
-  font-weight: 750;
-  color: #597b76;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.sp-metric-highlight {
+  border-color: rgba(254, 216, 102, 0.35);
+  background: rgba(254, 216, 102, 0.06);
 }
 
-.sp-value {
-  font-size: 14px;
-  font-weight: 650;
-  color: #012622;
+.sp-p-metric-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  margin-bottom: 2px;
 }
 
-.sp-value.sp-code {
-  font-family: monospace;
+.sp-p-metric-value {
+  font-size: 15px;
   font-weight: 800;
-  color: #013e37;
+  color: #ffffff;
+  line-height: 1.2;
 }
 
-.sp-value.sp-link {
-  color: #013e37;
-  text-decoration: underline;
+.sp-metric-highlight .sp-p-metric-value {
+  color: #fed866;
 }
 
-.sp-value.sp-status-ok {
-  color: #059669;
-  font-weight: 750;
-}
-
-/* Tab 2: Grades */
-.sp-grades-intro {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.sp-section-heading {
-  font-size: 16px;
-  font-weight: 800;
-  color: #012622;
-  margin: 0 0 4px 0;
-}
-
-.sp-section-desc {
-  font-size: 13px;
-  color: #597b76;
-  margin: 0;
-}
-
-.sp-cgpa-badge {
-  text-align: right;
-  background: #fff8e6;
-  border: 1px solid #f3dc98;
-  padding: 8px 16px;
-  border-radius: 12px;
-}
-
-.sp-cgpa-badge span {
-  display: block;
+.sp-p-metric-value small {
   font-size: 10px;
-  font-weight: 800;
-  color: #b3861b;
-  letter-spacing: 0.5px;
+  font-weight: 500;
+  color: #94a3b8;
 }
 
-.sp-cgpa-badge strong {
-  font-size: 19px;
-  font-weight: 850;
-  color: #b3861b;
+.sp-emerald-val {
+  color: #34d399;
 }
 
-.sp-grades-table-wrapper {
-  background: #ffffff;
-  border: 1px solid #e0efe9;
-  border-radius: 14px;
-  overflow: hidden;
+.sp-p-metric-sub {
+  font-size: 9.5px;
+  color: #64748b;
+  margin-top: 2px;
 }
 
-.sp-grades-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 13.5px;
-}
-
-.sp-grades-table th {
-  background: #f4faf7;
-  padding: 12px 18px;
-  font-weight: 750;
-  color: #013e37;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid #e0efe9;
-}
-
-.sp-grades-table td {
-  padding: 12px 18px;
-  border-bottom: 1px solid #eef4f1;
-  color: #2d544f;
-}
-
-.sp-grades-table tr:last-child td {
-  border-bottom: none;
-}
-
-.sp-grades-table tr.current-row {
-  background: #fffdf5;
-}
-
-.sp-td-sem strong {
-  color: #012622;
-}
-
-.sp-td-sgpa {
-  font-weight: 800;
-}
-
-.sp-sgpa-num {
-  color: #013e37;
-  font-size: 14.5px;
-}
-
-.sp-in-progress-tag {
-  background: #eef6f3;
-  color: #013e37;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11.5px;
-  font-weight: 700;
-}
-
-.sp-result-pill {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: #eef8f5;
-  color: #059669;
-  font-size: 11.5px;
-  font-weight: 700;
-}
-
-.sp-result-pill.gold {
-  background: #fff8e6;
-  color: #b3861b;
-  border: 1px solid #f3dc98;
-}
-
-/* Tab 3: Saved Notes */
-.sp-saved-notes-header {
-  margin-bottom: 16px;
-}
-
-.sp-saved-notes-list {
+/* Details List */
+.sp-preview-details-list {
+  padding: 14px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.sp-note-card {
-  background: #ffffff;
-  border: 1px solid #e0efe9;
-  border-radius: 14px;
-  padding: 14px 18px;
+.sp-preview-detail-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(1, 62, 55, 0.03);
+  gap: 12px;
+  font-size: 12px;
 }
 
-.sp-note-card:hover {
-  border-color: #013e37;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(1, 62, 55, 0.08);
-}
-
-.sp-note-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.sp-note-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #eef8f5;
-  color: #013e37;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.sp-pd-label {
+  color: #94a3b8;
+  font-weight: 500;
   flex-shrink: 0;
 }
 
-.sp-note-icon svg {
-  width: 20px;
-  height: 20px;
+.sp-pd-value {
+  color: #f1f5f9;
+  font-weight: 600;
+  text-align: right;
+  line-height: 1.3;
 }
 
-.sp-note-title {
-  font-size: 14.5px;
-  font-weight: 750;
-  color: #012622;
-  margin: 0 0 3px 0;
+.sp-pd-code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: #ffefb3;
+  letter-spacing: 0.03em;
 }
 
-.sp-note-meta {
-  margin: 0;
-  font-size: 12px;
-  color: #597b76;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.sp-note-badge {
-  background: #eef6f3;
-  color: #013e37;
-  font-weight: 750;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-}
-
-.sp-note-access-btn {
-  background: #013e37;
-  color: #ffffff;
-  border: 1px solid rgba(255, 239, 179, 0.25);
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sp-note-access-btn:hover {
-  background: #02594f;
-  transform: translateY(-1px);
-}
-
-/* Tab 4: Edit Form */
-.sp-edit-form {
-  background: #ffffff;
-  border: 1px solid #e5efe9;
-  border-radius: 16px;
-  padding: 22px 24px;
-}
-
-.sp-save-success-alert {
-  background: #eefaf6;
-  border: 1px solid #a3dfcb;
-  color: #059669;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 13.5px;
-  font-weight: 700;
-  margin-bottom: 18px;
-}
-
-.sp-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 22px;
-}
-
-.sp-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.sp-field.sp-col-span-2 {
-  grid-column: span 2;
-}
-
-.sp-field label {
-  font-size: 12px;
-  font-weight: 750;
-  color: #2d544f;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.sp-field input {
-  padding: 10px 14px;
-  border: 1px solid #d4e5df;
-  border-radius: 10px;
-  font-size: 13.5px;
-  color: #012622;
-  outline: none;
-  background: #ffffff;
-  transition: all 0.2s ease;
-}
-
-.sp-field input:focus {
-  border-color: #013e37;
-  box-shadow: 0 0 0 3px rgba(1, 62, 55, 0.12);
-}
-
-.sp-form-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.sp-btn-cancel {
-  background: transparent;
-  border: 1px solid #d4e5df;
-  color: #597b76;
-  padding: 9px 20px;
-  border-radius: 10px;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sp-btn-cancel:hover {
-  background: #f4faf7;
-  color: #012622;
-}
-
-.sp-btn-save {
-  background: linear-gradient(135deg, #013e37 0%, #02594f 100%);
-  color: #ffffff;
-  border: 1px solid rgba(255, 239, 179, 0.3);
-  padding: 9px 24px;
-  border-radius: 10px;
-  font-size: 13.5px;
-  font-weight: 750;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(1, 62, 55, 0.2);
-}
-
-.sp-btn-save:hover {
-  background: #02594f;
-  transform: translateY(-1px);
-}
-
-/* =========================================================
-   MODAL FOOTER
-   ========================================================= */
-
-.sp-modal-footer {
-  padding: 14px 28px;
-  background: #fbfdfc;
-  border-top: 1px solid #eef4f1;
+/* Footer Done Button */
+.sp-preview-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 12px 20px;
+  background: rgba(1, 22, 18, 0.85);
+  border-top: 1px solid rgba(255, 239, 179, 0.15);
 }
 
-.sp-footer-note {
-  font-size: 12px;
-  color: #597b76;
-  font-weight: 550;
+.sp-preview-footer-note {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 500;
 }
 
-.sp-footer-close-btn {
+.sp-preview-done-btn {
   background: #013e37;
-  color: #ffffff;
-  border: none;
-  padding: 8px 22px;
+  color: #ffefb3;
+  border: 1px solid #fed866;
   border-radius: 999px;
-  font-size: 13px;
+  padding: 6px 18px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 0 10px rgba(254, 216, 102, 0.25);
   transition: all 0.2s ease;
 }
 
-.sp-footer-close-btn:hover {
+.sp-preview-done-btn:hover {
   background: #02594f;
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(254, 216, 102, 0.45);
 }
 
-/* =========================================================
-   RESPONSIVE (< 768px)
-   ========================================================= */
+.sp-preview-done-btn:active {
+  transform: scale(0.96);
+}
 
-@media (max-width: 768px) {
-  .sp-modal-backdrop {
-    padding: 12px;
+@media (max-width: 480px) {
+  .sp-preview-card {
+    max-width: 95vw;
+    border-radius: 16px;
   }
 
-  .sp-modal-container {
-    max-height: 95vh;
+  .sp-preview-user-row {
+    padding: 16px;
+    gap: 12px;
   }
 
-  .sp-identity-card {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 18px 20px;
+  .sp-preview-avatar-wrap {
+    width: 52px;
+    height: 52px;
   }
 
-  .sp-metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 14px 20px;
+  .sp-preview-metrics {
+    padding: 12px 14px;
+    gap: 6px;
   }
 
-  .sp-details-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .sp-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .sp-field.sp-col-span-2 {
-    grid-column: span 1;
-  }
-
-  .sp-modal-body {
-    padding: 18px 20px;
+  .sp-preview-details-list {
+    padding: 12px 16px;
   }
 }

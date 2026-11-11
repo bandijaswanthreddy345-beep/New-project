@@ -38,16 +38,40 @@ if (!comment) {
   });
 }
 
+// SECURITY: only plain strings, with sane lengths (blocks NoSQL
+// operator objects and giant payloads)
+if (
+  typeof note !== "string" ||
+  typeof name !== "string" ||
+  typeof email !== "string" ||
+  typeof comment !== "string"
+) {
+  return res.status(400).json({
+    message: "Invalid comment data",
+  });
+}
+
+if (name.length > 100 || email.length > 254 || comment.length > 2000) {
+  return res.status(400).json({
+    message: "Name, email or comment is too long",
+  });
+}
+
 const newComment = await Comment.create({
   note,
-  name,
-  email,
-  comment,
+  name: name.trim(),
+  email: email.trim(),
+  comment: comment.trim(),
 });
+
+// The page promises "your email will not be displayed publicly",
+// so the email is never sent back.
+const publicComment = newComment.toObject();
+delete publicComment.email;
 
 res.status(201).json({
   success: true,
-  comment: newComment,
+  comment: publicComment,
 });
 
 
@@ -72,9 +96,10 @@ res.status(500).json({
 
 exports.getComments = async (req, res) => {
 try {
+// SECURITY: commenters' emails are private; never return them publicly
 const comments = await Comment.find({
 note: req.params.noteId,
-}).sort({
+}).select("-email").sort({
 createdAt: -1,
 });
 
@@ -119,7 +144,10 @@ comment.likes += 1;
 
 await comment.save();
 
-res.status(200).json(comment);
+const likedComment = comment.toObject();
+delete likedComment.email;
+
+res.status(200).json(likedComment);
 
 
 } catch (error) {
@@ -151,7 +179,10 @@ comment.dislikes += 1;
 
 await comment.save();
 
-res.status(200).json(comment);
+const dislikedComment = comment.toObject();
+delete dislikedComment.email;
+
+res.status(200).json(dislikedComment);
 
 
 } catch (error) {

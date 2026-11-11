@@ -2,9 +2,55 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
+import { getStoredStudentData } from "../data/studentData";
 import "./NoteDetails.css";
 
+function formatFriendlySemester(sem) {
+  if (!sem) return "";
+  const clean = String(sem).trim();
+  if (clean === "1-1") return "Semester 1";
+  if (clean === "1-2") return "Semester 2";
+  if (clean === "2-1") return "Semester 3";
+  if (clean === "2-2") return "Semester 4";
+  if (clean === "3-1") return "Semester 5";
+  if (clean === "3-2") return "Semester 6";
+  if (clean === "4-1") return "Semester 7";
+  if (clean === "4-2") return "Semester 8";
+  if (/^[1-8]$/.test(clean)) return "Semester " + clean;
+  return clean;
+}
+
+
+function getInitialCommentIdentity() {
+  try {
+    // 1. Check student profile first
+    const student = getStoredStudentData();
+    if (student?.name || student?.email) {
+      return {
+        name: student.name || "",
+        email: student.email || "",
+      };
+    }
+
+    // 2. Check logged-in user in localStorage
+    const rawUser = localStorage.getItem("user");
+    if (rawUser) {
+      const user = JSON.parse(rawUser);
+      if (user?.name || user?.email) {
+        return {
+          name: user.name || "",
+          email: user.email || "",
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Error reading identity for comment form:", e);
+  }
+  return { name: "", email: "" };
+}
+
 function NoteDetails() {
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -12,6 +58,7 @@ function NoteDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [openUnit, setOpenUnit] = useState(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   // =========================================================
   // COMMENTS STATE
@@ -24,13 +71,44 @@ function NoteDetails() {
   // Heart pop animation state
   const [heartPop, setHeartPop] = useState(null);
 
-  const [commentForm, setCommentForm] = useState({
-    name: "",
-    email: "",
-    comment: "",
+  // Auto-fill student/user profile info if created, else allow manual entry
+  const [commentForm, setCommentForm] = useState(() => {
+    const identity = getInitialCommentIdentity();
+    return {
+      name: identity.name,
+      email: identity.email,
+      comment: "",
+    };
   });
 
-  const BACKEND_URL = "http://localhost:5000";
+  // Listen for profile creation or updates in real-time
+  useEffect(() => {
+    const syncIdentity = () => {
+      const identity = getInitialCommentIdentity();
+      if (identity.name || identity.email) {
+        setCommentForm((prev) => ({
+          ...prev,
+          name: identity.name || prev.name,
+          email: identity.email || prev.email,
+        }));
+      }
+    };
+
+    // Run on initial mount
+    syncIdentity();
+
+    window.addEventListener("studentProfileUpdated", syncIdentity);
+    window.addEventListener("storage", syncIdentity);
+    window.addEventListener("focus", syncIdentity);
+
+    return () => {
+      window.removeEventListener("studentProfileUpdated", syncIdentity);
+      window.removeEventListener("storage", syncIdentity);
+      window.removeEventListener("focus", syncIdentity);
+    };
+  }, []);
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
 
   // =========================================================
   // FETCH NOTE
@@ -443,10 +521,13 @@ function NoteDetails() {
         }
       }
 
-      setCommentForm({
-        name: "",
-        email: "",
-        comment: "",
+      setCommentForm((prev) => {
+        const identity = getInitialCommentIdentity();
+        return {
+          name: identity.name || prev.name || "",
+          email: identity.email || prev.email || "",
+          comment: "",
+        };
       });
     } catch (err) {
       console.error(
@@ -471,6 +552,11 @@ function NoteDetails() {
     commentId,
     event
   ) => {
+    const likedKey = `comment_liked_${commentId}`;
+    if (localStorage.getItem(likedKey)) {
+      return; // Already liked by this user
+    }
+
     const buttonRect =
       event.currentTarget.getBoundingClientRect();
 
@@ -495,6 +581,7 @@ function NoteDetails() {
     }, 1200);
 
     try {
+      localStorage.setItem(likedKey, "true");
       const response = await API.put(
         `/comments/${commentId}/like`
       );
@@ -510,6 +597,7 @@ function NoteDetails() {
         )
       );
     } catch (err) {
+      localStorage.removeItem(likedKey);
       console.error(
         "LIKE COMMENT ERROR:",
         err
@@ -524,7 +612,13 @@ function NoteDetails() {
   const handleDislikeComment = async (
     commentId
   ) => {
+    const dislikedKey = `comment_disliked_${commentId}`;
+    if (localStorage.getItem(dislikedKey)) {
+      return; // Already disliked
+    }
+
     try {
+      localStorage.setItem(dislikedKey, "true");
       const response = await API.put(
         `/comments/${commentId}/dislike`
       );
@@ -540,6 +634,7 @@ function NoteDetails() {
         )
       );
     } catch (err) {
+      localStorage.removeItem(dislikedKey);
       console.error(
         "DISLIKE COMMENT ERROR:",
         err
@@ -609,6 +704,26 @@ function NoteDetails() {
   // BACK TO TOP
   // =========================================================
 
+  // =========================================================
+  // BACK NAVIGATION TO ALL NOTES
+  // =========================================================
+
+  const handleBackToNotes = () => {
+    if (note?.branch) {
+      navigate(`/notes?branch=${encodeURIComponent(note.branch)}`);
+    } else {
+      navigate("/notes");
+    }
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -660,10 +775,10 @@ function NoteDetails() {
 
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={handleBackToNotes}
             className="green-button"
           >
-            ← Go Back
+            ← Back to Notes
           </button>
         </div>
       </div>
@@ -676,19 +791,7 @@ function NoteDetails() {
 
   return (
     <div className="note-details-page">
-      {/* =====================================================
-          FLOATING BUBBLES ANIMATION BACKDROP (MATCHING REFERENCE)
-      ====================================================== */}
-      <div className="note-bubbles-container" aria-hidden="true">
-        <span className="note-bubble note-bubble-1"></span>
-        <span className="note-bubble note-bubble-2"></span>
-        <span className="note-bubble note-bubble-3"></span>
-        <span className="note-bubble note-bubble-4"></span>
-        <span className="note-bubble note-bubble-5"></span>
-        <span className="note-bubble note-bubble-6"></span>
-        <span className="note-bubble note-bubble-7"></span>
-        <span className="note-bubble note-bubble-8"></span>
-      </div>
+      
 
       {/* =====================================================
           ❤️ BIG HEART POP OVERLAY
@@ -760,6 +863,58 @@ function NoteDetails() {
         </div>
       )}
 
+      {/* =========================================================
+          TOP NAVIGATION BAR (MATCHING NOTIFICATIONS)
+          Anchored Logo Left + Close (✕) Button Right
+          ========================================================= */}
+      <header className="notif-page-header">
+        <div className="notif-page-header-inner">
+          <div
+            className="notif-header-left"
+            onClick={() => navigate("/")}
+            title="Return to Homepage"
+          >
+            <img
+              src="/jntu-circle-logo.png"
+              alt="JNTU Circle"
+              className="notif-page-logo"
+            />
+            <div>
+              <h2 className="notif-brand-title">
+                <span className="font-deltha">JNTU</span> Circle
+              </h2>
+              <span className="notif-brand-subtitle">
+                Official University Study Materials & Notes
+              </span>
+            </div>
+          </div>
+
+          <div className="notif-header-right">
+            <button
+              type="button"
+              className="notif-header-close-btn"
+              onClick={handleBackToNotes}
+              title="Close and Return to All Notes"
+              aria-label="Close and Return to All Notes"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
       {/* =====================================================
           TWO-COLUMN PAGE LAYOUT (DESKTOP) / STACKED (MOBILE)
       ====================================================== */}
@@ -770,29 +925,10 @@ function NoteDetails() {
           ====================================================== */}
           <section className="note-hero">
         <div className="note-hero-content">
-          <div className="note-hero-topbar">
-            <button
-              type="button"
-              className="hero-back-button"
-              onClick={() => navigate(-1)}
-            >
-              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H16" />
-              </svg>
-              <span>Back</span>
-            </button>
-
-            <span className="hero-topbar-label">
-              <span aria-hidden="true"></span>
-              JNTU CIRCLE · STUDY RESOURCE
-            </span>
-          </div>
-
           <div className="hero-main">
             <div className="hero-heading-layout">
               <div className="hero-title-block">
                 <div className="study-badge">
-                  <span aria-hidden="true"></span>
                   STUDY MATERIAL
                 </div>
 
@@ -820,30 +956,29 @@ function NoteDetails() {
             <div className="hero-unified-footer">
               <div className="hero-tags">
                 {branch && (
-                  <div className="hero-tag">
+                  <div className="hero-tag hero-tag-card">
                     <span className="hero-tag-label">BRANCH</span>
-                    <strong>{branch}</strong>
+                    <strong className="hero-tag-value">{branch}</strong>
                   </div>
                 )}
                 {semester && (
-                  <div className="hero-tag">
+                  <div className="hero-tag hero-tag-card">
                     <span className="hero-tag-label">SEMESTER</span>
-                    <strong>{semester}</strong>
+                    <strong className="hero-tag-value">{formatFriendlySemester(semester)}</strong>
                   </div>
                 )}
                 {year && (
-                  <div className="hero-tag">
+                  <div className="hero-tag hero-tag-card">
                     <span className="hero-tag-label">ACADEMIC YEAR</span>
-                    <strong>{year}</strong>
+                    <strong className="hero-tag-value">{year}</strong>
                   </div>
                 )}
               </div>
 
               <div className="hero-credits-integrated" aria-label="Course credits">
                 <div className="hero-credits-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M12 3.5 14.4 8.4l5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8L12 3.5Z" />
-                    <path d="M8.2 19.4v2.1l3.8-1.8 3.8 1.8v-2.1" />
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                   </svg>
                 </div>
                 <div className="hero-credits-copy">
@@ -975,28 +1110,8 @@ function NoteDetails() {
 
                     <div className="module-inner">
 
-                      <div className={`module-resource-grid ${unit.notes && unit.notes.trim() ? "has-notes" : "pdf-only"}`}>
-
-                        {/* UNIT NOTES (Only displayed when real notes content exists) */}
-                        {Boolean(unit.notes && unit.notes.trim()) && (
-                          <div className="module-notes-box">
-                            <div className="resource-title">
-                              <div className="resource-icon">
-                                📝
-                              </div>
-                              <div>
-                                <span>UNIT NOTES</span>
-                                <small>Important concepts and summary</small>
-                              </div>
-                            </div>
-
-                            <div className="notes-text">
-                              <p>{unit.notes}</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* PDF */}
+                      <div className="module-resource-grid pdf-only">
+                        {/* PDF Box */}
                         <div className="module-pdf-box">
                           <div className="resource-title-row">
                             <div className="resource-title">
@@ -1019,14 +1134,7 @@ function NoteDetails() {
                               </div>
                             </div>
 
-                            {pdfUrl && (
-                              <span className="pdf-verified-chip">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                  <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                                Document Ready
-                              </span>
-                            )}
+                            
                           </div>
 
                           {pdfUrl ? (
@@ -1070,64 +1178,9 @@ function NoteDetails() {
                             </p>
                           )}
                         </div>
-
                       </div>
-
-                      {/* PDF PREVIEW */}
-
-                      {pdfUrl && (
-
-                        <div className="pdf-preview-card">
-
-                          <div className="preview-header">
-
-                            <div>
-
-                              <span className="preview-label">
-                                DOCUMENT PREVIEW
-                              </span>
-
-                              <strong>
-                                Unit{" "}
-                                {unit.number}{" "}
-                                Material
-                              </strong>
-
-                            </div>
-
-                            <button
-                              type="button"
-                              className="new-tab-button"
-                              onClick={() =>
-                                openPdfInNewTab(
-                                  unit.pdf
-                                )
-                              }
-                            >
-                              Open in new tab ↗
-                            </button>
-
-                          </div>
-
-                          <div className="pdf-frame-wrapper">
-
-                            <iframe
-                              src={pdfUrl}
-                              title={`Unit ${unit.number} PDF`}
-                              className="pdf-frame"
-                              loading="lazy"
-                            />
-
-                          </div>
-
-                        </div>
-
-                      )}
-
                     </div>
-
                   </div>
-
                 </article>
               );
             })}
@@ -1154,9 +1207,7 @@ function NoteDetails() {
 
                 <div>
 
-                  <span className="eyebrow">
-                    COMMUNITY
-                  </span>
+                  <span className="comments-eyebrow-badge">COMMUNITY</span>
 
                   <h2>
                     Comments
@@ -1237,9 +1288,7 @@ function NoteDetails() {
 
               <div className="comment-submit-row">
 
-                <span className="comment-private-note">
-                  Your email will not be displayed publicly.
-                </span>
+                
 
                 <button
                   type="submit"
@@ -1435,10 +1484,6 @@ function NoteDetails() {
 
           </div>
 
-          <div className="footer-books">
-            📚
-          </div>
-
         </section>
 
       </main>
@@ -1456,14 +1501,16 @@ function NoteDetails() {
           BACK TO TOP
       ====================================================== */}
 
-      <button
-        type="button"
-        className="back-to-top"
-        onClick={scrollToTop}
-        aria-label="Back to top"
-      >
-        ↑
-      </button>
+      {showBackToTop && (
+        <button
+          type="button"
+          className="back-to-top"
+          onClick={scrollToTop}
+          aria-label="Back to top"
+        >
+          ↑
+        </button>
+      )}
 
     </div>
   );
