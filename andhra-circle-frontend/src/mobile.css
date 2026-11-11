@@ -127,6 +127,19 @@
     width: 28px !important;
     height: 28px !important;
     border-radius: 7px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: 0 1px 3px rgba(1, 58, 51, 0.25) !important;
+    background: #013a33 !important;
+  }
+
+  .nav-mobile-toggle svg {
+    width: 14px !important;
+    height: 14px !important;
+    stroke-width: 2.2 !important;
   }
 
   .nav-item-profile,
