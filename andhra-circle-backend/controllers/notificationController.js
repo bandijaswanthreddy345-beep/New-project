@@ -341,6 +341,18 @@ exports.proxyPdf = async (req, res) => {
   try {
     let targetUrl = url;
 
+    // Handle local upload streaming
+    if (url.includes("/uploads/")) {
+      const parts = url.split("/uploads/");
+      const relativeFile = parts[1];
+      const filePath = path.join(__dirname, "..", "uploads", relativeFile);
+      if (fs.existsSync(filePath)) {
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", 'inline; filename="document.pdf"');
+        return fs.createReadStream(filePath).pipe(res);
+      }
+    }
+
     // Handle Google Drive links
     const driveMatch =
       url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||

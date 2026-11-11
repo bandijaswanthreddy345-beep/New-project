@@ -206,7 +206,7 @@ exports.likeSyllabus = async (req, res) => {
       syllabus = await Syllabus.findOneAndUpdate(
         { _id: req.params.id, likes: { $gt: 0 } },
         { $inc: { likes: change } },
-        { new: true }
+        { returnDocument: 'after' }
       );
       if (!syllabus) {
         syllabus = await Syllabus.findById(req.params.id);
@@ -215,7 +215,7 @@ exports.likeSyllabus = async (req, res) => {
       syllabus = await Syllabus.findByIdAndUpdate(
         req.params.id,
         { $inc: { likes: change } },
-        { new: true }
+        { returnDocument: 'after' }
       );
     }
 
@@ -242,7 +242,7 @@ exports.increaseViews = async (req, res) => {
     const syllabus = await Syllabus.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!syllabus) {
@@ -268,7 +268,7 @@ exports.increaseDownloads = async (req, res) => {
     const syllabus = await Syllabus.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!syllabus) {

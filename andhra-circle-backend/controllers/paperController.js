@@ -239,7 +239,7 @@ exports.likePaper = async (req, res) => {
       paper = await Paper.findOneAndUpdate(
         { _id: req.params.id, likes: { $gt: 0 } },
         { $inc: { likes: change } },
-        { new: true }
+        { returnDocument: 'after' }
       );
       if (!paper) {
         paper = await Paper.findById(req.params.id);
@@ -248,7 +248,7 @@ exports.likePaper = async (req, res) => {
       paper = await Paper.findByIdAndUpdate(
         req.params.id,
         { $inc: { likes: change } },
-        { new: true }
+        { returnDocument: 'after' }
       );
     }
 
@@ -277,7 +277,7 @@ exports.increaseViews = async (req, res) => {
     const paper = await Paper.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!paper) {
@@ -305,7 +305,7 @@ exports.increaseDownloads = async (req, res) => {
     const paper = await Paper.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!paper) {

@@ -41,6 +41,11 @@ function PdfViewer() {
   const embedUrl = useMemo(() => {
     if (!rawPdfUrl) return "";
 
+    // Local uploads can be served directly by the backend static handler
+    if (rawPdfUrl.includes("/uploads/")) {
+      return rawPdfUrl;
+    }
+
     // Direct proxy streaming gives 100% full-screen Chrome PDF reader with zero letterboxing
     if (rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/")) {
       return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`;
