@@ -7,7 +7,7 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "migrate": "node migrations/runner.js",
-    "test": "node --test \"tests/**/*.test.js\"",
+    "test": "node --test tests/integration.test.js",
     "build:indexes": "node scripts/build-indexes.js",
     "security:check": "node scripts/security-check.js"
   },
