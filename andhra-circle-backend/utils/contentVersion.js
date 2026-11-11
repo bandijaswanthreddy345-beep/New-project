@@ -11,10 +11,10 @@ const VERSION_KEY = "portal_content_version";
 async function getContentVersion() {
   try {
     const doc = await SecurityState.findOne({ key: VERSION_KEY, type: "ai_daily_cap" }).lean();
-    return doc?.count || 1;
+    return doc?.count || 0;
   } catch (err) {
-    logger.warn("Failed to get content version, defaulting to 1", { error: err.message });
-    return 1;
+    logger.warn("Failed to get content version, defaulting to 0", { error: err.message });
+    return 0;
   }
 }
 
@@ -26,10 +26,10 @@ async function bumpContentVersion() {
         $inc: { count: 1 },
         $setOnInsert: { key: VERSION_KEY, type: "ai_daily_cap", expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) },
       },
-      { upsert: true, returnDocument: "after" }
+      { upsert: true, returnDocument: "after", new: true }
     );
-    logger.info("Content version bumped", { newVersion: doc.count });
-    return doc.count;
+    logger.info("Content version bumped", { newVersion: doc?.count });
+    return doc?.count || 1;
   } catch (err) {
     logger.warn("Failed to bump content version", { error: err.message });
     return 1;
