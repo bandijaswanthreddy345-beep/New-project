@@ -176,6 +176,7 @@
 
   /* Section padding: the late desktop override (48px 56px) was
      winning over the old mobile rule and squeezing content */
+  .notes-section,
   .papers-section,
   .lab-programs-section,
   .notification-section {
@@ -184,6 +185,7 @@
 
   /* "Tag" pill sat absolutely on the left and collided with the
      title; on phones it sits centered above the heading */
+  .notes-section .section-heading .section-tag,
   .papers-section .section-heading .section-tag,
   .lab-programs-section .section-heading .section-tag,
   .notification-section .section-heading .section-tag {
@@ -192,6 +194,7 @@
     margin-bottom: 12px;
   }
 
+  .notes-section .section-heading,
   .papers-section .section-heading,
   .lab-programs-section .section-heading,
   .notification-section .section-heading {
