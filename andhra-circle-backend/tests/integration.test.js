@@ -18,11 +18,16 @@ const { CircuitBreaker } = require("../utils/resilientFetch");
 
 describe("JNTU Circle Backend Integration Test Suite", () => {
   before(async () => {
-    await connectDB();
+    // Only connect if not already connected
+    if (mongoose.connection.readyState !== 1) {
+      await connectDB();
+    }
   });
 
   after(async () => {
-    await mongoose.connection.close();
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close();
+    }
   });
 
   test("1. Encrypted CAPTCHA Challenge & Replay Defense", async () => {
@@ -34,7 +39,12 @@ describe("JNTU Circle Backend Integration Test Suite", () => {
     assert.strictEqual(failCheck.ok, false, "Invalid captcha answer rejected");
   });
 
-  test("2. Soft Delete Plugin Hides Documents by Default", async () => {
+  test("2. Soft Delete Plugin Hides Documents by Default", async (t) => {
+    if (mongoose.connection.readyState !== 1) {
+      t.skip("Skipping DB dependent test: MongoDB offline");
+      return;
+    }
+
     const note = await Note.create({
       title: "Test Soft Delete Note",
       branch: "CSE",
@@ -64,7 +74,11 @@ describe("JNTU Circle Backend Integration Test Suite", () => {
     await Note.findByIdAndDelete(note._id);
   });
 
-  test("3. Content Version Bumping for Cache Invalidation", async () => {
+  test("3. Content Version Bumping for Cache Invalidation", async (t) => {
+    if (mongoose.connection.readyState !== 1) {
+      t.skip("Skipping DB dependent test: MongoDB offline");
+      return;
+    }
     const v1 = await getContentVersion();
     const v2 = await bumpContentVersion();
     assert.strictEqual(v2, v1 + 1, "Content version incremented atomically");

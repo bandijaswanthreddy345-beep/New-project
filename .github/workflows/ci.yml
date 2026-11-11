@@ -38,13 +38,14 @@ jobs:
         run: npm audit --audit-level=high
 
       - name: Start local MongoDB
-        uses: supercharge/mongodb-github-action@1.11.0
+        uses: supercharge/mongodb-github-action@1.12.0
         with:
-          mongodb-version: "7.0"
+          mongodb-version: "6.0"
 
       - name: Run Backend Unit & Integration Tests
         env:
-          MONGO_URI: mongodb://127.0.0.1:27017/ci_test_db
+          NODE_ENV: test
+          MONGO_URI: mongodb://localhost:27017/ci_test_db
           JWT_SECRET: ci_test_random_super_secret_jwt_at_least_32_characters_long
           CAPTCHA_SECRET: ci_test_random_super_secret_captcha_32_chars
         run: npm test
