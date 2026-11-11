@@ -100,9 +100,12 @@ function PdfViewer() {
 
       // 1. Try direct fetch blob download
       try {
-        const streamUrl = rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/")
-          ? `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`
-          : rawPdfUrl;
+        const streamUrl =
+          rawPdfUrl.includes("/uploads/")
+            ? rawPdfUrl
+            : rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/")
+            ? `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`
+            : rawPdfUrl;
 
         const response = await fetch(streamUrl);
         if (response.ok) {
