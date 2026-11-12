@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./BranchSection.css";
-import aimlImg from "../assets/branches/aiml.webp";
+import aimlImg from "../assets/branches/aiml.jpg";
 import cseImg from "../assets/branches/cse.webp";
 import eceImg from "../assets/branches/ece.webp";
 import mechImg from "../assets/branches/mech.webp";
