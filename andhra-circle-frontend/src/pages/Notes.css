@@ -215,6 +215,21 @@
   object-fit: cover;
   border: 1.5px solid rgba(255, 239, 179, 0.4);
   background: #013e37;
+  display: block;
+}
+
+.profile-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffefb3;
+  background: linear-gradient(135deg, #0d453c 0%, #012420 100%);
+  border: 1.5px solid rgba(255, 239, 179, 0.45);
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.1);
+}
+
+.profile-avatar-fallback svg {
+  display: block;
 }
 
 .profile-status-dot {
