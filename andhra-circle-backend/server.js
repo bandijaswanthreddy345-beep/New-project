@@ -107,17 +107,16 @@ const allowedOrigins = (process.env.CORS_ORIGINS || "")
   .filter(Boolean);
 
 if (process.env.NODE_ENV === "production" && allowedOrigins.length === 0) {
-  console.error(
-    "FATAL: CORS_ORIGINS is missing or empty. Set your domain(s) in .env in production."
+  console.warn(
+    "NOTICE: CORS_ORIGINS is not set in production. Allowing incoming requests by default. You can restrict this to your frontend domain in your Render dashboard environment variables."
   );
-  process.exit(1);
 }
 
 app.use(
   cors(
     allowedOrigins.length
-      ? { origin: allowedOrigins }
-      : undefined
+      ? { origin: allowedOrigins, credentials: true }
+      : { origin: true, credentials: true }
   )
 );
 
