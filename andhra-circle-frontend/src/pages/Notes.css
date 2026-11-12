@@ -69,14 +69,14 @@
 }
 
 .sidebar-logo-img {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
+  width: 46px;
+  height: 46px;
+  object-fit: cover;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 239, 179, 0.35);
+  border: 1.5px solid rgba(255, 239, 179, 0.5);
   box-shadow: 0 0 14px rgba(217, 167, 38, 0.25);
-  background: #013e37;
-  padding: 2px;
+  background: #ffffff;
+  padding: 1px;
 }
 
 .sidebar-brand-text {

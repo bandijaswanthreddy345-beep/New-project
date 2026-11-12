@@ -173,24 +173,24 @@ ul {
 }
 
 .logo-image {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
 
-  object-fit: contain;
+  object-fit: cover;
 
   border-radius: 50%;
   background: #ffffff;
 
-  border: 1.5px solid rgba(13, 69, 60, 0.16);
-  padding: 3px;
+  border: 1.5px solid rgba(13, 69, 60, 0.18);
+  padding: 1px;
 
-  box-shadow: 0 1px 4px rgba(1, 58, 51, 0.06);
+  box-shadow: 0 1px 6px rgba(1, 58, 51, 0.08);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .logo a:hover .logo-image {
-  border-color: rgba(13, 69, 60, 0.32);
-  transform: scale(1.02);
+  border-color: rgba(13, 69, 60, 0.35);
+  transform: scale(1.04);
 }
 
 .logo-text {
@@ -5098,8 +5098,8 @@ textarea:focus-visible {
   }
 
   .logo-image {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
   }
 
   .logo h2 {
@@ -5386,8 +5386,8 @@ textarea:focus-visible {
   }
 
   .logo-image {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   .logo h2 {
@@ -8184,13 +8184,14 @@ textarea:focus-visible {
 }
 
 .notif-page-logo {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 239, 179, 0.5);
-  background: #0d453c;
-  padding: 2px;
+  border: 1.5px solid rgba(255, 239, 179, 0.6);
+  background: #ffffff;
+  padding: 1px;
   box-shadow: 0 0 14px rgba(255, 239, 179, 0.3);
+  object-fit: cover;
 }
 
 .notif-brand-title {
@@ -8474,14 +8475,14 @@ body {
   }
 
   .logo-image {
-    width: 38px !important;
-    height: 38px !important;
+    width: 42px !important;
+    height: 42px !important;
     border-radius: 50% !important;
-    border: 1.5px solid rgba(13, 69, 60, 0.16) !important;
+    border: 1.5px solid rgba(13, 69, 60, 0.18) !important;
     background: #ffffff !important;
-    padding: 2.5px !important;
-    box-shadow: 0 1px 4px rgba(1, 58, 51, 0.06) !important;
-    object-fit: contain !important;
+    padding: 1px !important;
+    box-shadow: 0 1px 4px rgba(1, 58, 51, 0.08) !important;
+    object-fit: cover !important;
   }
 
   .logo h2,

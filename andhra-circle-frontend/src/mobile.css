@@ -63,14 +63,14 @@
   }
 
   .logo-image {
-    width: 40px !important;
-    height: 40px !important;
+    width: 42px !important;
+    height: 42px !important;
     border-radius: 50% !important;
-    border: 1.5px solid rgba(13, 69, 60, 0.16) !important;
+    border: 1.5px solid rgba(13, 69, 60, 0.18) !important;
     background: #ffffff !important;
-    padding: 2.5px !important;
-    box-shadow: 0 1px 4px rgba(1, 58, 51, 0.06) !important;
-    object-fit: contain !important;
+    padding: 1px !important;
+    box-shadow: 0 1px 4px rgba(1, 58, 51, 0.08) !important;
+    object-fit: cover !important;
   }
 
   .logo-text {

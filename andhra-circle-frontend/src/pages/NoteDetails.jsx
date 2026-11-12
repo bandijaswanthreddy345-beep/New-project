@@ -260,15 +260,15 @@ function NoteDetails() {
 
     const trimmed = value.trim();
 
-    // Local uploads: use same-origin relative path so it is always same-origin
+    // Local uploads: route to backend server so iframe loads PDF from backend (not SPA router)
     if (trimmed.includes("/uploads/")) {
       const uploadPath = trimmed.substring(trimmed.indexOf("/uploads/"));
-      return `${uploadPath}#toolbar=1&navpanes=0&view=FitH`;
+      return `${BACKEND_URL}${uploadPath}#toolbar=1&navpanes=0&view=FitH`;
     }
 
     // External URLs (Google Drive, university portals, etc.): proxy through backend
     if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-      if (!trimmed.includes("localhost:5000")) {
+      if (!trimmed.includes("localhost:5000") && !trimmed.startsWith(BACKEND_URL)) {
         return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(trimmed)}#toolbar=1&navpanes=0&view=FitH`;
       }
       return `${trimmed}#toolbar=1&navpanes=0&view=FitH`;
