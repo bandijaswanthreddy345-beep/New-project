@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/api";
 import "./Login.css";
@@ -11,43 +11,15 @@ function Register() {
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: "",
     agreeTerms: false,
   });
 
-  const [captchaData, setCaptchaData] = useState({ token: "", svg: "" });
-  const [captchaInput, setCaptchaInput] = useState("");
-  const [captchaLoading, setCaptchaLoading] = useState(false);
-
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-
-  const fetchCaptcha = useCallback(async () => {
-    try {
-      setCaptchaLoading(true);
-      const res = await API.get("/auth/captcha");
-      if (res.data?.success) {
-        setCaptchaData({
-          token: res.data.captchaToken,
-          svg: res.data.captchaSvg,
-        });
-        setCaptchaInput("");
-      }
-    } catch (err) {
-      console.error("Failed to load security CAPTCHA challenge:", err);
-    } finally {
-      setCaptchaLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCaptcha();
-  }, [fetchCaptcha]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -88,17 +60,6 @@ function Register() {
       return;
     }
 
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match. Please verify both password fields.");
-      return;
-    }
-
-    const captchaTrimmed = captchaInput.trim();
-    if (!captchaTrimmed) {
-      setError("Please enter the 6-character security CAPTCHA verification code.");
-      return;
-    }
-
     if (!form.agreeTerms) {
       setError("Please agree to the Terms of Service and Privacy Policy to continue.");
       return;
@@ -107,13 +68,11 @@ function Register() {
     try {
       setLoading(true);
 
-      // Call backend registration endpoint with CAPTCHA verification
+      // Call backend registration endpoint
       const res = await API.post("/auth/register", {
         name: nameTrimmed,
         email: emailTrimmed,
         password: form.password,
-        captchaToken: captchaData.token,
-        captchaAnswer: captchaTrimmed,
       });
 
       setSuccess(
@@ -141,8 +100,6 @@ function Register() {
         err.response?.data?.message ||
         "Registration could not be completed. Please check your credentials and try again.";
       setError(errMsg);
-      // Refresh CAPTCHA on failure so user gets a fresh challenge
-      fetchCaptcha();
     } finally {
       setLoading(false);
     }
@@ -360,144 +317,7 @@ function Register() {
             </div>
           </div>
 
-          {/* Confirm Password */}
-          <div className="login-field-group">
-            <label className="login-field-label" htmlFor="signup-confirm-password">
-              <span>Confirm Password</span>
-              <span className="login-required-star">*</span>
-            </label>
-            <div className="login-input-wrapper">
-              <svg
-                className="login-input-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-              <input
-                id="signup-confirm-password"
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                placeholder="Re-enter your password"
-                className="login-text-input login-password-input"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                autoComplete="new-password"
-                minLength={8}
-                required
-              />
-              <button
-                type="button"
-                className="login-password-toggle-btn"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                title={showConfirmPassword ? "Hide password" : "Show password"}
-                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-              >
-                {showConfirmPassword ? (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
 
-          {/* Security Verification (CAPTCHA) */}
-          <div className="login-field-group signup-captcha-section">
-            <div className="signup-label-between">
-              <label className="login-field-label" htmlFor="signup-captcha">
-                <span>Security Verification</span>
-                <span className="login-required-star">*</span>
-              </label>
-              <span className="signup-helper-text">Case-insensitive</span>
-            </div>
-
-            <div className="signup-captcha-box">
-              <div className="signup-captcha-visual-row">
-                {captchaData.svg ? (
-                  <div className="signup-captcha-svg-container">
-                    <img
-                      src={`data:image/svg+xml;utf8,${encodeURIComponent(captchaData.svg)}`}
-                      alt="Security verification challenge"
-                      className="signup-captcha-image"
-                    />
-                  </div>
-                ) : (
-                  <div className="signup-captcha-placeholder">
-                    <span className="login-spinner" />
-                    <span>Loading challenge...</span>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  className="signup-captcha-reload-btn"
-                  onClick={fetchCaptcha}
-                  disabled={captchaLoading}
-                  title="Generate a new security challenge"
-                  aria-label="Refresh security challenge"
-                >
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className={captchaLoading ? "signup-spin" : ""}
-                  >
-                    <polyline points="23 4 23 10 17 10" />
-                    <polyline points="1 20 1 14 7 14" />
-                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="login-input-wrapper">
-                <svg
-                  className="login-input-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect width="18" height="18" x="3" y="3" rx="2" />
-                  <path d="M9 10h6" />
-                  <path d="M12 10v4" />
-                </svg>
-                <input
-                  id="signup-captcha"
-                  type="text"
-                  name="captchaInput"
-                  value={captchaInput}
-                  onChange={(e) => {
-                    setCaptchaInput(e.target.value.toUpperCase());
-                    if (error) setError("");
-                  }}
-                  placeholder="Enter 6-character code"
-                  className="login-text-input signup-captcha-text-input"
-                  maxLength={6}
-                  autoComplete="off"
-                  spellCheck="false"
-                  required
-                />
-              </div>
-            </div>
-          </div>
 
           {/* Terms & Privacy Agreement */}
           <div className="signup-terms-agreement">

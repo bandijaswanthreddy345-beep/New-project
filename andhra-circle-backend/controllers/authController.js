@@ -49,12 +49,14 @@ exports.registerUser = async (req, res) => {
     const captchaToken = asString(req.body?.captchaToken);
     const captchaAnswer = asString(req.body?.captchaAnswer);
 
-    // Verify security CAPTCHA
-    const captchaCheck = verifyCaptcha(captchaToken, captchaAnswer);
-    if (!captchaCheck.ok) {
-      return res.status(400).json({
-        message: captchaCheck.message,
-      });
+    // Verify security CAPTCHA only if provided by client
+    if (captchaToken || captchaAnswer) {
+      const captchaCheck = verifyCaptcha(captchaToken, captchaAnswer);
+      if (!captchaCheck.ok) {
+        return res.status(400).json({
+          message: captchaCheck.message,
+        });
+      }
     }
 
     if (!name || name.length > 100) {
