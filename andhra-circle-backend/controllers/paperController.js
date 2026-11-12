@@ -194,8 +194,9 @@ exports.deletePaper = async (req, res) => {
     );
 
     if (!paper) {
-      return res.status(404).json({
-        message: "Paper not found",
+      return res.status(200).json({
+        message: "Paper already removed or not found",
+        alreadyDeleted: true,
       });
     }
 
