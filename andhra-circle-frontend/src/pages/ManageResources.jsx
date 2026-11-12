@@ -66,6 +66,12 @@ function ManageResources() {
       fetchResources();
     } catch (err) {
       console.log("Delete Resource Error:", err);
+      // If resource was already deleted on server (404), refresh list and notify cleanly
+      if (err?.response?.status === 404) {
+        alert("Resource was already deleted or not found. Refreshing list.");
+        fetchResources();
+        return;
+      }
       alert("Delete Failed!");
     }
   };

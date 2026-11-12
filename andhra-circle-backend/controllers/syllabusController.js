@@ -167,8 +167,9 @@ exports.deleteSyllabus = async (req, res) => {
     const syllabus = await Syllabus.findByIdAndDelete(req.params.id);
 
     if (!syllabus) {
-      return res.status(404).json({
-        message: "Syllabus not found",
+      return res.status(200).json({
+        message: "Syllabus already removed or not found",
+        alreadyDeleted: true,
       });
     }
 

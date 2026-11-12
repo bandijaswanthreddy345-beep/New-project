@@ -174,8 +174,9 @@ exports.deleteLabProgram = async (req, res) => {
       );
 
     if (!labProgram) {
-      return res.status(404).json({
-        message: "Lab program not found",
+      return res.status(200).json({
+        message: "Lab program already removed or not found",
+        alreadyDeleted: true,
       });
     }
 
