@@ -23,19 +23,20 @@
 
 .admin-portal-navbar {
   background: #013a33;
-  border-bottom: 1.5px solid rgba(255, 239, 179, 0.22);
+  border-bottom: 1.5px solid rgba(255, 239, 179, 0.2);
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 4px 20px rgba(1, 34, 30, 0.35);
   width: 100%;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .admin-portal-navbar-inner {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 12px 28px;
+  min-height: 72px;
+  padding: 10px clamp(16px, 2.5vw, 36px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -48,22 +49,32 @@
   align-items: center;
   gap: 14px;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  flex-shrink: 0;
 }
 
 .admin-brand-group:hover {
-  opacity: 0.92;
+  opacity: 0.95;
+  transform: translateY(-1px);
 }
 
 .admin-portal-logo {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 239, 179, 0.55);
+  border: 1.5px solid rgba(255, 239, 179, 0.6);
   background: #0d453c;
   padding: 2.5px;
-  box-shadow: 0 0 16px rgba(255, 239, 179, 0.35);
+  box-shadow: 0 0 16px rgba(255, 239, 179, 0.28);
   object-fit: contain;
+  flex-shrink: 0;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.admin-brand-group:hover .admin-portal-logo {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 239, 179, 0.45);
 }
 
 .admin-brand-text {
@@ -73,43 +84,48 @@
 
 .admin-brand-heading {
   color: #ffffff;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 800;
   margin: 0;
   line-height: 1.15;
   letter-spacing: -0.2px;
+  white-space: nowrap;
 }
 
 .admin-brand-heading .font-deltha {
-  color: #ffefb3;
+  color: #fed866;
+  text-shadow: 0 0 12px rgba(254, 216, 102, 0.35);
 }
 
 .admin-portal-badge {
-  font-size: 11px;
+  font-size: 10.5px;
   color: #a8d5cf;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 3px;
+  white-space: nowrap;
 }
 
-/* Nav Actions Right */
+/* Nav Actions Right (Pinned to Right Corner) */
 .admin-nav-actions {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .admin-status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
+  gap: 9px;
+  padding: 7px 16px;
   border-radius: 9999px;
-  background: rgba(1, 34, 30, 0.7);
-  border: 1px solid rgba(255, 239, 179, 0.3);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  background: rgba(1, 24, 21, 0.75);
+  border: 1px solid rgba(255, 239, 179, 0.28);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .admin-pulse-dot {
@@ -119,6 +135,7 @@
   background: #10b981;
   box-shadow: 0 0 10px #10b981;
   animation: adminDotPulse 2s infinite ease-in-out;
+  flex-shrink: 0;
 }
 
 @keyframes adminDotPulse {
@@ -133,42 +150,49 @@
 }
 
 .admin-user-email {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 650;
   color: #ffefb3;
-  letter-spacing: 0.1px;
+  letter-spacing: 0.15px;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .admin-nav-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 15px;
+  gap: 7px;
+  padding: 7.5px 16px;
   border-radius: 10px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: inherit;
   border: none;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .admin-view-site-btn {
-  background: rgba(255, 239, 179, 0.14);
-  border: 1px solid rgba(255, 239, 179, 0.4);
+  background: rgba(255, 239, 179, 0.12);
+  border: 1.5px solid rgba(255, 239, 179, 0.4);
   color: #ffefb3;
 }
 
 .admin-view-site-btn:hover {
   background: #ffefb3;
   color: #013a33;
-  box-shadow: 0 0 14px rgba(255, 239, 179, 0.45);
-  transform: translateY(-1px);
+  border-color: #ffefb3;
+  box-shadow: 0 4px 14px rgba(255, 239, 179, 0.35);
+  transform: translateY(-1.5px);
 }
 
 .admin-logout-btn {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
   color: #fca5a5;
 }
 
@@ -176,8 +200,8 @@
   background: #ef4444;
   color: #ffffff;
   border-color: #ef4444;
-  box-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1.5px);
 }
 
 /* =========================================================
@@ -908,7 +932,10 @@
 
 @media (max-width: 640px) {
   .admin-portal-navbar-inner {
-    padding: 12px 18px;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: auto;
   }
 
   .admin-nav-actions {
