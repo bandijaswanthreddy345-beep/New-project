@@ -260,15 +260,9 @@ function NoteDetails() {
 
     const trimmed = value.trim();
 
-    // Local uploads: use same-origin relative path so it is always same-origin
-    if (trimmed.includes("/uploads/")) {
-      const uploadPath = trimmed.substring(trimmed.indexOf("/uploads/"));
-      return `${uploadPath}#toolbar=1&navpanes=0&view=FitH`;
-    }
-
     // External URLs (Google Drive, university portals, etc.): proxy through backend
     if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-      if (!trimmed.includes("localhost:5000")) {
+      if (!trimmed.includes("localhost:5000") && !trimmed.includes(BACKEND_URL)) {
         return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(trimmed)}#toolbar=1&navpanes=0&view=FitH`;
       }
       return `${trimmed}#toolbar=1&navpanes=0&view=FitH`;
@@ -320,31 +314,31 @@ function NoteDetails() {
     return [
       {
         number: 1,
-        title: note.module1Title || "Unit 1",
+        title: note.module1Title || note.module1 || "Unit 1",
         notes: note.module1 || "",
         pdf: note.module1Pdf || "",
       },
       {
         number: 2,
-        title: note.module2Title || "Unit 2",
+        title: note.module2Title || note.module2 || "Unit 2",
         notes: note.module2 || "",
         pdf: note.module2Pdf || "",
       },
       {
         number: 3,
-        title: note.module3Title || "Unit 3",
+        title: note.module3Title || note.module3 || "Unit 3",
         notes: note.module3 || "",
         pdf: note.module3Pdf || "",
       },
       {
         number: 4,
-        title: note.module4Title || "Unit 4",
+        title: note.module4Title || note.module4 || "Unit 4",
         notes: note.module4 || "",
         pdf: note.module4Pdf || "",
       },
       {
         number: 5,
-        title: note.module5Title || "Unit 5",
+        title: note.module5Title || note.module5 || "Unit 5",
         notes: note.module5 || "",
         pdf: note.module5Pdf || "",
       },
@@ -1137,6 +1131,29 @@ function NoteDetails() {
                   >
 
                     <div className="module-inner">
+
+                      {unit.notes && unit.notes.trim() !== "" && (
+                        <div
+                          className="module-notes-box"
+                          style={{
+                            marginBottom: "16px",
+                            padding: "16px 20px",
+                            background: "linear-gradient(145deg, #ffffff 0%, #f4f8f6 100%)",
+                            borderRadius: "12px",
+                            border: "1.5px solid rgba(16, 185, 129, 0.25)",
+                            boxShadow: "0 2px 8px rgba(0, 36, 31, 0.04)"
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "0.75rem", fontWeight: "700", letterSpacing: "0.08em", color: "#00796b", textTransform: "uppercase" }}>
+                              Unit Syllabus & Topics Outline
+                            </span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: "0.92rem", color: "#1e293b", lineHeight: "1.65", whiteSpace: "pre-wrap", fontWeight: "500" }}>
+                            {unit.notes}
+                          </p>
+                        </div>
+                      )}
 
                       <div className="module-resource-grid pdf-only">
                         {/* PDF Box */}
