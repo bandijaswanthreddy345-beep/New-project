@@ -5,7 +5,7 @@ import aimlImg from "../assets/branches/aiml.jpg";
 import cseImg from "../assets/branches/cse.webp";
 import eceImg from "../assets/branches/ece.webp";
 import mechImg from "../assets/branches/mech.webp";
-import civilImg from "../assets/branches/civil.webp";
+import civilImg from "../assets/branches/civil.jpg";
 import eeeImg from "../assets/branches/eee.webp";
 
 const BRANCHES = [
