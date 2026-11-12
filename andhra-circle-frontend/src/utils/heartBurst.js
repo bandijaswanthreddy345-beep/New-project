@@ -74,61 +74,68 @@ class HeartBurstEngine {
   }
 
   /**
-   * Spawns exactly 100 popping hearts originating from (originX, originY)
+   * Spawns an abundant, energetic burst of 100 3D floating hearts originating from (originX, originY)
    * in staggered energetic waves.
    */
   burst(originX, originY) {
     this.initCanvas();
     if (!this.ctx) return;
 
-    // Fast, lightweight particle count (30 hearts) to run at locked 60/120fps with zero frame drops
-    const totalHearts = 30;
+    // Rich, abundant particle count (100 hearts) as requested
+    const totalHearts = 100;
     const now = performance.now();
 
     for (let i = 0; i < totalHearts; i++) {
       let delay = 0;
-      if (i >= 12 && i < 22) {
-        delay = 30 + Math.random() * 40;
-      } else if (i >= 22) {
-        delay = 70 + Math.random() * 50;
+      if (i < 30) {
+        // First immediate explosive pop
+        delay = Math.random() * 30;
+      } else if (i < 65) {
+        // Second staggered wave
+        delay = 40 + Math.random() * 70;
+      } else {
+        // Third trailing fountain wave
+        delay = 100 + Math.random() * 120;
       }
 
-      // Trajectory angle: mainly upward fountain (-135deg to -45deg)
+      // Trajectory angle: wide fountain burst (-150deg to -30deg with lateral variations)
       const spreadRatio = (i / totalHearts) * 2 - 1; // -1 to +1
-      const angle = -Math.PI / 2 + (spreadRatio * 0.95 + (Math.random() - 0.5) * 0.5);
-      const speed = 4 + Math.random() * 8;
+      const angle = -Math.PI / 2 + (spreadRatio * 1.15 + (Math.random() - 0.5) * 0.6);
+      const speed = 3.5 + Math.random() * 9.5;
 
       const vx = Math.cos(angle) * speed;
-      const vy = Math.sin(angle) * speed - (1.5 + Math.random() * 2.5); // Upward push
+      const vy = Math.sin(angle) * speed - (1.8 + Math.random() * 3.2); // Upward celebratory push
 
-      let size = 12 + Math.random() * 12; // 12-24px
-      if (i % 8 === 0) {
-        size = 22 + Math.random() * 6; // Hero 22-28px
+      let size = 12 + Math.random() * 14; // 12-26px
+      if (i % 6 === 0) {
+        size = 24 + Math.random() * 8; // Hero 24-32px
+      } else if (i % 3 === 0) {
+        size = 18 + Math.random() * 6; // Mid 18-24px
       }
 
       const color = HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)];
       const isGold = color === "#fbbf24";
 
       this.particles.push({
-        x: originX + (Math.random() - 0.5) * 12,
-        y: originY + (Math.random() - 0.5) * 8,
+        x: originX + (Math.random() - 0.5) * 20,
+        y: originY + (Math.random() - 0.5) * 14,
         vx,
         vy,
-        gravity: 0.18 + Math.random() * 0.1,
-        drag: 0.98,
+        gravity: 0.16 + Math.random() * 0.12,
+        drag: 0.985,
         size,
         color,
         isGold,
-        rotation: (Math.random() - 0.5) * 0.6,
-        rotSpeed: (Math.random() - 0.5) * 0.06,
+        rotation: (Math.random() - 0.5) * 0.8,
+        rotSpeed: (Math.random() - 0.5) * 0.08,
         wobblePhase: Math.random() * Math.PI * 2,
-        wobbleSpeed: 0.08 + Math.random() * 0.06,
-        wobbleAmp: 0.8 + Math.random() * 1.2,
-        scale: 0.2,
-        targetScale: 0.85 + Math.random() * 0.4,
-        scaleGrowth: 0.15 + Math.random() * 0.08,
+        wobbleSpeed: 0.07 + Math.random() * 0.07,
+        wobbleAmp: 0.9 + Math.random() * 1.4,
+        scale: 0.15,
+        targetScale: 0.85 + Math.random() * 0.45,
+        scaleGrowth: 0.14 + Math.random() * 0.09,
         opacity: 1,
-        fadeSpeed: 0.018 + Math.random() * 0.012,
+        fadeSpeed: 0.012 + Math.random() * 0.01,
         delay,
         createdAt: now,
       });
@@ -225,7 +232,7 @@ class HeartBurstEngine {
     }
 
     // Clean up finished particles
-    if (this.particles.length > 80) {
+    if (this.particles.length > 250) {
       this.particles = this.particles.filter((p) => p.opacity > 0);
     }
 
