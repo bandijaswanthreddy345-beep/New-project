@@ -24,12 +24,16 @@ function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
       type: "hero",
     });
 
-    // 3. Staggered Fountain Mini 3D Hearts (Arches to left and right)
+    // 3. Staggered Fountain Mini 3D Hearts (Rich energetic burst of mini hearts)
     const fountainConfigs = [
-      { xMid: -16, xEnd: -32, rot: -22, scale: 0.95, delay: 0 },
-      { xMid: 18, xEnd: 34, rot: 20, scale: 0.9, delay: 35 },
-      { xMid: -24, xEnd: -45, rot: -30, scale: 0.75, delay: 75 },
-      { xMid: 22, xEnd: 42, rot: 28, scale: 0.8, delay: 110 },
+      { xMid: -16, xEnd: -32, rot: -22, scale: 1.05, delay: 0 },
+      { xMid: 18, xEnd: 34, rot: 20, scale: 1.0, delay: 25 },
+      { xMid: -26, xEnd: -48, rot: -32, scale: 0.9, delay: 50 },
+      { xMid: 25, xEnd: 46, rot: 30, scale: 0.95, delay: 75 },
+      { xMid: -12, xEnd: -24, rot: -15, scale: 0.85, delay: 100 },
+      { xMid: 14, xEnd: 26, rot: 16, scale: 0.9, delay: 125 },
+      { xMid: -34, xEnd: -60, rot: -40, scale: 0.8, delay: 150 },
+      { xMid: 32, xEnd: 58, rot: 38, scale: 0.82, delay: 175 },
     ];
 
     fountainConfigs.forEach((cfg, i) => {
@@ -43,9 +47,11 @@ function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
     // 4. Shimmering 4-Point Golden & Rose Diamond Sparkles
     const sparkleConfigs = [
       { sx: -24, sy: -30, delay: 0, color: "#fbbf24" },
-      { sx: 26, sy: -28, delay: 40, color: "#f59e0b" },
-      { sx: -32, sy: -10, delay: 80, color: "#fda4af" },
-      { sx: 30, sy: -12, delay: 110, color: "#fef08a" },
+      { sx: 26, sy: -28, delay: 30, color: "#f59e0b" },
+      { sx: -32, sy: -10, delay: 60, color: "#fda4af" },
+      { sx: 30, sy: -12, delay: 90, color: "#fef08a" },
+      { sx: -18, sy: -42, delay: 120, color: "#ff2d75" },
+      { sx: 20, sy: -44, delay: 140, color: "#fbbf24" },
     ];
 
     sparkleConfigs.forEach((sp, i) => {
@@ -61,7 +67,7 @@ function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
     // Clean up particles automatically after animation duration
     setTimeout(() => {
       setParticles([]);
-    }, 950);
+    }, 1200);
   };
 
   const handleClick = (e) => {

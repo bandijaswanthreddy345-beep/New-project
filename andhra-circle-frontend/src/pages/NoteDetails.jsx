@@ -4,6 +4,7 @@ import API, { BACKEND_URL } from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
 import { getStoredStudentData } from "../data/studentData";
 import { formatSemDisplay } from "../utils/validators";
+import trigger100Hearts from "../utils/heartBurst";
 import "./NoteDetails.css";
 
 function formatFriendlySemester(sem) {
@@ -548,16 +549,22 @@ function NoteDetails() {
     const buttonRect =
       event.currentTarget.getBoundingClientRect();
 
+    const originX = buttonRect.left + buttonRect.width / 2;
+    const originY = buttonRect.top + buttonRect.height / 2;
+
+    // Trigger full celebratory 100 hearts explosion
+    try {
+      trigger100Hearts(originX, originY);
+    } catch (e) {
+      console.error("Heart burst error:", e);
+    }
+
     const popId = Date.now();
 
     setHeartPop({
       id: popId,
-      x:
-        buttonRect.left +
-        buttonRect.width / 2,
-      y:
-        buttonRect.top +
-        buttonRect.height / 2,
+      x: originX,
+      y: originY,
     });
 
     setTimeout(() => {
