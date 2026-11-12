@@ -12,25 +12,16 @@ const usedNonces = new Set();
 let devEphemeralSecret = null;
 
 /**
- * Derives a 32-byte key for AES-256-GCM from CAPTCHA_SECRET.
- * In production: refuses to start if CAPTCHA_SECRET is missing.
- * In development: generates a random 32-byte secret at startup and warns.
+ * Derives a 32-byte key for AES-256-GCM from CAPTCHA_SECRET or fallback to JWT_SECRET.
  */
 function getCaptchaKey() {
-  const secret = process.env.CAPTCHA_SECRET;
+  const secret = process.env.CAPTCHA_SECRET || process.env.JWT_SECRET;
 
   if (!secret || typeof secret !== "string" || !secret.trim()) {
-    if (process.env.NODE_ENV === "production") {
-      console.error(
-        "FATAL: CAPTCHA_SECRET is not set in production. The server cannot start securely."
-      );
-      process.exit(1);
-    }
-
     if (!devEphemeralSecret) {
       devEphemeralSecret = crypto.randomBytes(32).toString("hex");
       console.warn(
-        "WARNING: CAPTCHA_SECRET is not set in environment. Generated an ephemeral development secret for this process session."
+        "WARNING: Neither CAPTCHA_SECRET nor JWT_SECRET set. Generated an ephemeral secret for this session."
       );
     }
 
@@ -38,17 +29,6 @@ function getCaptchaKey() {
   }
 
   return crypto.createHash("sha256").update(secret.trim()).digest();
-}
-
-// Immediate startup validation check for production environment
-if (
-  process.env.NODE_ENV === "production" &&
-  (!process.env.CAPTCHA_SECRET || !process.env.CAPTCHA_SECRET.trim())
-) {
-  console.error(
-    "FATAL: CAPTCHA_SECRET is not set in production. The server refuses to start."
-  );
-  process.exit(1);
 }
 
 /**
