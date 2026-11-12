@@ -220,6 +220,7 @@ function Notes({ initialType }) {
 
   const searchInputRef = useRef(null);
   const searchMetalRef = useRef(null);
+  const loadMoreSentinelRef = useRef(null);
 
   // Hook for cursor-driven liquid metal bend interaction
   useMetalBend(searchMetalRef);
@@ -531,6 +532,35 @@ function Notes({ initialType }) {
   const paginatedItems = useMemo(() => {
     return displayItems.slice(0, visibleCount);
   }, [displayItems, visibleCount]);
+
+  // Infinite scroll: automatically load more items when scrolling down
+  useEffect(() => {
+    const sentinel = loadMoreSentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => {
+            if (prev < displayItems.length) {
+              return Math.min(prev + 16, displayItems.length);
+            }
+            return prev;
+          });
+        }
+      },
+      {
+        root: null,
+        rootMargin: "300px",
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(sentinel);
+    return () => {
+      observer.disconnect();
+    };
+  }, [displayItems.length]);
 
   // Switch between academic resource types (Notes, Question Papers, Syllabus, Lab Programs)
   const handleSwitchResource = (type) => {
@@ -1059,14 +1089,21 @@ function Notes({ initialType }) {
                   ))}
 
                   {displayItems.length > visibleCount && (
-                    <div style={{ textAlign: "center", margin: "1.5rem 0" }}>
-                      <button
-                        type="button"
-                        className="empty-reset-btn"
-                        onClick={() => setVisibleCount((prev) => prev + 16)}
-                      >
-                        Load More ({displayItems.length - visibleCount} remaining) ↓
-                      </button>
+                    <div
+                      ref={loadMoreSentinelRef}
+                      style={{
+                        textAlign: "center",
+                        padding: "1.5rem 0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        color: "var(--text-muted, #94a3b8)",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      <span className="papers-spinner" style={{ width: 18, height: 18 }} />
+                      <span>Loading more...</span>
                     </div>
                   )}
                 </>
