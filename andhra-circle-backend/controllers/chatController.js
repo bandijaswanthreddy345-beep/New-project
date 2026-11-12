@@ -139,8 +139,9 @@ function formatPortalContext(items) {
 exports.chat = async (req, res) => {
   const openRouterApiKey = process.env.OPENROUTER_API_KEY;
   const geminiApiKey = process.env.GEMINI_API_KEY;
+  const groqApiKey = process.env.GROQ_API_KEY;
 
-  if (!openRouterApiKey && !geminiApiKey) {
+  if (!openRouterApiKey && !geminiApiKey && !groqApiKey) {
     return res.status(503).json({ success: false, message: "AI is not configured" });
   }
 
@@ -292,7 +293,69 @@ exports.chat = async (req, res) => {
   }
 
   // =========================================================
-  // 6. Gemini Fallback (if OpenRouter key not set or all models failed)
+  // 5b. Groq Fallback / Direct Provider
+  // =========================================================
+  if (groqApiKey) {
+    const groqCandidates = [
+      "qwen/qwen3.8-27b",
+      "openai/gpt-oss-120b",
+      "openai/gpt-oss-20b",
+    ];
+
+    const groqMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+    ];
+    for (const turn of rawHistory.slice(-MAX_HISTORY)) {
+      const text = asString(turn && turn.text).trim().slice(0, MAX_HISTORY_TEXT);
+      if (!text) continue;
+      const role = (turn.role === "model" || turn.role === "assistant") ? "assistant" : "user";
+      groqMessages.push({ role, content: text });
+    }
+    groqMessages.push({ role: "user", content: userPromptText });
+
+    for (const gModel of groqCandidates) {
+      try {
+        const response = await resilientFetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${groqApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: gModel,
+            messages: groqMessages,
+            temperature: 0.3,
+            max_completion_tokens: 1024,
+          }),
+        }, { breakerName: "groq", timeoutMs: TIMEOUT_MS });
+
+        if (!response.ok) continue;
+
+        const data = await response.json();
+        const reply = asString(data.choices?.[0]?.message?.content).trim();
+        if (!reply) continue;
+
+        const { cleanReply, sources } = extractSourcesAndCleanReply(reply, retrievedItems);
+        const payload = {
+          reply: cleanReply,
+          sources,
+          provider: "groq",
+          model: data.model || gModel,
+        };
+
+        if (!isHistoryTurn) {
+          setCachedAnswer(message, payload);
+        }
+
+        return res.json(payload);
+      } catch (err) {
+        console.error(`Groq error (${gModel}):`, err.name || err.message);
+      }
+    }
+  }
+
+  // =========================================================
+  // 6. Gemini Fallback (if OpenRouter/Groq key not set or all models failed)
   // =========================================================
   if (geminiApiKey) {
     const contents = [];

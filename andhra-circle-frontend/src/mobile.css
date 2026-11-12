@@ -1484,3 +1484,37 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Mobile Navigation Drawer Sign Out */
+@media (max-width: 992px) {
+  .nav-item-mobile-signout {
+    display: block !important;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .nav-link-signout {
+    color: #ffb4ab !important;
+    background: transparent !important;
+    border: none !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    text-align: left !important;
+    cursor: pointer !important;
+    border-radius: 12px !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .nav-link-signout:active,
+  .nav-link-signout:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #ffffff !important;
+  }
+}

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../api/api";
+import { logoutStudentProfile } from "../data/studentData";
 import "./Dashboard.css";
 
 function Dashboard() {
@@ -38,11 +39,12 @@ function Dashboard() {
   };
 
   const handleLogout = () => {
+    logoutStudentProfile();
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    alert("Logged out successfully!");
-
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("authChanged"));
+    }
     navigate("/login");
   };
 

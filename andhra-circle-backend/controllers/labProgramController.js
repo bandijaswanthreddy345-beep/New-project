@@ -168,10 +168,7 @@ exports.updateLabProgram = async (req, res) => {
 // ==========================================
 exports.deleteLabProgram = async (req, res) => {
   try {
-    const labProgram =
-      await LabProgram.findByIdAndDelete(
-        req.params.id
-      );
+    const labProgram = await LabProgram.findById(req.params.id);
 
     if (!labProgram) {
       return res.status(200).json({
@@ -180,10 +177,12 @@ exports.deleteLabProgram = async (req, res) => {
       });
     }
 
+    await labProgram.softDelete(req.user?._id);
+
     if (req.user) {
       await recordAuditLog({
         adminId: req.user._id,
-        action: "delete",
+        action: "soft_delete",
         resourceType: "LabProgram",
         resourceId: req.params.id,
         route: req.originalUrl,

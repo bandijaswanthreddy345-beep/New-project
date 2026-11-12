@@ -24,6 +24,27 @@ const userSchema = new mongoose.Schema(
       default: "student",
     },
 
+    // Terms and Privacy Policy user consent tracking
+    termsConsent: {
+      type: Boolean,
+      default: false,
+    },
+
+    privacyConsent: {
+      type: Boolean,
+      default: false,
+    },
+
+    consentTimestamp: {
+      type: Date,
+      default: null,
+    },
+
+    termsVersion: {
+      type: String,
+      default: "1.0",
+    },
+
     // Session hardening: timestamp and version of the last password modification
     // Used to invalidate JWTs issued prior to password reset
     passwordChangedAt: {

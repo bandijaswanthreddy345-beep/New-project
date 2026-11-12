@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import API from "../api/api";
+import TurnstileWidget from "../components/TurnstileWidget";
 import "./Login.css";
 import "./Register.css";
 
@@ -12,7 +13,7 @@ function Login() {
   const adminMessage = location.state?.message;
 
   const [form, setForm] = useState({
-    email: "",
+    email: location.state?.prefillEmail || "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -20,11 +21,12 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // CAPTCHA challenge state (only activated on repeated failed login attempts)
+  // CAPTCHA / Turnstile challenge state (only activated on repeated failed login attempts)
   const [requireCaptcha, setRequireCaptcha] = useState(false);
   const [captchaData, setCaptchaData] = useState({ token: "", svg: "" });
   const [captchaInput, setCaptchaInput] = useState("");
   const [captchaLoading, setCaptchaLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const fetchCaptcha = useCallback(async () => {
     try {
@@ -56,8 +58,8 @@ function Login() {
     e.preventDefault();
     setError("");
 
-    if (requireCaptcha && !captchaInput.trim()) {
-      setError("Please enter the 6-character security CAPTCHA verification code.");
+    if (requireCaptcha && !turnstileToken && !captchaInput.trim()) {
+      setError("Please complete the Cloudflare security verification challenge.");
       return;
     }
 
@@ -70,8 +72,12 @@ function Login() {
       };
 
       if (requireCaptcha) {
-        payload.captchaToken = captchaData.token;
-        payload.captchaAnswer = captchaInput.trim();
+        if (turnstileToken) {
+          payload.turnstileToken = turnstileToken;
+        } else {
+          payload.captchaToken = captchaData.token;
+          payload.captchaAnswer = captchaInput.trim();
+        }
       }
 
       // Login request
@@ -87,6 +93,7 @@ function Login() {
       }
 
       // Save JWT token & user information
+      localStorage.removeItem("jntu_student_logged_out");
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       window.dispatchEvent(new Event("authChanged"));
@@ -99,9 +106,27 @@ function Login() {
       }
     } catch (err) {
       console.error("Login Error:", err);
-      const errMsg =
-        err.response?.data?.message ||
-        "Invalid email or password. Please verify your credentials and try again.";
+      let errMsg = "Invalid email or password. Please verify your credentials and try again.";
+
+      if (!err.response) {
+        // Network connection error / server unreachable / CORS blockage
+        errMsg = "Cannot connect to server. Please verify your internet connection or check if the server is running.";
+      } else if (err.response.status === 429) {
+        // Rate limit exceeded
+        errMsg = err.response.data?.message || "Too many login attempts. Please wait a few minutes before trying again.";
+      } else if (err.response.status === 403 && err.response.data?.requireCaptcha) {
+        // Captcha required
+        errMsg = "Security verification required. Please solve the CAPTCHA puzzle to continue.";
+      } else if (err.response.status === 400 && err.response.data?.message) {
+        // Captcha verification failed or malformed request
+        errMsg = err.response.data.message;
+      } else if (err.response.status >= 500) {
+        // Internal server error
+        errMsg = "Server error encountered. Please try again later.";
+      } else if (err.response?.data?.message) {
+        errMsg = err.response.data.message;
+      }
+
       setError(errMsg);
 
       // If backend reports repeated failures requiring CAPTCHA
@@ -195,7 +220,7 @@ function Login() {
 
         {/* Error Alert Banner */}
         {error && (
-          <div className="login-alert login-alert-error" role="alert">
+          <div className="login-alert login-alert-error" role="alert" aria-live="assertive">
             <svg
               className="login-alert-icon"
               viewBox="0 0 24 24"
@@ -300,91 +325,26 @@ function Login() {
             </div>
           </div>
 
-          {/* Security Verification (CAPTCHA) - Only shown after repeated login failures */}
+          {/* Security Verification (Cloudflare Turnstile) - Only shown after repeated login failures */}
           {requireCaptcha && (
             <div className="login-field-group signup-captcha-section">
               <div className="signup-label-between">
-                <label className="login-field-label" htmlFor="login-captcha">
+                <label className="login-field-label">
                   <span>Security Verification</span>
                   <span className="login-required-star">*</span>
                 </label>
-                <span className="signup-helper-text">Case-insensitive</span>
+                <span className="signup-helper-text">Cloudflare Turnstile</span>
               </div>
 
-              <div className="signup-captcha-box">
-                <div className="signup-captcha-visual-row">
-                  {captchaData.svg ? (
-                    <div className="signup-captcha-svg-container">
-                      <img
-                        src={`data:image/svg+xml;utf8,${encodeURIComponent(captchaData.svg)}`}
-                        alt="Security verification challenge"
-                        className="signup-captcha-image"
-                      />
-                    </div>
-                  ) : (
-                    <div className="signup-captcha-placeholder">
-                      <span className="login-spinner" />
-                      <span>Loading challenge...</span>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    className="signup-captcha-reload-btn"
-                    onClick={fetchCaptcha}
-                    disabled={captchaLoading}
-                    title="Generate a new security challenge"
-                    aria-label="Refresh security challenge"
-                  >
-                    <svg
-                      width="17"
-                      height="17"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className={captchaLoading ? "signup-spin" : ""}
-                    >
-                      <polyline points="23 4 23 10 17 10" />
-                      <polyline points="1 20 1 14 7 14" />
-                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="login-input-wrapper">
-                  <svg
-                    className="login-input-icon"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect width="18" height="18" x="3" y="3" rx="2" />
-                    <path d="M9 10h6" />
-                    <path d="M12 10v4" />
-                  </svg>
-                  <input
-                    id="login-captcha"
-                    type="text"
-                    name="captchaInput"
-                    value={captchaInput}
-                    onChange={(e) => {
-                      setCaptchaInput(e.target.value.toUpperCase());
-                      if (error) setError("");
-                    }}
-                    placeholder="Enter 6-character code"
-                    className="login-text-input signup-captcha-text-input"
-                    maxLength={6}
-                    autoComplete="off"
-                    spellCheck="false"
-                    required
-                  />
-                </div>
+              <div style={{ background: "transparent", border: "none", padding: "0.25rem 0", display: "flex", justifyContent: "center" }}>
+                <TurnstileWidget
+                  onVerify={(token) => {
+                    setTurnstileToken(token);
+                    if (error) setError("");
+                  }}
+                  onExpire={() => setTurnstileToken("")}
+                  onError={() => setTurnstileToken("")}
+                />
               </div>
             </div>
           )}

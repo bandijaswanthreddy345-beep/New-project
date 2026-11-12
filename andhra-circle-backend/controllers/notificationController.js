@@ -198,18 +198,21 @@ exports.updateNotification = async (req, res) => {
 
 exports.deleteNotification = async (req, res) => {
   try {
-    const notification = await Notification.findByIdAndDelete(req.params.id);
+    const notification = await Notification.findById(req.params.id);
 
     if (!notification) {
-      return res.status(404).json({
-        message: "Notification not found",
+      return res.status(200).json({
+        message: "Notification already removed or not found",
+        alreadyDeleted: true,
       });
     }
+
+    await notification.softDelete(req.user?._id);
 
     if (req.user) {
       await recordAuditLog({
         adminId: req.user._id,
-        action: "delete",
+        action: "soft_delete",
         resourceType: "Notification",
         resourceId: req.params.id,
         route: req.originalUrl,

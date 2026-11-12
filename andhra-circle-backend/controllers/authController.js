@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const emailjs = require("@emailjs/nodejs");
 const { createCaptcha, verifyCaptcha } = require("../services/captchaService");
+const { verifyTurnstileToken } = require("../services/turnstileService");
 const {
   isCaptchaRequired,
   recordFailedAttempt,
@@ -43,17 +44,47 @@ exports.getCaptcha = (req, res) => {
 exports.registerUser = async (req, res) => {
   try {
     const name = asString(req.body?.name);
-    const email = asString(req.body?.email);
+    const email = asString(req.body?.email).toLowerCase();
     const password =
       typeof req.body?.password === "string" ? req.body.password : "";
     const captchaToken = asString(req.body?.captchaToken);
     const captchaAnswer = asString(req.body?.captchaAnswer);
 
-    // Verify security CAPTCHA
-    const captchaCheck = await verifyCaptcha(captchaToken, captchaAnswer);
-    if (!captchaCheck.ok) {
+    // Terms & Privacy consent fields
+    const termsConsent = req.body?.termsConsent === true || req.body?.termsConsent === "true" || req.body?.agreeTerms === true;
+    const privacyConsent = req.body?.privacyConsent === true || req.body?.privacyConsent === "true" || req.body?.agreeTerms === true;
+
+    // Enforce consent on server
+    if (!termsConsent || !privacyConsent) {
       return res.status(400).json({
-        message: captchaCheck.message,
+        message: "You must accept the Terms of Service and Privacy Policy to create an account.",
+      });
+    }
+
+    // Verify security challenge: Support Cloudflare Turnstile token or built-in SVG CAPTCHA
+    const turnstileToken = asString(req.body?.turnstileToken || req.body?.["cf-turnstile-response"]);
+    let challengePassed = false;
+    let challengeError = "Please complete the security verification challenge.";
+
+    if (turnstileToken) {
+      const turnstileCheck = await verifyTurnstileToken(turnstileToken, req.realClientIp || req.ip);
+      if (turnstileCheck.ok) {
+        challengePassed = true;
+      } else {
+        challengeError = turnstileCheck.message;
+      }
+    } else if (captchaToken && captchaAnswer) {
+      const captchaCheck = await verifyCaptcha(captchaToken, captchaAnswer);
+      if (captchaCheck.ok) {
+        challengePassed = true;
+      } else {
+        challengeError = captchaCheck.message;
+      }
+    }
+
+    if (!challengePassed) {
+      return res.status(400).json({
+        message: challengeError,
       });
     }
 
@@ -91,6 +122,10 @@ exports.registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      termsConsent: true,
+      privacyConsent: true,
+      consentTimestamp: new Date(),
+      termsVersion: "1.0",
     });
 
     // SECURITY: never send the password hash back to the browser
@@ -123,13 +158,15 @@ exports.registerUser = async (req, res) => {
 // ==========================================
 exports.loginUser = async (req, res) => {
   try {
-    const email = asString(req.body?.email);
+    const rawEmail = asString(req.body?.email);
+    const email = rawEmail.toLowerCase();
     const password =
       typeof req.body?.password === "string" ? req.body.password : "";
     const captchaToken = asString(req.body?.captchaToken);
     const captchaAnswer = asString(req.body?.captchaAnswer);
+    const turnstileToken = asString(req.body?.turnstileToken || req.body?.["cf-turnstile-response"]);
 
-    const clientIp = req.ip || req.socket?.remoteAddress || "unknown";
+    const clientIp = req.realClientIp || req.ip || req.socket?.remoteAddress || "unknown";
 
     // SECURITY: one generic answer for "no such user" and "wrong password"
     // so attackers cannot discover which emails are registered.
@@ -143,16 +180,28 @@ exports.loginUser = async (req, res) => {
     const captchaRequired = await isCaptchaRequired(clientIp, email);
 
     if (captchaRequired) {
-      // Must submit both captcha token and answer
-      if (!captchaToken || !captchaAnswer) {
-        return invalid(true);
+      let challengePassed = false;
+      let challengeError = "Security verification required. Please complete the CAPTCHA or Turnstile check.";
+
+      if (turnstileToken) {
+        const turnstileCheck = await verifyTurnstileToken(turnstileToken, clientIp);
+        if (turnstileCheck.ok) {
+          challengePassed = true;
+        } else {
+          challengeError = turnstileCheck.message;
+        }
+      } else if (captchaToken && captchaAnswer) {
+        const captchaCheck = await verifyCaptcha(captchaToken, captchaAnswer);
+        if (captchaCheck.ok) {
+          challengePassed = true;
+        } else {
+          challengeError = captchaCheck.message;
+        }
       }
 
-      // Verify CAPTCHA
-      const captchaCheck = await verifyCaptcha(captchaToken, captchaAnswer);
-      if (!captchaCheck.ok) {
+      if (!challengePassed) {
         return res.status(400).json({
-          message: captchaCheck.message,
+          message: challengeError,
           requireCaptcha: true,
         });
       }
@@ -211,7 +260,7 @@ exports.loginUser = async (req, res) => {
     console.error("Login Error:", error);
 
     res.status(500).json({
-      message: "Login failed. Please try again.",
+      message: "Login failed due to a server error. Please try again later.",
     });
   }
 };
@@ -228,7 +277,7 @@ exports.forgotPassword = async (req, res) => {
     });
 
   try {
-    const email = asString(req.body?.email);
+    const email = asString(req.body?.email).toLowerCase();
 
     if (!email) {
       return genericResponse();
@@ -256,21 +305,41 @@ exports.forgotPassword = async (req, res) => {
 
     await user.save();
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const frontendBase = process.env.FRONTEND_URL || "http://localhost:5173";
+    const resetUrl = `${frontendBase}/reset-password/${resetToken}`;
 
     // SECURITY: the reset link/token is deliberately NOT logged anymore.
     // Anyone who can read the server logs could otherwise take over accounts.
 
+    // If EmailJS credentials are not fully configured (e.g. EMAILJS_SERVICE_ID missing in dev),
+    // warn in server log without crashing and return a clear 503 response.
+    const serviceId = process.env.EMAILJS_SERVICE_ID;
+    const templateId = process.env.EMAILJS_TEMPLATE_ID;
+    const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+    const privateKey = process.env.EMAILJS_PRIVATE_KEY;
+
+    if (!serviceId || !templateId || !publicKey || !privateKey) {
+      console.warn(
+        "[WARN] Email service is not fully configured (missing EMAILJS_SERVICE_ID or credentials). Cannot dispatch reset email."
+      );
+      if (process.env.NODE_ENV !== "production") {
+        return res.status(503).json({
+          message: "Email service is temporarily unavailable. Please configure EMAILJS_SERVICE_ID in the backend.",
+        });
+      }
+      return genericResponse();
+    }
+
     await emailjs.send(
-      process.env.EMAILJS_SERVICE_ID,
-      process.env.EMAILJS_TEMPLATE_ID,
+      serviceId,
+      templateId,
       {
         email: user.email,
         link: resetUrl,
       },
       {
-        publicKey: process.env.EMAILJS_PUBLIC_KEY,
-        privateKey: process.env.EMAILJS_PRIVATE_KEY,
+        publicKey,
+        privateKey,
       }
     );
 

@@ -138,6 +138,16 @@ function Footer() {
           <strong>JNTU Circle</strong>. All rights reserved.
         </p>
 
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center", fontSize: "0.85rem" }}>
+          <Link to="/terms" style={{ color: "#94a3b8", textDecoration: "none" }} className="hover:text-white">
+            Terms of Service
+          </Link>
+          <span style={{ color: "#64748b" }}>•</span>
+          <Link to="/privacy" style={{ color: "#94a3b8", textDecoration: "none" }} className="hover:text-white">
+            Privacy Policy
+          </Link>
+        </div>
+
         <p className="footer-tagline">
           Built for Students
           <span className="footer-divider">•</span>

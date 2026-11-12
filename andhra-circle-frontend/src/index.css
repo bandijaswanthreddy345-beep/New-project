@@ -143,7 +143,7 @@ ul {
   justify-content: space-between;
 
   min-height: 72px;
-  padding: 10px 56px;
+  padding: 10px 24px;
 
   background: #ffffff;
   color: var(--text-primary);
@@ -445,7 +445,7 @@ ul {
 .nav-profile-dropdown {
   display: none;
   position: absolute;
-  top: calc(100% + 14px);
+  top: 100%;
   right: 0;
   width: 270px;
   background: linear-gradient(180deg, #062a1e 0%, #031c13 100%);
@@ -458,13 +458,26 @@ ul {
   overflow: hidden;
   animation: profileDropdownPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 8px 0;
+  margin-top: 6px;
+}
+
+/* Invisible bridge so mouse hover never drops across gap */
+.nav-profile-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: transparent;
 }
 
 @media (min-width: 993px) {
 
   .nav-item-profile:hover .nav-profile-dropdown,
-  .nav-profile-dropdown:hover {
-    display: block;
+  .nav-profile-dropdown:hover,
+  .nav-profile-dropdown.is-open {
+    display: block !important;
   }
 }
 
@@ -611,6 +624,10 @@ ul {
 .nav-profile-dd-signout:hover {
   background: rgba(147, 0, 10, 0.25) !important;
   color: #ffffff !important;
+}
+
+.nav-item-mobile-signout {
+  display: none;
 }
 
 

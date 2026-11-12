@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
-import { getStoredStudentData, getStudentAvatar, DEFAULT_STUDENT_AVATAR } from "../data/studentData";
+import { getStoredStudentData, getStudentAvatar, DEFAULT_STUDENT_AVATAR, logoutStudentProfile } from "../data/studentData";
 
 // Standard fallback notices for the pop-up preview
 const FALLBACK_NOTICES = [
@@ -62,6 +62,24 @@ function Navbar() {
   const [mobileNotifIndex, setMobileNotifIndex] = useState(0);
   const [showMobileNotifPopup, setShowMobileNotifPopup] = useState(false);
   const mobileNotifRef = useRef(null);
+
+  // Profile hover/click dropdown state
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileHoverTimeoutRef = useRef(null);
+
+  const handleProfileMouseEnter = () => {
+    if (profileHoverTimeoutRef.current) {
+      clearTimeout(profileHoverTimeoutRef.current);
+      profileHoverTimeoutRef.current = null;
+    }
+    setProfileDropdownOpen(true);
+  };
+
+  const handleProfileMouseLeave = () => {
+    profileHoverTimeoutRef.current = setTimeout(() => {
+      setProfileDropdownOpen(false);
+    }, 250);
+  };
 
   useEffect(() => {
     const handleProfileSync = () => {
@@ -588,7 +606,12 @@ function Navbar() {
               const photoSrc = getStudentAvatar(student);
 
               return (
-                <li key={item.path} className="nav-item-profile">
+                <li
+                  key={item.path}
+                  className="nav-item-profile"
+                  onMouseEnter={handleProfileMouseEnter}
+                  onMouseLeave={handleProfileMouseLeave}
+                >
                   <button
                     type="button"
                     className="nav-profile-btn"
@@ -609,9 +632,6 @@ function Navbar() {
                           src={photoSrc}
                           alt={displayName}
                           className="nav-profile-avatar-img"
-                          onError={(e) => {
-                            e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
-                          }}
                         />
                       ) : null}
                       <span
@@ -638,11 +658,19 @@ function Navbar() {
 
                   {/* Profile & Account Dropdown Menu (only when signed in, shown on hover/active) */}
                   {currentUser && (
-                    <div className="nav-profile-dropdown" role="menu">
+                    <div
+                      className={`nav-profile-dropdown ${profileDropdownOpen ? "is-open" : ""}`}
+                      role="menu"
+                      onMouseEnter={handleProfileMouseEnter}
+                      onMouseLeave={handleProfileMouseLeave}
+                    >
                       <Link
                         to="/profile"
                         className="nav-profile-dd-header"
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setProfileDropdownOpen(false);
+                        }}
                         title="Open Student Dashboard"
                       >
                         <div className="nav-profile-dd-avatar">
@@ -669,7 +697,10 @@ function Navbar() {
                           <Link
                             to="/dashboard"
                             className="nav-profile-dd-link"
-                            onClick={() => setMobileMenuOpen(false)}
+                            onClick={() => {
+                              setMobileMenuOpen(false);
+                              setProfileDropdownOpen(false);
+                            }}
                           >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <rect width="7" height="9" x="3" y="3" rx="1" />
@@ -685,6 +716,9 @@ function Navbar() {
                           type="button"
                           className="nav-profile-dd-link nav-profile-dd-signout"
                           onClick={() => {
+                            setProfileDropdownOpen(false);
+                            setMobileMenuOpen(false);
+                            logoutStudentProfile();
                             localStorage.removeItem("token");
                             localStorage.removeItem("user");
                             setCurrentUser(null);

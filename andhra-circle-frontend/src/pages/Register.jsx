@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/api";
+import TurnstileWidget from "../components/TurnstileWidget";
 import "./Login.css";
 import "./Register.css";
 
@@ -18,6 +19,7 @@ function Register() {
   const [captchaData, setCaptchaData] = useState({ token: "", svg: "" });
   const [captchaInput, setCaptchaInput] = useState("");
   const [captchaLoading, setCaptchaLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -91,8 +93,8 @@ function Register() {
     }
 
     const captchaTrimmed = captchaInput.trim();
-    if (!captchaTrimmed) {
-      setError("Please enter the 6-character security CAPTCHA verification code.");
+    if (!turnstileToken && !captchaTrimmed) {
+      setError("Please complete the Cloudflare security verification challenge.");
       return;
     }
 
@@ -104,14 +106,23 @@ function Register() {
     try {
       setLoading(true);
 
-      // Call backend registration endpoint with CAPTCHA verification
-      const res = await API.post("/auth/register", {
+      const payload = {
         name: nameTrimmed,
         email: emailTrimmed,
         password: form.password,
-        captchaToken: captchaData.token,
-        captchaAnswer: captchaTrimmed,
-      });
+        termsConsent: true,
+        privacyConsent: true,
+      };
+
+      if (turnstileToken) {
+        payload.turnstileToken = turnstileToken;
+      } else {
+        payload.captchaToken = captchaData.token;
+        payload.captchaAnswer = captchaTrimmed;
+      }
+
+      // Call backend registration endpoint
+      const res = await API.post("/auth/register", payload);
 
       setSuccess(
         res.data?.message || "Account created successfully! Preparing your sign in..."
@@ -124,11 +135,12 @@ function Register() {
         window.dispatchEvent(new Event("authChanged"));
       }
 
-      // Smooth redirection to sign in or home
+      // Smooth redirection to sign in with pre-filled email
       setTimeout(() => {
         navigate("/login", {
           state: {
             message: "Account created successfully! You can now sign in with your credentials.",
+            prefillEmail: emailTrimmed,
           },
         });
       }, 1200);
@@ -196,7 +208,7 @@ function Register() {
 
         {/* Success Alert Banner */}
         {success && (
-          <div className="login-alert login-alert-admin" role="status">
+          <div className="login-alert login-alert-admin" role="status" aria-live="polite">
             <svg
               className="login-alert-icon"
               viewBox="0 0 24 24"
@@ -215,7 +227,7 @@ function Register() {
 
         {/* Error Alert Banner */}
         {error && (
-          <div className="login-alert login-alert-error" role="alert">
+          <div className="login-alert login-alert-error" role="alert" aria-live="assertive">
             <svg
               className="login-alert-icon"
               viewBox="0 0 24 24"
@@ -409,101 +421,39 @@ function Register() {
             </div>
           </div>
 
-          {/* Security Verification (CAPTCHA) */}
+          {/* Security Verification (Cloudflare Turnstile) */}
           <div className="login-field-group signup-captcha-section">
             <div className="signup-label-between">
-              <label className="login-field-label" htmlFor="signup-captcha">
+              <label className="login-field-label">
                 <span>Security Verification</span>
                 <span className="login-required-star">*</span>
               </label>
-              <span className="signup-helper-text">Case-insensitive</span>
+              <span className="signup-helper-text">Cloudflare Turnstile</span>
             </div>
 
-            <div className="signup-captcha-box">
-              <div className="signup-captcha-visual-row">
-                {captchaData.svg ? (
-                  <div className="signup-captcha-svg-container">
-                    <img
-                      src={`data:image/svg+xml;utf8,${encodeURIComponent(captchaData.svg)}`}
-                      alt="Security verification challenge"
-                      className="signup-captcha-image"
-                    />
-                  </div>
-                ) : (
-                  <div className="signup-captcha-placeholder">
-                    <span className="login-spinner" />
-                    <span>Loading challenge...</span>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  className="signup-captcha-reload-btn"
-                  onClick={fetchCaptcha}
-                  disabled={captchaLoading}
-                  title="Generate a new security challenge"
-                  aria-label="Refresh security challenge"
-                >
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className={captchaLoading ? "signup-spin" : ""}
-                  >
-                    <polyline points="23 4 23 10 17 10" />
-                    <polyline points="1 20 1 14 7 14" />
-                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="login-input-wrapper">
-                <svg
-                  className="login-input-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect width="18" height="18" x="3" y="3" rx="2" />
-                  <path d="M9 10h6" />
-                  <path d="M12 10v4" />
-                </svg>
-                <input
-                  id="signup-captcha"
-                  type="text"
-                  name="captchaInput"
-                  value={captchaInput}
-                  onChange={(e) => {
-                    setCaptchaInput(e.target.value.toUpperCase());
-                    if (error) setError("");
-                  }}
-                  placeholder="Enter 6-character code"
-                  className="login-text-input signup-captcha-text-input"
-                  maxLength={6}
-                  autoComplete="off"
-                  spellCheck="false"
-                  required
-                />
-              </div>
+            <div style={{ background: "transparent", border: "none", padding: "0.25rem 0", display: "flex", justifyContent: "center" }}>
+              <TurnstileWidget
+                onVerify={(token) => {
+                  setTurnstileToken(token);
+                  if (error) setError("");
+                }}
+                onExpire={() => setTurnstileToken("")}
+                onError={() => setTurnstileToken("")}
+              />
             </div>
           </div>
 
           {/* Terms & Privacy Agreement */}
-          <div className="signup-terms-agreement" onClick={handleToggleTerms}>
-            <label className="login-remember-label">
+          <div className="signup-terms-agreement">
+            <label className="login-remember-label" htmlFor="signup-agree-terms" style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <input
+                id="signup-agree-terms"
                 type="checkbox"
+                name="agreeTerms"
                 className="login-remember-checkbox"
                 checked={form.agreeTerms}
-                onChange={handleToggleTerms}
+                onChange={handleChange}
+                style={{ cursor: "pointer", width: "18px", height: "18px" }}
               />
               <span className="signup-terms-copy">
                 I agree to the{" "}

@@ -12,6 +12,7 @@ const { initErrorTracker, captureException } = require("./utils/errorTracker");
 
 const securityHeaders = require("./middleware/securityHeaders");
 const { rateLimit } = require("./middleware/rateLimit");
+const { cloudflareRealIp } = require("./middleware/cloudflareIp");
 
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -139,6 +140,9 @@ if (process.env.TRUST_PROXY) {
     app.set("trust proxy", process.env.TRUST_PROXY.trim());
   }
 }
+
+// Cloudflare real IP validation middleware
+app.use(cloudflareRealIp);
 
 // In production, redirect plain HTTP to HTTPS when x-forwarded-proto says it was HTTP
 if (process.env.NODE_ENV === "production") {

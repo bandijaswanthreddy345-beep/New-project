@@ -164,7 +164,7 @@ exports.updateSyllabus = async (req, res) => {
 // Delete Syllabus
 exports.deleteSyllabus = async (req, res) => {
   try {
-    const syllabus = await Syllabus.findByIdAndDelete(req.params.id);
+    const syllabus = await Syllabus.findById(req.params.id);
 
     if (!syllabus) {
       return res.status(200).json({
@@ -173,10 +173,12 @@ exports.deleteSyllabus = async (req, res) => {
       });
     }
 
+    await syllabus.softDelete(req.user?._id);
+
     if (req.user) {
       await recordAuditLog({
         adminId: req.user._id,
-        action: "delete",
+        action: "soft_delete",
         resourceType: "Syllabus",
         resourceId: req.params.id,
         route: req.originalUrl,

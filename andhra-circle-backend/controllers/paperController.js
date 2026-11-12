@@ -192,9 +192,7 @@ exports.updatePaper = async (req, res) => {
 
 exports.deletePaper = async (req, res) => {
   try {
-    const paper = await Paper.findByIdAndDelete(
-      req.params.id
-    );
+    const paper = await Paper.findById(req.params.id);
 
     if (!paper) {
       return res.status(200).json({
@@ -203,10 +201,13 @@ exports.deletePaper = async (req, res) => {
       });
     }
 
+    // Soft delete paper
+    await paper.softDelete(req.user?._id);
+
     if (req.user) {
       await recordAuditLog({
         adminId: req.user._id,
-        action: "delete",
+        action: "soft_delete",
         resourceType: "Paper",
         resourceId: req.params.id,
         route: req.originalUrl,

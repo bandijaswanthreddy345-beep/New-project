@@ -24,6 +24,8 @@ const UploadMaterials = lazy(() => import("./pages/UploadMaterials"));
 
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const UploadNote = lazy(() => import("./pages/UploadNote"));
@@ -122,6 +124,10 @@ function App() {
           {/* Register & Signup */}
           <Route path="/register" element={<Register />} />
           <Route path="/signup" element={<Register />} />
+
+          {/* Terms & Privacy */}
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
 
           {/* =========================
               PDF VIEWER

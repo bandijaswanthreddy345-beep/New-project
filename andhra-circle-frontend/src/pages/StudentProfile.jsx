@@ -12,6 +12,7 @@ import {
   DEFAULT_STUDENT_AVATAR,
   cleanCollege,
   cleanSemester,
+  cleanBranch,
 } from "../data/studentData";
 import {
   validateName,
@@ -42,6 +43,7 @@ function StudentProfile() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
+  const headerFileInputRef = useRef(null);
   const mobileEditFileInputRef = useRef(null);
 
   const [student, setStudent] = useState(getStoredStudentData());
@@ -153,14 +155,58 @@ function StudentProfile() {
       alert(validation.message);
       if (fileInputRef.current) fileInputRef.current.value = "";
       if (editFileInputRef.current) editFileInputRef.current.value = "";
+      if (headerFileInputRef.current) headerFileInputRef.current.value = "";
       if (mobileEditFileInputRef.current) mobileEditFileInputRef.current.value = "";
       return;
     }
 
     setPhotoError("");
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64Data = reader.result;
+
+    // Resize and compress avatar to high-quality lightweight JPEG so it safely fits localStorage
+    const compressImage = (imageFile, callback) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(imageFile);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        const maxDim = 320;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.88);
+          callback(compressed);
+        } else {
+          // Fallback to FileReader
+          const reader = new FileReader();
+          reader.onload = () => callback(reader.result);
+          reader.readAsDataURL(imageFile);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        const reader = new FileReader();
+        reader.onload = () => callback(reader.result);
+        reader.readAsDataURL(imageFile);
+      };
+      img.src = objectUrl;
+    };
+
+    compressImage(file, (base64Data) => {
       if (targetForm === "create") {
         setCreateForm((prev) => ({ ...prev, profilePhoto: base64Data }));
       } else {
@@ -175,8 +221,7 @@ function StudentProfile() {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 2000);
       }
-    };
-    reader.readAsDataURL(file);
+    });
   };
 
   const handleRemovePhoto = (targetForm = "create") => {
@@ -187,6 +232,7 @@ function StudentProfile() {
     } else {
       setEditForm((prev) => ({ ...prev, profilePhoto: "none" }));
       if (editFileInputRef.current) editFileInputRef.current.value = "";
+      if (headerFileInputRef.current) headerFileInputRef.current.value = "";
       if (mobileEditFileInputRef.current) mobileEditFileInputRef.current.value = "";
       const current = getStoredStudentData();
       const updated = {
@@ -493,6 +539,9 @@ function StudentProfile() {
   // Logout / Switch Profile handler
   const handleConfirmLogout = () => {
     logoutStudentProfile();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setAuthUser(null);
     setShowLogoutModal(false);
     setShowMenu(false);
     setShowMobileMenu(false);
@@ -514,6 +563,10 @@ function StudentProfile() {
       semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
     });
     setActiveTab("overview");
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("authChanged"));
+    }
+    navigate("/login");
   };
 
   // Helper for attendance status
@@ -1033,19 +1086,33 @@ function StudentProfile() {
             {/* Identity Bar */}
             <div className="sp-page-identity">
               <div className="sp-avatar-holder">
+                <input
+                  type="file"
+                  ref={headerFileInputRef}
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => handlePhotoUpload(e, "edit")}
+                />
                 {activeAvatar ? (
-                  <img
-                    src={activeAvatar}
-                    alt={student.name || "Student"}
-                    className="sp-profile-photo"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
+                  <div
+                    className="sp-profile-photo-wrapper sp-clickable-avatar"
+                    onClick={() => headerFileInputRef.current?.click()}
+                    title="Click to change profile photo"
+                  >
+                    <img
+                      src={activeAvatar}
+                      alt={student.name || "Student"}
+                      className="sp-profile-photo"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                    <span className="sp-avatar-add-overlay">+ Photo</span>
+                  </div>
                 ) : (
                   <div
                     className="sp-profile-photo-placeholder sp-clickable-avatar"
-                    onClick={() => editFileInputRef.current?.click()}
+                    onClick={() => headerFileInputRef.current?.click()}
                     title="Click to upload profile photo"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -1063,14 +1130,7 @@ function StudentProfile() {
                   <h1 className="sp-main-name">
                     {student.name?.trim() || authUser?.name || "Student Scholar"}
                   </h1>
-                  {isConfigured ? (
-                    <span className="sp-verified-pill">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      Verified Academic Record
-                    </span>
-                  ) : (
+                  {!isConfigured && (
                     <button
                       type="button"
                       className="sp-inline-add-chip sp-inline-add-accent"
@@ -1098,7 +1158,7 @@ function StudentProfile() {
                   <span className="sp-dot-separator">•</span>
 
                   {student.branch?.trim() ? (
-                    <span>{student.branch} {student.branchCode ? `(${student.branchCode})` : ""}</span>
+                    <span>{cleanBranch(student.branch, student.branchCode)}</span>
                   ) : (
                     <button
                       type="button"
@@ -1340,7 +1400,7 @@ function StudentProfile() {
                       <span className="sp-info-label">Department & Branch</span>
                       <span className="sp-info-data">
                         {student.branch?.trim() ? (
-                          `${student.branch} ${student.branchCode ? `(${student.branchCode})` : ""}`
+                          cleanBranch(student.branch, student.branchCode)
                         ) : (
                           <button type="button" className="sp-inline-add-btn" onClick={() => setActiveTab("edit")}>
                             + Add Department & Branch
@@ -1492,10 +1552,10 @@ function StudentProfile() {
                               <td>
                                 <span
                                   className={`sp-badge-status ${hasScore && sgpaNum >= 8.5
-                                      ? "gold"
-                                      : hasScore
-                                        ? "completed"
-                                        : ""
+                                    ? "gold"
+                                    : hasScore
+                                      ? "completed"
+                                      : ""
                                     }`}
                                 >
                                   {hasScore
@@ -2097,7 +2157,7 @@ function StudentProfile() {
                   </button>
                 )}
                 {student.branch?.trim() ? (
-                  <span className="sp-m-branch-text">{student.branch}</span>
+                  <span className="sp-m-branch-text">{cleanBranch(student.branch, student.branchCode)}</span>
                 ) : (
                   <button
                     type="button"
@@ -2378,7 +2438,7 @@ function StudentProfile() {
                     <p className="sp-m-detail-lbl">DEPARTMENT & BRANCH</p>
                     <p className="sp-m-detail-val font-bold">
                       {student.branch?.trim() ? (
-                        `${student.branch} ${student.branchCode ? `(${student.branchCode})` : ""}`
+                        cleanBranch(student.branch, student.branchCode)
                       ) : (
                         <button type="button" className="sp-m-add-link-btn" onClick={() => setActiveTab("edit")}>
                           + Add Branch

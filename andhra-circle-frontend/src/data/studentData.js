@@ -30,6 +30,19 @@ export const DEFAULT_STUDENT_AVATAR =
 
 export const PROFILE_STORAGE_VERSION = "v3_chinnu";
 
+// Helper to clean up branch representation and avoid duplicated codes like (EEE) (EEE)
+export function cleanBranch(branch, branchCode = "") {
+  if (!branch || typeof branch !== "string") return "";
+  let cleaned = branch.trim();
+  // Strip duplicate consecutive parentheses like (EEE) (EEE) or (CSE) (CSE)
+  cleaned = cleaned.replace(/\s*\(([A-Za-z0-9&+\s]+)\)\s*\(\1\)/gi, " ($1)");
+  // If branchCode is provided and already exists in branch as (CODE), avoid double appending
+  if (branchCode && cleaned.includes(`(${branchCode})`)) {
+    return cleaned;
+  }
+  return cleaned;
+}
+
 // Helper to remove any lingering "(Autonomous)" from college names
 export function cleanCollege(col) {
   if (!col || typeof col !== "string") return "JNTU College of Engineering";
@@ -73,7 +86,7 @@ export const DEFAULT_CHINNU_DATA = {
   hallTicket: "21B91A0201",
   college: "JNTU College of Engineering",
   university: "JNT University",
-  branch: "Electrical & Electronics Engineering (EEE)",
+  branch: "Electrical & Electronics Engineering",
   branchCode: "EEE",
   year: "3rd Year",
   semester: "6th Semester",
@@ -86,7 +99,7 @@ export const DEFAULT_CHINNU_DATA = {
   phone: "+91 98765 43210",
   batch: "2021–25",
   mentor: "Dr. K. Ramesh (HOD - EEE)",
-  profilePhoto: DEFAULT_STUDENT_AVATAR,
+  profilePhoto: null,
   isConfigured: true,
   savedNotes: [
     { id: 1, branch: "EEE", sem: "Sem 6", title: "Power Systems Operation & Control", units: "Unit 1 - 5 Full Notes", faculty: "Dr. K. Ramesh" },
@@ -124,14 +137,11 @@ export const EMPTY_STUDENT_DATA = {
 
 // Helper to resolve the correct photo URL for a student object
 export function getStudentAvatar(student) {
-  if (!student || !student.isConfigured || !student.name?.trim()) return null;
+  if (!student) return null;
   if (student.profilePhoto && student.profilePhoto !== "none" && typeof student.profilePhoto === "string" && student.profilePhoto.trim()) {
     return student.profilePhoto;
   }
-  if (student.profilePhoto === "none") {
-    return null;
-  }
-  return DEFAULT_STUDENT_AVATAR;
+  return null;
 }
 
 // Calculate automatic CGPA from valid semester SGPAs
@@ -139,7 +149,7 @@ export function calculateCgpaFromGrades(grades = []) {
   const validScores = grades
     .map((g) => parseFloat(g.sgpa))
     .filter((score) => !isNaN(score) && score > 0 && score <= 10);
-  
+
   if (validScores.length === 0) return "";
   const sum = validScores.reduce((acc, curr) => acc + curr, 0);
   return (sum / validScores.length).toFixed(2);
@@ -202,9 +212,9 @@ export function getStoredStudentData() {
         };
       });
 
-      const photo = parsed.profilePhoto && parsed.profilePhoto !== "none"
+      const photo = parsed.profilePhoto && parsed.profilePhoto !== "none" && typeof parsed.profilePhoto === "string" && parsed.profilePhoto.trim()
         ? parsed.profilePhoto
-        : (parsed.profilePhoto === "none" ? "none" : DEFAULT_STUDENT_AVATAR);
+        : null;
 
       const cgpaCheck = validateGradePoint(parsed.cgpa);
       const attCheck = validateAttendance(parsed.attendance || parsed.attendancePercentage);
@@ -332,16 +342,19 @@ export function saveStoredStudentData(data) {
   }
 }
 
-// Clear / Logout student profile from this device
+// Clear / Logout student profile and auth session from this device
 export function clearStoredStudentData() {
   try {
     if (typeof localStorage !== "undefined") {
       localStorage.setItem("jntu_student_logged_out", "true");
       localStorage.removeItem("jntu_student_profile");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     }
     const emptyProfile = { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
     if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
       window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: emptyProfile }));
+      window.dispatchEvent(new Event("authChanged"));
     }
   } catch (e) {
     console.error("Error logging out student profile:", e);

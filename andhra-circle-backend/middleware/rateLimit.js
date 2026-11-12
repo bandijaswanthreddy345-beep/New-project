@@ -35,7 +35,7 @@ function rateLimit({
   return (req, res, next) => {
     if (skip && skip(req)) return next();
 
-    const key = req.ip || req.socket?.remoteAddress || "unknown";
+    const key = req.realClientIp || req.ip || req.socket?.remoteAddress || "unknown";
     const now = Date.now();
 
     let entry = hits.get(key);
