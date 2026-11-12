@@ -24,12 +24,16 @@ function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
       type: "hero",
     });
 
-    // 3. Staggered Fountain Mini 3D Hearts (Arches to left and right)
+    // 3. Staggered Fountain Mini 3D Hearts (Rich energetic burst of mini hearts)
     const fountainConfigs = [
-      { xMid: -16, xEnd: -32, rot: -22, scale: 0.95, delay: 0 },
-      { xMid: 18, xEnd: 34, rot: 20, scale: 0.9, delay: 35 },
-      { xMid: -24, xEnd: -45, rot: -30, scale: 0.75, delay: 75 },
-      { xMid: 22, xEnd: 42, rot: 28, scale: 0.8, delay: 110 },
+      { xMid: -16, xEnd: -32, rot: -22, scale: 1.05, delay: 0 },
+      { xMid: 18, xEnd: 34, rot: 20, scale: 1.0, delay: 25 },
+      { xMid: -26, xEnd: -48, rot: -32, scale: 0.9, delay: 50 },
+      { xMid: 25, xEnd: 46, rot: 30, scale: 0.95, delay: 75 },
+      { xMid: -12, xEnd: -24, rot: -15, scale: 0.85, delay: 100 },
+      { xMid: 14, xEnd: 26, rot: 16, scale: 0.9, delay: 125 },
+      { xMid: -34, xEnd: -60, rot: -40, scale: 0.8, delay: 150 },
+      { xMid: 32, xEnd: 58, rot: 38, scale: 0.82, delay: 175 },
     ];
 
     fountainConfigs.forEach((cfg, i) => {
@@ -43,9 +47,11 @@ function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
     // 4. Shimmering 4-Point Golden & Rose Diamond Sparkles
     const sparkleConfigs = [
       { sx: -24, sy: -30, delay: 0, color: "#fbbf24" },
-      { sx: 26, sy: -28, delay: 40, color: "#f59e0b" },
-      { sx: -32, sy: -10, delay: 80, color: "#fda4af" },
-      { sx: 30, sy: -12, delay: 110, color: "#fef08a" },
+      { sx: 26, sy: -28, delay: 30, color: "#f59e0b" },
+      { sx: -32, sy: -10, delay: 60, color: "#fda4af" },
+      { sx: 30, sy: -12, delay: 90, color: "#fef08a" },
+      { sx: -18, sy: -42, delay: 120, color: "#ff2d75" },
+      { sx: 20, sy: -44, delay: 140, color: "#fbbf24" },
     ];
 
     sparkleConfigs.forEach((sp, i) => {
@@ -61,7 +67,7 @@ function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
     // Clean up particles automatically after animation duration
     setTimeout(() => {
       setParticles([]);
-    }, 950);
+    }, 1200);
   };
 
   const handleClick = (e) => {
@@ -118,7 +124,6 @@ function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
                 <path
                   d="M16 28.2C15.4 28.2 4.2 20.6 2.4 13.5C0.8 7.3 5.2 2.2 11 2.2C13.6 2.2 15.1 3.5 16 4.6C16.9 3.5 18.4 2.2 21 2.2C26.8 2.2 31.2 7.3 29.6 13.5C27.8 20.6 16.6 28.2 16 28.2Z"
                   fill={`url(#heroGrad_${p.id})`}
-                  filter="drop-shadow(0 4px 8px rgba(225, 29, 72, 0.45))"
                 />
                 {/* Glossy Specular Reflection Curve */}
                 <path
@@ -153,7 +158,6 @@ function LikeReactionButton({ isLiked, count = 0, onToggle, title = "Like" }) {
                 <path
                   d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
                   fill={`url(#miniGrad_${p.id})`}
-                  filter="drop-shadow(0 2px 4px rgba(225, 29, 72, 0.4))"
                 />
                 <circle cx="8" cy="7" r="2.2" fill="#ffffff" opacity="0.65" />
               </svg>

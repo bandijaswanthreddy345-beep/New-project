@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
+import { normalizeSemester } from "../utils/semester";
 import { getStoredStudentData } from "../data/studentData";
 import { formatSemDisplay } from "../utils/validators";
+import trigger100Hearts from "../utils/heartBurst";
 import "./NoteDetails.css";
 
 function formatFriendlySemester(sem) {
@@ -248,6 +250,38 @@ function NoteDetails() {
   };
 
   // =========================================================
+  // BUILD EMBED PDF URL (SAFE AGAINST CSP FRAME-ANCESTORS)
+  // =========================================================
+
+  const getEmbedPdfUrl = (value) => {
+    if (!value || typeof value !== "string" || !value.trim() || value.trim() === "/") {
+      return "";
+    }
+
+    const trimmed = value.trim();
+
+    // Local uploads: use same-origin relative path so it is always same-origin
+    if (trimmed.includes("/uploads/")) {
+      const uploadPath = trimmed.substring(trimmed.indexOf("/uploads/"));
+      return `${uploadPath}#toolbar=1&navpanes=0&view=FitH`;
+    }
+
+    // External URLs (Google Drive, university portals, etc.): proxy through backend
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      if (!trimmed.includes("localhost:5000")) {
+        return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(trimmed)}#toolbar=1&navpanes=0&view=FitH`;
+      }
+      return `${trimmed}#toolbar=1&navpanes=0&view=FitH`;
+    }
+
+    const fullUrl = getBackendUrl(trimmed);
+    if (!fullUrl || fullUrl === `${BACKEND_URL}/` || fullUrl === BACKEND_URL) {
+      return "";
+    }
+    return `${fullUrl}#toolbar=1&navpanes=0&view=FitH`;
+  };
+
+  // =========================================================
   // NOTE DATA
   // =========================================================
 
@@ -260,7 +294,7 @@ function NoteDetails() {
   const subject = note?.subject || "";
   const subjectCode = note?.subjectCode || "";
   const branch = note?.branch || "";
-  const semester = note?.semester || "";
+  const semester = normalizeSemester(note?.semester || "");
 
   // =========================================================
   // CREDITS
@@ -548,16 +582,22 @@ function NoteDetails() {
     const buttonRect =
       event.currentTarget.getBoundingClientRect();
 
+    const originX = buttonRect.left + buttonRect.width / 2;
+    const originY = buttonRect.top + buttonRect.height / 2;
+
+    // Trigger full celebratory 100 hearts explosion
+    try {
+      trigger100Hearts(originX, originY);
+    } catch (e) {
+      console.error("Heart burst error:", e);
+    }
+
     const popId = Date.now();
 
     setHeartPop({
       id: popId,
-      x:
-        buttonRect.left +
-        buttonRect.width / 2,
-      y:
-        buttonRect.top +
-        buttonRect.height / 2,
+      x: originX,
+      y: originY,
     });
 
     setTimeout(() => {
@@ -1167,6 +1207,82 @@ function NoteDetails() {
                           )}
                         </div>
                       </div>
+                      {/* PDF PREVIEW */}
+
+                      {isOpen && pdfUrl && (
+
+                        <div className="pdf-preview-card">
+
+                          <div className="preview-header">
+
+                            <div>
+
+                              <span className="preview-label">
+                                DOCUMENT PREVIEW
+                              </span>
+
+                              <strong>
+                                Unit{" "}
+                                {unit.number}{" "}
+                                Material
+                              </strong>
+
+                            </div>
+
+                            <button
+                              type="button"
+                              className="new-tab-button"
+                              onClick={() =>
+                                openPdfInNewTab(
+                                  unit.pdf
+                                )
+                              }
+                            >
+                              Open in new tab ↗
+                            </button>
+
+                          </div>
+
+                          {getEmbedPdfUrl(unit.pdf) ? (
+                            <div className="unit-pdf-frame-wrapper">
+                              <iframe
+                                src={getEmbedPdfUrl(unit.pdf)}
+                                title={`Unit ${unit.number} PDF`}
+                                className="unit-pdf-frame"
+                                loading="lazy"
+                              />
+                            </div>
+                          ) : (
+                            <div className="unit-pdf-frame-wrapper" style={{ padding: "40px 20px", textAlign: "center", color: "#64748b", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+                              <p style={{ margin: 0, fontWeight: "500" }}>PDF document for this unit is currently being uploaded or updated.</p>
+                            </div>
+                          )}
+
+                          <div className="pdf-preview-bottom-bar">
+                            <div className="pdf-preview-hint">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="16" x2="12" y2="12" />
+                                <line x1="12" y1="8" x2="12.01" y2="8" />
+                              </svg>
+                              <span>Use document viewer controls inside to navigate pages or zoom</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="pdf-preview-expand-btn"
+                              onClick={() =>
+                                openPdfInNewTab(
+                                  unit.pdf
+                                )
+                              }
+                            >
+                              Full Window View ↗
+                            </button>
+                          </div>
+
+                        </div>
+
+                      )}
                     </div>
                   </div>
                 </article>

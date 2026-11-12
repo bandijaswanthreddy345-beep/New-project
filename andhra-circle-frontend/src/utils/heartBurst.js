@@ -74,64 +74,68 @@ class HeartBurstEngine {
   }
 
   /**
-   * Spawns exactly 100 popping hearts originating from (originX, originY)
+   * Spawns an abundant, energetic burst of 100 3D floating hearts originating from (originX, originY)
    * in staggered energetic waves.
    */
   burst(originX, originY) {
     this.initCanvas();
     if (!this.ctx) return;
 
+    // Rich, abundant particle count (100 hearts) as requested
     const totalHearts = 100;
     const now = performance.now();
 
     for (let i = 0; i < totalHearts; i++) {
-      // Stagger in 3 energetic waves for volcanic fountain progression
       let delay = 0;
-      if (i >= 35 && i < 70) {
-        delay = 40 + Math.random() * 50; // Wave 2
-      } else if (i >= 70) {
-        delay = 90 + Math.random() * 70; // Wave 3
+      if (i < 30) {
+        // First immediate explosive pop
+        delay = Math.random() * 30;
+      } else if (i < 65) {
+        // Second staggered wave
+        delay = 40 + Math.random() * 70;
+      } else {
+        // Third trailing fountain wave
+        delay = 100 + Math.random() * 120;
       }
 
-      // Trajectory angle: mainly upward fountain (-135deg to -45deg) with full spread
+      // Trajectory angle: wide fountain burst (-150deg to -30deg with lateral variations)
       const spreadRatio = (i / totalHearts) * 2 - 1; // -1 to +1
-      const angle = -Math.PI / 2 + (spreadRatio * 0.95 + (Math.random() - 0.5) * 0.6);
-      const speed = 4 + Math.random() * 9.5;
+      const angle = -Math.PI / 2 + (spreadRatio * 1.15 + (Math.random() - 0.5) * 0.6);
+      const speed = 3.5 + Math.random() * 9.5;
 
       const vx = Math.cos(angle) * speed;
-      const vy = Math.sin(angle) * speed - (1.5 + Math.random() * 3); // Strong upward push
+      const vy = Math.sin(angle) * speed - (1.8 + Math.random() * 3.2); // Upward celebratory push
 
-      // Heart size tiering: small, medium, large, few giant hero hearts
-      let size = 10 + Math.random() * 12; // Default 10-22px
-      if (i % 15 === 0) {
+      let size = 12 + Math.random() * 14; // 12-26px
+      if (i % 6 === 0) {
         size = 24 + Math.random() * 8; // Hero 24-32px
-      } else if (i % 4 === 0) {
-        size = 8 + Math.random() * 5; // Sparkle mini 8-13px
+      } else if (i % 3 === 0) {
+        size = 18 + Math.random() * 6; // Mid 18-24px
       }
 
       const color = HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)];
       const isGold = color === "#fbbf24";
 
       this.particles.push({
-        x: originX + (Math.random() - 0.5) * 14,
-        y: originY + (Math.random() - 0.5) * 10,
+        x: originX + (Math.random() - 0.5) * 20,
+        y: originY + (Math.random() - 0.5) * 14,
         vx,
         vy,
-        gravity: 0.16 + Math.random() * 0.1,
-        drag: 0.982,
+        gravity: 0.16 + Math.random() * 0.12,
+        drag: 0.985,
         size,
         color,
         isGold,
         rotation: (Math.random() - 0.5) * 0.8,
         rotSpeed: (Math.random() - 0.5) * 0.08,
         wobblePhase: Math.random() * Math.PI * 2,
-        wobbleSpeed: 0.06 + Math.random() * 0.07,
-        wobbleAmp: 0.6 + Math.random() * 1.4,
-        scale: 0.1,
+        wobbleSpeed: 0.07 + Math.random() * 0.07,
+        wobbleAmp: 0.9 + Math.random() * 1.4,
+        scale: 0.15,
         targetScale: 0.85 + Math.random() * 0.45,
-        scaleGrowth: 0.12 + Math.random() * 0.08,
+        scaleGrowth: 0.14 + Math.random() * 0.09,
         opacity: 1,
-        fadeSpeed: 0.012 + Math.random() * 0.011,
+        fadeSpeed: 0.012 + Math.random() * 0.01,
         delay,
         createdAt: now,
       });
@@ -179,9 +183,9 @@ class HeartBurstEngine {
       if (p.scale < p.targetScale) {
         p.scale = Math.min(p.targetScale, p.scale + p.scaleGrowth);
       } else {
-        // Slow natural fade & shrinkage
+        // Natural fade & shrinkage
         p.opacity -= p.fadeSpeed;
-        p.scale = Math.max(0.2, p.scale - 0.003);
+        p.scale = Math.max(0.2, p.scale - 0.004);
       }
 
       if (p.opacity <= 0 || p.y > h + 50) {
@@ -190,7 +194,7 @@ class HeartBurstEngine {
 
       activeCount++;
 
-      // Render Heart
+      // Render Heart using single lightweight save/restore
       this.ctx.save();
       this.ctx.translate(p.x, p.y);
       this.ctx.rotate(p.rotation);
@@ -202,15 +206,9 @@ class HeartBurstEngine {
 
       this.ctx.fillStyle = p.color;
 
-      // Subtle drop shadow for glossy depth
-      this.ctx.shadowColor = p.isGold ? "rgba(251, 191, 36, 0.55)" : "rgba(225, 29, 72, 0.4)";
-      this.ctx.shadowBlur = 6;
-      this.ctx.shadowOffsetY = 2;
-
       if (path) {
         this.ctx.fill(path);
       } else {
-        // Fallback heart drawing if Path2D unavailable
         this.ctx.beginPath();
         this.ctx.moveTo(12, 21.35);
         this.ctx.bezierCurveTo(4, 15, 2, 9, 2, 6);
@@ -222,13 +220,11 @@ class HeartBurstEngine {
         this.ctx.fill();
       }
 
-      // Glossy 3D specular highlight curve on top-left lobe for larger hearts
-      if (p.size >= 14 && p.scale > 0.4) {
-        this.ctx.shadowColor = "transparent";
-        this.ctx.shadowBlur = 0;
-        this.ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+      // Specular highlight dot on top-left lobe for larger hearts
+      if (p.size >= 16 && p.scale > 0.4) {
+        this.ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
         this.ctx.beginPath();
-        this.ctx.arc(8, 7.2, 2.2, 0, Math.PI * 2);
+        this.ctx.arc(8, 7.2, 2, 0, Math.PI * 2);
         this.ctx.fill();
       }
 
