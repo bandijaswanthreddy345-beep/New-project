@@ -429,44 +429,39 @@ export function validateSemester(semester) {
 
 /**
  * Canonical helper to format any semester representation (1-1, 1-2, 2-1, 2-2, etc.)
- * into friendly "1st sem, 2nd sem etc" format as requested.
+ * into standardized JNTU semester notation: 1-1, 1-2, 2-1, 2-2, 3-1, 3-2, 4-1, 4-2.
  */
 export function formatSemDisplay(sem) {
   if (!sem) return "";
   const clean = String(sem).trim();
 
-  const SEM_ORDINALS = ["", "1st sem", "2nd sem", "3rd sem", "4th sem", "5th sem", "6th sem", "7th sem", "8th sem"];
-
-  // Direct JNTU year-sem code matching: e.g. "1-1" -> "1st sem", "1-2" -> "2nd sem", "2-2" -> "4th sem"
+  // If already in 1-1, 3-2, etc. format, return standard normalized "X-Y"
   const codeMatch = clean.match(/^([1-4])\s*[-.]\s*([1-2])$/);
   if (codeMatch) {
-    const yr = parseInt(codeMatch[1], 10);
-    const sm = parseInt(codeMatch[2], 10);
-    const semNum = (yr - 1) * 2 + sm;
-    return SEM_ORDINALS[semNum] || `${semNum}th sem`;
+    return `${codeMatch[1]}-${codeMatch[2]}`;
   }
 
-  // Ordinal and common alias mappings
-  const ordinalMap = {
-    "1st": "1st sem",
-    "2nd": "2nd sem",
-    "3rd": "3rd sem",
-    "4th": "4th sem",
-    "5th": "5th sem",
-    "6th": "6th sem",
-    "7th": "7th sem",
-    "8th": "8th sem",
-    "1": "1st sem",
-    "2": "2nd sem",
-    "3": "3rd sem",
-    "4": "4th sem",
-    "5": "5th sem",
-    "6": "6th sem",
-    "7": "7th sem",
-    "8": "8th sem",
+  // Ordinal and common alias mappings to JNTU format (1-1 .. 4-2)
+  const codeMap = {
+    "1st": "1-1",
+    "2nd": "1-2",
+    "3rd": "2-1",
+    "4th": "2-2",
+    "5th": "3-1",
+    "6th": "3-2",
+    "7th": "4-1",
+    "8th": "4-2",
+    "1": "1-1",
+    "2": "1-2",
+    "3": "2-1",
+    "4": "2-2",
+    "5": "3-1",
+    "6": "3-2",
+    "7": "4-1",
+    "8": "4-2",
   };
   const lower = clean.toLowerCase();
-  for (const [key, val] of Object.entries(ordinalMap)) {
+  for (const [key, val] of Object.entries(codeMap)) {
     if (
       lower === key ||
       lower === `${key} sem` ||
@@ -482,7 +477,8 @@ export function formatSemDisplay(sem) {
   const numMatch = lower.match(/(?:sem(?:ester)?\s*)?([1-8])(?:st|nd|rd|th)?(?:\s*sem(?:ester)?)?/);
   if (numMatch && numMatch[1]) {
     const n = parseInt(numMatch[1], 10);
-    return SEM_ORDINALS[n] || `${n}th sem`;
+    const JNTU_CODES = ["", "1-1", "1-2", "2-1", "2-2", "3-1", "3-2", "4-1", "4-2"];
+    return JNTU_CODES[n] || clean;
   }
 
   return clean;

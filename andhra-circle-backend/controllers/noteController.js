@@ -304,9 +304,11 @@ exports.deleteNote = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
 
+    // If already deleted or not found, treat delete as success (idempotent delete)
     if (!note) {
-      return res.status(404).json({
-        message: "Note not found",
+      return res.status(200).json({
+        message: "Note already removed or not found",
+        alreadyDeleted: true,
       });
     }
 
