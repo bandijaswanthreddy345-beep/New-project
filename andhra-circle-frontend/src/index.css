@@ -460,6 +460,24 @@ ul {
   padding: 8px 0;
 }
 
+.nav-profile-dropdown.is-open {
+  display: block !important;
+}
+
+.nav-profile-dd-guest-header {
+  cursor: default !important;
+}
+
+.nav-profile-dd-guest-header:hover {
+  background: transparent !important;
+}
+
+.nav-profile-dd-guest-avatar {
+  background: rgba(160, 209, 184, 0.12) !important;
+  border: 1px dashed rgba(160, 209, 184, 0.35) !important;
+  color: #a0d1b8 !important;
+}
+
 @media (min-width: 993px) {
 
   .nav-item-profile:hover .nav-profile-dropdown,

@@ -491,7 +491,17 @@ function StudentProfile() {
 
   // Logout / Switch Profile handler
   const handleConfirmLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("admin_active_portal");
+    localStorage.removeItem("admin_last_active");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("admin_active_portal");
+    sessionStorage.removeItem("admin_last_active");
+
     logoutStudentProfile();
+    setAuthUser(null);
     setShowLogoutModal(false);
     setShowMenu(false);
     setShowMobileMenu(false);
@@ -513,6 +523,11 @@ function StudentProfile() {
       semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
     });
     setActiveTab("overview");
+
+    window.dispatchEvent(new Event("authChanged"));
+    window.dispatchEvent(new Event("studentProfileUpdated"));
+
+    navigate("/login");
   };
 
   // Helper for attendance status

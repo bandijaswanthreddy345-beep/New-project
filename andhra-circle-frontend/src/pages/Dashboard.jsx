@@ -109,14 +109,14 @@ function Dashboard() {
     try {
       const stored = JSON.parse(localStorage.getItem("user") || "{}");
       return {
-        name: stored?.name || "Jaswanth",
-        email: stored?.email || "bandijaswanthreddy345@gmail.com",
+        name: stored?.name || "Administrator",
+        email: stored?.email || "admin@andhra-circle.org",
         role: stored?.role || "admin",
       };
     } catch {
       return {
-        name: "Jaswanth",
-        email: "bandijaswanthreddy345@gmail.com",
+        name: "Administrator",
+        email: "admin@andhra-circle.org",
         role: "admin",
       };
     }

@@ -808,8 +808,14 @@ function Notes({ initialType }) {
               <span className="profile-status-dot" />
             </div>
             <div className="profile-info">
-              <span className="profile-name">{studentData.shortName || "Jaswanth"}</span>
-              <span className="profile-role">{studentData.role || "Student"}</span>
+              <span className="profile-name">
+                {studentData?.isConfigured && studentData?.name
+                  ? (studentData.shortName || studentData.name.split(" ")[0])
+                  : "Guest Student"}
+              </span>
+              <span className="profile-role">
+                {studentData?.isConfigured ? (studentData.role || "Student") : "Sign in to customize"}
+              </span>
             </div>
             <svg className="profile-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M9 18l6-6-6-6" />
