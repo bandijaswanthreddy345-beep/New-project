@@ -787,10 +787,14 @@ ul {
   transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
-.hero-ai-bar:focus-within {
-  border-color: #fbbf24;
-  background: rgba(6, 36, 30, 0.95);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.25);
+.hero-ai-bar:hover,
+.hero-ai-bar:focus-within,
+.hero-ai-bar:active,
+.hero-ai-bar.is-focused,
+.hero-ai-bar.is-active {
+  border-color: #fbbf24 !important;
+  background: rgba(6, 36, 30, 0.95) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 22px rgba(251, 191, 36, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Frosted Avatar Badge Pod */

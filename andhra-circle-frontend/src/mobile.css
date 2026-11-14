@@ -715,29 +715,42 @@
     justify-content: center !important;
     position: relative !important;
     box-sizing: border-box !important;
+    border-radius: 50% !important;
+    overflow: visible !important;
   }
 
   .nav-mobile-avatar-img {
     width: 34px !important;
     height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
     border-radius: 50% !important;
     border: 2px solid #087943 !important;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) !important;
     object-fit: cover !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    display: block !important;
   }
 
   .nav-mobile-fallback-icon {
     width: 34px !important;
     height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
     border-radius: 50% !important;
     background: rgba(8, 121, 67, 0.12) !important;
     border: 1.5px solid #087943 !important;
     color: #087943 !important;
-    display: flex !important;
+    display: flex;
     align-items: center !important;
     justify-content: center !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   .nav-mobile-fallback-icon svg {
@@ -835,6 +848,19 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer !important;
+  }
+
+  .hero-ai-bar:hover,
+  .hero-ai-bar:focus-within,
+  .hero-ai-bar:active,
+  .hero-ai-bar.is-focused,
+  .hero-ai-bar.is-active {
+    border-color: #fbbf24 !important;
+    background: rgba(6, 36, 30, 0.95) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 20px rgba(251, 191, 36, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    outline: none !important;
   }
 
   .hero-ai-avatar-desktop {
@@ -1348,6 +1374,14 @@
   .chat-modal-input-bar {
     padding: 4px 6px 4px 12px !important;
     border-radius: 9999px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .chat-modal-input-bar:hover,
+  .chat-modal-input-bar:focus-within,
+  .chat-modal-input-bar:active {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
   }
 
   .chat-modal-input-field {

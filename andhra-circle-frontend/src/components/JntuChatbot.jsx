@@ -402,6 +402,7 @@ function JntuChatbot() {
   const [modalInput, setModalInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBarFocused, setIsBarFocused] = useState(false);
   const [thinkingState, setThinkingState] = useState("searching");
   const [thinkingLabel, setThinkingLabel] = useState("Searching verified resources...");
 
@@ -1185,7 +1186,14 @@ function JntuChatbot() {
           HERO HOME COMMAND BAR (CLEAN TRIGGER BAR)
           ========================================================= */}
       <div className="hero-ai-bar-anchor">
-        <form className="hero-ai-bar" onSubmit={handleHeroSubmit}>
+        <form
+          className={`hero-ai-bar ${isBarFocused ? "is-focused" : ""}`}
+          onSubmit={handleHeroSubmit}
+          onClick={() => {
+            setIsBarFocused(true);
+            inputRef.current?.focus();
+          }}
+        >
           <div
             className={`hero-ai-avatar-badge ${isListening && listeningTarget === "hero" ? "is-listening" : ""}`}
             title={
@@ -1231,6 +1239,8 @@ function JntuChatbot() {
             }
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onFocus={() => setIsBarFocused(true)}
+            onBlur={() => setIsBarFocused(false)}
             onKeyDown={handleHeroKeyDown}
             aria-label="Ask JNTU AI"
             autoComplete="off"

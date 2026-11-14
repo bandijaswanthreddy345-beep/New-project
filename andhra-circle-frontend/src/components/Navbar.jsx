@@ -57,6 +57,8 @@ function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showToastAlert, setShowToastAlert] = useState(false);
   const [activeAlertItem, setActiveAlertItem] = useState(null);
+  const [mobileAvatarError, setMobileAvatarError] = useState(false);
+  const [desktopAvatarError, setDesktopAvatarError] = useState(false);
   const [student, setStudent] = useState(getStoredStudentData());
   const [currentUser, setCurrentUser] = useState(() => {
     try {
@@ -71,6 +73,11 @@ function Navbar() {
   const [mobileNotifIndex, setMobileNotifIndex] = useState(0);
   const [showMobileNotifPopup, setShowMobileNotifPopup] = useState(false);
   const mobileNotifRef = useRef(null);
+
+  useEffect(() => {
+    setMobileAvatarError(false);
+    setDesktopAvatarError(false);
+  }, [student?.profilePhoto, currentUser]);
 
   useEffect(() => {
     const handleProfileSync = () => {
@@ -480,28 +487,21 @@ function Navbar() {
           }}
         >
           <div className="nav-profile-avatar-wrapper nav-mobile-profile-avatar-wrapper">
-            {currentUser && getStudentAvatar(student) ? (
+            {currentUser && getStudentAvatar(student) && !mobileAvatarError ? (
               <img
                 src={getStudentAvatar(student)}
                 alt={currentUser.name || "Student"}
                 className="nav-profile-avatar-img nav-mobile-avatar-img"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  if (e.currentTarget.nextElementSibling) {
-                    e.currentTarget.nextElementSibling.style.display = "flex";
-                  }
-                }}
+                onError={() => setMobileAvatarError(true)}
               />
-            ) : null}
-            <span
-              className="nav-profile-fallback-icon nav-mobile-fallback-icon"
-              style={{ display: currentUser && getStudentAvatar(student) ? "none" : "flex" }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            </span>
+            ) : (
+              <span className="nav-profile-fallback-icon nav-mobile-fallback-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
+            )}
             {currentUser && <span className="nav-profile-status-dot is-online" />}
           </div>
         </Link>
@@ -646,37 +646,30 @@ function Navbar() {
                     aria-expanded={showProfileDropdown}
                   >
                     <div className="nav-profile-avatar-wrapper">
-                      {photoSrc ? (
+                      {photoSrc && !desktopAvatarError ? (
                         <img
                           src={photoSrc}
                           alt={displayName}
                           className="nav-profile-avatar-img"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            if (e.currentTarget.nextElementSibling) {
-                              e.currentTarget.nextElementSibling.style.display = "flex";
-                            }
-                          }}
+                          onError={() => setDesktopAvatarError(true)}
                         />
-                      ) : null}
-                      <span
-                        className="nav-profile-fallback-icon"
-                        style={{ display: photoSrc ? "none" : "flex" }}
-                      >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx="12" cy="7" r="4" />
-                        </svg>
-                      </span>
+                      ) : (
+                        <span className="nav-profile-fallback-icon">
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                          </svg>
+                        </span>
+                      )}
                       {currentUser && (
                         <span className="nav-profile-status-dot is-online" title="Account Online" />
                       )}
