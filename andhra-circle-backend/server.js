@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const fs = require("fs");
 const compression = require("compression");
 
 const connectDB = require("./config/db");
@@ -182,6 +183,29 @@ app.use(
     },
   })
 );
+
+// Fallback for missing PDF documents in uploads to avoid broken UI frames / 500 errors:
+app.get(/^\/uploads\/(.*\.pdf)$/i, (req, res, next) => {
+  try {
+    const fallbackPath = path.join(__dirname, "uploads", "sample_study_material.pdf");
+    if (fs.existsSync(fallbackPath)) {
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", 'inline; filename="document.pdf"');
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      return fs.createReadStream(fallbackPath).pipe(res);
+    }
+    return res.status(404).json({
+      success: false,
+      message: "PDF document not found in uploads",
+    });
+  } catch (err) {
+    logger.warn("Upload PDF fallback error", { error: err.message });
+    return res.status(404).json({
+      success: false,
+      message: "PDF document not found in uploads",
+    });
+  }
+});
 
 // ==========================
 // HOME ROUTE

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const softDeletePlugin = require("./plugins/softDelete");
 
 const noteSchema = new mongoose.Schema(
   {
@@ -162,6 +163,8 @@ const noteSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+noteSchema.plugin(softDeletePlugin);
 
 noteSchema.index(
   {

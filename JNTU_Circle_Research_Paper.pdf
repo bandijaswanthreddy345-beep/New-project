@@ -1,0 +1,4607 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R 10 0 R 12 0 R] /Count 5 >>
+endobj
+3 0 obj
+<< /Length 14876 >>
+stream
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      22.00 22.00 551.28 797.89 re
+      S
+      0.70 0.75 0.73 RG
+      0.5 w
+      26.00 26.00 543.28 789.89 re
+      S
+    
+
+      BT
+      /F2 11.8 Tf
+      0 0.23 0.2 rg
+      1 0 0 1 120.96 794.00 Tm
+      (JNTU Circle: Architectural Design, Real-Time Synchronization,) Tj
+      ET
+    
+
+      BT
+      /F2 11.8 Tf
+      0 0.23 0.2 rg
+      1 0 0 1 68.15 780.20 Tm
+      (and Multi-Regulation Evaluation for Engineering Educational Knowledge Systems) Tj
+      ET
+    
+
+      BT
+      /F2 8 Tf
+      0.3 0.3 0.3 rg
+      1 0 0 1 270.75 763.90 Tm
+      (Submitted By:) Tj
+      ET
+    
+
+      BT
+      /F2 8.8 Tf
+      0.08 0.08 0.08 rg
+      1 0 0 1 143.38 754.70 Tm
+      (Bandi Jaswanth Reddy   |   Naga Sai   |   Bandi Bharath   |   Vamsi Kumar) Tj
+      ET
+    
+
+      BT
+      /F2 8.8 Tf
+      0.08 0.28 0.23 rg
+      1 0 0 1 203.35 743.70 Tm
+      (Research Guide: Dr. MV. Jagannatha Reddy) Tj
+      ET
+    
+
+      BT
+      /F3 8 Tf
+      0.35 0.35 0.35 rg
+      1 0 0 1 182.04 733.70 Tm
+      (Department of Artificial Intelligence and Machine Learning \(AIML\)) Tj
+      ET
+    
+
+      BT
+      /F2 8.8 Tf
+      0.15 0.15 0.15 rg
+      1 0 0 1 246.40 724.50 Tm
+      (MS Engineering College) Tj
+      ET
+    
+
+      BT
+      /F3 7.6 Tf
+      0.45 0.45 0.45 rg
+      1 0 0 1 261.31 714.50 Tm
+      (Academic Year: 2026) Tj
+      ET
+    
+
+    0.08 0.28 0.23 RG
+    0.8 w
+    46 702.40 m
+    549.28 702.40 l
+    S
+  
+
+      0.980 0.985 0.982 rg
+      46.00 489.00 503.28 207.40 re
+      f
+      0.08 0.28 0.23 RG
+      0.9 w
+      46.00 489.00 503.28 207.40 re
+      S
+    
+
+      BT
+      /F2 8.6 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 272.87 682.40 Tm
+      (ABSTRACT) Tj
+      ET
+    
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        1.934 Tw
+        1 0 0 1 58.00 670.90 Tm
+        (Navigating undergraduate engineering coursework across institutions affiliated with Jawaharlal Nehru Technological University) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        1.244 Tw
+        1 0 0 1 58.00 659.90 Tm
+        (Anantapur \(JNTUA\) presents recurring operational hurdles. On our campus, concurrent regulatory frameworks--specifically R15,) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        0.567 Tw
+        1 0 0 1 58.00 648.90 Tm
+        (R19, R20, and R23--frequently cause students to revise from obsolete lecture materials, miss critical examination announcements) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        1.499 Tw
+        1 0 0 1 58.00 637.90 Tm
+        (during central server outages, and miscalculate semester GPAs due to shifting internal evaluation weights. To eliminate these) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        2.495 Tw
+        1 0 0 1 58.00 626.90 Tm
+        (recurring obstacles, our student research group at MS Engineering College developed JNTU Circle: a production-deployed) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        2.397 Tw
+        1 0 0 1 58.00 615.90 Tm
+        (academic knowledge hub, automated circular ingestion pipeline, and multi-scheme evaluation platform. Built with React 19,) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        0.738 Tw
+        1 0 0 1 58.00 604.90 Tm
+        (Express.js, and MongoDB Atlas, the architecture incorporates: \(1\) a multi-regulation digital repository categorizing validated study) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        0.081 Tw
+        1 0 0 1 58.00 593.90 Tm
+        (resources across 6 engineering disciplines; \(2\) a decoupled scraping daemon utilizing SHA-256 cryptographic DOM fingerprinting to) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        1.074 Tw
+        1 0 0 1 58.00 582.90 Tm
+        (broadcast genuine university circulars within 60 seconds without duplicates; \(3\) an in-browser PDF reverse proxy that bypasses) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        1.479 Tw
+        1 0 0 1 58.00 571.90 Tm
+        (cross-origin framing constraints for inline document inspection; \(4\) an adaptive grading algorithm calculating SGPA and CGPA) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        0.866 Tw
+        1 0 0 1 58.00 560.90 Tm
+        (under shifting continuous-evaluation splits; and \(5\) a curriculum-grounded conversational agent deployed on Groq LPU hardware) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        1.980 Tw
+        1 0 0 1 58.00 549.90 Tm
+        (delivering sub-200ms token streaming. Empirical trials conducted with N = 210 engineering scholars across two consecutive) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        0.539 Tw
+        1 0 0 1 58.00 538.90 Tm
+        (semesters demonstrated a 96.2% acceleration in finding verified study resources \(p < 0.001\) and an outstanding System Usability) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.2 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 58.00 527.90 Tm
+        (Scale \(SUS\) score of 89.4/100, verifying the practical efficacy of our platform.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 7.8 Tf
+      0.08 0.25 0.20 rg
+      1 0 0 1 58.00 512.40 Tm
+      (Keywords: ) Tj
+      /F3 7.8 Tf
+      0.22 0.22 0.22 rg
+      (Curricular Knowledge Hub, Real-Time Portal Ingestion, Multi-Regulation Evaluation, Engineering Informatics, Groq LPU) Tj
+      ET
+    
+
+        BT
+        /F3 7.8 Tf
+        0.22 0.22 0.22 rg
+        1 0 0 1 58.00 502.00 Tm
+        (Inference, PDF Streaming Pipeline, Progressive Web Application.) Tj
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 486.00 m
+      549.28 486.00 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 477.50 Tm
+      (1. INTRODUCTION) Tj
+      ET
+    
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 462.80 Tm
+      (1.1 The Affiliating Collegiate Framework in Regional Technical Education) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.351 Tw
+        1 0 0 1 46.00 453.60 Tm
+        (State-governed technical universities in India, including JNTUA, function through a federated affiliation model. Rather than confining) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.108 Tw
+        1 0 0 1 46.00 442.40 Tm
+        (academic operations to a single self-contained university campus, a central administrative board oversees syllabus formulation, legal) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.106 Tw
+        1 0 0 1 46.00 431.20 Tm
+        (circulars, centralized examinations, and degree conferrals for more than one hundred thousand engineering scholars enrolled across) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.200 Tw
+        1 0 0 1 46.00 420.00 Tm
+        (hundreds of affiliated institutions. While this structure maintains uniform qualification standards across diverse rural and metropolitan) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 408.80 Tm
+        (areas, it creates a severe information delivery bottleneck between central authorities and individual college classrooms.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 390.00 Tm
+      (1.2 Field Observations of Academic Resource Fragmentation) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.359 Tw
+        1 0 0 1 46.00 380.80 Tm
+        (During our coursework in the Department of Artificial Intelligence and Machine Learning at MS Engineering College, we carried out) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.045 Tw
+        1 0 0 1 46.00 369.60 Tm
+        (qualitative field surveys investigating how peers discover, exchange, and revise academic assets. We discovered that undergraduate) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.125 Tw
+        1 0 0 1 46.00 358.40 Tm
+        (scholars almost never consult official institutional portals during exam preparation. Because university servers do not offer organized) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.758 Tw
+        1 0 0 1 46.00 347.20 Tm
+        (lecture notes, student groups resort to unstructured peer networks such as WhatsApp chats, Telegram groups, and uncurated Google) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 336.00 Tm
+        (Drive repositories. This reliance introduces three major operational vulnerabilities:) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 323.90 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 321.40 Tm
+      (Curricular Version Drift: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.962 Tw
+      (Engineering curricula undergo substantial restructuring every three to four academic cycles to reflect) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.307 Tw
+        1 0 0 1 62.00 310.20 Tm
+        (AICTE recommendations. At JNTUA, four curricular regulations operate concurrently: R15, R19, R20, and R23. In peer groups,) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        2.431 Tw
+        1 0 0 1 62.00 299.00 Tm
+        (students often study from senior notes written for older schemes, leading to exam preparation mismatches where students) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 287.80 Tm
+        (inadvertently revise obsolete course units.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 276.70 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 274.20 Tm
+      (Statutory Notice Latencies: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      2.714 Tw
+      (Vital university circulars regarding exam registrations, fee deadlines, hall ticket downloads, and) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.652 Tw
+        1 0 0 1 62.00 263.00 Tm
+        (revaluation windows are published on central portals that routinely experience HTTP 500 downtime during peak visits, leaving) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 251.80 Tm
+        (thousands of candidates unaware of crucial academic cutoff dates.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 240.70 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 238.20 Tm
+      (Multi-Regulation Grading Ambiguity: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.984 Tw
+      (Each regulatory cycle enforces distinct degree credit totals \(180 credits in R15 vs. 160) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.162 Tw
+        1 0 0 1 62.00 227.00 Tm
+        (credits in R20/R23\), varying continuous internal assessment proportions \(30:70 in R20 vs. 40:60 in R23\), and different passing mark) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 215.80 Tm
+        (thresholds. Students routinely miscalculate their GPA metrics using outdated web calculators.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 198.00 Tm
+      (1.3 Project Motivation and Scope) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.382 Tw
+        1 0 0 1 46.00 188.80 Tm
+        (Motivated by these persistent campus challenges, our student engineering team undertook the design and implementation of JNTU) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.298 Tw
+        1 0 0 1 46.00 177.60 Tm
+        (Circle. Rather than assembling another generic, administrative learning management portal, our goal was to engineer a mobile-first,) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.599 Tw
+        1 0 0 1 46.00 166.40 Tm
+        (cloud-native knowledge platform tailored directly to the daily academic needs of affiliating engineering students: structured material) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 155.20 Tm
+        (discovery by regulation, real-time notice alerts, and syllabus-grounded tutoring.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 136.40 Tm
+      (1.4 Architectural Objectives and Core Contributions) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.139 Tw
+        1 0 0 1 46.00 127.20 Tm
+        (JNTU Circle addresses the collegiate communication divide through four core technological contributions: first, an indexed repository) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.345 Tw
+        1 0 0 1 46.00 116.00 Tm
+        (classifying verified study notes with zero duplication; second, an automated background scraping pipeline using SHA-256 DOM hashing) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.980 Tw
+        1 0 0 1 46.00 104.80 Tm
+        (for instant circular broadcasts; third, a dynamic reverse proxy streaming university PDFs directly without browser framing blocks; and) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 93.60 Tm
+        (fourth, an adaptive evaluation calculator handling shifting regulation rules.) Tj
+        0 Tw
+        ET
+      
+
+        0.78 0.82 0.80 RG
+        0.5 w
+        46 40 m
+        549.28 40 l
+        S
+        BT
+        /F1 8.0 Tf
+        0.40 0.40 0.40 rg
+        1 0 0 1 273.64 28 Tm
+        (Page 1 of 5) Tj
+        ET
+      
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 3 0 R /Resources << /Font << 
+          /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> 
+          /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> 
+          /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >> 
+          /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >> 
+          /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >> 
+        >> >> >>
+endobj
+5 0 obj
+<< /Length 21829 >>
+stream
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      22.00 22.00 551.28 797.89 re
+      S
+      0.70 0.75 0.73 RG
+      0.5 w
+      26.00 26.00 543.28 789.89 re
+      S
+    
+
+        BT
+        /F3 7.8 Tf
+        0.30 0.35 0.33 rg
+        1 0 0 1 46 803.89 Tm
+        (JNTU Circle: Architectural Design, Real-Time Synchronization & Multi-Regulation Evaluation) Tj
+        ET
+        0.75 0.80 0.78 RG
+        0.5 w
+        46 799.89 m
+        549.28 799.89 l
+        S
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 790.39 m
+      549.28 790.39 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 781.89 Tm
+      (2. PROBLEM STATEMENT AND RESEARCH OBJECTIVES) Tj
+      ET
+    
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 767.19 Tm
+      (2.1 Formal Problem Definition) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.562 Tw
+        1 0 0 1 46.00 757.99 Tm
+        (Undergraduate engineering students across affiliating state technical universities experience acute academic friction stemming from) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.034 Tw
+        1 0 0 1 46.00 746.79 Tm
+        (uncurated study material dissemination, document version ambiguity across overlapping regulatory cycles, delayed circular alerts caused) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 735.59 Tm
+        (by central portal outages, and widespread miscalculations during multi-scheme grade evaluations.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 716.79 Tm
+      (2.2 Five Measurable Engineering Objectives) Tj
+      ET
+    
+
+      0.08 0.28 0.23 rg
+      51.00 710.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 707.59 Tm
+      (Core Engineering Goal: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      2.468 Tw
+      (To conceptualize, construct, deploy, and empirically evaluate a cloud-native academic platform that) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.024 Tw
+        1 0 0 1 62.00 696.39 Tm
+        (organizes verified study notes, automates portal circular alerts with zero duplication, and executes adaptive multi-regulation GPA) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 685.19 Tm
+        (computations.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 674.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 671.59 Tm
+      (Objective 1 \(Curriculum Ontology\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.239 Tw
+      (Formulate an indexed document schema categorizing engineering learning assets across 6) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.173 Tw
+        1 0 0 1 62.00 660.39 Tm
+        (technical departments \(AIML, CSE, ECE, MECH, CIVIL, EEE\) and 4 regulatory schemes \(R15, R19, R20, R23\) delivering sub-50ms) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 649.19 Tm
+        (query speeds.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 638.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 635.59 Tm
+      (Objective 2 \(Resilient Ingestion Daemon\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.810 Tw
+      (Construct an autonomous background worker applying SHA-256 cryptographic row) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 624.39 Tm
+        (fingerprinting to parse university portal tables and broadcast genuine notices within 60 seconds of release.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 613.29 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 610.79 Tm
+      (Objective 3 \(Curriculum-Bound AI Tutor\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.966 Tw
+      (Deploy an interactive tutoring agent on Groq Cloud LPU accelerators that streams) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 599.59 Tm
+        (syllabus-verified explanations, code snippets, and mathematical derivations in under 200 milliseconds.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 588.49 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 585.99 Tm
+      (Objective 4 \(Adaptive Grading Engine\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.024 Tw
+      (Implement a regulation-aware computation service modeling shifting credit splits, grade) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 574.79 Tm
+        (point mappings, and backlog tallies for accurate student performance forecasting.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 563.69 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 561.19 Tm
+      (Objective 5 \(Empirical Peer Validation\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0.733 Tw
+      (Stress-test system endpoints under 10,000 synthetic requests and conduct an empirical) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 549.99 Tm
+        (evaluation with N = 210 engineering scholars across two semesters to validate educational benefits.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 539.89 m
+      549.28 539.89 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 531.39 Tm
+      (3. RELATED WORK AND COMPARATIVE ANALYSIS) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.001 Tw
+        1 0 0 1 46.00 520.89 Tm
+        (Existing educational software falls into three distinct categories: enterprise institutional ERPs, commercial LMS platforms, and standalone) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.096 Tw
+        1 0 0 1 46.00 509.69 Tm
+        (web utilities. Early research by Watson and Watson \(2007\) highlighted the critical importance of distinguishing administrative student) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.461 Tw
+        1 0 0 1 46.00 498.49 Tm
+        (record-keeping from agile student learning retrieval. ERP suites focus predominantly on financial accounting, staff payroll, and statutory) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.814 Tw
+        1 0 0 1 46.00 487.29 Tm
+        (attendance, offering cumbersome interfaces that hinder rapid document lookups. Commercial LMS platforms such as Canvas and) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.404 Tw
+        1 0 0 1 46.00 476.09 Tm
+        (Blackboard create enrollment barriers \(Dahlstrom et al., 2020\), preventing students from sharing verified notes across different affiliated) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 464.89 Tm
+        (institutions. In Table 1, we contrast existing academic platforms against the technical innovations implemented in JNTU Circle:) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F2 7.6 Tf
+        0.08 0.25 0.22 rg
+        1 0 0 1 46 448.29 Tm
+        (TABLE 1: COMPARATIVE TAXONOMY OF ACADEMIC KNOWLEDGE MANAGEMENT PLATFORMS) Tj
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 438.29 m
+      549.28 438.29 l
+      S
+    
+
+      0.93 0.96 0.95 rg
+      46 425.29 503.28 13 re
+      f
+    
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 50.00 428.79 Tm
+        (Investigated Paradigm) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 125.00 428.79 Tm
+        (Functional Focus) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 205.00 428.79 Tm
+        (Core Mechanism) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 310.00 428.79 Tm
+        (Observed Field Limitation) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 425.00 428.79 Tm
+        (Implemented JNTU Circle Advance) Tj
+        ET
+      
+
+      0.50 0.50 0.50 RG
+      0.6 w
+      46 425.29 m
+      549.28 425.29 l
+      S
+    
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 417.29 Tm
+            (Alavi \(2001\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 125.00 417.29 Tm
+            (Enterprise KMS) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 417.29 Tm
+            (Theoretical knowledge) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 408.29 Tm
+            (framework) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 417.29 Tm
+            (Lacks practical software) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 408.29 Tm
+            (implementation) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 417.29 Tm
+            (Real-world multi-regulation) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 408.29 Tm
+            (curriculum ontology) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 384.09 503.28 20.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 396.69 Tm
+            (Watson \(2007\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 125.00 396.69 Tm
+            (Campus LMS) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 396.69 Tm
+            (Course-centric student) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 387.69 Tm
+            (management) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 396.69 Tm
+            (Classroom enrollment silos) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 387.69 Tm
+            (prevent cross-college sharing) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 396.69 Tm
+            (Open cross-institutional knowledge) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 387.69 Tm
+            (hub for all colleges) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 376.09 Tm
+            (Dahlstrom \(2020\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 125.00 376.09 Tm
+            (Commercial LMS) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 376.09 Tm
+            (Survey of Canvas & Moodle in) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 367.09 Tm
+            (higher ed) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 376.09 Tm
+            (Documented adoption fatigue) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 367.09 Tm
+            (and slow search interfaces) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 376.09 Tm
+            (Cloud-native, sub-second PWA) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 367.09 Tm
+            (search optimized for mobile) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 342.89 503.28 20.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 355.49 Tm
+            (Kumar \(2019\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 125.00 355.49 Tm
+            (Evaluation Tools) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 355.49 Tm
+            (Web-based GPA calculator) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 355.49 Tm
+            (Static grading formulas fail on) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 346.49 Tm
+            (new university regulations) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 355.49 Tm
+            (Dynamic multi-regulation grading) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 346.49 Tm
+            (engine \(R15 through R23\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 334.89 Tm
+            (Baidoo-Anu \(2023\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 125.00 334.89 Tm
+            (AI in Education) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 334.89 Tm
+            (Empirical study of ChatGPT in) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 325.89 Tm
+            (tutoring) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 334.89 Tm
+            (Severe hallucinations on) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 325.89 Tm
+            (university-specific course codes) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 334.89 Tm
+            (Curriculum-grounded prompting on) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 325.89 Tm
+            (Groq LPU accelerators) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 292.69 503.28 29.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 314.29 Tm
+            (Biere \(2022\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 125.00 314.29 Tm
+            (PWA Systems) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 205.00 314.29 Tm
+            (Service worker client caching) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 314.29 Tm
+            (Generic web app study;) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 305.29 Tm
+            (unoptimized for document) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 310.00 296.29 Tm
+            (streaming) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 314.29 Tm
+            (Dynamic PDF proxy streamer with) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 305.29 Tm
+            (offline asset fallback) Tj
+            ET
+          
+
+      0.08 0.28 0.23 RG
+      1.0 w
+      46 292.69 m
+      549.28 292.69 l
+      S
+    
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 284.19 m
+      549.28 284.19 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 275.69 Tm
+      (4. IDENTIFIED RESEARCH GAPS AND SYSTEM CONTRIBUTIONS) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 265.19 Tm
+        (Our analytical review of existing higher educational software revealed four structural limitations:) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 253.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 250.59 Tm
+      (Curricular-Silo Gap: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0.089 Tw
+      (Online repositories do not classify notes across changing regulatory cycles simultaneously, leading candidates) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 239.39 Tm
+        (to study from superseded syllabus schemes.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 228.29 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 225.79 Tm
+      (Notification Latency Gap: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0 Tw
+      (Statutory university circulars remain confined to legacy portals devoid of background polling,) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 214.59 Tm
+        (deduplication, or push notification pipelines.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 203.49 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 200.99 Tm
+      (Document Streaming Gap: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0.083 Tw
+      (Strict browser security policies \(CORS and frame-ancestors CSP\) prevent embedding official university) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 189.79 Tm
+        (PDFs in web apps, forcing manual file downloads.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 178.69 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 176.19 Tm
+      (Grounded AI Gap: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      2.654 Tw
+      (Commercial conversational LLMs lack local university curriculum awareness, confusing course units and) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 164.99 Tm
+        (recommending out-of-syllabus examination questions.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        2.877 Tw
+        1 0 0 1 46.00 151.39 Tm
+        (JNTU Circle directly bridges these limitations through production-deployed innovations: a multi-scheme curriculum ontology, an) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.623 Tw
+        1 0 0 1 46.00 140.19 Tm
+        (autonomous SHA-256 DOM scraper, a Groq-accelerated AI tutor, an adaptive grading engine, and a dynamic reverse proxy document) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 128.99 Tm
+        (streamer.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.264 Tw
+        1 0 0 1 46.00 114.39 Tm
+        (By uniting verified resource dissemination with rigorous evaluative capabilities, the platform provides a dependable, single-pane-of-glass) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.569 Tw
+        1 0 0 1 46.00 103.19 Tm
+        (digital companion tailored to the socio-technical realities of affiliated state university cohorts, replacing fragmented chat sharing with an) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 91.99 Tm
+        (auditable academic repository.) Tj
+        0 Tw
+        ET
+      
+
+        0.78 0.82 0.80 RG
+        0.5 w
+        46 40 m
+        549.28 40 l
+        S
+        BT
+        /F1 8.0 Tf
+        0.40 0.40 0.40 rg
+        1 0 0 1 273.64 28 Tm
+        (Page 2 of 5) Tj
+        ET
+      
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 5 0 R /Resources << /Font << 
+          /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> 
+          /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> 
+          /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >> 
+          /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >> 
+          /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >> 
+        >> >> >>
+endobj
+7 0 obj
+<< /Length 20275 >>
+stream
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      22.00 22.00 551.28 797.89 re
+      S
+      0.70 0.75 0.73 RG
+      0.5 w
+      26.00 26.00 543.28 789.89 re
+      S
+    
+
+        BT
+        /F3 7.8 Tf
+        0.30 0.35 0.33 rg
+        1 0 0 1 46 803.89 Tm
+        (JNTU Circle: Architectural Design, Real-Time Synchronization & Multi-Regulation Evaluation) Tj
+        ET
+        0.75 0.80 0.78 RG
+        0.5 w
+        46 799.89 m
+        549.28 799.89 l
+        S
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 790.39 m
+      549.28 790.39 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 781.89 Tm
+      (5. SYSTEM ARCHITECTURE AND MODULE DESIGN) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.878 Tw
+        1 0 0 1 46.00 771.39 Tm
+        (JNTU Circle is organized as a modular client-server application partitioned across four decoupled architectural tiers, guaranteeing) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 760.19 Tm
+        (horizontal scalability, sub-50ms query response times, and dependable document streaming:) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 748.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 745.59 Tm
+      (Presentation Tier \(Client / PWA\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.880 Tw
+      (Built using React 19, Tailwind CSS v4, and Vite with manual code chunk splitting. Service) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.640 Tw
+        1 0 0 1 62.00 734.39 Tm
+        (workers cache core visual assets and high-resolution icons for offline responsiveness. Responsive layouts ensure fluid access) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 723.19 Tm
+        (across mobile viewports, tablets, and desktop workstations.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 712.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 709.59 Tm
+      (Gateway & Middleware Tier: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      3.771 Tw
+      (An Express.js API gateway equipped with Helmet HTTP security headers, dynamic CORS) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.840 Tw
+        1 0 0 1 62.00 698.39 Tm
+        (whitelisting, IP-based request rate limiting \(600 req/min/IP\), and stateless JWT authorization featuring integer token versioning for) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 687.19 Tm
+        (instant session revocation.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 676.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 673.59 Tm
+      (Core Services Tier: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      2.759 Tw
+      (Comprises five specialized micro-services: \(1\) Academic Resource Controller for multi-criteria note and) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.902 Tw
+        1 0 0 1 62.00 662.39 Tm
+        (question paper indexing; \(2\) Scraper Synchronization Service; \(3\) Groq AI Inference Bridge; \(4\) Multi-Regulation Grading Engine;) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 651.19 Tm
+        (and \(5\) Dynamic PDF Reverse Proxy Streamer.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 640.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 637.59 Tm
+      (Data Persistence Tier: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0.909 Tw
+      (MongoDB Atlas cloud database using compound indices for sub-40ms document queries, integrated with) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 626.39 Tm
+        (local fallback file caches for network resilience.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 616.29 m
+      549.28 616.29 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 607.79 Tm
+      (6. RESEARCH METHODOLOGY AND TECHNOLOGY SELECTION) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.462 Tw
+        1 0 0 1 46.00 597.29 Tm
+        (Our team adhered to an empirical software engineering pipeline structured into seven progressive phases: \(1\) Field interviews with 210) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.293 Tw
+        1 0 0 1 46.00 586.09 Tm
+        (engineering scholars; \(2\) Multi-regulation data ontology design; \(3\) API security gateway hardening; \(4\) Micro-service business logic) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.165 Tw
+        1 0 0 1 46.00 574.89 Tm
+        (execution; \(5\) Groq LPU streaming integration; \(6\) PWA service worker asset caching; and \(7\) Production usability benchmarking across) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 563.69 Tm
+        (two semesters.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F2 7.6 Tf
+        0.08 0.25 0.22 rg
+        1 0 0 1 46 547.09 Tm
+        (TABLE 2: ARCHITECTURAL TECHNOLOGY STACK SELECTION MATRIX) Tj
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 537.09 m
+      549.28 537.09 l
+      S
+    
+
+      0.93 0.96 0.95 rg
+      46 524.09 503.28 13 re
+      f
+    
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 50.00 527.59 Tm
+        (Subsystem / Layer) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 145.00 527.59 Tm
+        (Selected Stack) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 225.00 527.59 Tm
+        (Release) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 295.00 527.59 Tm
+        (Architectural Justification) Tj
+        ET
+      
+
+      0.50 0.50 0.50 RG
+      0.6 w
+      46 524.09 m
+      549.28 524.09 l
+      S
+    
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 516.09 Tm
+            (Frontend Framework) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 145.00 516.09 Tm
+            (React) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 225.00 516.09 Tm
+            (19.2.17) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 295.00 516.09 Tm
+            (Concurrent rendering, lightweight Virtual DOM, declarative component state) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 500.89 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 504.49 Tm
+            (Build & Bundling) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 145.00 504.49 Tm
+            (Vite) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 225.00 504.49 Tm
+            (8.3.6) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 295.00 504.49 Tm
+            (Rollup tree-shaking, sub-second HMR, optimized manual chunk splitting) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 492.89 Tm
+            (Styling & Tokens) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 145.00 492.89 Tm
+            (Tailwind CSS) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 225.00 492.89 Tm
+            (v4.0) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 295.00 492.89 Tm
+            (Utility-first compilation, zero runtime overhead, responsive design tokens) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 477.69 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 481.29 Tm
+            (Backend Runtime) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 145.00 481.29 Tm
+            (Node.js) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 225.00 481.29 Tm
+            (v26.13) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 295.00 481.29 Tm
+            (Asynchronous non-blocking I/O, event-driven streaming architecture) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 469.69 Tm
+            (Web Framework) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 145.00 469.69 Tm
+            (Express.js) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 225.00 469.69 Tm
+            (4.21.2) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 295.00 469.69 Tm
+            (Middleware ecosystem, native HTTP stream piping, minimal request overhead) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 454.49 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 458.09 Tm
+            (Cloud Database) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 145.00 458.09 Tm
+            (MongoDB Atlas) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 225.00 458.09 Tm
+            (7.0) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 295.00 458.09 Tm
+            (Document polymorphism, compound index acceleration, flexible schemas) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 446.49 Tm
+            (AI Inference Engine) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 145.00 446.49 Tm
+            (Groq LPU Cloud) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 225.00 446.49 Tm
+            (Llama 3 70B) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 295.00 446.49 Tm
+            (Specialized Language Processing Units yielding sub-200ms token streaming) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 431.29 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 434.89 Tm
+            (Authentication) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 145.00 434.89 Tm
+            (JWT + Bcrypt) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 225.00 434.89 Tm
+            (3.0.3) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 295.00 434.89 Tm
+            (Stateless token authorization enhanced with integer token versioning) Tj
+            ET
+          
+
+      0.08 0.28 0.23 RG
+      1.0 w
+      46 431.29 m
+      549.28 431.29 l
+      S
+    
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 422.79 m
+      549.28 422.79 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 414.29 Tm
+      (7. REAL-TIME SYNCHRONIZATION AND STREAMING ENGINE) Tj
+      ET
+    
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 399.59 Tm
+      (7.1 Scraping Workflow and Cryptographic Change Detection) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.643 Tw
+        1 0 0 1 46.00 390.39 Tm
+        (The university notification scraper runs as a decoupled background worker. Every T = 300 seconds, the engine queries official JNTUA) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.028 Tw
+        1 0 0 1 46.00 379.19 Tm
+        (examination portal endpoints. To prevent duplicate database entries and alert students solely when novel notices appear, the engine) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 367.99 Tm
+        (generates a cryptographic SHA-256 fingerprint from the extracted table row attributes:) Tj
+        0 Tw
+        ET
+      
+
+      0.96 0.97 0.98 rg
+      52 335.89 491.28 17.50 re
+      f
+      0.82 0.85 0.88 RG
+      0.5 w
+      52 335.89 491.28 17.50 re
+      S
+      BT
+      /F4 8.2 Tf
+      0.05 0.18 0.22 rg
+      1 0 0 1 62.00 341.89 Tm
+      (Fingerprint = SHA256\(Title || PublicationDate || DocumentURL\)) Tj
+    
+
+        /F2 8.0 Tf
+        0.20 0.20 0.20 rg
+        1 0 0 1 513.28 341.89 Tm
+        (\(1\)) Tj
+      
+ET
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.020 Tw
+        1 0 0 1 46.00 329.89 Tm
+        (When the scraper parses a notification, it checks MongoDB for the calculated hash: if absent, the notice is flagged as novel \(isNew: true\),) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 318.69 Tm
+        (saved to the database, and pushed to students in real time; if present, the cycle passes idempotently with zero redundant writes.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 299.89 Tm
+      (7.2 Resilience to Portal Outages and Dynamic Reverse Proxy Streamer) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.185 Tw
+        1 0 0 1 46.00 290.69 Tm
+        (Central university portals frequently return HTTP 500/502 errors during high-traffic declaration days. The synchronization engine catches) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.645 Tw
+        1 0 0 1 46.00 279.49 Tm
+        (upstream network exceptions, applies exponential backoff retries, and maintains previously cached records without data corruption. To) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.997 Tw
+        1 0 0 1 46.00 268.29 Tm
+        (overcome restrictive Content-Security-Policy headers \(frame-ancestors\) and CORS blocks that prevent embedding university PDFs in) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.410 Tw
+        1 0 0 1 46.00 257.09 Tm
+        (web applications, JNTU Circle incorporates a dynamic reverse proxy stream pipe. The server fetches upstream binary buffers, removes) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 245.89 Tm
+        (obstructive security headers, and streams documents directly to client viewers with byte-range resume support.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 234.79 m
+      549.28 234.79 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 226.29 Tm
+      (8. CONTEXTUAL CURRICULAR AI ASSISTANT \(JNTU BOT\)) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.777 Tw
+        1 0 0 1 46.00 215.79 Tm
+        (When engineering students use generic AI models like standard ChatGPT, they frequently encounter severe hallucinations: the model) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.050 Tw
+        1 0 0 1 46.00 204.59 Tm
+        (references subjects from other universities, cites incorrect course codes, or provides generic textbook answers that do not adhere to) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.035 Tw
+        1 0 0 1 46.00 193.39 Tm
+        (JNTUA examination expectations. To solve this, we engineered 'JNTU Bot', an institutional conversational assistant grounded specifically) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 182.19 Tm
+        (in university curriculum boundaries.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.059 Tw
+        1 0 0 1 46.00 167.59 Tm
+        (To achieve natural, real-time conversation on mobile devices, JNTU Bot connects to Groq Cloud Language Processing Units \(LPUs\)) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.203 Tw
+        1 0 0 1 46.00 156.39 Tm
+        (running Llama 3 70B. Because LPUs use deterministic tensor processing rather than standard GPU queuing, token generation begins in) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 145.19 Tm
+        (under 200 milliseconds, giving students immediate feedback.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 133.09 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 130.59 Tm
+      (Curriculum-Bound Prompting: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      3.037 Tw
+      (The AI system prompt injects active branch and regulation course constraints, ensuring all) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 119.39 Tm
+        (explanations strictly match the student's syllabus.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 108.29 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 105.79 Tm
+      (Mathematical & Code Explanations: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0 Tw
+      (Students can paste complex programming lab questions or request step-by-step) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 94.59 Tm
+        (mathematical derivations with full LaTeX notation.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 83.49 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 80.99 Tm
+      (Exam Strategy Guidance: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0.786 Tw
+      (The bot highlights high-frequency exam questions based on historical question paper trends, directing) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 69.79 Tm
+        (students to verified notes in the knowledge hub.) Tj
+        0 Tw
+        ET
+      
+
+        0.78 0.82 0.80 RG
+        0.5 w
+        46 40 m
+        549.28 40 l
+        S
+        BT
+        /F1 8.0 Tf
+        0.40 0.40 0.40 rg
+        1 0 0 1 273.64 28 Tm
+        (Page 3 of 5) Tj
+        ET
+      
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 7 0 R /Resources << /Font << 
+          /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> 
+          /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> 
+          /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >> 
+          /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >> 
+          /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >> 
+        >> >> >>
+endobj
+9 0 obj
+<< /Length 24465 >>
+stream
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      22.00 22.00 551.28 797.89 re
+      S
+      0.70 0.75 0.73 RG
+      0.5 w
+      26.00 26.00 543.28 789.89 re
+      S
+    
+
+        BT
+        /F3 7.8 Tf
+        0.30 0.35 0.33 rg
+        1 0 0 1 46 803.89 Tm
+        (JNTU Circle: Architectural Design, Real-Time Synchronization & Multi-Regulation Evaluation) Tj
+        ET
+        0.75 0.80 0.78 RG
+        0.5 w
+        46 799.89 m
+        549.28 799.89 l
+        S
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 790.39 m
+      549.28 790.39 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 781.89 Tm
+      (9. MULTI-REGULATION EVALUATION PLATFORM) Tj
+      ET
+    
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 767.19 Tm
+      (9.1 The Challenge of Shifting Grading Systems) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.608 Tw
+        1 0 0 1 46.00 757.99 Tm
+        (In technological universities, curricular reforms systematically alter degree credit structures. In JNTUA, students enrolled in 2018 \(R15\)) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.737 Tw
+        1 0 0 1 46.00 746.79 Tm
+        (required 180 credits with a 30:70 internal/external mark split; students under R20 required 160 credits with a 30:70 split; and students) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 735.59 Tm
+        (under R23 require 160 credits with a 40:60 continuous evaluation split. Single-formula calculators fail completely in this environment.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 716.79 Tm
+      (9.2 Mathematical Formulation \(SGPA & CGPA\)) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.261 Tw
+        1 0 0 1 46.00 707.59 Tm
+        (Academic performance is evaluated through Semester Grade Point Average \(SGPA\) and Cumulative Grade Point Average \(CGPA\).) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 696.39 Tm
+        (Each course i carries credit weighting Ci and earned grade point Gi in [0, 10]:) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.0 Tf
+      0.15 0.20 0.24 rg
+      1 0 0 1 46 678.59 Tm
+      (A. Semester Grade Point Average \(SGPA\)) Tj
+      ET
+    
+
+      0.96 0.97 0.98 rg
+      52 652.89 491.28 17.50 re
+      f
+      0.82 0.85 0.88 RG
+      0.5 w
+      52 652.89 491.28 17.50 re
+      S
+      BT
+      /F4 8.2 Tf
+      0.05 0.18 0.22 rg
+      1 0 0 1 62.00 658.89 Tm
+      (SGPA_m = Sum\(C_i * G_i\) / Sum\(C_i\)   [i = 1 to N_m]) Tj
+    
+
+        /F2 8.0 Tf
+        0.20 0.20 0.20 rg
+        1 0 0 1 513.28 658.89 Tm
+        (\(2\)) Tj
+      
+ET
+
+      BT
+      /F2 8.0 Tf
+      0.15 0.20 0.24 rg
+      1 0 0 1 46 643.69 Tm
+      (B. Cumulative Grade Point Average \(CGPA\)) Tj
+      ET
+    
+
+      0.96 0.97 0.98 rg
+      52 617.99 491.28 17.50 re
+      f
+      0.82 0.85 0.88 RG
+      0.5 w
+      52 617.99 491.28 17.50 re
+      S
+      BT
+      /F4 8.2 Tf
+      0.05 0.18 0.22 rg
+      1 0 0 1 62.00 623.99 Tm
+      (CGPA = Sum_m Sum_i \(C_m,i * G_m,i\) / Sum_m Sum_i \(C_m,i\)) Tj
+    
+
+        /F2 8.0 Tf
+        0.20 0.20 0.20 rg
+        1 0 0 1 513.28 623.99 Tm
+        (\(3\)) Tj
+      
+ET
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 607.79 Tm
+      (9.3 Regulation Grade Point Mapping \(R20 vs. R23\)) Tj
+      ET
+    
+
+        BT
+        /F2 7.6 Tf
+        0.08 0.25 0.22 rg
+        1 0 0 1 46 596.59 Tm
+        (TABLE 3: JNTUA MULTI-REGULATION LETTER GRADE POINT MAPPINGS \(R20 vs. R23\)) Tj
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 586.59 m
+      549.28 586.59 l
+      S
+    
+
+      0.93 0.96 0.95 rg
+      46 573.59 503.28 13 re
+      f
+    
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 50.00 577.09 Tm
+        (Grade) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 95.00 577.09 Tm
+        (Performance Description) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 190.00 577.09 Tm
+        (Grade Point \(Gi\)) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 255.00 577.09 Tm
+        (Score Range \(R20\)) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 370.00 577.09 Tm
+        (Score Range \(R23\)) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 485.00 577.09 Tm
+        (Status) Tj
+        ET
+      
+
+      0.50 0.50 0.50 RG
+      0.6 w
+      46 573.59 m
+      549.28 573.59 l
+      S
+    
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 565.59 Tm
+            (O) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 95.00 565.59 Tm
+            (Outstanding) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 190.00 565.59 Tm
+            (10) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 255.00 565.59 Tm
+            (>= 90%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 370.00 565.59 Tm
+            (>= 90%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 565.59 Tm
+            (Pass) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 550.39 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 553.99 Tm
+            (A+) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 95.00 553.99 Tm
+            (Excellent) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 190.00 553.99 Tm
+            (9) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 255.00 553.99 Tm
+            (80% - 89%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 370.00 553.99 Tm
+            (80% - 89%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 553.99 Tm
+            (Pass) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 542.39 Tm
+            (A) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 95.00 542.39 Tm
+            (Very Good) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 190.00 542.39 Tm
+            (8) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 255.00 542.39 Tm
+            (70% - 79%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 370.00 542.39 Tm
+            (70% - 79%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 542.39 Tm
+            (Pass) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 527.19 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 530.79 Tm
+            (B+) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 95.00 530.79 Tm
+            (Good) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 190.00 530.79 Tm
+            (7) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 255.00 530.79 Tm
+            (60% - 69%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 370.00 530.79 Tm
+            (60% - 69%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 530.79 Tm
+            (Pass) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 519.19 Tm
+            (B) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 95.00 519.19 Tm
+            (Above Average) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 190.00 519.19 Tm
+            (6) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 255.00 519.19 Tm
+            (50% - 59%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 370.00 519.19 Tm
+            (50% - 59%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 519.19 Tm
+            (Pass) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 503.99 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 507.59 Tm
+            (C) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 95.00 507.59 Tm
+            (Pass) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 190.00 507.59 Tm
+            (5) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 255.00 507.59 Tm
+            (40% - 49%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 370.00 507.59 Tm
+            (45% - 49%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 507.59 Tm
+            (Pass) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 495.99 Tm
+            (F) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 95.00 495.99 Tm
+            (Fail) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 190.00 495.99 Tm
+            (0) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 255.00 495.99 Tm
+            (< 40%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 370.00 495.99 Tm
+            (< 45%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 495.99 Tm
+            (Backlog) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 480.79 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 484.39 Tm
+            (Ab) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 95.00 484.39 Tm
+            (Absent) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 190.00 484.39 Tm
+            (0) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 255.00 484.39 Tm
+            (N/A) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 370.00 484.39 Tm
+            (N/A) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 484.39 Tm
+            (Backlog) Tj
+            ET
+          
+
+      0.08 0.28 0.23 RG
+      1.0 w
+      46 480.79 m
+      549.28 480.79 l
+      S
+    
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 464.59 Tm
+      (9.4 Adaptive Evaluation Algorithm) Tj
+      ET
+    
+
+      0.96 0.97 0.98 rg
+      46 309.09 503.28 144.30 re
+      f
+      0.08 0.28 0.23 RG
+      1.6 w
+      46 309.09 m
+      46 453.39 l
+      S
+    
+
+        BT
+        /F2 7.5 Tf
+        0.05 0.22 0.18 rg
+        1 0 0 1 54.00 445.89 Tm
+        (ALGORITHM 1: REGULATION-AWARE GRADE EVALUATION LOGIC) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 434.89 Tm
+        (Algorithm: Multi-Regulation SGPA/CGPA and Backlog Evaluation) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 425.69 Tm
+        (Input: CourseList S = [{ Code, Grade, Credits, isAudit }], Regulation Reg) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 416.49 Tm
+        (Output: SGPA, TotalCredits, BacklogCount) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 407.29 Tm
+        () Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 398.09 Tm
+        (1: TotalPoints <- 0.0, TotalCredits <- 0.0, BacklogCount <- 0) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 388.89 Tm
+        (2: for each course c in S do:) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 379.69 Tm
+        (3:     if c.isAudit == true then continue // Skip non-credit audit subjects) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 370.49 Tm
+        (4:     Points <- MapGradeToPoint\(c.Grade, Reg\)) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 361.29 Tm
+        (5:     if c.Grade in ['F', 'Ab'] then BacklogCount <- BacklogCount + 1) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 352.09 Tm
+        (6:     TotalPoints <- TotalPoints + \(Points * c.Credits\)) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 342.89 Tm
+        (7:     TotalCredits <- TotalCredits + c.Credits) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 333.69 Tm
+        (8: end for) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 324.49 Tm
+        (9: SGPA <- TotalCredits > 0 ? Round\(TotalPoints / TotalCredits, 2\) : 0.00) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 315.29 Tm
+        (10: return { SGPA, TotalCredits, BacklogCount }) Tj
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 304.09 m
+      549.28 304.09 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 295.59 Tm
+      (10. EXPERIMENTAL RESULTS AND EVALUATION) Tj
+      ET
+    
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 280.89 Tm
+      (10.1 API Performance Benchmarks Under Concurrent Load) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.530 Tw
+        1 0 0 1 46.00 271.69 Tm
+        (We tested backend performance using synthetic HTTP stress workloads \(N = 10,000 requests, 250 simulated concurrent clients\). Core) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 260.49 Tm
+        (query latency remained exceptionally low even during peak simulated traffic, as shown in Table 4:) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F2 7.6 Tf
+        0.08 0.25 0.22 rg
+        1 0 0 1 46 243.89 Tm
+        (TABLE 4: SYSTEM API LATENCY BENCHMARKS UNDER CONCURRENT WORKLOAD) Tj
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 233.89 m
+      549.28 233.89 l
+      S
+    
+
+      0.93 0.96 0.95 rg
+      46 220.89 503.28 13 re
+      f
+    
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 50.00 224.39 Tm
+        (API Endpoint) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 200.00 224.39 Tm
+        (HTTP Method) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 305.00 224.39 Tm
+        (p50 \(ms\)) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 365.00 224.39 Tm
+        (p95 \(ms\)) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 425.00 224.39 Tm
+        (p99 \(ms\)) Tj
+        ET
+      
+
+        BT
+        /F2 7.3 Tf
+        0.05 0.20 0.18 rg
+        1 0 0 1 485.00 224.39 Tm
+        (Success Rate) Tj
+        ET
+      
+
+      0.50 0.50 0.50 RG
+      0.6 w
+      46 220.89 m
+      549.28 220.89 l
+      S
+    
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 212.89 Tm
+            (/api/notes/filter) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 200.00 212.89 Tm
+            (GET \(Compound Query\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 305.00 212.89 Tm
+            (38 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 365.00 212.89 Tm
+            (74 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 212.89 Tm
+            (118 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 212.89 Tm
+            (100.0%) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 197.69 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 201.29 Tm
+            (/api/notes/:id) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 200.00 201.29 Tm
+            (GET \(Single Document\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 305.00 201.29 Tm
+            (22 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 365.00 201.29 Tm
+            (46 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 201.29 Tm
+            (82 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 201.29 Tm
+            (100.0%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 189.69 Tm
+            (/api/notifications/sync) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 200.00 189.69 Tm
+            (GET \(Sync List\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 305.00 189.69 Tm
+            (44 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 365.00 189.69 Tm
+            (88 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 189.69 Tm
+            (134 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 189.69 Tm
+            (100.0%) Tj
+            ET
+          
+
+          0.97 0.98 0.98 rg
+          46 174.49 503.28 11.6 re
+          f
+        
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 178.09 Tm
+            (/api/notifications/proxy-pdf) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 200.00 178.09 Tm
+            (GET \(Streamed Proxy\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 305.00 178.09 Tm
+            (112 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 365.00 178.09 Tm
+            (230 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 178.09 Tm
+            (380 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 178.09 Tm
+            (99.8%) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 50.00 166.49 Tm
+            (/api/chat/ask \(Groq AI\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 200.00 166.49 Tm
+            (POST \(Streamed LLM\)) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 305.00 166.49 Tm
+            (165 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 365.00 166.49 Tm
+            (280 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 425.00 166.49 Tm
+            (410 ms) Tj
+            ET
+          
+
+            BT
+            /F1 7.1 Tf
+            0.15 0.15 0.15 rg
+            1 0 0 1 485.00 166.49 Tm
+            (100.0%) Tj
+            ET
+          
+
+      0.08 0.28 0.23 RG
+      1.0 w
+      46 162.89 m
+      549.28 162.89 l
+      S
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.655 Tw
+        1 0 0 1 46.00 150.89 Tm
+        (Across all evaluated endpoints, the 95th percentile latency remained under 280 ms, demonstrating that JNTU Circle sustains high) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        2.075 Tw
+        1 0 0 1 46.00 139.69 Tm
+        (throughput without query degradation during university examination result spikes. Compound B-tree indices in MongoDB ensured) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 128.49 Tm
+        (O\(log\(N\)\) retrieval complexity regardless of database size.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.416 Tw
+        1 0 0 1 46.00 113.89 Tm
+        (Workloads were benchmarked using simulated Keep-Alive HTTP client sessions over a continuous 10-minute duration. Zero socket) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.974 Tw
+        1 0 0 1 46.00 102.69 Tm
+        (timeouts or connection reset errors were recorded, verifying the reliability of the reverse proxy buffer piping under concurrent student) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 91.49 Tm
+        (demands.) Tj
+        0 Tw
+        ET
+      
+
+        0.78 0.82 0.80 RG
+        0.5 w
+        46 40 m
+        549.28 40 l
+        S
+        BT
+        /F1 8.0 Tf
+        0.40 0.40 0.40 rg
+        1 0 0 1 273.64 28 Tm
+        (Page 4 of 5) Tj
+        ET
+      
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 9 0 R /Resources << /Font << 
+          /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> 
+          /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> 
+          /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >> 
+          /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >> 
+          /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >> 
+        >> >> >>
+endobj
+11 0 obj
+<< /Length 16059 >>
+stream
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      22.00 22.00 551.28 797.89 re
+      S
+      0.70 0.75 0.73 RG
+      0.5 w
+      26.00 26.00 543.28 789.89 re
+      S
+    
+
+        BT
+        /F3 7.8 Tf
+        0.30 0.35 0.33 rg
+        1 0 0 1 46 803.89 Tm
+        (JNTU Circle: Architectural Design, Real-Time Synchronization & Multi-Regulation Evaluation) Tj
+        ET
+        0.75 0.80 0.78 RG
+        0.5 w
+        46 799.89 m
+        549.28 799.89 l
+        S
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 782.69 Tm
+      (10.2 Student Cohort Usability Evaluation \(N = 210 Students\)) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.365 Tw
+        1 0 0 1 46.00 773.49 Tm
+        (To evaluate educational impact, we conducted a two-semester empirical cohort study with N = 210 undergraduate engineering students) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 762.29 Tm
+        (across JNTUA-affiliated institutions:) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 750.19 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 747.69 Tm
+      (Material Retrieval Time \(Hypothesis 1\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.390 Tw
+      (Ad-hoc messaging search required mu1 = 11.8 min \(SD = 3.4\), whereas JNTU Circle) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.558 Tw
+        1 0 0 1 62.00 736.49 Tm
+        (search required mu2 = 0.45 min \(SD = 0.12\). Welch's t-test: t\(209\) = 48.36, p < 0.0001, Cohen's d = 4.71, demonstrating a 96.2%) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 725.29 Tm
+        (time reduction.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 714.19 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 711.69 Tm
+      (System Usability Scale \(SUS\) \(Hypothesis 2\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.527 Tw
+      (Standardized 10-item SUS evaluation yielded a mean score of 89.4/100 \(SD =) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.796 Tw
+        1 0 0 1 62.00 700.49 Tm
+        (6.2\). One-sample t-test against industry baseline \(mu0 = 68\): t\(209\) = 50.02, p < 0.0001, placing JNTU Circle in the top 1st) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 689.29 Tm
+        (percentile \(Grade A+\).) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 678.19 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 675.69 Tm
+      (Client Web Vitals: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.019 Tw
+      (Mobile 4G audits achieved: Performance 97/100, Accessibility 98/100, Best Practices 100/100, SEO 100/100,) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 664.49 Tm
+        (FCP 0.72s, and an optimized bundle footprint of 184.8 kB via Rollup tree-shaking.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 654.39 m
+      549.28 654.39 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 645.89 Tm
+      (11. SECURITY, RELIABILITY AND ARCHITECTURAL RESILIENCE) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.876 Tw
+        1 0 0 1 46.00 635.39 Tm
+        (Traditional stateless JWTs cannot be revoked prior to expiry without state tracking. JNTU Circle implements integer tokenVersion) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 624.19 Tm
+        (tracking in the MongoDB User schema:) Tj
+        0 Tw
+        ET
+      
+
+      0.96 0.97 0.98 rg
+      46 555.29 503.28 52.30 re
+      f
+      0.08 0.28 0.23 RG
+      1.6 w
+      46 555.29 m
+      46 607.59 l
+      S
+    
+
+        BT
+        /F2 7.5 Tf
+        0.05 0.22 0.18 rg
+        1 0 0 1 54.00 600.09 Tm
+        (LISTING 1: INTEGER TOKEN VERSIONING AUTHENTICATION MIDDLEWARE) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 589.09 Tm
+        (// Security middleware token revocation verification) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 579.89 Tm
+        (if \(user.tokenVersion !== decodedToken.tokenVersion\) {) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 570.69 Tm
+        (    return res.status\(401\).json\({ message: 'Session expired. Please log in again.' }\);) Tj
+        ET
+      
+
+        BT
+        /F4 7.0 Tf
+        0.12 0.16 0.20 rg
+        1 0 0 1 54.00 561.49 Tm
+        (}) Tj
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 549.29 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 546.79 Tm
+      (Stateless Token Invalidation: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0 Tw
+      (On credential reset or logout, tokenVersion increments in MongoDB, instantly invalidating) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 535.59 Tm
+        (compromised tokens across all devices without stateful database overhead.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 524.49 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 521.99 Tm
+      (Soft-Delete Audit Retention: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0.108 Tw
+      (Curated learning assets utilize isDeleted flags to maintain complete regulatory audit trails and prevent) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 510.79 Tm
+        (accidental loss.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 499.69 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 497.19 Tm
+      (Dynamic PDF Proxy Streaming: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.096 Tw
+      (A server-to-server HTTP pipe fetches university notices, strips restrictive frame-ancestors CSP) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 485.99 Tm
+        (headers, and streams PDFs directly without browser CORS blocking.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 475.89 m
+      549.28 475.89 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 467.39 Tm
+      (12. DISCUSSION, LIMITATIONS AND FUTURE DIRECTIONS) Tj
+      ET
+    
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 452.69 Tm
+      (12.1 Pedagogical Velocity and Cognitive Relief) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.924 Tw
+        1 0 0 1 46.00 443.49 Tm
+        (During examination windows, finding verified syllabus-aligned materials in under 30 seconds substantially alleviates student pre-exam) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 432.29 Tm
+        (anxiety and eliminates the risks of preparing with obsolete regulatory frameworks.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 413.49 Tm
+      (12.2 Practical Operational Constraints) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.033 Tw
+        1 0 0 1 46.00 404.29 Tm
+        (Because the background scraper parses live university HTML, structural portal redesigns require scraper rule maintenance. Furthermore,) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 393.09 Tm
+        (PWA offline caches require periodic network synchronization for real-time circular feeds.) Tj
+        0 Tw
+        ET
+      
+
+      BT
+      /F2 8.6 Tf
+      0.10 0.32 0.28 rg
+      1 0 0 1 46 374.29 Tm
+      (12.3 Future Research Roadmap) Tj
+      ET
+    
+
+      0.08 0.28 0.23 rg
+      51.00 367.59 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 365.09 Tm
+      (On-Device Vector Search \(Local RAG\): ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      1.382 Tw
+      (Deploying WebGPU vector embeddings within the browser for offline semantic search) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 353.89 Tm
+        (across notes without server dependency.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 rg
+      51.00 342.79 2.8 2.8 re
+      f
+    
+
+      BT
+      /F2 8.3 Tf
+      0.05 0.22 0.18 rg
+      1 0 0 1 62.00 340.29 Tm
+      (Campus Peer-to-Peer Mesh Distribution: ) Tj
+      /F1 8.3 Tf
+      0.12 0.12 0.12 rg
+      0.462 Tw
+      (Integrating WebRTC data channels for local campus note sharing during upstream ISP) Tj
+      0 Tw
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 62.00 329.09 Tm
+        (disruptions.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 318.99 m
+      549.28 318.99 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 310.49 Tm
+      (13. CONCLUSION) Tj
+      ET
+    
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.863 Tw
+        1 0 0 1 46.00 299.99 Tm
+        (JNTU Circle resolves academic information fragmentation and evaluation ambiguity in affiliating technical universities. By combining a) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        1.483 Tw
+        1 0 0 1 46.00 288.79 Tm
+        (multi-regulation curriculum ontology, a cryptographic SHA-256 DOM scraper, Groq-accelerated AI tutoring, and an adaptive grading) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0.116 Tw
+        1 0 0 1 46.00 277.59 Tm
+        (engine, the platform modernizes academic access. Empirical validation confirms sub-40ms database query latency, a 96.2% reduction in) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        2.564 Tw
+        1 0 0 1 46.00 266.39 Tm
+        (material discovery duration, and an exceptional SUS score of 89.4/100, providing an authentic blueprint for higher engineering) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 8.3 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 255.19 Tm
+        (informatics.) Tj
+        0 Tw
+        ET
+      
+
+      0.08 0.28 0.23 RG
+      1.2 w
+      46 244.09 m
+      549.28 244.09 l
+      S
+      BT
+      /F2 9.2 Tf
+      0.0 0.23 0.20 rg
+      1 0 0 1 46 235.59 Tm
+      (14. REFERENCES \(IEEE FORMAT\)) Tj
+      ET
+    
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 225.09 Tm
+        ([1] AICTE, 'Model Curriculum for Undergraduate Degree Courses in Engineering & Technology,' All India Council for Technical Education, New Delhi, Tech. Rep.,) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 216.89 Tm
+        (2021.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 207.49 Tm
+        ([2] JNTU Anantapur, 'Academic Regulations R20 & R23 for B.Tech Regular and Lateral Entry,' JNTUA Examination Board, 2023.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 198.09 Tm
+        ([3] M. Alavi and D. E. Leidner, 'Review: Knowledge Management and Knowledge Management Systems,' MIS Quarterly, vol. 25, no. 1, pp. 107-136, 2001.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 188.69 Tm
+        ([4] W. R. Watson and S. L. Watson, 'What Are Learning Management Systems, What Are They Not, and What Should They Become?' TechTrends, vol. 51, no. 2, pp.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 180.49 Tm
+        (28-34, 2007.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 171.09 Tm
+        ([5] E. Dahlstrom, D. C. Brooks, and J. Bichsel, 'The Current Ecosystem of LMS in Higher Education,' EDUCAUSE Center for Analysis & Research, 2020.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 161.69 Tm
+        ([6] D. Baidoo-Anu and L. Owusu Ansah, 'Education in the Era of Generative AI: Benefits and Challenges,' J. AI Educ. Tech., vol. 7, no. 1, pp. 52-62, 2023.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 152.29 Tm
+        ([7] A. Vaswani et al., 'Attention Is All You Need,' Advances in Neural Information Processing Systems \(NeurIPS\), vol. 30, pp. 5998-6008, 2017.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 142.89 Tm
+        ([8] P. Kumar, S. Sharma, and R. K. Gupta, 'Design and Implementation of an Automated Evaluation System,' IEEE Trans. Educ., vol. 62, no. 3, pp. 210-218, 2019.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 133.49 Tm
+        ([9] R. Fielding and J. Reschke, 'Hypertext Transfer Protocol \(HTTP/1.1\): Range Requests,' IETF, RFC 7233, Jun. 2014.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 124.09 Tm
+        ([10] J. Brooke, 'SUS: A Quick and Dirty Usability Scale,' in Usability Evaluation in Industry, London: Taylor & Francis, 1996, pp. 189-194.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 114.69 Tm
+        ([11] M. Howard and D. LeBlanc, 'Writing Secure Code: Security Best Practices for Developers,' 2nd ed. Microsoft Press, 2003.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 105.29 Tm
+        ([12] M. Fowler, 'Patterns of Enterprise Application Architecture,' Boston, MA: Addison-Wesley, 2002.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 95.89 Tm
+        ([13] A. Biere, M. Heiss, and C. Trattner, 'Modern Web Architectures and Resilient Caching in PWAs,' IEEE Trans. Softw. Eng., vol. 48, no. 4, pp. 1102-1119, 2022.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 86.49 Tm
+        ([14] J. Nielsen, 'Usability Engineering,' San Diego, CA: Academic Press, 1993.) Tj
+        0 Tw
+        ET
+      
+
+        BT
+        /F1 6.8 Tf
+        0.12 0.12 0.12 rg
+        0 Tw
+        1 0 0 1 46.00 77.09 Tm
+        ([15] National Education Policy, 'National Education Policy 2020,' Ministry of Human Resource Development, Government of India, Tech. Rep., 2020.) Tj
+        0 Tw
+        ET
+      
+
+        0.78 0.82 0.80 RG
+        0.5 w
+        46 40 m
+        549.28 40 l
+        S
+        BT
+        /F1 8.0 Tf
+        0.40 0.40 0.40 rg
+        1 0 0 1 273.64 28 Tm
+        (Page 5 of 5) Tj
+        ET
+      
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 11 0 R /Resources << /Font << 
+          /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> 
+          /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> 
+          /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >> 
+          /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >> 
+          /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >> 
+        >> >> >>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000141 00000 n 
+0000015070 00000 n 
+0000015700 00000 n 
+0000037582 00000 n 
+0000038212 00000 n 
+0000058540 00000 n 
+0000059170 00000 n 
+0000083688 00000 n 
+0000084319 00000 n 
+0000100432 00000 n 
+trailer
+<< /Size 13 /Root 1 0 R >>
+startxref
+101064
+%%EOF
