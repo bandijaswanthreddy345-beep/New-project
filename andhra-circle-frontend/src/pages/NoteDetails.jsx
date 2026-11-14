@@ -316,31 +316,31 @@ function NoteDetails() {
         number: 1,
         title: note.module1Title || note.module1 || "Unit 1",
         notes: note.module1 || "",
-        pdf: note.module1Pdf || "",
+        pdf: note.module1Pdf || note.pdfUrl || "",
       },
       {
         number: 2,
         title: note.module2Title || note.module2 || "Unit 2",
         notes: note.module2 || "",
-        pdf: note.module2Pdf || "",
+        pdf: note.module2Pdf || note.pdfUrl || "",
       },
       {
         number: 3,
         title: note.module3Title || note.module3 || "Unit 3",
         notes: note.module3 || "",
-        pdf: note.module3Pdf || "",
+        pdf: note.module3Pdf || note.pdfUrl || "",
       },
       {
         number: 4,
         title: note.module4Title || note.module4 || "Unit 4",
         notes: note.module4 || "",
-        pdf: note.module4Pdf || "",
+        pdf: note.module4Pdf || note.pdfUrl || "",
       },
       {
         number: 5,
         title: note.module5Title || note.module5 || "Unit 5",
         notes: note.module5 || "",
-        pdf: note.module5Pdf || "",
+        pdf: note.module5Pdf || note.pdfUrl || "",
       },
     ];
   }, [note]);
