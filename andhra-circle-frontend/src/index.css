@@ -777,7 +777,7 @@ ul {
   -webkit-backdrop-filter: blur(20px);
   border: 1.5px solid rgba(16, 185, 129, 0.52);
   border-radius: 9999px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   padding: 0 8px 0 10px;
@@ -789,7 +789,7 @@ ul {
 .hero-ai-bar:focus-within {
   border-color: #fbbf24;
   background: rgba(6, 36, 30, 0.95);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 24px rgba(251, 191, 36, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 24px rgba(251, 191, 36, 0.45);
 }
 
 /* Frosted Avatar Badge Pod */
