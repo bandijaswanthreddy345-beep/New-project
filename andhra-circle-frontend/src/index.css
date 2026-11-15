@@ -777,7 +777,7 @@ ul {
   -webkit-backdrop-filter: blur(20px);
   border: 1.5px solid rgba(16, 185, 129, 0.52);
   border-radius: 9999px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 18px rgba(16, 185, 129, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   padding: 0 8px 0 10px;
@@ -789,7 +789,7 @@ ul {
 .hero-ai-bar:focus-within {
   border-color: #fbbf24;
   background: rgba(6, 36, 30, 0.95);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 24px rgba(251, 191, 36, 0.45);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 24px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 /* Frosted Avatar Badge Pod */
@@ -802,7 +802,7 @@ ul {
   border-radius: 9999px;
   background: #fbbf24 !important;
   border: none;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45), 0 0 12px rgba(251, 191, 36, 0.35);
   cursor: pointer;
   flex-shrink: 0;
   padding: 0;
@@ -812,10 +812,6 @@ ul {
 
 .hero-ai-avatar-badge:hover {
   transform: scale(1.08);
-}
-
-.hero-ai-bar:focus-within .hero-ai-avatar-badge {
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45), 0 0 16px rgba(251, 191, 36, 0.6) !important;
 }
 
 .hero-ai-avatar-desktop {
@@ -947,7 +943,7 @@ ul {
   background: #fbbf24 !important;
   color: #020617 !important;
   border: none !important;
-  box-shadow: none !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4) !important;
   cursor: pointer;
   padding: 0;
   margin: 0;
@@ -969,12 +965,8 @@ ul {
 
 .hero-ai-send-btn:hover {
   background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%) !important;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.6) !important;
   transform: scale(1.06);
-}
-
-.hero-ai-bar:focus-within .hero-ai-send-btn {
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45), 0 0 14px rgba(251, 191, 36, 0.55) !important;
 }
 
 .hero-ai-send-btn:hover svg {
