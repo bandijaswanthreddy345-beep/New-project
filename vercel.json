@@ -3,12 +3,8 @@
   "outputDirectory": "andhra-circle-frontend/dist",
   "rewrites": [
     {
-      "source": "/assets/(.*)",
-      "destination": "/andhra-circle-frontend/dist/assets/$1"
-    },
-    {
       "source": "/(.*)",
-      "destination": "/andhra-circle-frontend/dist/index.html"
+      "destination": "/index.html"
     }
   ],
   "headers": [
