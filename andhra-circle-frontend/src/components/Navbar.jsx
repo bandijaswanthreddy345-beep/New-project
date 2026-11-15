@@ -468,15 +468,30 @@ function Navbar() {
                 alt={student?.name || "Student"}
                 className="nav-profile-avatar-img nav-mobile-avatar-img"
                 onError={(e) => {
-                  e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
+                  e.currentTarget.style.display = "none";
+                  const fallback = e.currentTarget.parentElement?.querySelector(".nav-mobile-fallback-icon");
+                  if (fallback) {
+                    fallback.style.setProperty("display", "flex", "important");
+                  }
                 }}
               />
             ) : (
               <span className="nav-profile-fallback-icon nav-mobile-fallback-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
+                {student?.name ? (
+                  <span style={{ fontSize: "11px", fontWeight: "800", color: "#ffefb3" }}>
+                    {student.name
+                      .split(" ")
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map((n) => n[0].toUpperCase())
+                      .join("")}
+                  </span>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                )}
               </span>
             )}
             <span className="nav-profile-status-dot" />
@@ -632,26 +647,31 @@ function Navbar() {
                           src={photoSrc}
                           alt={displayName}
                           className="nav-profile-avatar-img"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            const fallback = e.currentTarget.parentElement?.querySelector(".nav-profile-fallback-icon");
+                            if (fallback) {
+                              fallback.style.setProperty("display", "flex", "important");
+                            }
+                          }}
                         />
-                      ) : null}
-                      <span
-                        className="nav-profile-fallback-icon"
-                        style={{ display: photoSrc ? "none" : "flex" }}
-                      >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx="12" cy="7" r="4" />
-                        </svg>
-                      </span>
+                      ) : (
+                        <span className="nav-profile-fallback-icon">
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                          </svg>
+                        </span>
+                      )}
                       <span className={`nav-profile-status-dot ${currentUser ? "is-online" : ""}`} title={currentUser ? "Account Online" : "Sign In or Sign Up"} />
                     </div>
                   </button>

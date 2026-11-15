@@ -6,7 +6,7 @@
 
 ## 1. Security Architecture Principles
 
-1. **No Hard-Coded Secrets:** Secrets (`JWT_SECRET`, `CAPTCHA_SECRET`, `MONGO_URI`, `EMAILJS_*`, `GEMINI_API_KEY`) live only in environment variables and are excluded from Git via `.gitignore`.
+1. **No Hard-Coded Secrets & Local Data Boundary:** Secrets (`JWT_SECRET`, `CAPTCHA_SECRET`, `EMAILJS_*`, `GEMINI_API_KEY`) live only in environment variables and are excluded from Git via `.gitignore`. By default, data lives strictly in the local MongoDB on this machine (`127.0.0.1:27017/andhra-circle`) and is not backed up to any cloud provider unless local backups (`scripts/backup-db.js`) are executed.
 2. **Server-Side Input Validation & Sanitization:** Type coercion (`asString()`), length limits, and field whitelisting are enforced in controllers. Route parameters are validated via `validateObjectId`.
 3. **Mongoose Schema & Parameterization:** Queries use Mongoose ODM with parameter binding, preventing NoSQL query selector injection.
 4. **Default-Deny Access Control:** All modifying administrative operations require `middleware/auth.js` verifying valid JWT and `user.role === "admin"`.

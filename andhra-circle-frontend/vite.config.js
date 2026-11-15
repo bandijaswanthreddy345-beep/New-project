@@ -26,6 +26,9 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'es2020',
+    cssCodeSplit: true,
+    sourcemap: false,
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
@@ -33,6 +36,9 @@ export default defineConfig({
           if (id.includes('node_modules')) {
             if (id.includes('react/') || id.includes('react-dom/') || id.includes('react-router-dom/')) {
               return 'vendor-react';
+            }
+            if (id.includes('axios')) {
+              return 'vendor-axios';
             }
             if (id.includes('framer-motion')) {
               return 'vendor-motion';

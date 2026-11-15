@@ -59,6 +59,57 @@ function NoteDetails() {
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [commentSubmitting, setCommentSubmitting] = useState(false);
 
+  // Comments menu & edit state
+  const [activeMenuCommentId, setActiveMenuCommentId] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingCommentText, setEditingCommentText] = useState("");
+  const [commentUpdating, setCommentUpdating] = useState(false);
+
+  // Close comments dropdown menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".comment-menu-wrapper")) {
+        setActiveMenuCommentId(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Starred / Bookmarked Note State (stored locally)
+  const [isStarred, setIsStarred] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    try {
+      const stored = localStorage.getItem("andhra_starred_notes");
+      const list = stored ? JSON.parse(stored) : [];
+      setIsStarred(Array.isArray(list) && list.includes(id));
+    } catch {
+      setIsStarred(false);
+    }
+  }, [id]);
+
+  const handleToggleStar = (e) => {
+    e.stopPropagation();
+    if (!id) return;
+    try {
+      const stored = localStorage.getItem("andhra_starred_notes");
+      const list = stored ? JSON.parse(stored) : [];
+      let updated;
+      if (list.includes(id)) {
+        updated = list.filter((item) => item !== id);
+        setIsStarred(false);
+      } else {
+        updated = [...list, id];
+        setIsStarred(true);
+      }
+      localStorage.setItem("andhra_starred_notes", JSON.stringify(updated));
+    } catch {
+      setIsStarred((prev) => !prev);
+    }
+  };
+
   // Heart pop animation state
   const [heartPop, setHeartPop] = useState(null);
 
@@ -284,36 +335,38 @@ function NoteDetails() {
   const units = useMemo(() => {
     if (!note) return [];
 
+    const defaultPdf = note.pdfUrl || "";
+
     return [
       {
         number: 1,
         title: note.module1Title || "Unit 1",
         notes: note.module1 || "",
-        pdf: note.module1Pdf || "",
+        pdf: note.module1Pdf || defaultPdf,
       },
       {
         number: 2,
         title: note.module2Title || "Unit 2",
         notes: note.module2 || "",
-        pdf: note.module2Pdf || "",
+        pdf: note.module2Pdf || defaultPdf,
       },
       {
         number: 3,
         title: note.module3Title || "Unit 3",
         notes: note.module3 || "",
-        pdf: note.module3Pdf || "",
+        pdf: note.module3Pdf || defaultPdf,
       },
       {
         number: 4,
         title: note.module4Title || "Unit 4",
         notes: note.module4 || "",
-        pdf: note.module4Pdf || "",
+        pdf: note.module4Pdf || defaultPdf,
       },
       {
         number: 5,
         title: note.module5Title || "Unit 5",
         notes: note.module5 || "",
-        pdf: note.module5Pdf || "",
+        pdf: note.module5Pdf || defaultPdf,
       },
     ];
   }, [note]);
@@ -638,12 +691,55 @@ function NoteDetails() {
   };
 
   // =========================================================
+  // EDIT COMMENT
+  // =========================================================
+
+  const handleStartEditComment = (item) => {
+    setEditingCommentId(item._id);
+    setEditingCommentText(item.comment || "");
+    setActiveMenuCommentId(null);
+  };
+
+  const handleCancelEditComment = () => {
+    setEditingCommentId(null);
+    setEditingCommentText("");
+  };
+
+  const handleSaveEditComment = async (commentId) => {
+    const text = editingCommentText.trim();
+    if (!text) {
+      alert("Comment cannot be empty.");
+      return;
+    }
+
+    try {
+      setCommentUpdating(true);
+      const res = await API.put(`/comments/${commentId}`, { comment: text });
+      const updated = res.data?.comment || { comment: text };
+
+      setComments((current) =>
+        current.map((item) =>
+          item._id === commentId ? { ...item, comment: updated.comment || text } : item
+        )
+      );
+      setEditingCommentId(null);
+      setEditingCommentText("");
+    } catch (err) {
+      console.error("EDIT COMMENT ERROR:", err);
+      alert(err?.response?.data?.message || "Unable to update comment.");
+    } finally {
+      setCommentUpdating(false);
+    }
+  };
+
+  // =========================================================
   // DELETE COMMENT
   // =========================================================
 
   const handleDeleteComment = async (
     commentId
   ) => {
+    setActiveMenuCommentId(null);
     const confirmed = window.confirm(
       "Are you sure you want to delete this comment?"
     );
@@ -970,15 +1066,33 @@ function NoteDetails() {
                 )}
               </div>
 
-              <div className="hero-credits-integrated" aria-label="Course credits">
-                <div className="hero-credits-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <div
+                className={`hero-credits-integrated ${isStarred ? "is-starred" : ""}`}
+                aria-label="Course credits & bookmark"
+                onClick={handleToggleStar}
+                title={isStarred ? "Starred note! Click to unstar" : "Click star to bookmark this note"}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleToggleStar(e);
+                  }
+                }}
+              >
+                <button
+                  type="button"
+                  className={`hero-credits-icon hero-credits-star-btn ${isStarred ? "starred" : ""}`}
+                  aria-label={isStarred ? "Starred note" : "Star this note"}
+                  onClick={handleToggleStar}
+                >
+                  <svg viewBox="0 0 24 24" fill={isStarred ? "#d9a726" : "none"} stroke={isStarred ? "#d9a726" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                   </svg>
-                </div>
+                </button>
                 <div className="hero-credits-copy">
                   <span className="hero-credits-label">COURSE CREDITS</span>
-                  <span className="hero-credits-desc">Credit value for this subject</span>
+                  <span className="hero-credits-desc">{isStarred ? "Starred in your favorites" : "Credit value for this subject"}</span>
                 </div>
                 <strong className="hero-credits-value">{credits || "4"}</strong>
               </div>
@@ -1367,25 +1481,91 @@ function NoteDetails() {
 
                       </div>
 
-                      <button
-                        type="button"
-                        className="comment-delete-button"
-                        onClick={() =>
-                          handleDeleteComment(
-                            item._id
-                          )
-                        }
-                      >
-                        Delete
-                      </button>
+                      {/* 3-DOTS ACTION MENU */}
+                      <div className="comment-menu-wrapper">
+                        <button
+                          type="button"
+                          className="comment-menu-trigger"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMenuCommentId((prev) => (prev === item._id ? null : item._id));
+                          }}
+                          aria-label="Comment options"
+                          title="More options"
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="5" r="2" />
+                            <circle cx="12" cy="12" r="2" />
+                            <circle cx="12" cy="19" r="2" />
+                          </svg>
+                        </button>
+
+                        {activeMenuCommentId === item._id && (
+                          <div className="comment-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              className="comment-menu-item comment-menu-edit"
+                              onClick={() => handleStartEditComment(item)}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                              </svg>
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="comment-menu-item comment-menu-delete"
+                              onClick={() => handleDeleteComment(item._id)}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                              </svg>
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
 
                     </div>
 
                     <div className="comment-body">
 
-                      <p>
-                        {item.comment}
-                      </p>
+                      {editingCommentId === item._id ? (
+                        <div className="comment-edit-inline-wrap">
+                          <textarea
+                            className="comment-edit-textarea"
+                            value={editingCommentText}
+                            onChange={(e) => setEditingCommentText(e.target.value)}
+                            rows="3"
+                            autoFocus
+                            placeholder="Edit your comment..."
+                          />
+                          <div className="comment-edit-actions">
+                            <button
+                              type="button"
+                              className="comment-edit-btn-cancel"
+                              onClick={handleCancelEditComment}
+                              disabled={commentUpdating}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              className="comment-edit-btn-save"
+                              onClick={() => handleSaveEditComment(item._id)}
+                              disabled={commentUpdating}
+                            >
+                              {commentUpdating ? "Saving..." : "Save"}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p>
+                          {item.comment}
+                        </p>
+                      )}
 
                     </div>
 

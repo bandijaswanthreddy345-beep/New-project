@@ -18,14 +18,21 @@ const { CircuitBreaker } = require("../utils/resilientFetch");
 
 describe("JNTU Circle Backend Integration Test Suite", () => {
   before(async () => {
-    // Only connect if not already connected
+    // Connect to local scratch test database to ensure isolation
     if (mongoose.connection.readyState !== 1) {
-      await connectDB();
+      const testUri = process.env.TEST_MONGO_URI || "mongodb://127.0.0.1:27017/andhra-circle-test";
+      await mongoose.connect(testUri, { serverSelectionTimeoutMS: 5000 });
     }
   });
 
   after(async () => {
     if (mongoose.connection.readyState !== 0) {
+      // Drop only scratch database
+      if (mongoose.connection.name === "andhra-circle-test") {
+        try {
+          await mongoose.connection.db.dropDatabase();
+        } catch (_) {}
+      }
       await mongoose.connection.close();
     }
   });

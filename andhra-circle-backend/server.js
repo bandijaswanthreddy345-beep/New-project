@@ -90,7 +90,7 @@ app.get("/readyz", async (req, res) => {
   if (!isConnected) {
     return res.status(503).json({
       status: "unavailable",
-      message: "Database connection not ready",
+      message: "MongoDB is not running at 127.0.0.1:27017. Start the MongoDB service.",
       readyState: mongoose.connection.readyState,
     });
   }
@@ -108,12 +108,14 @@ app.get("/readyz", async (req, res) => {
     return res.status(200).json({
       status: "ready",
       database: "connected",
+      name: mongoose.connection.name,
+      host: mongoose.connection.host,
     });
   } catch (err) {
     logger.warn("Readiness check ping failed", { error: err.message });
     return res.status(503).json({
       status: "unavailable",
-      message: "Database ping failed",
+      message: "MongoDB is not running at 127.0.0.1:27017. Start the MongoDB service.",
     });
   }
 });
@@ -253,6 +255,20 @@ app.get("/", (req, res) => {
 // ==========================
 
 const apiRouter = express.Router();
+
+// Database readiness guard for API routes: return clear 503 if MongoDB is down
+apiRouter.use((req, res, next) => {
+  if (req.path.startsWith("/notifications/proxy-pdf")) {
+    return next();
+  }
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({
+      success: false,
+      message: "MongoDB is not running at 127.0.0.1:27017. Start the MongoDB service.",
+    });
+  }
+  next();
+});
 
 apiRouter.use("/auth", require("./routes/authRoutes"));
 apiRouter.use("/upload", require("./routes/uploadRoutes"));

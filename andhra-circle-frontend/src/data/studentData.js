@@ -12,14 +12,14 @@ import {
   normalizeString,
 } from "../utils/validators.js";
 
-// Initial 8-Semester Grade Matrix
+// Initial 8-Semester Grade Matrix (Clean Template)
 export const INITIAL_SEMESTERS = [
-  { sem: "Sem 1", sgpa: "8.65", credits: 20, status: "Completed" },
-  { sem: "Sem 2", sgpa: "8.90", credits: 20, status: "Completed" },
-  { sem: "Sem 3", sgpa: "8.75", credits: 20, status: "Completed" },
-  { sem: "Sem 4", sgpa: "9.10", credits: 20, status: "Completed" },
-  { sem: "Sem 5", sgpa: "9.00", credits: 20, status: "Completed" },
-  { sem: "Sem 6", sgpa: "", credits: 20, status: "In Progress" },
+  { sem: "Sem 1", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 2", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 3", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 4", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 5", sgpa: "", credits: 20, status: "Not Started" },
+  { sem: "Sem 6", sgpa: "", credits: 20, status: "Not Started" },
   { sem: "Sem 7", sgpa: "", credits: 20, status: "Not Started" },
   { sem: "Sem 8", sgpa: "", credits: 20, status: "Not Started" },
 ];
@@ -107,17 +107,26 @@ export const DEFAULT_CHINNU_DATA = {
     { id: 3, branch: "EEE", sem: "Sem 5", title: "Power Electronics", units: "Complete Formula Sheet", faculty: "Dr. M. Lakshmi" },
     { id: 4, branch: "EEE", sem: "Sem 5", title: "Control Systems Engineering", units: "Previous Question Papers", faculty: "Prof. V. Sharma" },
   ],
-  semesterGrades: INITIAL_SEMESTERS,
+  semesterGrades: [
+    { sem: "Sem 1", sgpa: "8.65", credits: 20, status: "Completed" },
+    { sem: "Sem 2", sgpa: "8.90", credits: 20, status: "Completed" },
+    { sem: "Sem 3", sgpa: "8.75", credits: 20, status: "Completed" },
+    { sem: "Sem 4", sgpa: "9.10", credits: 20, status: "Completed" },
+    { sem: "Sem 5", sgpa: "9.00", credits: 20, status: "Completed" },
+    { sem: "Sem 6", sgpa: "", credits: 20, status: "In Progress" },
+    { sem: "Sem 7", sgpa: "", credits: 20, status: "Not Started" },
+    { sem: "Sem 8", sgpa: "", credits: 20, status: "Not Started" },
+  ],
 };
 
-export const DEFAULT_STUDENT_DATA = DEFAULT_CHINNU_DATA;
-
 export const EMPTY_STUDENT_DATA = {
-  ...DEFAULT_CHINNU_DATA,
+  _version: PROFILE_STORAGE_VERSION,
   name: "",
   shortName: "",
+  role: "Student",
   hallTicket: "",
   college: "",
+  university: "JNT University",
   branch: "",
   branchCode: "",
   year: "",
@@ -129,11 +138,15 @@ export const EMPTY_STUDENT_DATA = {
   attendancePercentage: 0,
   email: "",
   phone: "",
+  batch: "",
+  mentor: "",
   profilePhoto: null,
   isConfigured: false,
   savedNotes: [],
   semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
 };
+
+export const DEFAULT_STUDENT_DATA = EMPTY_STUDENT_DATA;
 
 // Helper to resolve the correct photo URL for a student object
 export function getStudentAvatar(student) {
@@ -162,10 +175,10 @@ export function hasStoredStudentProfile() {
       return false;
     }
     const raw = typeof localStorage !== "undefined" ? localStorage.getItem("jntu_student_profile") : null;
-    if (!raw) return true;
+    if (!raw) return false;
     const parsed = JSON.parse(raw);
-    if (parsed && parsed.isConfigured === false) return false;
-    return Boolean(parsed && parsed.name?.trim());
+    if (!parsed || parsed.isConfigured === false) return false;
+    return Boolean(parsed && parsed.name?.trim() && parsed.hallTicket?.trim());
   } catch (e) {
     return false;
   }
@@ -174,80 +187,156 @@ export function hasStoredStudentProfile() {
 // Retrieve stored student data with automatic schema synchronization and sanitization
 export function getStoredStudentData() {
   try {
-    if (typeof localStorage !== "undefined" && localStorage.getItem("jntu_student_logged_out") === "true") {
-      return { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
-    }
-    const raw = typeof localStorage !== "undefined" ? localStorage.getItem("jntu_student_profile") : null;
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && parsed.isConfigured === false) {
-        return { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" };
+    let authUser = null;
+    if (typeof localStorage !== "undefined") {
+      if (localStorage.getItem("jntu_student_logged_out") === "true") {
+        return { ...EMPTY_STUDENT_DATA, isConfigured: false, name: "", email: "" };
       }
+      try {
+        const u = localStorage.getItem("user");
+        if (u) {
+          authUser = JSON.parse(u);
+        }
+      } catch (e) {
+        authUser = null;
+      }
+    }
 
-      // Validate core fields defensively so corrupt or stale data is safely healed
-      const validName = validateName(parsed.name).ok ? parsed.name.trim() : DEFAULT_CHINNU_DATA.name;
-      const validHallTicket = validateHallTicket(parsed.hallTicket).ok
-        ? parsed.hallTicket.trim().toUpperCase()
-        : DEFAULT_CHINNU_DATA.hallTicket;
-      const branchRes = validateBranch(parsed.branch);
-      const validBranch = branchRes.ok ? branchRes.value : DEFAULT_CHINNU_DATA.branch;
-      const validBranchCode = branchRes.ok ? branchRes.code : (parsed.branchCode || DEFAULT_CHINNU_DATA.branchCode);
-      const yearRes = validateYear(parsed.year);
-      const validYear = yearRes.ok ? yearRes.value : DEFAULT_CHINNU_DATA.year;
-      const semRes = validateSemester(parsed.semester);
-      const validSemester = semRes.ok ? semRes.value : cleanSemester(parsed.semester);
-      const regRes = validateRegulation(parsed.regulation);
-      const validRegulation = regRes.ok ? regRes.value : DEFAULT_CHINNU_DATA.regulation;
+    const authName = (authUser && (authUser.name || authUser.fullName)) ? (authUser.name || authUser.fullName).trim() : "";
+    const authEmail = (authUser && authUser.email) ? authUser.email.trim() : "";
 
-      // Sanitize semester grades matrix
-      const mergedGrades = INITIAL_SEMESTERS.map((initSem, idx) => {
-        const found = parsed.semesterGrades?.[idx];
-        if (!found) return initSem;
-        const gradeCheck = validateGradePoint(found.sgpa);
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem("jntu_student_profile") : null;
+
+    // If no profile in localStorage:
+    if (!raw) {
+      if (authName || authEmail) {
         return {
-          ...initSem,
-          ...found,
-          sgpa: gradeCheck.ok ? gradeCheck.value : "",
-          status: gradeCheck.ok ? "Completed" : found.status || initSem.status,
+          ...EMPTY_STUDENT_DATA,
+          name: authName,
+          shortName: authName.split(" ")[0] || "Student",
+          email: authEmail,
+          isConfigured: false,
         };
-      });
+      }
+      return { ...EMPTY_STUDENT_DATA, isConfigured: false };
+    }
 
-      const photo = parsed.profilePhoto && parsed.profilePhoto !== "none" && typeof parsed.profilePhoto === "string" && parsed.profilePhoto.trim()
-        ? parsed.profilePhoto
-        : null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") {
+      if (authName || authEmail) {
+        return {
+          ...EMPTY_STUDENT_DATA,
+          name: authName,
+          shortName: authName.split(" ")[0] || "Student",
+          email: authEmail,
+          isConfigured: false,
+        };
+      }
+      return { ...EMPTY_STUDENT_DATA, isConfigured: false };
+    }
 
-      const cgpaCheck = validateGradePoint(parsed.cgpa);
-      const attCheck = validateAttendance(parsed.attendance || parsed.attendancePercentage);
+    // Check if the stored profile belongs to the mock Chinnu account while the current user is someone else
+    const isChinnuMock = (parsed.name === "Chinnu" || parsed.email === "chinnu@gmail.com" || parsed.hallTicket === "21B91A0201");
+    if (authUser && (authEmail !== "chinnu@gmail.com" || authName !== "Chinnu") && isChinnuMock) {
+      return {
+        ...EMPTY_STUDENT_DATA,
+        name: authName,
+        shortName: authName.split(" ")[0] || "Student",
+        email: authEmail,
+        isConfigured: false,
+      };
+    }
 
-      const healedProfile = {
-        ...DEFAULT_CHINNU_DATA,
+    // Determine effective name and email (prefer authUser if signed in)
+    const effectiveName = authName || (validateName(parsed.name).ok ? parsed.name.trim() : (parsed.name || ""));
+    const effectiveEmail = authEmail || (validateEmail(parsed.email).ok ? parsed.email.trim() : (parsed.email || ""));
+
+    // If profile is explicitly unconfigured (fresh signup state):
+    if (parsed.isConfigured === false) {
+      return {
+        ...EMPTY_STUDENT_DATA,
         ...parsed,
         _version: PROFILE_STORAGE_VERSION,
-        name: validName,
-        shortName: validName.split(" ")[0] || "Student",
-        hallTicket: validHallTicket,
-        branch: validBranch,
-        branchCode: validBranchCode,
-        year: validYear,
-        semester: validSemester,
-        regulation: validRegulation,
-        college: cleanCollege(parsed.college),
-        email: validateEmail(parsed.email).ok ? parsed.email.trim() : "",
-        phone: validatePhone(parsed.phone).ok ? validatePhone(parsed.phone).value : "",
-        cgpa: cgpaCheck.ok ? cgpaCheck.value : DEFAULT_CHINNU_DATA.cgpa,
-        attendance: attCheck.ok ? attCheck.formatted : DEFAULT_CHINNU_DATA.attendance,
-        attendancePercentage: attCheck.ok ? attCheck.value : DEFAULT_CHINNU_DATA.attendancePercentage,
-        profilePhoto: photo,
-        semesterGrades: mergedGrades,
-        isConfigured: true,
+        name: effectiveName,
+        shortName: effectiveName.split(" ")[0] || "Student",
+        email: effectiveEmail,
+        isConfigured: false,
+        hallTicket: parsed.hallTicket && validateHallTicket(parsed.hallTicket).ok ? parsed.hallTicket.trim().toUpperCase() : "",
+        branch: parsed.branch && validateBranch(parsed.branch).ok ? validateBranch(parsed.branch).value : (parsed.branch || ""),
+        branchCode: parsed.branchCode || "",
+        college: cleanCollege(parsed.college || ""),
+        cgpa: parsed.cgpa && validateGradePoint(parsed.cgpa).ok ? validateGradePoint(parsed.cgpa).value : "",
+        attendance: parsed.attendance && validateAttendance(parsed.attendance).ok ? validateAttendance(parsed.attendance).formatted : "0%",
+        attendancePercentage: parsed.attendancePercentage ? Number(parsed.attendancePercentage) : 0,
+        savedNotes: Array.isArray(parsed.savedNotes) ? parsed.savedNotes : [],
+        semesterGrades: Array.isArray(parsed.semesterGrades) ? parsed.semesterGrades : INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
       };
-
-      return healedProfile;
     }
+
+    // For a configured profile, heal/validate fields WITHOUT falling back to DEFAULT_CHINNU_DATA!
+    const validName = validateName(parsed.name).ok ? parsed.name.trim() : effectiveName;
+    const validHallTicket = validateHallTicket(parsed.hallTicket).ok
+      ? parsed.hallTicket.trim().toUpperCase()
+      : (parsed.hallTicket?.trim() || "");
+    const branchRes = validateBranch(parsed.branch);
+    const validBranch = branchRes.ok ? branchRes.value : (parsed.branch?.trim() || "");
+    const validBranchCode = branchRes.ok ? branchRes.code : (parsed.branchCode || "");
+    const yearRes = validateYear(parsed.year);
+    const validYear = yearRes.ok ? yearRes.value : (parsed.year?.trim() || "");
+    const semRes = validateSemester(parsed.semester);
+    const validSemester = semRes.ok ? semRes.value : cleanSemester(parsed.semester || "");
+    const regRes = validateRegulation(parsed.regulation);
+    const validRegulation = regRes.ok ? regRes.value : (parsed.regulation || "R23 Regulation");
+
+    const mergedGrades = INITIAL_SEMESTERS.map((initSem, idx) => {
+      const found = parsed.semesterGrades?.[idx];
+      if (!found) return { ...initSem, sgpa: "" };
+      const gradeCheck = validateGradePoint(found.sgpa);
+      return {
+        ...initSem,
+        ...found,
+        sgpa: gradeCheck.ok ? gradeCheck.value : "",
+        status: gradeCheck.ok ? "Completed" : found.status || "Not Started",
+      };
+    });
+
+    const photo = parsed.profilePhoto && parsed.profilePhoto !== "none" && typeof parsed.profilePhoto === "string" && parsed.profilePhoto.trim()
+      ? parsed.profilePhoto
+      : null;
+
+    const cgpaCheck = validateGradePoint(parsed.cgpa);
+    const attCheck = validateAttendance(parsed.attendance || parsed.attendancePercentage);
+
+    const healedProfile = {
+      ...EMPTY_STUDENT_DATA,
+      ...parsed,
+      _version: PROFILE_STORAGE_VERSION,
+      name: validName,
+      shortName: validName.split(" ")[0] || "Student",
+      hallTicket: validHallTicket,
+      branch: validBranch,
+      branchCode: validBranchCode,
+      year: validYear,
+      semester: validSemester,
+      regulation: validRegulation,
+      college: cleanCollege(parsed.college || ""),
+      email: effectiveEmail || (validateEmail(parsed.email).ok ? parsed.email.trim() : ""),
+      phone: validatePhone(parsed.phone).ok ? validatePhone(parsed.phone).value : (parsed.phone?.trim() || ""),
+      cgpa: cgpaCheck.ok ? cgpaCheck.value : (parsed.cgpa || ""),
+      attendance: attCheck.ok ? attCheck.formatted : (parsed.attendance || "0%"),
+      attendancePercentage: attCheck.ok ? attCheck.value : (parsed.attendancePercentage ? Number(parsed.attendancePercentage) : 0),
+      credits: parsed.credits || "0 / 160",
+      profilePhoto: photo,
+      savedNotes: Array.isArray(parsed.savedNotes) ? parsed.savedNotes : [],
+      semesterGrades: mergedGrades,
+      isConfigured: Boolean(parsed.isConfigured),
+    };
+
+    return healedProfile;
   } catch (e) {
     console.error("Error reading student profile from localStorage:", e);
+    return { ...EMPTY_STUDENT_DATA, isConfigured: false };
   }
-  return { ...DEFAULT_CHINNU_DATA, isConfigured: true };
 }
 
 // Persist student profile data to local storage and broadcast to all listeners
@@ -258,56 +347,56 @@ export function saveStoredStudentData(data) {
 
     // Validate fields as the last line of defense
     const nameCheck = validateName(incoming.name);
-    const validName = nameCheck.ok ? nameCheck.value : current.name;
+    const validName = nameCheck.ok ? nameCheck.value : (incoming.name || current.name || "");
 
     const htCheck = validateHallTicket(incoming.hallTicket);
-    const validHallTicket = htCheck.ok ? htCheck.value : current.hallTicket;
+    const validHallTicket = htCheck.ok ? htCheck.value : (incoming.hallTicket || current.hallTicket || "");
 
     const branchCheck = validateBranch(incoming.branch || incoming.branchCode);
-    const validBranch = branchCheck.ok ? branchCheck.value : current.branch;
-    const validBranchCode = branchCheck.ok ? branchCheck.code : (incoming.branchCode || current.branchCode);
+    const validBranch = branchCheck.ok ? branchCheck.value : (incoming.branch || current.branch || "");
+    const validBranchCode = branchCheck.ok ? branchCheck.code : (incoming.branchCode || current.branchCode || "");
 
     const yearCheck = validateYear(incoming.year);
-    const validYear = yearCheck.ok ? yearCheck.value : current.year;
+    const validYear = yearCheck.ok ? yearCheck.value : (incoming.year || current.year || "");
 
     const semCheck = validateSemester(incoming.semester);
-    const validSemester = semCheck.ok ? semCheck.value : cleanSemester(incoming.semester);
+    const validSemester = semCheck.ok ? semCheck.value : cleanSemester(incoming.semester || current.semester || "");
 
     const regCheck = validateRegulation(incoming.regulation);
-    const validRegulation = regCheck.ok ? regCheck.value : current.regulation;
+    const validRegulation = regCheck.ok ? regCheck.value : (incoming.regulation || current.regulation || "R23 Regulation");
 
     const emailCheck = validateEmail(incoming.email);
-    const validEmail = emailCheck.ok ? emailCheck.value : (incoming.email ? current.email : "");
+    const validEmail = emailCheck.ok ? emailCheck.value : (incoming.email || current.email || "");
 
     const phoneCheck = validatePhone(incoming.phone);
-    const validPhone = phoneCheck.ok ? phoneCheck.value : (incoming.phone ? current.phone : "");
+    const validPhone = phoneCheck.ok ? phoneCheck.value : (incoming.phone || current.phone || "");
 
     const attCheck = validateAttendance(incoming.attendance || incoming.attendancePercentage);
-    const validAttendance = attCheck.ok ? attCheck.formatted : current.attendance;
-    const validAttPct = attCheck.ok ? attCheck.value : current.attendancePercentage;
+    const validAttendance = attCheck.ok ? attCheck.formatted : (incoming.attendance || current.attendance || "0%");
+    const validAttPct = attCheck.ok ? attCheck.value : (incoming.attendancePercentage !== undefined ? Number(incoming.attendancePercentage) : (current.attendancePercentage || 0));
 
     // Validate and sanitize semester grades
     let validGrades = current.semesterGrades;
     if (Array.isArray(incoming.semesterGrades) && incoming.semesterGrades.length > 0) {
       validGrades = INITIAL_SEMESTERS.map((initSem, idx) => {
         const found = incoming.semesterGrades[idx];
-        if (!found) return initSem;
+        if (!found) return { ...initSem, sgpa: "" };
         const gCheck = validateGradePoint(found.sgpa);
         return {
           ...initSem,
           ...found,
           sgpa: gCheck.ok ? gCheck.value : "",
-          status: gCheck.ok ? "Completed" : found.status || initSem.status,
+          status: gCheck.ok ? "Completed" : found.status || "Not Started",
         };
       });
     }
 
     const calculatedCgpa = calculateCgpaFromGrades(validGrades);
     const cgpaCheck = validateGradePoint(incoming.cgpa);
-    const validCgpa = calculatedCgpa || (cgpaCheck.ok ? cgpaCheck.value : current.cgpa);
+    const validCgpa = calculatedCgpa || (cgpaCheck.ok ? cgpaCheck.value : (incoming.cgpa || current.cgpa || ""));
 
     const updated = {
-      ...DEFAULT_CHINNU_DATA,
+      ...EMPTY_STUDENT_DATA,
       ...incoming,
       _version: PROFILE_STORAGE_VERSION,
       name: validName,
@@ -318,7 +407,7 @@ export function saveStoredStudentData(data) {
       year: validYear,
       semester: validSemester,
       regulation: validRegulation,
-      college: cleanCollege(incoming.college || DEFAULT_CHINNU_DATA.college),
+      college: cleanCollege(incoming.college || current.college || ""),
       email: validEmail,
       phone: validPhone,
       attendance: validAttendance,

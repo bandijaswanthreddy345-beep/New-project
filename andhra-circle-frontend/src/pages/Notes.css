@@ -206,6 +206,9 @@
   width: 38px;
   height: 38px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .profile-avatar {
@@ -217,6 +220,28 @@
   background: #013e37;
 }
 
+.profile-avatar-placeholder {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(217, 167, 38, 0.5);
+  background: linear-gradient(135deg, #013e37 0%, #002420 100%);
+  color: #ffefb3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  box-shadow: 0 0 10px rgba(217, 167, 38, 0.2);
+}
+
+.profile-avatar-initials {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #ffefb3;
+}
+
 .profile-status-dot {
   position: absolute;
   bottom: 0;
@@ -226,6 +251,11 @@
   border-radius: 50%;
   background: #10b981;
   border: 2px solid #002420;
+}
+
+.profile-status-dot.is-offline {
+  background: #64748b;
+  opacity: 0.6;
 }
 
 .profile-info {
@@ -651,10 +681,12 @@
     transform: scale(0.82);
     box-shadow: 0 0 0 0 rgba(1, 62, 55, 0.5);
   }
+
   45% {
     transform: scale(1.28) rotate(4deg);
     box-shadow: 0 0 0 10px rgba(1, 62, 55, 0.12);
   }
+
   100% {
     transform: scale(1.06);
     box-shadow: 0 0 0 0 rgba(1, 62, 55, 0);
@@ -707,7 +739,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: scroll; /* Always show scrollbar on the right side */
+  overflow-y: scroll;
+  /* Always show scrollbar on the right side */
   overflow-x: hidden;
   height: 100%;
   max-height: none;
@@ -721,6 +754,7 @@
     opacity: 0.65;
     transform: translateY(5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -730,18 +764,21 @@
 .notes-cards-container::-webkit-scrollbar {
   width: 7px;
 }
+
 .notes-cards-container::-webkit-scrollbar-track {
   background: #e6f3f0;
   border-radius: 10px;
   margin-top: 4px;
   margin-bottom: 4px;
 }
+
 .notes-cards-container::-webkit-scrollbar-thumb {
   background: #a8d5cf;
   border-radius: 10px;
   min-height: 40px;
   border: 1px solid #e6f3f0;
 }
+
 .notes-cards-container::-webkit-scrollbar-thumb:hover {
   background: #013e37;
 }
@@ -876,7 +913,9 @@
 }
 
 @keyframes downloadSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* "View" Action Button (Homepage Flagship Emerald & Sunbeam) */
@@ -988,8 +1027,13 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* =========================================================
@@ -1046,7 +1090,7 @@
     padding: 0;
     overflow-y: auto;
   }
-  
+
   .notes-dashboard-card {
     flex-direction: column;
     min-height: 100vh;
@@ -1059,6 +1103,7 @@
     min-width: 100%;
     height: auto;
     padding: 12px 14px 14px;
+    background: #002420;
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
@@ -1066,6 +1111,50 @@
 
   .sidebar-brand {
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 6px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .sidebar-logo-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 239, 179, 0.35);
+    box-shadow: 0 0 14px rgba(217, 167, 38, 0.25);
+    background: #013e37;
+    padding: 2px;
+  }
+
+  .sidebar-brand-text h2 {
+    font-family: 'Montserrat', sans-serif !important;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .sidebar-brand-text h2 .font-deltha {
+    font-family: 'Montserrat', sans-serif !important;
+    color: #ffefb3;
+    font-size: 20px;
+    font-weight: 850;
+    letter-spacing: -0.01em;
+  }
+
+  .sidebar-brand-text span {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 11.5px;
+    color: #a8d5cf;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
   }
 
   .sidebar-nav {
@@ -1079,7 +1168,7 @@
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding: 2px 2px 4px 2px;
+    padding: 4px 2px 4px 2px;
     box-sizing: border-box;
   }
 
@@ -1121,8 +1210,11 @@
   .sidebar-notif-badge {
     margin-left: 5px;
     font-size: 9.5px;
-    padding: 1.5px 6px;
+    padding: 1px 6px;
     border-radius: 9999px;
+    background: #ffefb3 !important;
+    color: #013A33 !important;
+    font-weight: 700 !important;
   }
 
   .sidebar-profile {
@@ -1232,5 +1324,7 @@
 
   .notes-search-box {
     grid-column: auto;
+    overflow: hidden;
+    border-radius: 12px;
   }
 }

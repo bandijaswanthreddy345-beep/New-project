@@ -46,6 +46,9 @@ timestamps: true,
 
 commentSchema.plugin(require("./plugins/softDelete"));
 
+// Optimize queries fetching comments by note, excluding soft-deleted, sorted by creation date
+commentSchema.index({ note: 1, deletedAt: 1, createdAt: -1 });
+
 module.exports = mongoose.model(
 "Comment",
 commentSchema

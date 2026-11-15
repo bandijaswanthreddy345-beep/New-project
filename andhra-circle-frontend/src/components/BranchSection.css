@@ -97,7 +97,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 440px;
+  min-height: 460px;
   perspective: 1200px;
   user-select: none;
   -webkit-user-select: none;
@@ -108,7 +108,7 @@
 .branch-carousel-world {
   position: relative;
   width: 100%;
-  height: 350px;
+  height: 370px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,23 +119,31 @@
 .branch-3d-card {
   position: absolute;
   top: 0;
-  width: 410px;
-  height: 330px;
+  width: 440px;
+  height: 350px;
   border-radius: 24px;
   overflow: hidden;
   box-sizing: border-box;
   background: #090B10;
   border: 1.5px solid rgba(13, 69, 60, 0.16);
   cursor: pointer;
-  will-change: transform, opacity, filter;
-  transition: all 0.85s cubic-bezier(0.25, 1, 0.45, 1);
+  will-change: transform, opacity;
+  transform-style: flat;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transform: translateZ(0);
+  transition: transform 0.85s cubic-bezier(0.25, 1, 0.45, 1), opacity 0.85s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   transform-origin: center center;
   box-shadow: 0 16px 36px rgba(1, 42, 35, 0.12), 0 4px 12px rgba(0, 0, 0, 0.14);
 }
 
-/* Center Active Card: Sunbeam Gold Halo */
+/* Center Active Card: Sunbeam Gold Halo & Ultra Sharp 4K Clarity */
 .branch-3d-card.is-center {
   border-color: #d9a726 !important;
+  will-change: auto;
   box-shadow:
     0 24px 50px rgba(1, 42, 35, 0.22),
     0 0 32px rgba(217, 167, 38, 0.45),
@@ -147,28 +155,35 @@
   box-shadow: 0 20px 42px rgba(1, 42, 35, 0.18);
 }
 
-/* Visual Image Background - Crisp & Clear */
+/* Visual Image Background - Crisp, Hi-Res & High Vibrancy */
 .branch-card-img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: all 0.5s ease;
+  object-position: center;
   pointer-events: none;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: auto;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  filter: contrast(1.1) saturate(1.15) brightness(1.04);
+  transition: opacity 0.5s ease, filter 0.5s ease;
 }
 
 .branch-3d-card.is-center .branch-card-img {
-  opacity: 0.92;
-  transform: scale(1.05);
+  opacity: 1;
+  filter: contrast(1.12) saturate(1.18) brightness(1.08);
 }
 
 .branch-3d-card:not(.is-center) .branch-card-img {
-  opacity: 0.65;
-  transform: scale(1);
+  opacity: 0.92;
+  filter: contrast(1.08) saturate(1.1) brightness(0.98);
 }
 
-/* Dark Gradient Overlay for legibility */
+/* Dark Gradient Overlay for legibility while keeping visual vibrancy */
 .branch-card-overlay {
   position: absolute;
   inset: 0;
@@ -179,18 +194,21 @@
 .branch-3d-card.is-center .branch-card-overlay {
   background: linear-gradient(
     to top,
-    #090B10 0%,
-    rgba(9, 11, 16, 0.65) 45%,
-    rgba(9, 11, 16, 0.15) 100%
+    rgba(9, 11, 16, 0.94) 0%,
+    rgba(9, 11, 16, 0.58) 28%,
+    rgba(9, 11, 16, 0.12) 55%,
+    rgba(9, 11, 16, 0) 70%,
+    transparent 100%
   );
 }
 
 .branch-3d-card:not(.is-center) .branch-card-overlay {
   background: linear-gradient(
     to top,
-    #090B10 0%,
-    rgba(9, 11, 16, 0.78) 55%,
-    rgba(9, 11, 16, 0.35) 100%
+    rgba(9, 11, 16, 0.92) 0%,
+    rgba(9, 11, 16, 0.55) 45%,
+    rgba(9, 11, 16, 0.1) 80%,
+    transparent 100%
   );
 }
 
@@ -363,28 +381,31 @@
 /* Mobile Responsive - 3D Coverflow geometry strictly under @media (max-width: 768px) */
 @media (max-width: 768px) {
   .branch-3d-card {
-    width: 240px;
-    height: 300px;
+    width: 255px;
+    height: 318px;
     border-radius: 24px;
     transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     transform-origin: center center;
     backface-visibility: hidden;
     will-change: transform, opacity, z-index;
   }
+  .branch-3d-card.is-center {
+    will-change: auto;
+  }
   .branch-carousel-stage {
-    min-height: 330px;
+    min-height: 345px;
     perspective: 1200px;
     transform-style: preserve-3d;
   }
   .branch-carousel-world {
-    height: 310px;
+    height: 325px;
   }
 }
 
 @media (min-width: 640px) and (max-width: 768px) {
   .branch-3d-card {
-    width: 250px;
-    height: 310px;
+    width: 270px;
+    height: 330px;
   }
 }
 
@@ -408,8 +429,8 @@
     line-height: 1.25;
   }
   .branch-3d-card {
-    width: 230px;
-    height: 290px;
+    width: 242px;
+    height: 304px;
     border-radius: 20px;
   }
   .branch-card-inner {
@@ -425,10 +446,10 @@
     font-size: 11px;
   }
   .branch-carousel-stage {
-    min-height: 320px;
+    min-height: 330px;
   }
   .branch-carousel-world {
-    height: 295px;
+    height: 310px;
   }
   .branch-carousel-controls {
     margin-top: 16px;
@@ -442,17 +463,17 @@
 
 @media (max-width: 360px) {
   .branch-3d-card {
-    width: 215px;
-    height: 270px;
+    width: 226px;
+    height: 282px;
   }
   .branch-carousel-title {
     font-size: 18px;
   }
   .branch-carousel-stage {
-    min-height: 290px;
+    min-height: 305px;
   }
   .branch-carousel-world {
-    height: 275px;
+    height: 288px;
   }
 }
 

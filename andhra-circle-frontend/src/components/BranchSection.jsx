@@ -193,56 +193,45 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
     if (windowWidth < 768) {
       if (offset === 0) {
         return {
-          transform: "translateX(0) translateZ(40px) scale(1.02) rotateY(0deg)",
+          transform: "translate3d(0, 0, 0) scale(1) rotateY(0deg)",
           zIndex: 30,
           opacity: 1,
-          filter: "none",
-          boxShadow:
-            "0 14px 28px -6px rgba(15, 23, 42, 0.18), 0 6px 14px -4px rgba(15, 23, 42, 0.12)",
           pointerEvents: "auto",
         };
       }
       if (offset === -1) {
         return {
           transform:
-            "translateX(-64%) translateZ(-30px) scale(0.85) rotateY(20deg)",
+            "translateX(-64%) translateZ(-40px) scale(0.84) rotateY(20deg)",
           zIndex: 20,
-          opacity: 1,
-          filter: "brightness(0.65)",
-          boxShadow:
-            "0 10px 22px -6px rgba(15, 23, 42, 0.15)",
+          opacity: 0.95,
           pointerEvents: "auto",
         };
       }
       if (offset < -1) {
         return {
           transform:
-            "translateX(-110%) translateZ(-80px) scale(0.72) rotateY(28deg)",
+            "translateX(-110%) translateZ(-90px) scale(0.70) rotateY(28deg)",
           zIndex: 10,
           opacity: 0,
-          filter: "brightness(0.4)",
           pointerEvents: "none",
         };
       }
       if (offset === 1) {
         return {
           transform:
-            "translateX(64%) translateZ(-30px) scale(0.85) rotateY(-20deg)",
+            "translateX(64%) translateZ(-40px) scale(0.84) rotateY(-20deg)",
           zIndex: 20,
-          opacity: 1,
-          filter: "brightness(0.65)",
-          boxShadow:
-            "0 10px 22px -6px rgba(15, 23, 42, 0.15)",
+          opacity: 0.95,
           pointerEvents: "auto",
         };
       }
       if (offset > 1) {
         return {
           transform:
-            "translateX(110%) translateZ(-80px) scale(0.72) rotateY(-28deg)",
+            "translateX(110%) translateZ(-90px) scale(0.70) rotateY(-28deg)",
           zIndex: 10,
           opacity: 0,
-          filter: "brightness(0.4)",
           pointerEvents: "none",
         };
       }
@@ -258,10 +247,9 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
     if (windowWidth < 1180) {
       if (offset === 0) {
         return {
-          transform: "translate3d(0, 0, 80px) rotateY(0deg) scale(1.04)",
+          transform: "translate3d(0, 0, 0) scale(1) rotateY(0deg)",
           zIndex: 30,
           opacity: 1,
-          filter: "brightness(1) drop-shadow(0 20px 40px rgba(1, 42, 35, 0.22))",
           pointerEvents: "auto",
         };
       }
@@ -269,10 +257,9 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
         const xTranslate = offset === -1 ? -240 : 240;
         const yRotate = offset === -1 ? 22 : -22;
         return {
-          transform: `translate3d(${xTranslate}px, 0, -30px) rotateY(${yRotate}deg) scale(0.86)`,
+          transform: `translate3d(${xTranslate}px, 0, -40px) rotateY(${yRotate}deg) scale(0.84)`,
           zIndex: 20,
           opacity: 0.96,
-          filter: "brightness(0.85)",
           pointerEvents: "auto",
         };
       }
@@ -280,46 +267,42 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
         const xTranslate = offset === -2 ? -420 : 420;
         const yRotate = offset === -2 ? 34 : -34;
         return {
-          transform: `translate3d(${xTranslate}px, 0, -90px) rotateY(${yRotate}deg) scale(0.72)`,
+          transform: `translate3d(${xTranslate}px, 0, -100px) rotateY(${yRotate}deg) scale(0.70)`,
           zIndex: 10,
           opacity: 0.88,
-          filter: "brightness(0.72)",
           pointerEvents: "auto",
         };
       }
     }
 
-    // 3. Desktop (>= 1180px) - Perfectly proportioned spread without clipping on laptop screens
+    // 3. Desktop (>= 1180px) - Center card at true 1:1 scale(1) for razor-sharp 4K pixel rendering
     if (offset === 0) {
       return {
-        transform: "translate3d(0, 0, 100px) rotateY(0deg) scale(1.06)",
+        transform: "translate3d(0, 0, 0) scale(1) rotateY(0deg)",
         zIndex: 30,
         opacity: 1,
-        filter: "brightness(1) drop-shadow(0 24px 45px rgba(1, 42, 35, 0.22))",
         pointerEvents: "auto",
       };
     }
 
     if (absOffset === 1) {
-      const xTranslate = offset === -1 ? -300 : 300;
+      const xTranslate = offset === -1 ? -315 : 315;
       const yRotate = offset === -1 ? 24 : -24;
       return {
-        transform: `translate3d(${xTranslate}px, 0, -30px) rotateY(${yRotate}deg) scale(0.88)`,
+        transform: `translate3d(${xTranslate}px, 0, -50px) rotateY(${yRotate}deg) scale(0.85)`,
         zIndex: 20,
         opacity: 0.96,
-        filter: "brightness(0.85)",
         pointerEvents: "auto",
       };
     }
 
     if (absOffset === 2) {
-      const xTranslate = offset === -2 ? -520 : 520;
+      const xTranslate = offset === -2 ? -540 : 540;
       const yRotate = offset === -2 ? 38 : -38;
       return {
-        transform: `translate3d(${xTranslate}px, 0, -100px) rotateY(${yRotate}deg) scale(0.74)`,
+        transform: `translate3d(${xTranslate}px, 0, -120px) rotateY(${yRotate}deg) scale(0.72)`,
         zIndex: 10,
         opacity: 0.90,
-        filter: "brightness(0.72)",
         pointerEvents: "auto",
       };
     }
@@ -369,8 +352,8 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
                   ...style3D,
                   transition:
                     windowWidth < 768
-                      ? "transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease, filter 0.45s ease"
-                      : "all 0.85s cubic-bezier(0.25, 1, 0.45, 1)",
+                      ? "transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s ease"
+                      : "transform 0.85s cubic-bezier(0.25, 1, 0.45, 1), opacity 0.85s ease, border-color 0.4s ease, box-shadow 0.4s ease",
                 }}
                 className={`branch-3d-card ${isCenter ? "is-center" : ""}`}
                 title={`Explore ${branch.name}`}
@@ -380,8 +363,8 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
                   src={branch.image}
                   alt={branch.name}
                   className="branch-card-img"
-                  width="360"
-                  height="360"
+                  width="880"
+                  height="700"
                   loading={index === 0 ? "eager" : "lazy"}
                   fetchPriority={index === 0 ? "high" : "auto"}
                   decoding="async"

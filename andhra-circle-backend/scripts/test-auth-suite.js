@@ -36,7 +36,8 @@ function postJson(urlPath, payload, headers = {}) {
 }
 
 async function fullSuite() {
-  await mongoose.connect(process.env.MONGO_URI);
+  const uri = process.env.TEST_MONGO_URI || "mongodb://127.0.0.1:27017/andhra-circle-test";
+  await mongoose.connect(uri);
   const User = mongoose.model('User');
   const bcrypt = require('../node_modules/bcryptjs');
 

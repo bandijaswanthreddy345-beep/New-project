@@ -170,7 +170,7 @@ function checkSecrets() {
       "HIGH",
       "S1",
       "JWT_SECRET is weak",
-      "Use 32+ random characters: node -e \"console.log(require('crypto').randomBytes(48).toString('hex'))\""
+      "The current JWT_SECRET is a weak default. Generate a strong 64+ character random key using: node -e \"console.log(require('crypto').randomBytes(48).toString('hex'))\" and replace JWT_SECRET in .env."
     );
   }
 
@@ -188,9 +188,15 @@ function checkSecrets() {
     add(
       "INFO",
       "S3",
-      "Database password lives in .env",
-      "Fine locally. Rotate it if .env was ever shared, committed or pasted anywhere, " +
-        "and keep Atlas 'Network Access' limited to your server's IP."
+      "Database credentials live in .env",
+      "Hosted database URI contains credentials. Fine locally, but keep .env private and limit database network access to authorized IPs."
+    );
+  } else {
+    add(
+      "INFO",
+      "S3",
+      "Local MongoDB in use",
+      "Using local MongoDB at 127.0.0.1:27017 without remote credentials. Note: Data lives strictly on this computer and is not backed up unless you run the backup script (node scripts/backup-db.js)."
     );
   }
 

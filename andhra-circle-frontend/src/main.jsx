@@ -4,6 +4,9 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./index.css";
 import "./mobile.css"; // phone-only overrides, must stay last
+import { initSecurityGuardian } from "./utils/securityGuardian";
+
+initSecurityGuardian();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

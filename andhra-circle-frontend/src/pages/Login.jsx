@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import API from "../api/api";
 import TurnstileWidget from "../components/TurnstileWidget";
+import { EMPTY_STUDENT_DATA } from "../data/studentData";
 import "./Login.css";
 import "./Register.css";
 
@@ -96,6 +97,33 @@ function Login() {
       localStorage.removeItem("jntu_student_logged_out");
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+
+      // Ensure profile matches this logged-in user with only signup name & email if unconfigured
+      try {
+        const existingProfileRaw = localStorage.getItem("jntu_student_profile");
+        let existingProfile = null;
+        if (existingProfileRaw) {
+          existingProfile = JSON.parse(existingProfileRaw);
+        }
+
+        const isChinnu = existingProfile && (existingProfile.name === "Chinnu" || existingProfile.email === "chinnu@gmail.com" || existingProfile.hallTicket === "21B91A0201");
+        const isDifferentUser = existingProfile && existingProfile.email && user.email && existingProfile.email.toLowerCase() !== user.email.toLowerCase();
+
+        if (!existingProfile || isChinnu || isDifferentUser) {
+          const freshProfile = {
+            ...EMPTY_STUDENT_DATA,
+            name: user.name || "",
+            shortName: (user.name || "").split(" ")[0] || "Student",
+            email: user.email || "",
+            isConfigured: false,
+          };
+          localStorage.setItem("jntu_student_profile", JSON.stringify(freshProfile));
+          window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: freshProfile }));
+        }
+      } catch (profileSyncErr) {
+        console.warn("Could not sync student profile on login:", profileSyncErr);
+      }
+
       window.dispatchEvent(new Event("authChanged"));
 
       // Role based redirection
@@ -325,29 +353,26 @@ function Login() {
             </div>
           </div>
 
-          {/* Security Verification (Cloudflare Turnstile) - Only shown after repeated login failures */}
-          {requireCaptcha && (
-            <div className="login-field-group signup-captcha-section">
-              <div className="signup-label-between">
-                <label className="login-field-label">
-                  <span>Security Verification</span>
-                  <span className="login-required-star">*</span>
-                </label>
-                <span className="signup-helper-text">Cloudflare Turnstile</span>
-              </div>
-
-              <div style={{ background: "transparent", border: "none", padding: "0.25rem 0", display: "flex", justifyContent: "center" }}>
-                <TurnstileWidget
-                  onVerify={(token) => {
-                    setTurnstileToken(token);
-                    if (error) setError("");
-                  }}
-                  onExpire={() => setTurnstileToken("")}
-                  onError={() => setTurnstileToken("")}
-                />
-              </div>
+          {/* Security Verification (Captcha) */}
+          <div className="login-field-group signup-captcha-section">
+            <div className="signup-label-between">
+              <label className="login-field-label">
+                <span>Security Verification</span>
+                <span className="login-required-star">*</span>
+              </label>
             </div>
-          )}
+
+            <div style={{ background: "transparent", border: "none", padding: "0.25rem 0", display: "flex", justifyContent: "center" }}>
+              <TurnstileWidget
+                onVerify={(token) => {
+                  setTurnstileToken(token);
+                  if (error) setError("");
+                }}
+                onExpire={() => setTurnstileToken("")}
+                onError={() => setTurnstileToken("")}
+              />
+            </div>
+          </div>
 
           {/* Utility Row: Remember Me & Forgot Password */}
           <div className="login-utility-row">
@@ -392,14 +417,6 @@ function Login() {
             Create an Account
           </Link>
         </p>
-
-        {/* Security Trust Badge */}
-        <div className="login-security-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-          <span>Official JNTU Academic Portal · Secure Access</span>
-        </div>
       </div>
     </div>
   );

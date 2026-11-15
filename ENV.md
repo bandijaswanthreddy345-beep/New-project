@@ -29,8 +29,10 @@
 * **Production Recommendation:** Must be enabled behind reverse proxies so rate limiters and IP checks see the visitor's real client IP rather than the proxy server IP.
 
 ### `MONGO_URI`
-* **Purpose:** MongoDB Atlas connection string.
-* **Classification:** Critical Secret.
+* **Purpose:** MongoDB connection string.
+* **Default:** `mongodb://127.0.0.1:27017/andhra-circle` (Local MongoDB instance).
+* **Storage Location:** Data lives strictly on this computer and is not backed up automatically. Run `node scripts/backup-db.js` for local snapshots.
+* **Classification:** Sensitive configuration (contains credentials only when connecting to a remote/hosted cluster).
 * **Required in Production:** Yes.
 
 ### `JWT_SECRET`

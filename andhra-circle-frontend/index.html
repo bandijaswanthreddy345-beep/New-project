@@ -8,6 +8,8 @@
   <title>Andhra Circle — Academic Resource Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://new-project-1-sjgo.onrender.com" crossorigin />
+  <link rel="dns-prefetch" href="https://new-project-1-sjgo.onrender.com" />
   <link rel="preload" as="style"
     href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
     onload="this.onload=null;this.rel='stylesheet'" />
@@ -15,11 +17,36 @@
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" />
   </noscript>
+  <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
+  <link rel="dns-prefetch" href="https://challenges.cloudflare.com" />
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  <style>
+    /* Inline minimal critical loading background to prevent blank flash */
+    html,
+    body {
+      background-color: #0b1311;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0b1311;">
+      <div
+        style="width: 42px; height: 42px; border: 3px solid rgba(13,148,136,0.2); border-top-color: #0d9488; border-radius: 50%; animation: spin 0.8s linear infinite;">
+      </div>
+    </div>
+    <style>
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

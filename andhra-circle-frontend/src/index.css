@@ -775,9 +775,9 @@ ul {
   background: rgba(6, 32, 27, 0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(16, 185, 129, 0.42);
+  border: 1.5px solid rgba(16, 185, 129, 0.52);
   border-radius: 9999px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 18px rgba(16, 185, 129, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   padding: 0 8px 0 10px;
@@ -789,7 +789,7 @@ ul {
 .hero-ai-bar:focus-within {
   border-color: #fbbf24;
   background: rgba(6, 36, 30, 0.95);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.25);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 24px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 /* Frosted Avatar Badge Pod */
@@ -802,7 +802,7 @@ ul {
   border-radius: 9999px;
   background: #fbbf24 !important;
   border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45), 0 0 12px rgba(251, 191, 36, 0.35);
   cursor: pointer;
   flex-shrink: 0;
   padding: 0;
@@ -7030,18 +7030,27 @@ textarea:focus-visible {
   position: relative;
   width: 34px;
   height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .nav-profile-avatar-img {
   width: 34px;
   height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   object-fit: cover;
+  display: block;
+  flex-shrink: 0;
   border: 2px solid var(--primary);
   background: #013A33;
   box-shadow: 0 2px 6px rgba(1, 58, 51, 0.2);

@@ -66,7 +66,7 @@
 .calc-brand-title {
   font-family: 'Montserrat', sans-serif !important;
   color: #ffffff;
-  font-size: 17.5px;
+  font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.02em;
   margin: 0;
@@ -76,6 +76,8 @@
 .calc-brand-title .font-deltha {
   font-family: 'Montserrat', sans-serif !important;
   color: #ffefb3;
+  font-size: 21px;
+  font-weight: 800;
 }
 
 .calc-brand-subtitle {
@@ -757,7 +759,7 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 0;
+  margin-top: 12px;
 }
 
 .calc-btn-fresh-sidebar:hover {
@@ -812,6 +814,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
   margin-bottom: 20px;
 }
 
@@ -824,6 +828,8 @@
   border: 1px solid rgba(255, 239, 179, 0.3);
   padding: 4px 10px;
   border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .calc-sem-name {
@@ -831,6 +837,9 @@
   font-weight: 650;
   color: #ffefb3;
   opacity: 0.9;
+  white-space: nowrap;
+  text-align: right;
+  margin-left: auto;
 }
 
 .calc-score-visual {
@@ -908,6 +917,12 @@
   background: rgba(239, 68, 68, 0.2);
   border: 1px solid rgba(239, 68, 68, 0.5);
   color: #f87171;
+}
+
+.standing-awaiting {
+  background: #063323;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #34d399;
 }
 
 .calc-breakdown-list {
@@ -1489,4 +1504,604 @@ button:disabled.calc-btn-save-score {
   cursor: not-allowed;
   filter: grayscale(0.5);
 }
+
+/* =========================================================
+   SGPA TABLE MOBILE RESPONSIVENESS & STITCH MOBILE DESIGN
+   ========================================================= */
+.calc-mobile-only {
+  display: none;
+}
+
+.calc-desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .calc-desktop-only {
+    display: none !important;
+  }
+
+  .calc-mobile-only {
+    display: block !important;
+  }
+
+  /* Flush container on mobile - remove side paddings causing left/right empty gaps */
+  .calc-main-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px 12px 60px 12px !important;
+  }
+
+  .calc-page-header-inner {
+    padding: 8px 16px !important;
+  }
+
+  .calc-brand-title,
+  .calc-brand-title .font-deltha {
+    font-size: 18px !important;
+  }
+
+  .calc-page-logo {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .calc-student-header-card {
+    padding: 16px 14px !important;
+    margin-bottom: 16px !important;
+    border-radius: 14px !important;
+  }
+
+  .calc-student-header-card::before {
+    display: none !important;
+  }
+
+  /* Remove bulky card padding/borders in mobile so course view is edge-to-edge & sleek */
+  .calc-card-primary {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Screen 1: Mobile Live Summary Banner */
+  .calc-mobile-course-view {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 8px;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .calc-mobile-summary-banner {
+    background: linear-gradient(135deg, #06281e 0%, #0a3d2e 60%, #041d16 100%);
+    color: #ffffff;
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 16px rgba(6, 40, 30, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .calc-mobile-banner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+
+  .calc-mobile-banner-sub {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #6ee7b7;
+    text-transform: uppercase;
+    display: block;
+  }
+
+  .calc-mobile-banner-title {
+    font-size: 16.5px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 2px 0 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .calc-mobile-badge-branch {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fde68a;
+    background: rgba(251, 191, 36, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    padding: 2px 8px;
+    border-radius: 9999px;
+  }
+
+  .calc-mobile-banner-right {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .calc-mobile-banner-reglabel {
+    font-size: 10px;
+    color: rgba(209, 250, 229, 0.8);
+    display: block;
+    font-weight: 500;
+  }
+
+  .calc-mobile-banner-regvalue {
+    font-size: 12px;
+    font-weight: 750;
+    color: #fde68a;
+    white-space: nowrap;
+  }
+
+  .calc-mobile-banner-desc {
+    font-size: 12px;
+    color: rgba(209, 250, 229, 0.95);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Mobile Course List Heading */
+  .calc-mobile-course-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px;
+  }
+
+  .calc-mobile-course-heading-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #064e3b;
+  }
+
+  .calc-mobile-course-heading-title h4 {
+    font-size: 12.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .calc-mobile-course-range-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  /* Mobile Course Cards List */
+  .calc-mobile-course-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .calc-mobile-empty-state {
+    background: #f8faf9;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 24px 16px;
+    text-align: center;
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  .calc-mobile-course-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.15s ease;
+  }
+
+  .calc-mobile-course-card:focus-within {
+    border-color: #059669;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.08);
+  }
+
+  .calc-mobile-card-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .calc-mobile-card-subject-name {
+    flex: 1;
+    font-size: 13.5px;
+    font-weight: 650;
+    color: #0f172a;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    padding: 4px 6px;
+    outline: none;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .calc-mobile-card-subject-name:focus {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+
+  .calc-mobile-card-marks-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .calc-mobile-card-marks-input {
+    width: 110px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #f8faf9;
+    color: #0f172a;
+    outline: none;
+  }
+
+  .calc-mobile-card-marks-input:focus {
+    border-color: #059669;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+  }
+
+  .calc-mobile-card-grade-pill {
+    font-size: 11px;
+    font-weight: 750;
+    padding: 3px 6px;
+    border-radius: 6px;
+    border: 1px solid;
+  }
+
+  .calc-mobile-card-row-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 6px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .calc-mobile-card-credit-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 3px 8px;
+  }
+
+  .calc-mobile-card-credit-input {
+    width: 32px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0f172a;
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+  }
+
+  .calc-mobile-card-auto-pill {
+    font-size: 9px;
+    font-weight: 800;
+    background: #06281e;
+    color: #a7f3d0;
+    padding: 2px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .calc-mobile-card-del-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+  }
+
+  .calc-mobile-card-del-btn:hover {
+    color: #ef4444;
+  }
+
+  .calc-mobile-card-error-row {
+    font-size: 11px;
+    color: #dc2626;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* Mobile Quick Management Controls */
+  .calc-mobile-quick-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .calc-mobile-btn-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px dashed rgba(6, 78, 59, 0.5);
+    background: rgba(16, 185, 129, 0.06);
+    color: #064e3b;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .calc-mobile-btn-add:hover {
+    background: rgba(16, 185, 129, 0.12);
+  }
+
+  .calc-mobile-btn-reload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #334155;
+    font-size: 12.5px;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .calc-mobile-btn-reload:hover {
+    background: #f8fafc;
+  }
+
+  .calc-mobile-reset-link-wrapper {
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .calc-mobile-reset-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    font-size: 12px;
+    color: #475569;
+    font-weight: 600;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+
+  .calc-mobile-reset-link:hover {
+    color: #0f172a;
+  }
+
+  /* Sticky Bottom Toolbar (Screen 1) */
+  .calc-mobile-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(226, 232, 240, 0.9);
+    padding: 10px 16px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    z-index: 1000;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .calc-mobile-bottom-bar-inner {
+    max-width: 440px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .calc-mobile-bottom-btn-reset {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+
+  .calc-mobile-bottom-btn-reset:active {
+    transform: scale(0.95);
+  }
+
+  .calc-mobile-bottom-btn-complete {
+    flex: 1;
+    height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #041d16 0%, #083528 50%, #041d16 100%);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 750;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(6, 40, 30, 0.3);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .calc-mobile-bottom-btn-complete:active {
+    transform: scale(0.98);
+  }
+
+  .calc-mobile-bottom-btn-complete:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .calc-mobile-check-circle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Screen 2 Mobile Score Card Centering & Refinements */
+  .calc-sidebar-score {
+    width: 100%;
+    max-width: 100%;
+    margin: 16px 0 0 0;
+  }
+
+  /* Sticky bottom bar removed on mobile */
+  .calc-mobile-bottom-bar {
+    display: none !important;
+  }
+
+  .calc-score-card {
+    background: #031d14 !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.35) !important;
+    border-radius: 24px !important;
+    padding: 22px 18px !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .calc-score-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .calc-score-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .sgpa-ring {
+    box-shadow: 0 0 25px rgba(245, 175, 25, 0.28), inset 0 0 18px rgba(245, 175, 25, 0.15) !important;
+    border: 3px solid #eed171 !important;
+    background: #01140d !important;
+    margin: 0 auto;
+  }
+
+  .sgpa-ring .calc-score-val {
+    color: #f5b326 !important;
+    font-size: 38px !important;
+    font-weight: 900 !important;
+    text-shadow: 0 2px 8px rgba(245, 179, 38, 0.4) !important;
+  }
+
+  .sgpa-ring .calc-score-sub {
+    color: #eed072 !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .calc-breakdown-list {
+    border-top: 1px solid rgba(16, 185, 129, 0.2) !important;
+  }
+
+  .calc-breakdown-row {
+    border-bottom: 1px solid rgba(16, 185, 129, 0.12);
+    padding: 7px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .calc-breakdown-row span {
+    color: #89aba0 !important;
+    font-size: 12px;
+  }
+
+  .calc-breakdown-row strong {
+    color: #ffffff;
+    font-size: 12.5px;
+    text-align: right;
+  }
+
+  .calc-btn-complete-task {
+    background: #063324 !important;
+    border: 1.5px solid #1d6b4f !important;
+    color: #e9caa2 !important;
+    border-radius: 12px !important;
+    padding: 13px !important;
+    font-weight: 750 !important;
+    width: 100%;
+  }
+
+  .calc-btn-save-profile {
+    background: #04281d !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
+    color: #e9caa2 !important;
+    border-radius: 12px !important;
+    padding: 13px !important;
+    font-weight: 750 !important;
+    width: 100%;
+  }
+
+  .calc-btn-fresh-sidebar {
+    background: #031d15 !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.2) !important;
+    color: #e9caa2 !important;
+    border-radius: 12px !important;
+    padding: 13px !important;
+    font-weight: 750 !important;
+    width: 100%;
+  }
+
+  /* Padding offset so sticky bottom bar doesn't cover content */
+  .calc-section-layout {
+    padding-bottom: 75px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
 

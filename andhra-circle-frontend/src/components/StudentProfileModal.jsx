@@ -87,14 +87,39 @@ function StudentProfileModal({ isOpen, onClose }) {
             {/* Student Profile Info Section */}
             <div className="sp-preview-user-row">
               <div className="sp-preview-avatar-wrap">
-                <img
-                  src={avatar || DEFAULT_STUDENT_AVATAR}
-                  alt={displayName}
-                  className="sp-preview-avatar"
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
-                  }}
-                />
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt={displayName}
+                    className="sp-preview-avatar"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      if (e.currentTarget.nextElementSibling) {
+                        e.currentTarget.nextElementSibling.style.display = "flex";
+                      }
+                    }}
+                  />
+                ) : null}
+                <div
+                  className="sp-preview-avatar-placeholder"
+                  style={{ display: avatar ? "none" : "flex" }}
+                >
+                  {displayName ? (
+                    <span className="sp-preview-avatar-initials">
+                      {displayName
+                        .split(" ")
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map((n) => n[0].toUpperCase())
+                        .join("")}
+                    </span>
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  )}
+                </div>
                 <span className="sp-preview-status-dot" />
               </div>
 

@@ -2,10 +2,10 @@
  * scripts/db-inspect.js
  * Read-only database telemetry inspection tool.
  * Connects with the app's settings and prints:
- * - All visible databases on the cluster
+ * - Host and database name
  * - Document counts for each collection
  * - Index names for each collection
- * NEVER prints document content, passwords, emails or hashes.
+ * NEVER prints connection strings, passwords, emails or hashes.
  */
 
 const path = require("path");
@@ -13,18 +13,11 @@ require("dotenv").config({ path: path.join(__dirname, "../.env") });
 const mongoose = require("mongoose");
 
 async function inspect() {
-  const uri = process.env.MONGO_URI;
-  if (!uri) {
-    console.error("ERROR: MONGO_URI not found in environment.");
-    process.exit(1);
-  }
+  const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/andhra-circle";
 
-  // Parse connection URI safely without logging credentials
-  const sanitizedUri = uri.replace(/^mongodb(?:\+srv)?:\/\/[^@]+@/, "mongodb://***:***@");
   console.log("==================================================");
   console.log("READ-ONLY DATABASE TELEMETRY INSPECTION");
   console.log("==================================================");
-  console.log("Connection URI (sanitized):", sanitizedUri);
 
   await mongoose.connect(uri, {
     serverSelectionTimeoutMS: 8000,
@@ -32,22 +25,21 @@ async function inspect() {
 
   const currentDbName = mongoose.connection.name;
   const host = mongoose.connection.host;
-  console.log(`Connected Cluster Host: ${host}`);
+  console.log(`Connected Host    : ${host}`);
   console.log(`Connected Database: "${currentDbName}"`);
   console.log("--------------------------------------------------");
 
   const admin = mongoose.connection.db.admin();
   const dbsList = await admin.listDatabases();
 
-  console.log("\n--- CLUSTER DATABASES OVERVIEW ---");
+  console.log("\n--- DATABASES OVERVIEW ---");
   for (const dbInfo of dbsList.databases) {
-    console.log(`Database: "${dbInfo.name}" | Size: ${(dbInfo.sizeOnDisk / 1024).toFixed(1)} KB | Empty: ${dbInfo.empty}`);
+    console.log(`Database: "${dbInfo.name}" | Size: ${(dbInfo.sizeOnDisk / 1024).toFixed(1)} KB`);
   }
 
-  // Iterate over non-system databases
-  for (const dbInfo of dbsList.databases) {
-    if (["admin", "local", "config"].includes(dbInfo.name)) continue;
-
+  // Iterate over target database
+  const targetDbs = dbsList.databases.filter(d => !["admin", "local", "config"].includes(d.name));
+  for (const dbInfo of targetDbs) {
     const db = mongoose.connection.client.db(dbInfo.name);
     const collections = await db.listCollections().toArray();
 
@@ -96,4 +88,3 @@ inspect().catch((err) => {
   console.error("DB Inspect Error:", err.message);
   process.exit(1);
 });
-

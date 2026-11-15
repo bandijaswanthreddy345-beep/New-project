@@ -37,11 +37,28 @@ function PdfViewer() {
     return "";
   }, [customUrl, fileName]);
 
-  // Stream directly via backend proxy so Chrome renders its native full-height PDF reader
+  // Stream directly via backend proxy only for external cross-origin links
   const embedUrl = useMemo(() => {
     if (!rawPdfUrl) return "";
 
-    // Direct proxy streaming gives 100% full-screen Chrome PDF reader with zero letterboxing
+    // 1. If it's a backend-hosted upload file (/uploads/), embed directly as native static PDF
+    if (rawPdfUrl.includes("/uploads/")) {
+      return rawPdfUrl;
+    }
+
+    // 2. Google Drive direct embed preview
+    if (rawPdfUrl.includes("drive.google.com")) {
+      return rawPdfUrl
+        .replace(/\/view(\?.*)?$/, "/preview")
+        .replace(/\/edit(\?.*)?$/, "/preview");
+    }
+
+    // 3. Google Docs viewer link already formatted
+    if (rawPdfUrl.includes("docs.google.com/viewer")) {
+      return rawPdfUrl;
+    }
+
+    // 4. External circular links: stream via backend proxy to avoid CORS / iframe restrictions
     if (rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/")) {
       return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`;
     }
@@ -95,9 +112,11 @@ function PdfViewer() {
 
       // 1. Try direct fetch blob download
       try {
-        const streamUrl = rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/")
-          ? `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`
-          : rawPdfUrl;
+        const isHostedUpload = rawPdfUrl.includes("/uploads/");
+        const streamUrl =
+          !isHostedUpload && rawPdfUrl.startsWith("http") && !rawPdfUrl.includes("/api/")
+            ? `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(rawPdfUrl)}`
+            : rawPdfUrl;
 
         const response = await fetch(streamUrl);
         if (response.ok) {

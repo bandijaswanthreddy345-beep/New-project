@@ -11,6 +11,7 @@ const {
   getComments,
   likeComment,
   dislikeComment,
+  updateComment,
   deleteComment,
 } = require("../controllers/commentController");
 
@@ -41,6 +42,12 @@ router.get("/note/:noteId", validateObjectId("noteId"), getComments);
 router.put("/:id/like", validateObjectId("id"), likeComment);
 
 router.put("/:id/dislike", validateObjectId("id"), dislikeComment);
+
+// ==========================================
+// UPDATE COMMENT (admin only)
+// ==========================================
+
+router.put("/:id", auth, validateObjectId("id"), updateComment);
 
 // ==========================================
 // DELETE COMMENT (admin only)

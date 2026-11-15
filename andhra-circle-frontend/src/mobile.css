@@ -25,10 +25,19 @@
   /* Media never wider than the screen */
   img,
   video,
-  canvas,
+  canvas:not(.metal-fx-canvas),
   iframe,
   svg {
     max-width: 100%;
+  }
+
+  /* Prevent metal-fx interactive cursor/liquid reflections from appearing on touch/mobile devices */
+  .metal-fx-cursor,
+  .metal-fx-cursor-spill {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
   }
 
   img {
@@ -693,6 +702,8 @@
     min-height: 34px !important;
     max-width: 34px !important;
     max-height: 34px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
     padding: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -710,26 +721,41 @@
     min-height: 34px !important;
     max-width: 34px !important;
     max-height: 34px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     position: relative !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   .nav-mobile-avatar-img {
     width: 34px !important;
     height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    aspect-ratio: 1 / 1 !important;
     border-radius: 50% !important;
     border: 2px solid #087943 !important;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) !important;
     object-fit: cover !important;
+    display: block !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   .nav-mobile-fallback-icon {
     width: 34px !important;
     height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+    aspect-ratio: 1 / 1 !important;
     border-radius: 50% !important;
     background: rgba(8, 121, 67, 0.12) !important;
     border: 1.5px solid #087943 !important;
@@ -738,11 +764,13 @@
     align-items: center !important;
     justify-content: center !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   .nav-mobile-fallback-icon svg {
     width: 17px !important;
     height: 17px !important;
+    flex-shrink: 0 !important;
   }
 
   /* =========================================================
@@ -825,16 +853,23 @@
   .hero-ai-bar {
     width: 100% !important;
     height: 48px !important;
-    background: rgba(6, 32, 27, 0.82) !important;
-    border: 1px solid rgba(16, 185, 129, 0.42) !important;
+    background: rgba(6, 32, 27, 0.88) !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.55) !important;
     border-radius: 9999px !important;
     padding: 4px 6px 4px 14px !important;
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
+    transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease !important;
+  }
+
+  .hero-ai-bar:focus-within {
+    border-color: #fbbf24 !important;
+    background: rgba(6, 36, 30, 0.95) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 22px rgba(251, 191, 36, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
   }
 
   .hero-ai-avatar-desktop {
@@ -856,7 +891,7 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45), 0 0 12px rgba(251, 191, 36, 0.35) !important;
     flex-shrink: 0 !important;
     color: #020617 !important;
     padding: 0 !important;
@@ -895,7 +930,7 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4) !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45), 0 0 12px rgba(251, 191, 36, 0.35) !important;
     flex-shrink: 0 !important;
     transition: transform 0.15s ease, opacity 0.15s ease !important;
   }
@@ -1173,18 +1208,22 @@
   }
 
   .branch-3d-card .branch-card-img {
-    opacity: 0.92 !important;
+    opacity: 1 !important;
+    filter: contrast(1.1) saturate(1.15) brightness(1.08) !important;
   }
 
   .branch-3d-card:not(.is-center) .branch-card-img {
-    opacity: 0.8 !important;
+    opacity: 0.85 !important;
+    filter: contrast(1.05) saturate(1.08) brightness(0.95) !important;
   }
 
   .branch-3d-card .branch-card-overlay {
     background: linear-gradient(to top,
-        #090b10 0%,
-        rgba(9, 11, 16, 0.88) 45%,
-        rgba(9, 11, 16, 0.4) 100%) !important;
+        rgba(9, 11, 16, 0.94) 0%,
+        rgba(9, 11, 16, 0.6) 28%,
+        rgba(9, 11, 16, 0.15) 55%,
+        rgba(9, 11, 16, 0) 70%,
+        transparent 100%) !important;
   }
 
   .branch-card-inner {
@@ -1445,6 +1484,7 @@
 
 /* ---------- Performance & Smooth Scrolling for Budget Mobile Devices (<= 768px) ---------- */
 @media (max-width: 768px) {
+
   /* Prevent horizontal scrolling */
   html,
   body {
@@ -1475,6 +1515,7 @@
 
 /* Comprehensive prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

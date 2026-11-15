@@ -64,9 +64,26 @@ export default function Calculator() {
     const s = getStoredStudentData();
     return s?.hallTicket || "";
   });
-  const [branch, setBranch] = useState("AIML");
-  const [regulation, setRegulation] = useState("R23"); // Scheme (R23 default)
-  const [semester, setSemester] = useState("1");
+  const [branch, setBranch] = useState(() => {
+    const s = getStoredStudentData();
+    return (s?.isConfigured && s?.branchCode) ? s.branchCode : "AIML";
+  });
+  const [regulation, setRegulation] = useState(() => {
+    const s = getStoredStudentData();
+    if (s?.isConfigured && s?.regulation) {
+      const match = s.regulation.match(/R\d+/i);
+      if (match) return match[0].toUpperCase();
+    }
+    return "R23";
+  });
+  const [semester, setSemester] = useState(() => {
+    const s = getStoredStudentData();
+    if (s?.isConfigured && s?.semester) {
+      const match = s.semester.match(/\d+/);
+      if (match) return match[0];
+    }
+    return "1";
+  });
   const [saveSuccessMsg, setSaveSuccessMsg] = useState("");
   const [taskCompleted, setTaskCompleted] = useState(false);
   const [completedReport, setCompletedReport] = useState(null);
@@ -75,8 +92,28 @@ export default function Calculator() {
     const handleUpdate = () => {
       const data = getStoredStudentData();
       setStudentData(data);
-      if (data?.name && !studentName) setStudentName(data.name);
-      if (data?.hallTicket && !universityNumber) setUniversityNumber(data.hallTicket);
+      if (data?.name) setStudentName(data.name);
+      if (data?.hallTicket) setUniversityNumber(data.hallTicket);
+      if (data?.isConfigured) {
+        if (data?.branchCode) setBranch(data.branchCode);
+        if (data?.regulation) {
+          const rMatch = data.regulation.match(/R\d+/i);
+          if (rMatch) setRegulation(rMatch[0].toUpperCase());
+        }
+        if (data?.semester) {
+          const sMatch = data.semester.match(/\d+/);
+          if (sMatch) setSemester(sMatch[0]);
+        }
+      }
+      if (data?.isConfigured && Array.isArray(data.semesterGrades) && data.semesterGrades.some((g) => g.sgpa)) {
+        setCgpaSemesters(
+          Array.from({ length: 8 }, (_, i) => ({
+            sem: `Semester ${i + 1}`,
+            sgpa: data.semesterGrades[i]?.sgpa || "",
+            active: true,
+          }))
+        );
+      }
     };
     window.addEventListener("studentProfileUpdated", handleUpdate);
     return () => window.removeEventListener("studentProfileUpdated", handleUpdate);
@@ -85,13 +122,20 @@ export default function Calculator() {
   // -------------------------------------------------------------
   // SGPA STATE & LOGIC (AUTOMATED CREDITS + MARKS ENTRY)
   // -------------------------------------------------------------
-  const [sgpaSubjects, setSgpaSubjects] = useState(() =>
-    getR23PresetSubjects("AIML", "1").map((item) => ({ ...item, marks: "" }))
-  );
+  const [sgpaSubjects, setSgpaSubjects] = useState(() => {
+    const s = getStoredStudentData();
+    const b = (s?.isConfigured && s?.branchCode) ? s.branchCode : "AIML";
+    const sem = (s?.isConfigured && s?.semester) ? (s.semester.match(/\d+/) ? s.semester.match(/\d+/)[0] : "1") : "1";
+    return getR23PresetSubjects(b, sem).map((item) => ({ ...item, marks: "" }));
+  });
 
   const handleApplyPreset = (b, s) => {
-    const preset = getR23PresetSubjects(b, s);
-    setSgpaSubjects(preset.map((item) => ({ ...item, marks: "" })));
+    if (b && s) {
+      const preset = getR23PresetSubjects(b, s);
+      setSgpaSubjects(preset.map((item) => ({ ...item, marks: "" })));
+    } else {
+      setSgpaSubjects([]);
+    }
   };
 
   const handleSubjectNameChange = (index, newName) => {
@@ -137,23 +181,17 @@ export default function Calculator() {
   const handleStartFreshForNewStudent = () => {
     setStudentName("");
     setUniversityNumber("");
-    setRegulation("R23");
-    setBranch("AIML");
-    setSemester("1");
-    // Fresh subjects with empty marks
-    setSgpaSubjects(
-      getR23PresetSubjects("AIML", "1").map((item) => ({ ...item, marks: "" }))
+    setRegulation("");
+    setBranch("");
+    setSemester("");
+    setSgpaSubjects([]);
+    setCgpaSemesters(
+      Array.from({ length: 8 }, (_, i) => ({
+        sem: `Semester ${i + 1}`,
+        sgpa: "",
+        active: true,
+      }))
     );
-    setCgpaSemesters([
-      { sem: "Semester 1", sgpa: "", active: true },
-      { sem: "Semester 2", sgpa: "", active: true },
-      { sem: "Semester 3", sgpa: "", active: false },
-      { sem: "Semester 4", sgpa: "", active: false },
-      { sem: "Semester 5", sgpa: "", active: false },
-      { sem: "Semester 6", sgpa: "", active: false },
-      { sem: "Semester 7", sgpa: "", active: false },
-      { sem: "Semester 8", sgpa: "", active: false },
-    ]);
     setTaskCompleted(false);
     setCompletedReport(null);
     setSaveSuccessMsg("Portal ready for next student! All fields and marks reset fresh.");
@@ -307,16 +345,21 @@ export default function Calculator() {
   // -------------------------------------------------------------
   // CGPA STATE & LOGIC (NO CREDITS REQUIRED)
   // -------------------------------------------------------------
-  const [cgpaSemesters, setCgpaSemesters] = useState([
-    { sem: "Semester 1", sgpa: "8.60", active: true },
-    { sem: "Semester 2", sgpa: "8.90", active: true },
-    { sem: "Semester 3", sgpa: "9.10", active: true },
-    { sem: "Semester 4", sgpa: "8.75", active: true },
-    { sem: "Semester 5", sgpa: "9.05", active: true },
-    { sem: "Semester 6", sgpa: "8.80", active: true },
-    { sem: "Semester 7", sgpa: "", active: false },
-    { sem: "Semester 8", sgpa: "", active: false },
-  ]);
+  const [cgpaSemesters, setCgpaSemesters] = useState(() => {
+    const s = getStoredStudentData();
+    if (s?.isConfigured && Array.isArray(s.semesterGrades) && s.semesterGrades.some((g) => g.sgpa)) {
+      return Array.from({ length: 8 }, (_, i) => ({
+        sem: `Semester ${i + 1}`,
+        sgpa: s.semesterGrades[i]?.sgpa || "",
+        active: true,
+      }));
+    }
+    return Array.from({ length: 8 }, (_, i) => ({
+      sem: `Semester ${i + 1}`,
+      sgpa: "",
+      active: true,
+    }));
+  });
 
   const handleCgpaSemChange = (index, value) => {
     setCgpaSemesters((prev) => {
@@ -339,7 +382,7 @@ export default function Calculator() {
     return cgpaSemesters.map((sem) => {
       if (!sem.active) return { error: "", hasError: false };
       if (sem.sgpa === "" || sem.sgpa === undefined) {
-        return { error: "SGPA required (0.00–10.00)", hasError: true };
+        return { error: "", hasError: false };
       }
       const check = validateGradePoint(sem.sgpa, "SGPA");
       return {
@@ -361,8 +404,8 @@ export default function Calculator() {
         jntuPercentage: "0.00",
         aictePercentage: "0.00",
         hasError: true,
-        errorMessage: "Please enter valid SGPA values (0.00 – 10.00) for all active semesters.",
-        standing: "Invalid Input Detected",
+        errorMessage: "Please enter valid SGPA values (0.00 – 10.00).",
+        standing: "",
       };
     }
 
@@ -370,7 +413,7 @@ export default function Calculator() {
     let activeSemCount = 0;
 
     cgpaSemesters.forEach((sem) => {
-      if (sem.active) {
+      if (sem.active && sem.sgpa !== "" && sem.sgpa !== undefined) {
         const check = validateGradePoint(sem.sgpa);
         if (check.ok) {
           totalSgpa += check.numeric;
@@ -386,7 +429,7 @@ export default function Calculator() {
         jntuPercentage: "0.00",
         aictePercentage: "0.00",
         hasError: false,
-        standing: "Awaiting Semester SGPAs",
+        standing: "",
       };
     }
 
@@ -533,7 +576,6 @@ export default function Calculator() {
               <span className="calc-badge-pulse" />
               <span>Official University Academic Evaluation Portal</span>
             </div>
-            <span className="calc-header-tagline">Academic Session 2024–2025 • {regulation} Scheme</span>
           </div>
 
           <div className="calc-student-grid">
@@ -601,6 +643,7 @@ export default function Calculator() {
                 }}
                 className="calc-field-select"
               >
+                <option value="">Select Branch</option>
                 <option value="AIML">AI & Machine Learning (AIML)</option>
                 <option value="CSE">Computer Science (CSE)</option>
                 <option value="ECE">Electronics & Comm (ECE)</option>
@@ -624,6 +667,7 @@ export default function Calculator() {
                 onChange={(e) => setRegulation(e.target.value)}
                 className="calc-field-select"
               >
+                <option value="">Select Scheme</option>
                 <option value="R23">R23 Scheme</option>
                 <option value="R20">R20 Scheme</option>
                 <option value="R19">R19 Scheme</option>
@@ -650,9 +694,19 @@ export default function Calculator() {
                 }}
                 className="calc-field-select"
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
-                  <option key={s} value={s}>
-                    Semester {s}
+                <option value="">Select Semester</option>
+                {[
+                  { val: "1", label: "1-1" },
+                  { val: "2", label: "1-2" },
+                  { val: "3", label: "2-1" },
+                  { val: "4", label: "2-2" },
+                  { val: "5", label: "3-1" },
+                  { val: "6", label: "3-2" },
+                  { val: "7", label: "4-1" },
+                  { val: "8", label: "4-2" },
+                ].map((s) => (
+                  <option key={s.val} value={s.val}>
+                    {s.label}
                   </option>
                 ))}
               </select>
@@ -666,7 +720,7 @@ export default function Calculator() {
         {activeTab === "sgpa" && (
           <div className="calc-section-layout">
             <div className="calc-card-primary">
-              <div className="calc-card-header">
+              <div className="calc-card-header calc-desktop-only">
                 <div>
                   <h2 className="calc-card-title">Semester Grade Point Average (SGPA)</h2>
                   <p className="calc-card-desc">
@@ -681,24 +735,31 @@ export default function Calculator() {
                   <span>⚠️ {sgpaResult.errorMessage}</span>
                 </div>
               )}
-              <div className="calc-table-wrapper">
+
+              {/* Desktop Table View */}
+              <div className="calc-table-wrapper calc-desktop-only">
                 <table className="calc-table">
                   <thead>
                     <tr>
-                      <th style={{ width: "6%" }}>#</th>
-                      <th style={{ width: "44%" }}>Subject / Course Title</th>
-                      <th style={{ width: "16%" }} className="text-center-cell">Credits (Auto)</th>
-                      <th style={{ width: "26%" }}>Subject Marks (0–100)</th>
+                      <th style={{ width: "36%" }}>Subject / Course Title</th>
+                      <th style={{ width: "24%" }} className="text-center-cell">Credits (Auto)</th>
+                      <th style={{ width: "32%" }}>Subject Marks (0–100)</th>
                       <th style={{ width: "8%" }} className="text-center-cell">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {sgpaSubjects.map((sub, idx) => {
+                    {sgpaSubjects.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" style={{ textAlign: "center", padding: "36px 16px", color: "#64748b", fontSize: "14px", fontWeight: "500" }}>
+                          Please select your Branch and Semester above, or click "+ Add Subject" to begin entering courses.
+                        </td>
+                      </tr>
+                    ) : (
+                      sgpaSubjects.map((sub, idx) => {
                       const gradeInfo = getGradeInfoFromMarks(sub.marks);
                       const rowVal = sgpaRowValidation[idx];
                       return (
                         <tr key={idx}>
-                          <td className="text-center-cell">{idx + 1}</td>
                           <td>
                             <input
                               type="text"
@@ -774,10 +835,164 @@ export default function Calculator() {
                           </td>
                         </tr>
                       );
-                    })}
+                    }))}
                   </tbody>
                 </table>
               </div>
+
+              {/* Mobile View: Stitch Design Screen 1 */}
+              <div className="calc-mobile-only calc-mobile-course-view">
+                {/* Mobile Live Summary Banner */}
+                <div className="calc-mobile-summary-banner">
+                  <div className="calc-mobile-banner-header">
+                    <div>
+                      <span className="calc-mobile-banner-sub">Semester Grade Point Average</span>
+                      <h3 className="calc-mobile-banner-title">
+                        <span>Sem {semester || "1"} Calculation</span>
+                        {branch && <span className="calc-mobile-badge-branch">{branch}</span>}
+                      </h3>
+                    </div>
+                    <div className="calc-mobile-banner-right">
+                      <span className="calc-mobile-banner-reglabel">Regulation</span>
+                      <span className="calc-mobile-banner-regvalue">{regulation || "R23"} Scheme</span>
+                    </div>
+                  </div>
+                  <p className="calc-mobile-banner-desc">
+                    Enter your marks (0–100) below, To calculate SGPA
+                  </p>
+                </div>
+
+                {/* Mobile Course List Heading */}
+                <div className="calc-mobile-course-list-header">
+                  <div className="calc-mobile-course-heading-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    </svg>
+                    <h4>Course List ({sgpaSubjects.length} Subjects)</h4>
+                  </div>
+                  <span className="calc-mobile-course-range-text">Marks Range: 0 - 100</span>
+                </div>
+
+                {/* Mobile Course Cards List */}
+                <div className="calc-mobile-course-cards-container">
+                  {sgpaSubjects.length === 0 ? (
+                    <div className="calc-mobile-empty-state">
+                      Please select your Branch and Semester above, or tap "+ Add Subject" to begin entering courses.
+                    </div>
+                  ) : (
+                    sgpaSubjects.map((sub, idx) => {
+                      const gradeInfo = getGradeInfoFromMarks(sub.marks);
+                      const rowVal = sgpaRowValidation[idx];
+                      return (
+                        <div key={idx} className="calc-mobile-course-card">
+                          <div className="calc-mobile-card-row-top">
+                            <input
+                              type="text"
+                              list="r23-subjects-datalist"
+                              value={sub.name}
+                              onChange={(e) => handleSubjectNameChange(idx, e.target.value)}
+                              className="calc-mobile-card-subject-name"
+                              placeholder="Course title..."
+                            />
+                            <div className="calc-mobile-card-marks-wrapper">
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="1"
+                                value={sub.marks !== undefined ? sub.marks : ""}
+                                onChange={(e) => handleSubjectChange(idx, "marks", e.target.value)}
+                                aria-invalid={Boolean(rowVal?.markError)}
+                                className="calc-mobile-card-marks-input"
+                                placeholder="Marks (0–100)"
+                              />
+                              {gradeInfo.hasMarks && gradeInfo.isValid && (
+                                <span
+                                  className="calc-mobile-card-grade-pill"
+                                  style={{
+                                    backgroundColor: `${gradeInfo.color}15`,
+                                    color: gradeInfo.color,
+                                    borderColor: `${gradeInfo.color}40`,
+                                  }}
+                                >
+                                  {gradeInfo.grade}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="calc-mobile-card-row-bottom">
+                            <div className="calc-mobile-card-credit-box">
+                              <input
+                                type="number"
+                                step="0.5"
+                                min="0.5"
+                                max="16"
+                                value={sub.credits}
+                                onChange={(e) => handleSubjectChange(idx, "credits", e.target.value)}
+                                className="calc-mobile-card-credit-input"
+                              />
+                              <span className="calc-mobile-card-auto-pill">AUTO</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="calc-mobile-card-del-btn"
+                              onClick={() => handleRemoveSubject(idx)}
+                              aria-label="Remove Subject"
+                              title="Remove Course"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                              </svg>
+                            </button>
+                          </div>
+                          {(rowVal?.markError || rowVal?.creditError) && (
+                            <div className="calc-mobile-card-error-row" role="alert">
+                              {rowVal.markError || rowVal.creditError}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Mobile Quick Management Controls */}
+                <div className="calc-mobile-quick-controls">
+                  <button type="button" className="calc-mobile-btn-add" onClick={handleAddSubject}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    <span>Add Subject</span>
+                  </button>
+
+                  <button type="button" className="calc-mobile-btn-reload" onClick={handleResetSgpa}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <polyline points="1 4 1 10 7 10" />
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                    </svg>
+                    <span>Reload Sem {semester || "1"}</span>
+                  </button>
+                </div>
+
+                {/* Mobile Reset Data Link */}
+                <div className="calc-mobile-reset-link-wrapper">
+                  <button type="button" className="calc-mobile-reset-link" onClick={handleStartFreshForNewStudent}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                      <path d="M21 3v5h-5" />
+                      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                      <path d="M3 21v-5h5" />
+                    </svg>
+                    <span>Start Fresh (Next User)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Datalist with Official Subjects for fast typing */}
 
               {/* Datalist with Official Subjects for fast typing */}
               <datalist id="r23-subjects-datalist">
@@ -792,7 +1007,7 @@ export default function Calculator() {
               </datalist>
 
               {/* Table Action Bar */}
-              <div className="calc-action-bar">
+              <div className="calc-action-bar calc-desktop-only">
                 <div className="calc-action-left">
                   <button type="button" className="calc-btn-add" onClick={handleAddSubject}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -810,43 +1025,6 @@ export default function Calculator() {
                     <span>Reload {branch} Sem {semester} Courses</span>
                   </button>
                 </div>
-
-                <div className="calc-action-right">
-                  <button
-                    type="button"
-                    className="calc-btn-complete-task"
-                    style={{ margin: 0, width: "auto", padding: "9px 18px" }}
-                    onClick={handleCompleteTask}
-                    disabled={hasSgpaErrors || sgpaResult.isAwaiting || !studentNameValidation.ok || !universityNumberValidation.ok}
-                    title={
-                      hasSgpaErrors
-                        ? "Fix invalid marks or credits in table first"
-                        : sgpaResult.isAwaiting
-                          ? "Enter subject marks first"
-                          : "Complete evaluation task for this student"
-                    }
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    <span>Complete Task</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="calc-btn-fresh"
-                    onClick={handleStartFreshForNewStudent}
-                    title="Clear previous calculation and start fresh for the next student"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                      <path d="M21 3v5h-5" />
-                      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                      <path d="M3 21v-5h5" />
-                    </svg>
-                    <span>Start Fresh (Next User)</span>
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -854,25 +1032,31 @@ export default function Calculator() {
             <aside className="calc-sidebar-score">
               <div className="calc-score-card">
                 <div className="calc-score-header">
-                  <span className="calc-pill-tag">{regulation} SCHEME SCORE</span>
-                  <span className="calc-sem-name">Sem {semester} ({branch})</span>
+                  <span className="calc-pill-tag">{regulation ? `${regulation} SCHEME` : "R23 SCHEME"}</span>
+                  <span className="calc-sem-name">{semester ? `Sem ${semester}` : "Sem 1"} {branch ? `(${branch})` : ""}</span>
                 </div>
 
                 <div className="calc-score-visual">
-                  <div className="calc-score-circle">
+                  <div className="calc-score-circle sgpa-ring">
                     <span className="calc-score-val">{sgpaResult.sgpa}</span>
                     <span className="calc-score-sub">SGPA</span>
                   </div>
                 </div>
 
-                <div className={`calc-standing-badge ${sgpaResult.hasFail ? "standing-fail" : "standing-distinction"}`}>
-                  {sgpaResult.classification}
-                </div>
+                {sgpaResult.classification ? (
+                  <div className={`calc-standing-badge ${sgpaResult.hasFail ? "standing-fail" : "standing-distinction"}`}>
+                    {sgpaResult.classification}
+                  </div>
+                ) : (
+                  <div className="calc-standing-badge standing-awaiting">
+                    Awaiting Marks Entry
+                  </div>
+                )}
 
                 <div className="calc-breakdown-list">
                   <div className="calc-breakdown-row">
                     <span>Student Name:</span>
-                    <strong>{studentName || "N/A"}</strong>
+                    <strong>{studentName || "NAGASAI G"}</strong>
                   </div>
                   <div className="calc-breakdown-row">
                     <span>University Roll No:</span>
@@ -880,11 +1064,11 @@ export default function Calculator() {
                   </div>
                   <div className="calc-breakdown-row">
                     <span>Branch & Scheme:</span>
-                    <strong>{branch} ({regulation})</strong>
+                    <strong>{branch || "AIML"} ({regulation || "R23"})</strong>
                   </div>
                   <div className="calc-breakdown-row">
                     <span>Evaluated Term:</span>
-                    <strong>Semester {semester}</strong>
+                    <strong>Semester {semester || "1"}</strong>
                   </div>
                   <div className="calc-breakdown-row">
                     <span>Courses Evaluated:</span>
@@ -924,10 +1108,8 @@ export default function Calculator() {
                   onClick={handleSaveCgpaToProfile}
                   disabled={hasSgpaErrors || sgpaResult.isAwaiting}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                    <polyline points="17 21 17 13 7 13 7 21" />
-                    <polyline points="7 3 7 8 15 8" />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
                   </svg>
                   <span>Sync to Student Profile</span>
                 </button>
@@ -948,6 +1130,38 @@ export default function Calculator() {
               </div>
             </aside>
           </div>
+        )}
+
+        {/* Mobile Sticky Bottom Toolbar (Screen 1) */}
+        {false && activeTab === "sgpa" && (
+          <aside className="calc-mobile-bottom-bar calc-mobile-only">
+            <div className="calc-mobile-bottom-bar-inner">
+              <button
+                type="button"
+                className="calc-mobile-bottom-btn-reset"
+                onClick={handleStartFreshForNewStudent}
+                title="Start Fresh"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="calc-mobile-bottom-btn-complete"
+                onClick={handleCompleteTask}
+                disabled={hasSgpaErrors || sgpaResult.isAwaiting || !studentNameValidation.ok || !universityNumberValidation.ok}
+              >
+                <span className="calc-mobile-check-circle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                <span>Complete Task</span>
+              </button>
+            </div>
+          </aside>
         )}
 
         {/* =========================================================
@@ -1016,7 +1230,7 @@ export default function Calculator() {
             <aside className="calc-sidebar-score">
               <div className="calc-score-card">
                 <div className="calc-score-header">
-                  <span className="calc-pill-tag">OVERALL ACADEMIC CGPA</span>
+                  <span className="calc-pill-tag">OVERALL CGPA</span>
                   <span className="calc-sem-name">{cgpaResult.activeSemCount} Semesters Included</span>
                 </div>
 
@@ -1027,9 +1241,11 @@ export default function Calculator() {
                   </div>
                 </div>
 
-                <div className="calc-standing-badge standing-distinction">
-                  {cgpaResult.standing}
-                </div>
+                {cgpaResult.standing ? (
+                  <div className="calc-standing-badge standing-distinction">
+                    {cgpaResult.standing}
+                  </div>
+                ) : null}
 
                 <div className="calc-breakdown-list">
                   <div className="calc-breakdown-row">

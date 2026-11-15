@@ -21,14 +21,14 @@ const BRANCH_FILTERS = [
 
 const SEMESTER_OPTIONS = [
   { value: "ALL", label: "All Semesters" },
-  { value: "1st sem", label: "1st sem" },
-  { value: "2nd sem", label: "2nd sem" },
-  { value: "3rd sem", label: "3rd sem" },
-  { value: "4th sem", label: "4th sem" },
-  { value: "5th sem", label: "5th sem" },
-  { value: "6th sem", label: "6th sem" },
-  { value: "7th sem", label: "7th sem" },
-  { value: "8th sem", label: "8th sem" },
+  { value: "1-1", label: "1-1" },
+  { value: "1-2", label: "1-2" },
+  { value: "2-1", label: "2-1" },
+  { value: "2-2", label: "2-2" },
+  { value: "3-1", label: "3-1" },
+  { value: "3-2", label: "3-2" },
+  { value: "4-1", label: "4-1" },
+  { value: "4-2", label: "4-2" },
 ];
 
 const getSyllabusSnippet = (item) => {

@@ -208,24 +208,45 @@ function Notes({ initialType }) {
   const [downloadingId, setDownloadingId] = useState(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [studentData, setStudentData] = useState(getStoredStudentData());
+  const [authUser, setAuthUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
   const [pulsingBranch, setPulsingBranch] = useState(null);
 
   const searchInputRef = useRef(null);
   const searchMetalRef = useRef(null);
 
-  // Hook for cursor-driven liquid metal bend interaction
-  useMetalBend(searchMetalRef);
+  // Hook for cursor-driven liquid metal bend interaction (desktop only, disabled on touch/low-power devices)
+  const isTouchOrLowPower = typeof window !== "undefined" && (window.innerWidth < 768 || isLowPowerDevice() || ('ontouchstart' in window));
+  useMetalBend(searchMetalRef, () => ({ enabled: !isTouchOrLowPower }));
 
-  // Profile synchronization listener
+  // Profile and auth synchronization listener
   useEffect(() => {
     const handleProfileSync = () => {
       setStudentData(getStoredStudentData());
     };
+    const handleAuthSync = () => {
+      try {
+        const raw = localStorage.getItem("user");
+        setAuthUser(raw ? JSON.parse(raw) : null);
+      } catch {
+        setAuthUser(null);
+      }
+    };
     window.addEventListener("studentProfileUpdated", handleProfileSync);
     window.addEventListener("storage", handleProfileSync);
+    window.addEventListener("storage", handleAuthSync);
+    window.addEventListener("authChanged", handleAuthSync);
     return () => {
       window.removeEventListener("studentProfileUpdated", handleProfileSync);
       window.removeEventListener("storage", handleProfileSync);
+      window.removeEventListener("storage", handleAuthSync);
+      window.removeEventListener("authChanged", handleAuthSync);
     };
   }, []);
 
@@ -641,7 +662,7 @@ function Notes({ initialType }) {
             <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sidebar-logo-img" />
             <div className="sidebar-brand-text">
               <h2><span className="font-deltha">JNTU</span> Circle</h2>
-              <span>Academic Hub</span>
+              <span>Academic Resource Hub</span>
             </div>
           </div>
 
@@ -731,23 +752,58 @@ function Notes({ initialType }) {
           <button
             type="button"
             className="sidebar-profile"
-            onClick={() => setIsProfileOpen(true)}
-            title="View & Edit Student Profile"
+            onClick={() => {
+              if (authUser) {
+                setIsProfileOpen(true);
+              } else {
+                navigate("/login");
+              }
+            }}
+            title={authUser ? "View & Edit Student Profile" : "Sign In to Andhra Circle"}
           >
             <div className="profile-avatar-wrapper">
-              <img
-                src={getStudentAvatar(studentData)}
-                alt={studentData?.name || "Chinnu"}
-                className="profile-avatar"
-                onError={(e) => {
-                  e.currentTarget.src = DEFAULT_STUDENT_AVATAR;
-                }}
-              />
-              <span className="profile-status-dot" />
+              {authUser && getStudentAvatar(studentData) ? (
+                <img
+                  src={getStudentAvatar(studentData)}
+                  alt={studentData?.name || "Student"}
+                  className="profile-avatar"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    if (e.currentTarget.nextElementSibling) {
+                      e.currentTarget.nextElementSibling.style.display = "flex";
+                    }
+                  }}
+                />
+              ) : null}
+              <div
+                className="profile-avatar-placeholder"
+                style={{ display: (authUser && getStudentAvatar(studentData)) ? "none" : "flex" }}
+              >
+                {authUser && (authUser.name || studentData?.name) ? (
+                  <span className="profile-avatar-initials">
+                    {(authUser.name || studentData.name)
+                      .split(" ")
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map((n) => n[0].toUpperCase())
+                      .join("")}
+                  </span>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                )}
+              </div>
+              <span className={`profile-status-dot ${authUser ? "is-online" : "is-offline"}`} />
             </div>
             <div className="profile-info">
-              <span className="profile-name">{studentData.shortName || "Chinnu"}</span>
-              <span className="profile-role">{studentData.role || "Student"}</span>
+              <span className="profile-name">
+                {authUser ? (authUser.name?.split(" ")[0] || studentData.shortName || "Student") : "Sign In"}
+              </span>
+              <span className="profile-role">
+                {authUser ? (studentData.role || "Student") : "Guest Account"}
+              </span>
             </div>
             <svg className="profile-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M9 18l6-6-6-6" />
@@ -846,14 +902,14 @@ function Notes({ initialType }) {
                 onChange={(e) => setSelectedSemester(e.target.value)}
               >
                 <option value="ALL">All Semesters</option>
-                <option value="1st sem">1st sem</option>
-                <option value="2nd sem">2nd sem</option>
-                <option value="3rd sem">3rd sem</option>
-                <option value="4th sem">4th sem</option>
-                <option value="5th sem">5th sem</option>
-                <option value="6th sem">6th sem</option>
-                <option value="7th sem">7th sem</option>
-                <option value="8th sem">8th sem</option>
+                <option value="1-1">1-1</option>
+                <option value="1-2">1-2</option>
+                <option value="2-1">2-1</option>
+                <option value="2-2">2-2</option>
+                <option value="3-1">3-1</option>
+                <option value="3-2">3-2</option>
+                <option value="4-1">4-1</option>
+                <option value="4-2">4-2</option>
               </select>
             </div>
           </section>

@@ -342,6 +342,22 @@ exports.proxyPdf = async (req, res) => {
   }
 
   try {
+    // If it references an uploaded file, serve it directly from the local uploads directory
+    if (url.includes("/uploads/")) {
+      const cleanPath = url.split("/uploads/")[1]?.split("?")[0];
+      if (cleanPath) {
+        const path = require("path");
+        const fs = require("fs");
+        const filePath = path.join(__dirname, "..", "uploads", path.basename(cleanPath));
+        if (fs.existsSync(filePath)) {
+          res.setHeader("Content-Type", "application/pdf");
+          res.setHeader("Content-Disposition", 'inline; filename="document.pdf"');
+          res.setHeader("X-Content-Type-Options", "nosniff");
+          return fs.createReadStream(filePath).pipe(res);
+        }
+      }
+    }
+
     let targetUrl = url;
 
     // Handle Google Drive links

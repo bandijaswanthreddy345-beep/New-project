@@ -94,25 +94,33 @@ function StudentProfile() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Initial effective user details
+  const initialName = student?.name || authUser?.name || "";
+  const initialEmail = student?.email || authUser?.email || "";
+
   // Creation Form State for fresh users
-  const [createForm, setCreateForm] = useState({
-    name: "",
-    branch: "Computer Science & Engineering",
-    branchCode: "CSE",
+  const [createForm, setCreateForm] = useState(() => ({
+    name: initialName,
+    branch: student?.branch || "",
+    branchCode: student?.branchCode || "",
     customBranch: "",
-    hallTicket: "",
-    college: "",
-    email: "",
-    phone: "",
-    semester: "1st Semester",
-    regulation: "R23 Regulation",
-    attendancePercentage: 82,
-    profilePhoto: null,
+    hallTicket: student?.hallTicket || "",
+    college: student?.college || "",
+    email: initialEmail,
+    phone: student?.phone || "",
+    semester: student?.semester || "1st Semester",
+    regulation: student?.regulation || "R23 Regulation",
+    attendancePercentage: student?.attendancePercentage || 0,
+    profilePhoto: student?.profilePhoto || null,
     semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
-  });
+  }));
 
   // Edit Form State for existing users
-  const [editForm, setEditForm] = useState(student);
+  const [editForm, setEditForm] = useState(() => ({
+    ...student,
+    name: initialName,
+    email: initialEmail,
+  }));
 
   // Field validation errors state
   const [createErrors, setCreateErrors] = useState({});
@@ -139,10 +147,21 @@ function StudentProfile() {
     };
   }, []);
 
-  // Update edit form when student data changes
+  // Update edit form and create form when student data or authUser changes
   useEffect(() => {
-    setEditForm(student);
-  }, [student]);
+    const effName = student?.name || authUser?.name || "";
+    const effEmail = student?.email || authUser?.email || "";
+    setEditForm((prev) => ({
+      ...student,
+      name: effName || prev.name || "",
+      email: effEmail || prev.email || "",
+    }));
+    setCreateForm((prev) => ({
+      ...prev,
+      name: effName || prev.name || "",
+      email: effEmail || prev.email || "",
+    }));
+  }, [student, authUser]);
 
   // Handle Photo Upload with strict validation (image types only, max 2MB)
   const handlePhotoUpload = (e, targetForm = "create") => {
@@ -511,7 +530,9 @@ function StudentProfile() {
     const filledSems = (editForm.semesterGrades || []).filter((g) => g.sgpa && !isNaN(g.sgpa)).length;
     const completedCredits = filledSems * 20;
 
-    const attVal = Number(editForm.attendancePercentage) || 75;
+    const attVal = editForm.attendancePercentage !== undefined && editForm.attendancePercentage !== ""
+      ? Number(editForm.attendancePercentage)
+      : 0;
     const updated = {
       ...student,
       ...editForm,
@@ -549,8 +570,8 @@ function StudentProfile() {
     setStudent({ ...EMPTY_STUDENT_DATA, isConfigured: false, name: "" });
     setCreateForm({
       name: "",
-      branch: "Computer Science & Engineering",
-      branchCode: "CSE",
+      branch: "",
+      branchCode: "",
       customBranch: "",
       hallTicket: "",
       college: "",
@@ -558,7 +579,7 @@ function StudentProfile() {
       phone: "",
       semester: "1st Semester",
       regulation: "R23 Regulation",
-      attendancePercentage: 82,
+      attendancePercentage: 0,
       profilePhoto: null,
       semesterGrades: INITIAL_SEMESTERS.map((s) => ({ ...s, sgpa: "" })),
     });
@@ -1352,7 +1373,7 @@ function StudentProfile() {
                 className={`sp-page-tab ${activeTab === "attendance" ? "active" : ""}`}
                 onClick={() => setActiveTab("attendance")}
               >
-                Attendance Status ({student.attendancePercentage || 75}%)
+                Attendance Status ({student.attendancePercentage !== undefined && student.attendancePercentage !== "" ? student.attendancePercentage : 0}%)
               </button>
               <button
                 type="button"
@@ -1906,13 +1927,13 @@ function StudentProfile() {
                     <div className="sp-form-row-1">
                       <div className="sp-input-group">
                         <label>
-                          Attendance Percentage ({editForm.attendancePercentage || 75}%)
+                          Attendance Percentage ({editForm.attendancePercentage !== undefined && editForm.attendancePercentage !== "" ? editForm.attendancePercentage : 0}%)
                         </label>
                         <input
                           type="range"
                           min="0"
                           max="100"
-                          value={editForm.attendancePercentage || 75}
+                          value={editForm.attendancePercentage !== undefined && editForm.attendancePercentage !== "" ? editForm.attendancePercentage : 0}
                           onChange={(e) =>
                             setEditForm((prev) => ({
                               ...prev,
@@ -2125,21 +2146,35 @@ function StudentProfile() {
           {/* Student Identification Overview */}
           <div className="sp-m-identity">
             <div className="sp-m-avatar-container">
-              <div
-                className="sp-m-avatar-ring sp-clickable-avatar"
-                onClick={() => mobileEditFileInputRef.current?.click()}
-                title="Tap to change photo"
-              >
-                <img
-                  src={activeAvatar || profileImgDefault}
-                  alt={`Student Avatar - ${student.name || "Student"}`}
-                  className="sp-m-avatar-img"
-                  onError={(e) => {
-                    e.currentTarget.src = profileImgDefault;
-                  }}
-                />
-                <span className="sp-m-status-dot" title="Active Enrolled" />
-              </div>
+              {activeAvatar ? (
+                <div
+                  className="sp-m-avatar-ring sp-clickable-avatar"
+                  onClick={() => mobileEditFileInputRef.current?.click()}
+                  title="Tap to change photo"
+                >
+                  <img
+                    src={activeAvatar}
+                    alt={`Student Avatar - ${student.name || "Student"}`}
+                    className="sp-m-avatar-img"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                  <span className="sp-m-status-dot" title="Active Enrolled" />
+                </div>
+              ) : (
+                <div
+                  className="sp-profile-photo-placeholder sp-clickable-avatar"
+                  onClick={() => mobileEditFileInputRef.current?.click()}
+                  title="Tap to upload profile photo"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span className="sp-avatar-add-overlay">+ Photo</span>
+                </div>
+              )}
             </div>
 
             <div className="sp-m-identity-details">
@@ -2623,7 +2658,7 @@ function StudentProfile() {
               <div className="sp-m-white-card">
                 <div className="sp-m-att-stat-box">
                   <div className="sp-m-att-big-circle">
-                    <span className="sp-m-att-circle-val">{student.attendancePercentage || 75}%</span>
+                    <span className="sp-m-att-circle-val">{student.attendancePercentage ?? 0}%</span>
                     <span className="sp-m-att-circle-lbl">Attendance</span>
                   </div>
                   <div className="sp-m-att-status-info">

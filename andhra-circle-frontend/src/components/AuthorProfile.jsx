@@ -11,25 +11,21 @@ const developers = [
     name: "Bandi Jaswanth Reddy",
     image: jaswanthProfile,
     title: "PLATFORM CREATOR",
-    role: "Backend Developer · AIML Student",
   },
   {
     name: "Naga Sai",
     image: nagaSaiProfile,
     title: "DEVELOPER",
-    role: "Frontend Developer · AIML Student",
   },
   {
     name: "Bandi Bharath",
     image: bharathProfile,
-    title: "DEVELOPER",
-    role: "Frontend Developer · AIML Student",
+    title: "UI/UX DESIGNER",
   },
   {
     name: "Vamsi Kumar",
     image: vamsiKumarProfile,
-    title: "DEVELOPER",
-    role: "Application Developer · AIML Student",
+    title: "DATA COLLECTION LEAD",
   },
 ];
 
@@ -201,8 +197,8 @@ function AuthorProfile() {
           >
             <div
               className={`developer-slide-image ${developer.title === "PLATFORM CREATOR"
-                  ? "developer-slide-image--creator"
-                  : "developer-slide-image--dev"
+                ? "developer-slide-image--creator"
+                : "developer-slide-image--dev"
                 }`}
             >
               <img src={developer.image} alt="" />
@@ -210,14 +206,14 @@ function AuthorProfile() {
             <div className="developer-slide-copy">
               <span
                 className={`author-role-tag ${developer.title === "PLATFORM CREATOR"
-                    ? "author-role-tag--creator"
-                    : "author-role-tag--dev"
+                  ? "author-role-tag--creator"
+                  : "author-role-tag--dev"
                   }`}
               >
                 {developer.title}
               </span>
               <h3>{developer.name}</h3>
-              <p>{developer.role}</p>
+              {developer.role && <p>{developer.role}</p>}
             </div>
           </div>
 

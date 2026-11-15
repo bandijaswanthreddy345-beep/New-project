@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/api";
 import TurnstileWidget from "../components/TurnstileWidget";
+import { EMPTY_STUDENT_DATA } from "../data/studentData";
 import "./Login.css";
 import "./Register.css";
 
@@ -78,7 +79,7 @@ function Register() {
     const emailTrimmed = form.email.trim();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(emailTrimmed)) {
-      setError("Please enter a valid email address (e.g. name@example.com).");
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -128,12 +129,33 @@ function Register() {
         res.data?.message || "Account created successfully! Preparing your sign in..."
       );
 
+      // Initialize clean student profile with ONLY the registered name and email
+      const initialProfile = {
+        ...EMPTY_STUDENT_DATA,
+        name: nameTrimmed,
+        shortName: nameTrimmed.split(" ")[0] || "Student",
+        email: emailTrimmed,
+        isConfigured: false,
+      };
+      localStorage.removeItem("jntu_student_logged_out");
+      localStorage.setItem("jntu_student_profile", JSON.stringify(initialProfile));
+
       // If token and user returned, persist session immediately
       if (res.data?.token && res.data?.user) {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
-        window.dispatchEvent(new Event("authChanged"));
+      } else {
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            name: nameTrimmed,
+            email: emailTrimmed,
+            role: "student",
+          })
+        );
       }
+      window.dispatchEvent(new CustomEvent("studentProfileUpdated", { detail: initialProfile }));
+      window.dispatchEvent(new Event("authChanged"));
 
       // Smooth redirection to sign in with pre-filled email
       setTimeout(() => {
@@ -428,7 +450,6 @@ function Register() {
                 <span>Security Verification</span>
                 <span className="login-required-star">*</span>
               </label>
-              <span className="signup-helper-text">Cloudflare Turnstile</span>
             </div>
 
             <div style={{ background: "transparent", border: "none", padding: "0.25rem 0", display: "flex", justifyContent: "center" }}>
@@ -503,14 +524,6 @@ function Register() {
             Sign In
           </Link>
         </p>
-
-        {/* Security Trust Badge */}
-        <div className="login-security-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-          <span>Official JNTU Academic Portal · Secure Access</span>
-        </div>
       </div>
     </div>
   );
