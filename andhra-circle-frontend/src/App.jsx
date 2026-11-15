@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 
 // Route Protection
 import AdminRoute from "./components/AdminRoute";
+import DevToolsGuard from "./components/DevToolsGuard";
 
 // =========================
 // Lazy-Loaded Routes
@@ -109,6 +110,7 @@ function App() {
 
   return (
     <>
+      <DevToolsGuard />
       <Suspense fallback={<PageSkeleton />}>
         <Routes>
           {/* =========================
