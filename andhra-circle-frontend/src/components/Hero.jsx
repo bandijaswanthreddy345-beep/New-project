@@ -1,21 +1,14 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import ResourceHighlights from "./ResourceHighlights";
-import JntuBotAvatar from "./JntuBotAvatar";
 
 const JntuChatbot = lazy(() => import("./JntuChatbot"));
 
-function HeroCommandBarSkeleton({ onTrigger }) {
+function HeroChatbotFallback() {
   return (
-    <div className="hero-ai-container" onClick={onTrigger}>
+    <div className="hero-ai-container" style={{ minHeight: "68px" }}>
       <div className="hero-ai-bar-anchor">
-        <div className="hero-ai-bar" style={{ cursor: "pointer" }}>
-          <div
-            className="hero-ai-avatar-badge"
-            title="Click for Voice Search / Ask AI"
-          >
-            <div className="hero-ai-avatar-desktop">
-              <JntuBotAvatar size={34} state="default" />
-            </div>
+        <div className="hero-ai-bar">
+          <div className="hero-ai-avatar-badge" title="Voice Search / Ask AI">
             <div className="hero-ai-avatar-mobile-mic" aria-label="Voice Search / Ask AI">
               <svg
                 width="16"
@@ -33,17 +26,13 @@ function HeroCommandBarSkeleton({ onTrigger }) {
               </svg>
             </div>
           </div>
-
           <input
             type="text"
             className="hero-ai-input"
             placeholder="Ask JNTU AI or enter branch (CSE, AIML)..."
-            onFocus={onTrigger}
             readOnly
-            style={{ outline: "none", border: "none", boxShadow: "none", cursor: "pointer" }}
-            aria-label="Ask JNTU AI"
+            style={{ outline: "none", border: "none", boxShadow: "none" }}
           />
-
           <div className="hero-ai-send-wrapper">
             <button
               type="button"
@@ -57,7 +46,7 @@ function HeroCommandBarSkeleton({ onTrigger }) {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.8"
+                strokeWidth="2.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -67,55 +56,12 @@ function HeroCommandBarSkeleton({ onTrigger }) {
             </button>
           </div>
         </div>
-
-        <div className="hero-ai-starter-chips">
-          <button type="button" className="hero-ai-quick-pill" onClick={onTrigger}>
-            <span>Student Profile</span>
-          </button>
-          <button type="button" className="hero-ai-quick-pill" onClick={onTrigger}>
-            <span>CSE</span>
-          </button>
-          <button type="button" className="hero-ai-quick-pill" onClick={onTrigger}>
-            <span>AIML</span>
-          </button>
-          <button type="button" className="hero-ai-quick-pill" onClick={onTrigger}>
-            <span>ECE</span>
-          </button>
-          <button type="button" className="hero-ai-quick-pill" onClick={onTrigger}>
-            <span>ME</span>
-          </button>
-          <button type="button" className="hero-ai-quick-pill" onClick={onTrigger}>
-            <span>Civil</span>
-          </button>
-          <button type="button" className="hero-ai-quick-pill" onClick={onTrigger}>
-            <span>EEE</span>
-          </button>
-        </div>
       </div>
     </div>
   );
 }
 
 function Hero() {
-  const [shouldLoadBot, setShouldLoadBot] = useState(false);
-
-  // Preload chatbot after page has become idle
-  useEffect(() => {
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(() => setShouldLoadBot(true), {
-        timeout: 4000,
-      });
-      return () => window.cancelIdleCallback(id);
-    } else {
-      const timer = setTimeout(() => setShouldLoadBot(true), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const triggerBot = () => {
-    setShouldLoadBot(true);
-  };
-
   return (
     <section className="hero">
       <div className="hero-content">
@@ -144,13 +90,9 @@ function Hero() {
         {/* =================================================
             AI SEARCH / COMMAND BAR (Interactive Trigger)
         ================================================== */}
-        {shouldLoadBot ? (
-          <Suspense fallback={<HeroCommandBarSkeleton onTrigger={triggerBot} />}>
-            <JntuChatbot />
-          </Suspense>
-        ) : (
-          <HeroCommandBarSkeleton onTrigger={triggerBot} />
-        )}
+        <Suspense fallback={<HeroChatbotFallback />}>
+          <JntuChatbot />
+        </Suspense>
 
         <ResourceHighlights />
       </div>
