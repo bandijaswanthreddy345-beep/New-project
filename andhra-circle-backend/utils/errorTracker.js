@@ -11,8 +11,6 @@ let isInitialized = false;
 
 function initErrorTracker(app) {
   if (!SENTRY_DSN) {
-    // Sentry is optional; omit or use debug log when not configured
-    logger.debug("Sentry DSN not configured, external error reporting disabled");
     return;
   }
 
