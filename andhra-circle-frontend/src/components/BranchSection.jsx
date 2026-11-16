@@ -114,19 +114,19 @@ function BranchSection({ selectedBranch = "", onSelectBranch = null }) {
     return () => window.removeEventListener("select-branch", onCustomSelect);
   }, [selectedBranch]);
 
-  // Smooth continuous auto-rotation: paused on touch/interaction
+  // Smooth continuous auto-rotation: changes branch every 2 seconds
   useEffect(() => {
     let pauseUntil = 0;
     const onSelectEvent = (e) => {
       if (e?.detail) {
-        pauseUntil = Date.now() + 8000;
+        pauseUntil = Date.now() + 4000;
       }
     };
     window.addEventListener('select-branch', onSelectEvent);
     const timer = setInterval(() => {
       if (Date.now() < pauseUntil) return;
       setActiveIndex((prev) => (prev + 1) % BRANCHES.length);
-    }, 3600);
+    }, 2000);
     return () => {
       clearInterval(timer);
       window.removeEventListener('select-branch', onSelectEvent);
