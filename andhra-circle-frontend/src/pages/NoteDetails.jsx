@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
-import { normalizeSemester } from "../utils/semester";
+import { normalizeSemester, normalizeScheme } from "../utils/semester";
 import { getStoredStudentData } from "../data/studentData";
 import { formatSemDisplay } from "../utils/validators";
 import trigger100Hearts from "../utils/heartBurst";
@@ -1196,6 +1196,12 @@ function NoteDetails() {
 
             <div className="hero-unified-footer">
               <div className="hero-tags">
+                <div className="hero-tag hero-tag-card hero-tag-scheme" title="Curriculum Regulation Scheme">
+                  <span className="hero-tag-label">SCHEME</span>
+                  <strong className="hero-tag-value">
+                    {normalizeScheme(note).includes("Scheme") ? normalizeScheme(note) : `${normalizeScheme(note)} Scheme`}
+                  </strong>
+                </div>
                 {branch && (
                   <div className="hero-tag hero-tag-card">
                     <span className="hero-tag-label">BRANCH</span>

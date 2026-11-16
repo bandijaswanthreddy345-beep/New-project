@@ -643,6 +643,19 @@
   border-color: #bbf7d0;
 }
 
+.hero-tag-scheme {
+  background: #fdf8eb !important;
+  border-color: #f1e1af !important;
+}
+
+.hero-tag-scheme .hero-tag-label {
+  color: #8a6815 !important;
+}
+
+.hero-tag-scheme strong {
+  color: #875f00 !important;
+}
+
 @media (max-width: 768px) {
   .hero-unified-footer {
     flex-direction: column;

@@ -33,6 +33,12 @@ const labProgramSchema = new mongoose.Schema(
       uppercase: true,
     },
 
+    regulation: {
+      type: String,
+      default: "R23",
+      trim: true,
+    },
+
     description: {
       type: String,
       trim: true,

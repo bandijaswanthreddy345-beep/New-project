@@ -4,6 +4,7 @@ import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
+import { normalizeScheme } from "../utils/semester";
 
 const getPaperSnippet = (paper) => {
   if (paper.description && paper.description.trim().length > 10) {
@@ -423,9 +424,12 @@ function QuestionPapers({ search = "" }) {
 
               {/* Content Body */}
               <div className="resource-content">
-                {/* Subject Code Badge */}
-                {paper.subjectCode && (
-                  <div className="card-code-row">
+                {/* Subject Code & Scheme Badges */}
+                <div className="card-code-row">
+                  <span className="card-scheme-badge" title={`Academic Regulation Scheme: ${normalizeScheme(paper)} Scheme`}>
+                    {normalizeScheme(paper).includes("Scheme") ? normalizeScheme(paper) : `${normalizeScheme(paper)} Scheme`}
+                  </span>
+                  {paper.subjectCode && (
                     <span className="card-code-badge" title={`Subject Code: ${paper.subjectCode}`}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -433,8 +437,18 @@ function QuestionPapers({ search = "" }) {
                       </svg>
                       {paper.subjectCode}
                     </span>
-                  </div>
-                )}
+                  )}
+                  {paper.branch && (
+                    <span className="card-branch-badge" title={`Branch: ${paper.branch}`}>
+                      {paper.branch}
+                    </span>
+                  )}
+                  {paper.semester && (
+                    <span className="card-sem-badge" title={`Semester: ${formatSemDisplay(paper.semester)}`}>
+                      Sem {String(formatSemDisplay(paper.semester)).replace(/^sem\s*/i, "")}
+                    </span>
+                  )}
+                </div>
 
                 {/* Subject Name */}
                 <h3 className="resource-title" title={getPaperDisplayTitle(paper)}>

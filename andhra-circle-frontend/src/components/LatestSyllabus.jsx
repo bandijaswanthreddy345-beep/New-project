@@ -4,6 +4,7 @@ import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
+import { normalizeScheme } from "../utils/semester";
 
 const getSyllabusSnippet = (item) => {
   if (item.description && item.description.trim().length > 10) {
@@ -353,9 +354,12 @@ function LatestSyllabus({ search = "" }) {
 
               {/* Card Body */}
               <div className="resource-content">
-                {/* Subject Code Badge */}
-                {item.subjectCode && (
-                  <div className="card-code-row">
+                {/* Subject Code & Scheme Badges */}
+                <div className="card-code-row">
+                  <span className="card-scheme-badge" title={`Academic Regulation Scheme: ${normalizeScheme(item)} Scheme`}>
+                    {normalizeScheme(item).includes("Scheme") ? normalizeScheme(item) : `${normalizeScheme(item)} Scheme`}
+                  </span>
+                  {item.subjectCode && (
                     <span className="card-code-badge" title={`Subject Code: ${item.subjectCode}`}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -363,8 +367,18 @@ function LatestSyllabus({ search = "" }) {
                       </svg>
                       {item.subjectCode}
                     </span>
-                  </div>
-                )}
+                  )}
+                  {item.branch && (
+                    <span className="card-branch-badge" title={`Branch: ${item.branch}`}>
+                      {item.branch}
+                    </span>
+                  )}
+                  {item.semester && (
+                    <span className="card-sem-badge" title={`Semester: ${formatSemDisplay(item.semester)}`}>
+                      Sem {String(formatSemDisplay(item.semester)).replace(/^sem\s*/i, "")}
+                    </span>
+                  )}
+                </div>
 
                 {/* Subject Name */}
                 <h3 className="resource-title" title={getSyllabusDisplayTitle(item)}>

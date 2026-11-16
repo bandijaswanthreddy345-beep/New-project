@@ -4,6 +4,7 @@ import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "../components/LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
+import { normalizeScheme } from "../utils/semester";
 
 const getLabSnippet = (program) => {
   if (program.description && program.description.trim().length > 10) {
@@ -430,9 +431,12 @@ function LabPrograms({ search = "" }) {
 
               {/* Card Body */}
               <div className="resource-content">
-                {/* Subject Code Badge */}
-                {program.subjectCode && (
-                  <div className="card-code-row">
+                {/* Subject Code & Scheme Badges */}
+                <div className="card-code-row">
+                  <span className="card-scheme-badge" title={`Academic Regulation Scheme: ${normalizeScheme(program)} Scheme`}>
+                    {normalizeScheme(program).includes("Scheme") ? normalizeScheme(program) : `${normalizeScheme(program)} Scheme`}
+                  </span>
+                  {program.subjectCode && (
                     <span className="card-code-badge" title={`Subject Code: ${program.subjectCode}`}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -440,8 +444,18 @@ function LabPrograms({ search = "" }) {
                       </svg>
                       {program.subjectCode}
                     </span>
-                  </div>
-                )}
+                  )}
+                  {program.branch && (
+                    <span className="card-branch-badge" title={`Branch: ${program.branch}`}>
+                      {program.branch}
+                    </span>
+                  )}
+                  {program.semester && (
+                    <span className="card-sem-badge" title={`Semester: ${formatSemDisplay(program.semester)}`}>
+                      Sem {String(formatSemDisplay(program.semester)).replace(/^sem\s*/i, "")}
+                    </span>
+                  )}
+                </div>
 
                 {/* Subject Name */}
                 <h3 className="resource-title" title={getLabDisplayTitle(program)}>

@@ -5,6 +5,7 @@ import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
+import { normalizeScheme } from "../utils/semester";
 import trigger100Hearts from "../utils/heartBurst";
 import { updateCachedResourceItem } from "../utils/resourceCache";
 
@@ -538,9 +539,12 @@ function LatestNotes({ search = "" }) {
                   CONTENT
               ========================================== */}
               <div className="resource-content">
-                {/* Subject Code Badge */}
-                {note.subjectCode && (
-                  <div className="card-code-row">
+                {/* Subject Code & Scheme Badges */}
+                <div className="card-code-row">
+                  <span className="card-scheme-badge" title={`Academic Regulation Scheme: ${normalizeScheme(note)} Scheme`}>
+                    {normalizeScheme(note).includes("Scheme") ? normalizeScheme(note) : `${normalizeScheme(note)} Scheme`}
+                  </span>
+                  {note.subjectCode && (
                     <span className="card-code-badge" title={`Subject Code: ${note.subjectCode}`}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -548,8 +552,18 @@ function LatestNotes({ search = "" }) {
                       </svg>
                       {note.subjectCode}
                     </span>
-                  </div>
-                )}
+                  )}
+                  {note.branch && (
+                    <span className="card-branch-badge" title={`Branch: ${note.branch}`}>
+                      {note.branch}
+                    </span>
+                  )}
+                  {note.semester && (
+                    <span className="card-sem-badge" title={`Semester: ${formatSemDisplay(note.semester)}`}>
+                      Sem {String(formatSemDisplay(note.semester)).replace(/^sem\s*/i, "")}
+                    </span>
+                  )}
+                </div>
 
                 {/* Subject Name */}
                 <h3 className="resource-title" title={getSubjectName(note)}>

@@ -8825,7 +8825,24 @@ body {
 .card-code-row {
   display: flex;
   align-items: center;
-  margin-bottom: 7px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.card-scheme-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8.5px;
+  border-radius: 6px;
+  background: #fdf8eb;
+  border: 1px solid #f1e1af;
+  color: #875f00;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.25px;
+  line-height: 1.2;
 }
 
 .card-code-badge {
@@ -8841,6 +8858,34 @@ body {
   font-weight: 750;
   letter-spacing: 0.25px;
   font-family: var(--font-family-mono, monospace);
+  line-height: 1.2;
+}
+
+.card-branch-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7.5px;
+  border-radius: 6px;
+  background: #e6f3f1;
+  border: 1px solid rgba(1, 62, 55, 0.16);
+  color: #013e37;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+
+.card-sem-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7.5px;
+  border-radius: 6px;
+  background: #f0f7f5;
+  border: 1px solid #d2e7e1;
+  color: #02594f;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
   line-height: 1.2;
 }
 

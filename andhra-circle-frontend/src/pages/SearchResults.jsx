@@ -4,6 +4,7 @@ import { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
 import { performSearch, formatResourceAction } from "../utils/searchEngine";
 import { formatSemDisplay } from "../utils/validators";
+import { normalizeScheme } from "../utils/semester";
 import "./SearchResults.css";
 
 const PAGE_SIZE = 15;
@@ -191,9 +192,10 @@ function SearchResults() {
 
   const getMeta = (item) => {
     const meta = [];
+    const scheme = normalizeScheme(item);
+    if (scheme) meta.push(scheme.includes("Scheme") ? scheme : `${scheme} Scheme`);
     if (item.branch) meta.push(item.branch);
     if (item.semester) meta.push(formatSemDisplay(item.semester));
-    if (item.regulation) meta.push(item.regulation);
     if (item.year) meta.push(`Year ${item.year}`);
     if (item.subjectCode) meta.push(`Code: ${item.subjectCode}`);
     if (item.examType) meta.push(item.examType);
