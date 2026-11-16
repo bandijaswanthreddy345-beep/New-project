@@ -1,10 +1,12 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
+import trigger100Hearts from "../utils/heartBurst";
+import { updateCachedResourceItem } from "../utils/resourceCache";
 
 const getSubjectSnippet = (item) => {
   if (item.description && item.description.trim().length > 10) {
@@ -23,11 +25,24 @@ function LatestNotes({ search = "" }) {
   const [loading, setLoading] = useState(true);
   const [blinkingNoteId, setBlinkingNoteId] = useState(null);
 
+  // Double-tap heart pop animations & tap timer references
+  const [cardHeartPops, setCardHeartPops] = useState({});
+  const lastTapTimeRef = useRef({});
+
   // Liked notes tracked per client browser
   const [likedNoteIds, setLikedNoteIds] = useState(() => {
     try {
-      const stored = localStorage.getItem("andhra_liked_notes");
-      return stored ? new Set(JSON.parse(stored)) : new Set();
+      const set = new Set();
+      ["andhra_liked_notes", "andhra_liked_resources"].forEach((k) => {
+        const stored = localStorage.getItem(k);
+        if (stored) {
+          try {
+            const arr = JSON.parse(stored);
+            if (Array.isArray(arr)) arr.forEach((id) => set.add(id));
+          } catch {}
+        }
+      });
+      return set;
     } catch {
       return new Set();
     }
@@ -76,7 +91,7 @@ function LatestNotes({ search = "" }) {
     const isLiked = likedNoteIds.has(noteId);
     const action = isLiked ? "unlike" : "like";
 
-    // 1. Optimistic Local Liked State
+    // 1. Optimistic Local Liked State across client storage
     setLikedNoteIds((prev) => {
       const next = new Set(prev);
       if (isLiked) {
@@ -86,6 +101,12 @@ function LatestNotes({ search = "" }) {
       }
       try {
         localStorage.setItem("andhra_liked_notes", JSON.stringify([...next]));
+        const resSet = new Set(
+          JSON.parse(localStorage.getItem("andhra_liked_resources") || "[]")
+        );
+        if (isLiked) resSet.delete(noteId);
+        else resSet.add(noteId);
+        localStorage.setItem("andhra_liked_resources", JSON.stringify([...resSet]));
       } catch (err) {
         console.error("Error saving liked notes:", err);
       }
@@ -93,6 +114,7 @@ function LatestNotes({ search = "" }) {
     });
 
     // 2. Optimistic Counter Update (Instant 0ms feedback)
+    const targetLikes = Math.max(0, (note.likes || 0) + (isLiked ? -1 : 1));
     setNotes((prevNotes) =>
       prevNotes.map((n) => {
         if (n._id === noteId) {
@@ -107,6 +129,8 @@ function LatestNotes({ search = "" }) {
       })
     );
 
+    updateCachedResourceItem("notes", noteId, { likes: targetLikes });
+
     // 3. Persist to Backend API
     try {
       const res = await API.put(`/notes/${noteId}/like`, { action });
@@ -116,6 +140,7 @@ function LatestNotes({ search = "" }) {
             n._id === noteId ? { ...n, likes: res.data.likes } : n
           )
         );
+        updateCachedResourceItem("notes", noteId, { likes: res.data.likes });
       }
     } catch (error) {
       console.error("Error updating like reaction:", error);
@@ -148,6 +173,70 @@ function LatestNotes({ search = "" }) {
           return n;
         })
       );
+    }
+  };
+
+  // ==========================================
+  // DOUBLE-TAP TO LIKE INTERACTION
+  // ==========================================
+
+  const triggerDoubleTapLike = (note, e) => {
+    let clientX = window.innerWidth / 2;
+    let clientY = window.innerHeight / 2;
+    if (e) {
+      if (e.clientX && e.clientY) {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      } else if (e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      }
+    }
+
+    // 1. Haptic vibration
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      try {
+        navigator.vibrate([40, 30, 60]);
+      } catch {}
+    }
+
+    // 2. 100-Hearts Canvas Fountain
+    trigger100Hearts(clientX, clientY);
+
+    // 3. Card-level pop heart overlay
+    const noteId = note._id;
+    setCardHeartPops((prev) => ({
+      ...prev,
+      [noteId]: Date.now(),
+    }));
+    setTimeout(() => {
+      setCardHeartPops((prev) => {
+        const next = { ...prev };
+        delete next[noteId];
+        return next;
+      });
+    }, 900);
+
+    // 4. Register like if not already liked
+    if (!likedNoteIds.has(noteId)) {
+      handleToggleLike(note, e);
+    }
+  };
+
+  const handleCardClick = (note, e) => {
+    // If click originated from view or download buttons or like button, do not intercept
+    if (e.target.closest("button") || e.target.closest("a")) {
+      return;
+    }
+    const noteId = note._id;
+    const now = Date.now();
+    const lastTap = lastTapTimeRef.current[noteId] || 0;
+
+    if (now - lastTap < 350) {
+      lastTapTimeRef.current[noteId] = 0;
+      triggerDoubleTapLike(note, e);
+    } else {
+      lastTapTimeRef.current[noteId] = now;
     }
   };
 
@@ -415,7 +504,18 @@ function LatestNotes({ search = "" }) {
             <article
               className="resource-card"
               key={note._id}
+              onClick={(e) => handleCardClick(note, e)}
+              onDoubleClick={(e) => triggerDoubleTapLike(note, e)}
             >
+              {/* Double-tap Floating Heart Pop */}
+              {cardHeartPops[note._id] && (
+                <div className="card-double-tap-heart" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="#e11d48">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                </div>
+              )}
+
               {/* ==========================================
                   BANNER / COVER
               ========================================== */}

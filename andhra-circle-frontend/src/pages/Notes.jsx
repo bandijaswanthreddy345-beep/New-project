@@ -14,6 +14,7 @@ import {
   setCachedResource,
   updateCachedResourceItem,
 } from "../utils/resourceCache";
+import trigger100Hearts from "../utils/heartBurst";
 import "./Notes.css";
 
 // Branch definitions matching requested engineering departments: CSE, AIML, ME, CE, ECE, EEE
@@ -800,6 +801,106 @@ function Notes({ initialType }) {
     }
   };
 
+  // Double-tap heart pop overlay state and detection per card
+  const [cardHeartPops, setCardHeartPops] = useState({});
+  const cardTapTimersRef = useRef({});
+  const cardLastTapTimeRef = useRef({});
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(cardTapTimersRef.current).forEach((timer) => clearTimeout(timer));
+    };
+  }, []);
+
+  const triggerDoubleTapLike = (item, e) => {
+    // 1. Get tap coordinates for the celebratory fountain
+    let clientX = window.innerWidth / 2;
+    let clientY = window.innerHeight / 2;
+    if (e) {
+      if (e.clientX && e.clientY) {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      } else if (e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      }
+    }
+
+    // 2. Haptic vibration feedback
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      try {
+        navigator.vibrate([40, 30, 60]);
+      } catch {}
+    }
+
+    // 3. 100-Hearts Canvas Fountain
+    trigger100Hearts(clientX, clientY);
+
+    // 4. Card-level pop heart overlay
+    const itemId = item.id;
+    setCardHeartPops((prev) => ({
+      ...prev,
+      [itemId]: Date.now(),
+    }));
+    setTimeout(() => {
+      setCardHeartPops((prev) => {
+        const next = { ...prev };
+        delete next[itemId];
+        return next;
+      });
+    }, 900);
+
+    // 5. If not already liked, register like
+    if (!likedItemIds.has(itemId)) {
+      handleToggleLikeItem(item, e);
+    }
+  };
+
+  const handleCardClick = (item, e) => {
+    // If user clicked directly on a button or link inside the card, ignore
+    if (e.target.closest("button") || e.target.closest("a")) {
+      return;
+    }
+
+    const itemId = item.id;
+    const now = Date.now();
+    const lastTap = cardLastTapTimeRef.current[itemId] || 0;
+
+    // Double-tap threshold: within 350ms
+    if (now - lastTap < 350) {
+      // Cancel pending single-tap navigation timer
+      if (cardTapTimersRef.current[itemId]) {
+        clearTimeout(cardTapTimersRef.current[itemId]);
+        delete cardTapTimersRef.current[itemId];
+      }
+      cardLastTapTimeRef.current[itemId] = 0;
+      triggerDoubleTapLike(item, e);
+    } else {
+      cardLastTapTimeRef.current[itemId] = now;
+      // Single tap navigation with 280ms grace window
+      if (cardTapTimersRef.current[itemId]) {
+        clearTimeout(cardTapTimersRef.current[itemId]);
+      }
+      cardTapTimersRef.current[itemId] = setTimeout(() => {
+        delete cardTapTimersRef.current[itemId];
+        handleViewItem(item);
+      }, 280);
+    }
+  };
+
+  const handleCardDoubleClick = (item, e) => {
+    if (e.target.closest("button") || e.target.closest("a")) {
+      return;
+    }
+    const itemId = item.id;
+    if (cardTapTimersRef.current[itemId]) {
+      clearTimeout(cardTapTimersRef.current[itemId]);
+      delete cardTapTimersRef.current[itemId];
+    }
+    triggerDoubleTapLike(item, e);
+  };
+
   // Handle Download Action
   const handleDownloadPdf = async (item, e) => {
     if (e) {
@@ -1158,7 +1259,8 @@ function Notes({ initialType }) {
                     <article
                       key={item.id}
                       className="notes-folder-card"
-                      onClick={() => handleViewItem(item)}
+                      onClick={(e) => handleCardClick(item, e)}
+                      onDoubleClick={(e) => handleCardDoubleClick(item, e)}
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => {
@@ -1168,6 +1270,14 @@ function Notes({ initialType }) {
                         }
                       }}
                     >
+                      {/* Double-tap Floating Heart Pop */}
+                      {cardHeartPops[item.id] && (
+                        <div className="card-double-tap-heart" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="#e11d48">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                          </svg>
+                        </div>
+                      )}
                       {/* Folder Icon & Resource Details */}
                       <div className="folder-card-left">
                         {/* Deep Emerald & Sunbeam Dual-Tone Folder Icon */}

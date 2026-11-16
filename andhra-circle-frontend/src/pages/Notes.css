@@ -820,6 +820,8 @@
 
 /* Individual Subject Card (Harmonized with Homepage) */
 .notes-folder-card {
+  position: relative;
+  overflow: hidden;
   background: #ffffff;
   border: 1px solid #e0efe9;
   border-radius: 15px;
@@ -831,6 +833,49 @@
   box-shadow: 0 2px 8px rgba(1, 62, 55, 0.04);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+}
+
+/* Double-tap Instagram-style Floating Heart Pop */
+.card-double-tap-heart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cardHeartPopBounce 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.card-double-tap-heart svg {
+  width: 68px;
+  height: 68px;
+  filter: drop-shadow(0 10px 24px rgba(225, 29, 72, 0.45))
+          drop-shadow(0 0 16px rgba(255, 255, 255, 0.9));
+}
+
+@keyframes cardHeartPopBounce {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0) rotate(-14deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.35) rotate(4deg);
+  }
+  38% {
+    transform: translate(-50%, -50%) scale(1.0) rotate(0deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05) translateY(-6px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.3) translateY(-26px);
+  }
 }
 
 .notes-folder-card:hover {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
@@ -180,6 +180,28 @@ function NoteDetails() {
       }
     } catch (err) {
       console.error("Error updating like on note:", err);
+    }
+  };
+
+  // Double-tap to like on hero banner
+  const heroLastTapRef = useRef(0);
+  const handleHeroClick = (e) => {
+    if (e.target.closest("button") || e.target.closest("a")) return;
+    const now = Date.now();
+    if (now - heroLastTapRef.current < 350) {
+      heroLastTapRef.current = 0;
+      handleToggleLikeNote(e);
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        try {
+          navigator.vibrate([40, 30, 60]);
+        } catch {}
+      }
+      trigger100Hearts(
+        e.clientX || window.innerWidth / 2,
+        e.clientY || window.innerHeight / 2
+      );
+    } else {
+      heroLastTapRef.current = now;
     }
   };
 
@@ -1132,7 +1154,17 @@ function NoteDetails() {
           {/* =====================================================
               HERO
           ====================================================== */}
-          <section className="note-hero">
+          <section
+            className="note-hero"
+            onClick={handleHeroClick}
+            onDoubleClick={(e) => {
+              handleToggleLikeNote(e);
+              trigger100Hearts(
+                e.clientX || window.innerWidth / 2,
+                e.clientY || window.innerHeight / 2
+              );
+            }}
+          >
         <div className="note-hero-content">
           <div className="hero-main">
             <div className="hero-heading-layout">
