@@ -157,6 +157,11 @@ export function getStudentAvatar(student) {
   return null;
 }
 
+export function getStudentAvatarUrl(photo) {
+  if (!photo || photo === "none" || typeof photo !== "string" || !photo.trim()) return null;
+  return photo;
+}
+
 // Calculate automatic CGPA from valid semester SGPAs
 export function calculateCgpaFromGrades(grades = []) {
   const validScores = grades

@@ -463,7 +463,7 @@ function Notifications({ search = "" }) {
               <h2 className="notif-brand-title">
                 <span className="font-deltha">JNTU</span> Circle
               </h2>
-              <span className="notif-brand-subtitle">Official University Announcements & Circulars</span>
+              <span className="notif-brand-subtitle">Academic Resource Hub</span>
             </div>
           </div>
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
+import { normalizeSemester } from "../utils/semester";
 import { getStoredStudentData } from "../data/studentData";
 import { formatSemDisplay } from "../utils/validators";
 import trigger100Hearts from "../utils/heartBurst";
@@ -300,6 +301,32 @@ function NoteDetails() {
   };
 
   // =========================================================
+  // BUILD EMBED PDF URL (SAFE AGAINST CSP FRAME-ANCESTORS)
+  // =========================================================
+
+  const getEmbedPdfUrl = (value) => {
+    if (!value || typeof value !== "string" || !value.trim() || value.trim() === "/") {
+      return "";
+    }
+
+    const trimmed = value.trim();
+
+    // External URLs (Google Drive, university portals, etc.): proxy through backend
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      if (!trimmed.includes("localhost:5000") && !trimmed.includes(BACKEND_URL)) {
+        return `${BACKEND_URL}/api/notifications/proxy-pdf?url=${encodeURIComponent(trimmed)}#toolbar=1&navpanes=0&view=FitH`;
+      }
+      return `${trimmed}#toolbar=1&navpanes=0&view=FitH`;
+    }
+
+    const fullUrl = getBackendUrl(trimmed);
+    if (!fullUrl || fullUrl === `${BACKEND_URL}/` || fullUrl === BACKEND_URL) {
+      return "";
+    }
+    return `${fullUrl}#toolbar=1&navpanes=0&view=FitH`;
+  };
+
+  // =========================================================
   // NOTE DATA
   // =========================================================
 
@@ -312,7 +339,7 @@ function NoteDetails() {
   const subject = note?.subject || "";
   const subjectCode = note?.subjectCode || "";
   const branch = note?.branch || "";
-  const semester = note?.semester || "";
+  const semester = normalizeSemester(note?.semester || "");
 
   // =========================================================
   // CREDITS
@@ -340,33 +367,33 @@ function NoteDetails() {
     return [
       {
         number: 1,
-        title: note.module1Title || "Unit 1",
+        title: note.module1Title || note.module1 || "Unit 1",
         notes: note.module1 || "",
-        pdf: note.module1Pdf || defaultPdf,
+        pdf: note.module1Pdf || note.pdfUrl || "",
       },
       {
         number: 2,
-        title: note.module2Title || "Unit 2",
+        title: note.module2Title || note.module2 || "Unit 2",
         notes: note.module2 || "",
-        pdf: note.module2Pdf || defaultPdf,
+        pdf: note.module2Pdf || note.pdfUrl || "",
       },
       {
         number: 3,
-        title: note.module3Title || "Unit 3",
+        title: note.module3Title || note.module3 || "Unit 3",
         notes: note.module3 || "",
-        pdf: note.module3Pdf || defaultPdf,
+        pdf: note.module3Pdf || note.pdfUrl || "",
       },
       {
         number: 4,
-        title: note.module4Title || "Unit 4",
+        title: note.module4Title || note.module4 || "Unit 4",
         notes: note.module4 || "",
-        pdf: note.module4Pdf || defaultPdf,
+        pdf: note.module4Pdf || note.pdfUrl || "",
       },
       {
         number: 5,
-        title: note.module5Title || "Unit 5",
+        title: note.module5Title || note.module5 || "Unit 5",
         notes: note.module5 || "",
-        pdf: note.module5Pdf || defaultPdf,
+        pdf: note.module5Pdf || note.pdfUrl || "",
       },
     ];
   }, [note]);
@@ -975,7 +1002,7 @@ function NoteDetails() {
                 <span className="font-deltha">JNTU</span> Circle
               </h2>
               <span className="notif-brand-subtitle">
-                Official University Study Materials & Notes
+                Academic Resource Hub
               </span>
             </div>
           </div>
@@ -1219,6 +1246,29 @@ function NoteDetails() {
 
                     <div className="module-inner">
 
+                      {unit.notes && unit.notes.trim() !== "" && (
+                        <div
+                          className="module-notes-box"
+                          style={{
+                            marginBottom: "16px",
+                            padding: "16px 20px",
+                            background: "linear-gradient(145deg, #ffffff 0%, #f4f8f6 100%)",
+                            borderRadius: "12px",
+                            border: "1.5px solid rgba(16, 185, 129, 0.25)",
+                            boxShadow: "0 2px 8px rgba(0, 36, 31, 0.04)"
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "0.75rem", fontWeight: "700", letterSpacing: "0.08em", color: "#00796b", textTransform: "uppercase" }}>
+                              Unit Syllabus & Topics Outline
+                            </span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: "0.92rem", color: "#1e293b", lineHeight: "1.65", whiteSpace: "pre-wrap", fontWeight: "500" }}>
+                            {unit.notes}
+                          </p>
+                        </div>
+                      )}
+
                       <div className="module-resource-grid pdf-only">
                         {/* PDF Box */}
                         <div className="module-pdf-box">
@@ -1288,6 +1338,82 @@ function NoteDetails() {
                           )}
                         </div>
                       </div>
+                      {/* PDF PREVIEW */}
+
+                      {isOpen && pdfUrl && (
+
+                        <div className="pdf-preview-card">
+
+                          <div className="preview-header">
+
+                            <div>
+
+                              <span className="preview-label">
+                                DOCUMENT PREVIEW
+                              </span>
+
+                              <strong>
+                                Unit{" "}
+                                {unit.number}{" "}
+                                Material
+                              </strong>
+
+                            </div>
+
+                            <button
+                              type="button"
+                              className="new-tab-button"
+                              onClick={() =>
+                                openPdfInNewTab(
+                                  unit.pdf
+                                )
+                              }
+                            >
+                              Open in new tab ↗
+                            </button>
+
+                          </div>
+
+                          {getEmbedPdfUrl(unit.pdf) ? (
+                            <div className="unit-pdf-frame-wrapper">
+                              <iframe
+                                src={getEmbedPdfUrl(unit.pdf)}
+                                title={`Unit ${unit.number} PDF`}
+                                className="unit-pdf-frame"
+                                loading="lazy"
+                              />
+                            </div>
+                          ) : (
+                            <div className="unit-pdf-frame-wrapper" style={{ padding: "40px 20px", textAlign: "center", color: "#64748b", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+                              <p style={{ margin: 0, fontWeight: "500" }}>PDF document for this unit is currently being uploaded or updated.</p>
+                            </div>
+                          )}
+
+                          <div className="pdf-preview-bottom-bar">
+                            <div className="pdf-preview-hint">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="16" x2="12" y2="12" />
+                                <line x1="12" y1="8" x2="12.01" y2="8" />
+                              </svg>
+                              <span>Use document viewer controls inside to navigate pages or zoom</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="pdf-preview-expand-btn"
+                              onClick={() =>
+                                openPdfInNewTab(
+                                  unit.pdf
+                                )
+                              }
+                            >
+                              Full Window View ↗
+                            </button>
+                          </div>
+
+                        </div>
+
+                      )}
                     </div>
                   </div>
                 </article>
