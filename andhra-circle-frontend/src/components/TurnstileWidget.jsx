@@ -2,6 +2,28 @@ import React, { useEffect, useRef, useState } from "react";
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAF952O_X3zyuNtUr";
 
+function loadTurnstileScript() {
+  if (typeof window === "undefined") return Promise.resolve();
+  if (window.turnstile) return Promise.resolve();
+  const existing = document.querySelector('script[src*="turnstile"]');
+  if (existing) {
+    return new Promise((resolve) => {
+      existing.addEventListener("load", resolve);
+      existing.addEventListener("error", resolve);
+    });
+  }
+
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => resolve();
+    document.head.appendChild(script);
+  });
+}
+
 function TurnstileWidget({ onVerify, onError, onExpire, theme = "auto" }) {
   const containerRef = useRef(null);
   const widgetIdRef = useRef(null);
@@ -17,6 +39,8 @@ function TurnstileWidget({ onVerify, onError, onExpire, theme = "auto" }) {
   useEffect(() => {
     let interval = null;
     let cancelled = false;
+
+    loadTurnstileScript();
 
     const renderWidget = () => {
       if (cancelled || !window.turnstile || !containerRef.current) return;
