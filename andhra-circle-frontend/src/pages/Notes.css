@@ -770,17 +770,16 @@
 
 /* Right Column: Subject Folder Cards */
 .notes-cards-container {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  overflow-y: scroll;
-  /* Always show scrollbar on the right side */
+  gap: 14px;
+  overflow-y: auto;
   overflow-x: hidden;
-  height: 100%;
-  max-height: none;
-  padding-right: 4px;
-  padding-bottom: 24px;
+  max-height: 100%;
+  padding-right: 6px;
+  padding-bottom: 36px;
   animation: searchCardsFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -821,7 +820,9 @@
 /* Individual Subject Card (Harmonized with Homepage) */
 .notes-folder-card {
   position: relative;
-  overflow: hidden;
+  flex-shrink: 0 !important;
+  min-height: fit-content;
+  box-sizing: border-box;
   background: #ffffff;
   border: 1px solid #e0efe9;
   border-radius: 15px;
@@ -981,17 +982,110 @@
   font-size: 11px;
 }
 
-/* Card Actions (View) */
+/* Card Actions (View & Stats) */
 .folder-card-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   flex-shrink: 0;
 }
 
-/* Views and downloads stats on card - visible ONLY on mobile version */
+/* Views and downloads stats on card */
 .folder-card-stats-mobile {
-  display: none !important;
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.folder-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13.5px;
+  font-weight: 750;
+  line-height: 1;
+  user-select: none;
+}
+
+.folder-stat-views {
+  color: #0d9488;
+}
+
+.folder-stat-views svg {
+  color: #0d9488;
+  stroke: currentColor;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.folder-stat-views .folder-stat-count {
+  color: #0f766e;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.folder-stat-downloads {
+  color: #2563eb;
+}
+
+.folder-stat-downloads svg {
+  color: #2563eb;
+  stroke: currentColor;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.folder-stat-downloads .folder-stat-count {
+  color: #1d4ed8;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.folder-stat-likes {
+  color: #e11d48;
+}
+
+.folder-stat-likes svg {
+  color: #e11d48;
+  fill: currentColor;
+  width: 13.5px;
+  height: 13.5px;
+  flex-shrink: 0;
+}
+
+.folder-stat-likes .folder-stat-count {
+  color: #be123c;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.folder-stat-likes-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.15s ease;
+  user-select: none;
+}
+
+.folder-stat-likes-btn:hover {
+  transform: scale(1.12);
+}
+
+.folder-stat-likes-btn:active {
+  transform: scale(0.9);
+}
+
+.folder-stat-likes-btn.is-liked svg {
+  fill: #e11d48 !important;
+  color: #e11d48 !important;
+  filter: drop-shadow(0 0 4px rgba(225, 29, 72, 0.45));
 }
 
 .folder-download-btn {
@@ -1416,6 +1510,8 @@
 
 @media (max-width: 768px) {
   .notes-folder-card {
+    flex-shrink: 0 !important;
+    min-height: fit-content;
     flex-direction: column;
     align-items: stretch;
     padding: 14px 16px;
