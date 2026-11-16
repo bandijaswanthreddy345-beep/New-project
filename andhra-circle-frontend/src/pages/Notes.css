@@ -1502,6 +1502,32 @@
     font-size: 13px;
   }
 
+  .folder-stat-likes-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.15s ease;
+    user-select: none;
+  }
+
+  .folder-stat-likes-btn:hover {
+    transform: scale(1.12);
+  }
+
+  .folder-stat-likes-btn:active {
+    transform: scale(0.9);
+  }
+
+  .folder-stat-likes-btn.is-liked svg {
+    fill: #e11d48 !important;
+    color: #e11d48 !important;
+    filter: drop-shadow(0 0 4px rgba(225, 29, 72, 0.45));
+  }
+
   /* Minimized right-aligned View button on mobile */
   .folder-view-metal-wrap {
     width: auto !important;

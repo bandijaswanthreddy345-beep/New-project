@@ -75,6 +75,24 @@ export function setCachedResource(key, data) {
 }
 
 /**
+ * Optimistically patch an individual item inside cached resource list
+ */
+export function updateCachedResourceItem(key, itemId, patch) {
+  if (!key || !itemId || !patch) return;
+  const cached = getCachedResource(key);
+  if (!Array.isArray(cached)) return;
+
+  const updated = cached.map((item) => {
+    if (item._id === itemId || item.id === itemId) {
+      return { ...item, ...patch };
+    }
+    return item;
+  });
+
+  setCachedResource(key, updated);
+}
+
+/**
  * Deduplicated, cached fetcher for individual resource endpoints
  */
 export async function fetchResourceWithCache(key, endpoint) {

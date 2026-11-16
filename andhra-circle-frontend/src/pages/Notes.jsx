@@ -12,6 +12,7 @@ import {
   hasCachedResource,
   fetchResourceWithCache,
   setCachedResource,
+  updateCachedResourceItem,
 } from "../utils/resourceCache";
 import "./Notes.css";
 
@@ -234,6 +235,31 @@ function Notes({ initialType }) {
     }
   });
   const [pulsingBranch, setPulsingBranch] = useState(null);
+
+  // Liked items tracked per client browser across shared keys
+  const [likedItemIds, setLikedItemIds] = useState(() => {
+    try {
+      const set = new Set();
+      [
+        "andhra_liked_notes",
+        "andhra_liked_papers",
+        "andhra_liked_syllabus",
+        "andhra_liked_labs",
+        "andhra_liked_resources",
+      ].forEach((k) => {
+        const stored = localStorage.getItem(k);
+        if (stored) {
+          try {
+            const arr = JSON.parse(stored);
+            if (Array.isArray(arr)) arr.forEach((id) => set.add(id));
+          } catch {}
+        }
+      });
+      return set;
+    } catch {
+      return new Set();
+    }
+  });
 
   const studentAvatar = getStudentAvatarUrl(studentData?.profilePhoto);
 
@@ -615,22 +641,151 @@ function Notes({ initialType }) {
     }
   };
 
+  // Handle Toggle Like Action
+  const handleToggleLikeItem = async (item, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const itemId = item.id;
+    if (!itemId) return;
+
+    const isLiked = likedItemIds.has(itemId);
+    const action = isLiked ? "unlike" : "like";
+
+    // 1. Optimistic Local Liked State across client storage
+    setLikedItemIds((prev) => {
+      const next = new Set(prev);
+      if (isLiked) {
+        next.delete(itemId);
+      } else {
+        next.add(itemId);
+      }
+      try {
+        localStorage.setItem("andhra_liked_resources", JSON.stringify([...next]));
+        const specificKey =
+          item.resourceType === "papers"
+            ? "andhra_liked_papers"
+            : item.resourceType === "syllabus"
+            ? "andhra_liked_syllabus"
+            : item.resourceType === "labs"
+            ? "andhra_liked_labs"
+            : "andhra_liked_notes";
+        const specificSet = new Set(
+          JSON.parse(localStorage.getItem(specificKey) || "[]")
+        );
+        if (isLiked) specificSet.delete(itemId);
+        else specificSet.add(itemId);
+        localStorage.setItem(specificKey, JSON.stringify([...specificSet]));
+      } catch (err) {
+        console.error("Error saving liked resource:", err);
+      }
+      return next;
+    });
+
+    // 2. Optimistic Counter Update in active data store & local cache
+    const targetLikes = Math.max(0, (item.likes || 0) + (isLiked ? -1 : 1));
+    const updateResourceList = (prevList) =>
+      prevList.map((res) => {
+        if (res._id === itemId || res.id === itemId) {
+          const current = typeof res.likes === "number" && !isNaN(res.likes) ? res.likes : 0;
+          return {
+            ...res,
+            likes: Math.max(0, current + (isLiked ? -1 : 1)),
+          };
+        }
+        return res;
+      });
+
+    const resKey =
+      item.resourceType === "papers"
+        ? "papers"
+        : item.resourceType === "syllabus"
+        ? "syllabus"
+        : item.resourceType === "labs"
+        ? "labs"
+        : "notes";
+
+    if (item.resourceType === "papers") setPapersData(updateResourceList);
+    else if (item.resourceType === "syllabus") setSyllabusData(updateResourceList);
+    else if (item.resourceType === "labs") setLabsData(updateResourceList);
+    else setNotesData(updateResourceList);
+
+    updateCachedResourceItem(resKey, itemId, { likes: targetLikes });
+
+    // 3. Persist to Backend API
+    try {
+      const endpoint =
+        item.resourceType === "papers"
+          ? `/papers/${itemId}/like`
+          : item.resourceType === "syllabus"
+          ? `/syllabus/${itemId}/like`
+          : item.resourceType === "labs"
+          ? `/lab-programs/${itemId}/like`
+          : `/notes/${itemId}/like`;
+
+      const res = await API.put(endpoint, { action });
+      if (res.data && typeof res.data.likes === "number") {
+        const syncServerLikes = (prevList) =>
+          prevList.map((r) =>
+            r._id === itemId || r.id === itemId ? { ...r, likes: res.data.likes } : r
+          );
+        if (item.resourceType === "papers") setPapersData(syncServerLikes);
+        else if (item.resourceType === "syllabus") setSyllabusData(syncServerLikes);
+        else if (item.resourceType === "labs") setLabsData(syncServerLikes);
+        else setNotesData(syncServerLikes);
+
+        updateCachedResourceItem(resKey, itemId, { likes: res.data.likes });
+      }
+    } catch (err) {
+      console.error("Error updating like on resource:", err);
+    }
+  };
+
   // Handle View Action
   const handleViewItem = async (item) => {
-    if (item.resourceType === "notes") {
-      if (item.id) {
-        navigate(`/notes/${item.id}`);
-        return;
+    const itemId = item.id;
+
+    // 1. Instantly register view count on backend & sync local cache
+    if (itemId) {
+      if (item.resourceType === "papers") {
+        API.put(`/papers/${itemId}/view`).catch(() => { });
+      } else if (item.resourceType === "syllabus") {
+        API.put(`/syllabus/${itemId}/view`).catch(() => { });
+      } else if (item.resourceType === "labs") {
+        API.put(`/lab-programs/${itemId}/view`).catch(() => { });
+      } else {
+        API.put(`/notes/${itemId}/view`).catch(() => { });
       }
+
+      const resKey =
+        item.resourceType === "papers"
+          ? "papers"
+          : item.resourceType === "syllabus"
+          ? "syllabus"
+          : item.resourceType === "labs"
+          ? "labs"
+          : "notes";
+      const newViews = (item.views || 0) + 1;
+      updateCachedResourceItem(resKey, itemId, { views: newViews });
+
+      // Optimistic update in active data store
+      const updateViews = (prevList) =>
+        prevList.map((res) =>
+          res._id === itemId || res.id === itemId
+            ? { ...res, views: (res.views || 0) + 1 }
+            : res
+        );
+
+      if (item.resourceType === "papers") setPapersData(updateViews);
+      else if (item.resourceType === "syllabus") setSyllabusData(updateViews);
+      else if (item.resourceType === "labs") setLabsData(updateViews);
+      else setNotesData(updateViews);
     }
 
-    // Record view counts on backend
-    if (item.resourceType === "papers") {
-      API.put(`/papers/${item.id}/view`).catch(() => { });
-    } else if (item.resourceType === "syllabus") {
-      API.put(`/syllabus/${item.id}/view`).catch(() => { });
-    } else if (item.resourceType === "labs") {
-      API.put(`/lab-programs/${item.id}/view`).catch(() => { });
+    if (item.resourceType === "notes" && item.id) {
+      navigate(`/notes/${item.id}`);
+      return;
     }
 
     const fileName = getPdfFileName(item.pdfUrl);
@@ -1116,15 +1271,17 @@ function Notes({ initialType }) {
                             </span>
                           </span>
 
-                          <span
-                            className="folder-stat-chip folder-stat-likes"
-                            title={`${item.likes || 0} Total Likes`}
+                          <button
+                            type="button"
+                            className={`folder-stat-chip folder-stat-likes folder-stat-likes-btn ${likedItemIds.has(item.id) ? "is-liked" : ""}`}
+                            title={likedItemIds.has(item.id) ? "Liked! Click to unlike" : "Click to like"}
+                            onClick={(e) => handleToggleLikeItem(item, e)}
                           >
                             <svg
                               width="13.5"
                               height="13.5"
                               viewBox="0 0 24 24"
-                              fill="currentColor"
+                              fill={likedItemIds.has(item.id) ? "#e11d48" : "currentColor"}
                               stroke="currentColor"
                               strokeWidth="1.5"
                               strokeLinecap="round"
@@ -1135,7 +1292,7 @@ function Notes({ initialType }) {
                             <span className="folder-stat-count">
                               {item.likes || 0}
                             </span>
-                          </span>
+                          </button>
                         </div>
 
                         {/* Right side: Minimized View button */}

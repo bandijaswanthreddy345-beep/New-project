@@ -593,11 +593,67 @@
   border-left: 1px solid rgba(217, 167, 38, 0.35);
 }
 
+.hero-action-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero-likes-integrated {
+  border-color: #fecdd3;
+  background: linear-gradient(135deg, #fffafb 0%, #fff1f2 100%);
+}
+
+.hero-likes-integrated:hover {
+  border-color: #f43f5e;
+  box-shadow:
+    0 10px 24px rgba(244, 63, 94, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.hero-likes-integrated.is-liked {
+  border-color: #e11d48;
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  box-shadow:
+    0 8px 24px rgba(225, 29, 72, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.hero-likes-icon {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #e11d48;
+}
+
+.hero-likes-icon.liked {
+  background: #ffe4e6;
+  border-color: #f43f5e;
+  color: #e11d48;
+}
+
+.hero-likes-value {
+  color: #e11d48;
+  border-left-color: rgba(225, 29, 72, 0.3);
+}
+
+.hero-tag-views,
+.hero-tag-downloads {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
 @media (max-width: 768px) {
   .hero-unified-footer {
     flex-direction: column;
     align-items: stretch;
     gap: 14px;
+  }
+
+  .hero-action-buttons-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
   }
 
   .hero-credits-integrated {

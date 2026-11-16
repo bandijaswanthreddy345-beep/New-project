@@ -6,6 +6,7 @@ import { normalizeSemester } from "../utils/semester";
 import { getStoredStudentData } from "../data/studentData";
 import { formatSemDisplay } from "../utils/validators";
 import trigger100Hearts from "../utils/heartBurst";
+import { updateCachedResourceItem } from "../utils/resourceCache";
 import "./NoteDetails.css";
 
 function formatFriendlySemester(sem) {
@@ -111,6 +112,77 @@ function NoteDetails() {
     }
   };
 
+  // Note like state tracked per client browser
+  const [isNoteLiked, setIsNoteLiked] = useState(() => {
+    try {
+      const keys = ["andhra_liked_notes", "andhra_liked_resources"];
+      for (const k of keys) {
+        const stored = localStorage.getItem(k);
+        if (stored) {
+          const arr = JSON.parse(stored);
+          if (Array.isArray(arr) && arr.includes(id)) return true;
+        }
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleLikeNote = async (e) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    if (!id) return;
+
+    const nextLiked = !isNoteLiked;
+    setIsNoteLiked(nextLiked);
+    const action = nextLiked ? "like" : "unlike";
+
+    if (nextLiked) {
+      const rect = e?.currentTarget?.getBoundingClientRect();
+      if (rect) {
+        setHeartPop({
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        });
+        setTimeout(() => setHeartPop(null), 950);
+      }
+    }
+
+    // Persist to local storage across shared keys
+    try {
+      ["andhra_liked_notes", "andhra_liked_resources"].forEach((k) => {
+        const raw = localStorage.getItem(k);
+        const set = new Set(raw ? JSON.parse(raw) : []);
+        if (nextLiked) set.add(id);
+        else set.delete(id);
+        localStorage.setItem(k, JSON.stringify([...set]));
+      });
+    } catch (err) {
+      console.error("Storage error for note like:", err);
+    }
+
+    // Optimistic state and cache update
+    setNote((prev) => {
+      if (!prev) return prev;
+      const current = typeof prev.likes === "number" && !isNaN(prev.likes) ? prev.likes : 0;
+      const target = Math.max(0, current + (nextLiked ? 1 : -1));
+      updateCachedResourceItem("notes", id, { likes: target });
+      return { ...prev, likes: target };
+    });
+
+    try {
+      const res = await API.put(`/notes/${id}/like`, { action });
+      if (res.data && typeof res.data.likes === "number") {
+        setNote((prev) => (prev ? { ...prev, likes: res.data.likes } : prev));
+        updateCachedResourceItem("notes", id, { likes: res.data.likes });
+      }
+    } catch (err) {
+      console.error("Error updating like on note:", err);
+    }
+  };
+
   // Heart pop animation state
   const [heartPop, setHeartPop] = useState(null);
 
@@ -169,6 +241,16 @@ function NoteDetails() {
         setLoading(true);
         setError("");
 
+        // Register view count on backend
+        API.put(`/notes/${id}/view`)
+          .then((res) => {
+            if (res.data && typeof res.data.views === "number") {
+              setNote((prev) => (prev ? { ...prev, views: res.data.views } : prev));
+              updateCachedResourceItem("notes", id, { views: res.data.views });
+            }
+          })
+          .catch(() => { });
+
         const response = await API.get(`/notes/${id}`);
 
         if (!mounted) return;
@@ -187,6 +269,11 @@ function NoteDetails() {
         }
 
         setNote(noteData);
+        updateCachedResourceItem("notes", id, {
+          views: noteData.views,
+          likes: noteData.likes,
+          downloads: noteData.downloads,
+        });
       } catch (err) {
         console.error("NOTE DETAILS ERROR:", err);
 
@@ -468,6 +555,16 @@ function NoteDetails() {
     const url = getBackendUrl(pdf);
 
     if (!url) return;
+
+    if (id) {
+      API.put(`/notes/${id}/download`).catch(() => { });
+      setNote((prev) => {
+        if (!prev) return prev;
+        const newDl = (prev.downloads || 0) + 1;
+        updateCachedResourceItem("notes", id, { downloads: newDl });
+        return { ...prev, downloads: newDl };
+      });
+    }
 
     try {
       const response = await fetch(url);
@@ -1085,37 +1182,78 @@ function NoteDetails() {
                     <strong className="hero-tag-value">{year}</strong>
                   </div>
                 )}
+                <div className="hero-tag hero-tag-card hero-tag-views" title={`${note?.views || 0} Total Views`}>
+                  <span className="hero-tag-label">VIEWS</span>
+                  <strong className="hero-tag-value">👁 {note?.views || 0}</strong>
+                </div>
+                <div className="hero-tag hero-tag-card hero-tag-downloads" title={`${note?.downloads || 0} Total Downloads`}>
+                  <span className="hero-tag-label">DOWNLOADS</span>
+                  <strong className="hero-tag-value">📥 {note?.downloads || 0}</strong>
+                </div>
               </div>
 
-              <div
-                className={`hero-credits-integrated ${isStarred ? "is-starred" : ""}`}
-                aria-label="Course credits & bookmark"
-                onClick={handleToggleStar}
-                title={isStarred ? "Starred note! Click to unstar" : "Click star to bookmark this note"}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleToggleStar(e);
-                  }
-                }}
-              >
-                <button
-                  type="button"
-                  className={`hero-credits-icon hero-credits-star-btn ${isStarred ? "starred" : ""}`}
-                  aria-label={isStarred ? "Starred note" : "Star this note"}
+              <div className="hero-action-buttons-group">
+                <div
+                  className={`hero-credits-integrated ${isStarred ? "is-starred" : ""}`}
+                  aria-label="Course credits & bookmark"
                   onClick={handleToggleStar}
+                  title={isStarred ? "Starred note! Click to unstar" : "Click star to bookmark this note"}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleToggleStar(e);
+                    }
+                  }}
                 >
-                  <svg viewBox="0 0 24 24" fill={isStarred ? "#d9a726" : "none"} stroke={isStarred ? "#d9a726" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                </button>
-                <div className="hero-credits-copy">
-                  <span className="hero-credits-label">COURSE CREDITS</span>
-                  <span className="hero-credits-desc">{isStarred ? "Starred in your favorites" : "Credit value for this subject"}</span>
+                  <button
+                    type="button"
+                    className={`hero-credits-icon hero-credits-star-btn ${isStarred ? "starred" : ""}`}
+                    aria-label={isStarred ? "Starred note" : "Star this note"}
+                    onClick={handleToggleStar}
+                  >
+                    <svg viewBox="0 0 24 24" fill={isStarred ? "#d9a726" : "none"} stroke={isStarred ? "#d9a726" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </button>
+                  <div className="hero-credits-copy">
+                    <span className="hero-credits-label">COURSE CREDITS</span>
+                    <span className="hero-credits-desc">{isStarred ? "Starred in your favorites" : "Credit value for this subject"}</span>
+                  </div>
+                  <strong className="hero-credits-value">{credits || "4"}</strong>
                 </div>
-                <strong className="hero-credits-value">{credits || "4"}</strong>
+
+                <div
+                  className={`hero-credits-integrated hero-likes-integrated ${isNoteLiked ? "is-liked" : ""}`}
+                  aria-label="Like this study material"
+                  onClick={handleToggleLikeNote}
+                  title={isNoteLiked ? "Liked! Click to unlike" : "Click heart to like this note"}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleToggleLikeNote(e);
+                    }
+                  }}
+                >
+                  <button
+                    type="button"
+                    className={`hero-credits-icon hero-likes-icon ${isNoteLiked ? "liked" : ""}`}
+                    aria-label={isNoteLiked ? "Liked note" : "Like this note"}
+                    onClick={handleToggleLikeNote}
+                  >
+                    <svg viewBox="0 0 24 24" fill={isNoteLiked ? "#e11d48" : "none"} stroke={isNoteLiked ? "#e11d48" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  </button>
+                  <div className="hero-credits-copy">
+                    <span className="hero-credits-label">LIKES</span>
+                    <span className="hero-credits-desc">{isNoteLiked ? "You liked this note" : "Tap heart to like"}</span>
+                  </div>
+                  <strong className="hero-credits-value hero-likes-value">{note?.likes || 0}</strong>
+                </div>
               </div>
             </div>
           </div>
