@@ -32,7 +32,6 @@
   },
   "devDependencies": {
     "oxlint": "^1.69.0",
-    "sharp": "^0.35.5",
     "vitest": "^5.1.0"
   }
 }
