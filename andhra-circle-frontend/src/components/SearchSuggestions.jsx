@@ -30,15 +30,8 @@ function NoteDetails() {
         setLoading(true);
         setError("");
 
-        console.log("=================================");
-        console.log("NOTE DETAILS");
-        console.log("NOTE ID:", id);
-
         // Fetch the individual note
         const response = await API.get(`/notes/${id}`);
-
-        console.log("NOTE RESPONSE:", response.data);
-        console.log("=================================");
 
         if (!mounted) return;
 

@@ -169,14 +169,7 @@ function NoteDetails() {
         setLoading(true);
         setError("");
 
-        console.log("=================================");
-        console.log("NOTE DETAILS");
-        console.log("NOTE ID:", id);
-
         const response = await API.get(`/notes/${id}`);
-
-        console.log("NOTE RESPONSE:", response.data);
-        console.log("=================================");
 
         if (!mounted) return;
 
@@ -1380,7 +1373,6 @@ function NoteDetails() {
                                 src={getEmbedPdfUrl(unit.pdf)}
                                 title={`Unit ${unit.number} PDF`}
                                 className="unit-pdf-frame"
-                                loading="lazy"
                               />
                             </div>
                           ) : (

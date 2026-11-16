@@ -107,14 +107,6 @@ function UploadNote() {
     try {
       setLoading(true);
 
-      console.log("========== NOTE UPLOAD ==========");
-
-      for (const pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
-      console.log("=================================");
-
       await API.post("/notes", formData, {
         headers: {
           "Content-Type": "multipart/form-data",

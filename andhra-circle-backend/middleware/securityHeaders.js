@@ -24,14 +24,14 @@ function securityHeaders(req, res, next) {
     );
   }
 
-  // API responses get restrictive CSP without breaking static PDFs / images / proxy-pdf iframes
+  // API responses get clickjacking protection without breaking static PDFs / images / proxy-pdf iframes
   if (
     (req.path.startsWith("/api") || req.path === "/") &&
     !req.path.startsWith("/api/notifications/proxy-pdf")
   ) {
     res.setHeader(
       "Content-Security-Policy",
-      "default-src 'none'; frame-ancestors 'none'"
+      "frame-ancestors 'none'"
     );
   }
 
