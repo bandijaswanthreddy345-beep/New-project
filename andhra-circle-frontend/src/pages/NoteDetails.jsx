@@ -1545,16 +1545,16 @@ function NoteDetails() {
                           </div>
 
                           {getEmbedPdfUrl(unit.pdf) ? (
-                            <div className="unit-pdf-frame-wrapper">
+                            <div className="unit-pdf-frame-wrapper pdf-frame-wrapper">
                               <iframe
                                 src={getEmbedPdfUrl(unit.pdf)}
                                 title={`Unit ${unit.number} PDF`}
-                                className="unit-pdf-frame"
+                                className="unit-pdf-frame pdf-frame"
                                 loading="lazy"
                               />
                             </div>
                           ) : (
-                            <div className="unit-pdf-frame-wrapper" style={{ padding: "40px 20px", textAlign: "center", color: "#64748b", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+                            <div className="unit-pdf-frame-wrapper pdf-frame-wrapper" style={{ padding: "40px 20px", textAlign: "center", color: "#64748b", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
                               <p style={{ margin: 0, fontWeight: "500" }}>PDF document for this unit is currently being uploaded or updated.</p>
                             </div>
                           )}
