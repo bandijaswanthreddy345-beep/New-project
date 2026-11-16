@@ -1220,14 +1220,6 @@ function NoteDetails() {
                     <strong className="hero-tag-value">{year}</strong>
                   </div>
                 )}
-                <div className="hero-tag hero-tag-card hero-tag-views" title={`${note?.views || 0} Total Views`}>
-                  <span className="hero-tag-label">VIEWS</span>
-                  <strong className="hero-tag-value">👁 {note?.views || 0}</strong>
-                </div>
-                <div className="hero-tag hero-tag-card hero-tag-downloads" title={`${note?.downloads || 0} Total Downloads`}>
-                  <span className="hero-tag-label">DOWNLOADS</span>
-                  <strong className="hero-tag-value">📥 {note?.downloads || 0}</strong>
-                </div>
               </div>
 
               <div className="hero-action-buttons-group">
@@ -1260,37 +1252,6 @@ function NoteDetails() {
                     <span className="hero-credits-desc">{isStarred ? "Starred in your favorites" : "Credit value for this subject"}</span>
                   </div>
                   <strong className="hero-credits-value">{credits || "4"}</strong>
-                </div>
-
-                <div
-                  className={`hero-credits-integrated hero-likes-integrated ${isNoteLiked ? "is-liked" : ""}`}
-                  aria-label="Like this study material"
-                  onClick={handleToggleLikeNote}
-                  title={isNoteLiked ? "Liked! Click to unlike" : "Click heart to like this note"}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleToggleLikeNote(e);
-                    }
-                  }}
-                >
-                  <button
-                    type="button"
-                    className={`hero-credits-icon hero-likes-icon ${isNoteLiked ? "liked" : ""}`}
-                    aria-label={isNoteLiked ? "Liked note" : "Like this note"}
-                    onClick={handleToggleLikeNote}
-                  >
-                    <svg viewBox="0 0 24 24" fill={isNoteLiked ? "#e11d48" : "none"} stroke={isNoteLiked ? "#e11d48" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                  </button>
-                  <div className="hero-credits-copy">
-                    <span className="hero-credits-label">LIKES</span>
-                    <span className="hero-credits-desc">{isNoteLiked ? "You liked this note" : "Tap heart to like"}</span>
-                  </div>
-                  <strong className="hero-credits-value hero-likes-value">{note?.likes || 0}</strong>
                 </div>
               </div>
             </div>
