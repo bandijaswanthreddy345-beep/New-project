@@ -406,6 +406,7 @@ function Notes({ initialType }) {
           resourceType: "notes",
           views: n.views || 0,
           downloads: n.downloads || 0,
+          likes: n.likes || 0,
         };
       });
   }, [notesData, activeTab, activeBranch]);
@@ -446,6 +447,7 @@ function Notes({ initialType }) {
           resourceType: "papers",
           views: p.views || 0,
           downloads: p.downloads || 0,
+          likes: p.likes || 0,
         };
       });
   }, [papersData, activeTab, activeBranch]);
@@ -481,6 +483,7 @@ function Notes({ initialType }) {
           resourceType: "syllabus",
           views: s.views || 0,
           downloads: s.downloads || 0,
+          likes: s.likes || 0,
         };
       });
   }, [syllabusData, activeTab, activeBranch]);
@@ -514,6 +517,7 @@ function Notes({ initialType }) {
           resourceType: "labs",
           views: l.views || 0,
           downloads: l.downloads || 0,
+          likes: l.likes || 0,
         };
       });
   }, [labsData, activeTab, activeBranch]);
@@ -1117,6 +1121,27 @@ function Notes({ initialType }) {
                             </svg>
                             <span className="folder-stat-count">
                               {item.downloads || 0}
+                            </span>
+                          </span>
+
+                          <span
+                            className="folder-stat-chip folder-stat-likes"
+                            title={`${item.likes || 0} Total Likes`}
+                          >
+                            <svg
+                              width="13.5"
+                              height="13.5"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                            </svg>
+                            <span className="folder-stat-count">
+                              {item.likes || 0}
                             </span>
                           </span>
                         </div>

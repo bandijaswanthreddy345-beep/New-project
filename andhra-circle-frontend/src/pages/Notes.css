@@ -1484,6 +1484,24 @@
     font-size: 13px;
   }
 
+  .folder-stat-likes {
+    color: #e11d48;
+  }
+
+  .folder-stat-likes svg {
+    color: #e11d48;
+    fill: currentColor;
+    width: 13.5px;
+    height: 13.5px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-likes .folder-stat-count {
+    color: #be123c;
+    font-weight: 800;
+    font-size: 13px;
+  }
+
   /* Minimized right-aligned View button on mobile */
   .folder-view-metal-wrap {
     width: auto !important;
@@ -1629,13 +1647,15 @@
   }
 
   .folder-stat-views svg,
-  .folder-stat-downloads svg {
-    width: 14px;
-    height: 14px;
+  .folder-stat-downloads svg,
+  .folder-stat-likes svg {
+    width: 13.5px;
+    height: 13.5px;
   }
 
   .folder-stat-views .folder-stat-count,
-  .folder-stat-downloads .folder-stat-count {
+  .folder-stat-downloads .folder-stat-count,
+  .folder-stat-likes .folder-stat-count {
     font-size: 12px;
   }
 
