@@ -2,8 +2,7 @@
   "name": "jntu-circle-root",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "build": "node build-root.js"
+    "build": "npm --prefix andhra-circle-frontend install && npm --prefix andhra-circle-frontend run build"
   }
 }
