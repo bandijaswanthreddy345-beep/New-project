@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
-import { MetalFx, useMetalBend } from "metal-fx";
-import { isLowPowerDevice } from "../utils/devicePerf";
+import { MetalFx } from "metal-fx";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import StudentProfileModal from "../components/StudentProfileModal";
@@ -199,7 +198,6 @@ function Notes({ initialType }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(16);
-  const isWeak = useMemo(() => isLowPowerDevice(), []);
 
   // Debounce search query (~250ms)
   useEffect(() => {
@@ -240,12 +238,7 @@ function Notes({ initialType }) {
   const studentAvatar = getStudentAvatarUrl(studentData?.profilePhoto);
 
   const searchInputRef = useRef(null);
-  const searchMetalRef = useRef(null);
   const loadMoreSentinelRef = useRef(null);
-
-  // Hook for cursor-driven liquid metal bend interaction (desktop only, disabled on touch/low-power devices)
-  const isTouchOrLowPower = typeof window !== "undefined" && (window.innerWidth < 768 || isLowPowerDevice() || ('ontouchstart' in window));
-  useMetalBend(searchMetalRef, () => ({ enabled: !isTouchOrLowPower }));
 
   // Profile and auth synchronization listener
   useEffect(() => {
@@ -864,7 +857,6 @@ function Notes({ initialType }) {
               <div className="notes-search-box">
                 <div className="notes-search-metal-wrap">
                   <MetalFx
-                    ref={searchMetalRef}
                     preset="chromatic"
                     variant="circle"
                     strength={1}
@@ -1147,67 +1139,30 @@ function Notes({ initialType }) {
                         </div>
 
                         {/* Right side: Minimized View button */}
-                        {isWeak ? (
-                          <button
-                            type="button"
-                            className="folder-view-btn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewItem(item);
-                            }}
-                            title={`View ${item.title}`}
+                        <button
+                          type="button"
+                          className="folder-view-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewItem(item);
+                          }}
+                          title={`View ${item.title}`}
+                        >
+                          <svg
+                            className="folder-view-btn-icon"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
                           >
-                            <svg
-                              className="folder-view-btn-icon"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                              aria-hidden="true"
-                            >
-                              <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                              <path
-                                fillRule="evenodd"
-                                d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            <span>View</span>
-                          </button>
-                        ) : (
-                          <MetalFx
-                            preset="gold"
-                            variant="button"
-                            theme="dark"
-                            strength={1}
-                            innerShadow
-                            normalizeHostStyles={false}
-                            className="folder-view-metal-wrap"
-                          >
-                            <button
-                              type="button"
-                              className="folder-view-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewItem(item);
-                              }}
-                              title={`View ${item.title}`}
-                            >
-                              <svg
-                                className="folder-view-btn-icon"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
-                              >
-                                <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                                <path
-                                  fillRule="evenodd"
-                                  d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              <span>View</span>
-                            </button>
-                          </MetalFx>
-                        )}
+                            <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
+                            <path
+                              fillRule="evenodd"
+                              d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span>View</span>
+                        </button>
                       </div>
                     </article>
                   ))}
