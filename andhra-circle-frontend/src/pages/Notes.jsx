@@ -643,7 +643,7 @@ function Notes({ initialType }) {
   };
 
   // Handle Toggle Like Action
-  const handleToggleLikeItem = async (item, e) => {
+  const handleToggleLikeItem = async (item, e, skipAnimation = false) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -653,6 +653,33 @@ function Notes({ initialType }) {
 
     const isLiked = likedItemIds.has(itemId);
     const action = isLiked ? "unlike" : "like";
+
+    // Celebratory 100 hearts fountain if clicking heart button to like
+    if (!isLiked && !skipAnimation) {
+      let clientX = window.innerWidth / 2;
+      let clientY = window.innerHeight / 2;
+      if (e) {
+        if (e.clientX && e.clientY) {
+          clientX = e.clientX;
+          clientY = e.clientY;
+        } else if (e.touches && e.touches[0]) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        }
+      }
+      trigger100Hearts(clientX, clientY);
+      setCardHeartPops((prev) => ({
+        ...prev,
+        [itemId]: Date.now(),
+      }));
+      setTimeout(() => {
+        setCardHeartPops((prev) => {
+          const next = { ...prev };
+          delete next[itemId];
+          return next;
+        });
+      }, 900);
+    }
 
     // 1. Optimistic Local Liked State across client storage
     setLikedItemIds((prev) => {
@@ -824,6 +851,9 @@ function Notes({ initialType }) {
       } else if (e.touches && e.touches[0]) {
         clientX = e.touches[0].clientX;
         clientY = e.touches[0].clientY;
+      } else if (e.changedTouches && e.changedTouches[0]) {
+        clientX = e.changedTouches[0].clientX;
+        clientY = e.changedTouches[0].clientY;
       }
     }
 
@@ -853,7 +883,7 @@ function Notes({ initialType }) {
 
     // 5. If not already liked, register like
     if (!likedItemIds.has(itemId)) {
-      handleToggleLikeItem(item, e);
+      handleToggleLikeItem(item, e, true);
     }
   };
 
@@ -867,8 +897,8 @@ function Notes({ initialType }) {
     const now = Date.now();
     const lastTap = cardLastTapTimeRef.current[itemId] || 0;
 
-    // Double-tap threshold: within 350ms
-    if (now - lastTap < 350) {
+    // Double-tap threshold: within 400ms (and at least 40ms to filter bounce)
+    if (now - lastTap < 400 && now - lastTap > 40) {
       // Cancel pending single-tap navigation timer
       if (cardTapTimersRef.current[itemId]) {
         clearTimeout(cardTapTimersRef.current[itemId]);
@@ -878,14 +908,14 @@ function Notes({ initialType }) {
       triggerDoubleTapLike(item, e);
     } else {
       cardLastTapTimeRef.current[itemId] = now;
-      // Single tap navigation with 280ms grace window
+      // Single tap navigation with 380ms grace window so double tap is never interrupted
       if (cardTapTimersRef.current[itemId]) {
         clearTimeout(cardTapTimersRef.current[itemId]);
       }
       cardTapTimersRef.current[itemId] = setTimeout(() => {
         delete cardTapTimersRef.current[itemId];
         handleViewItem(item);
-      }, 280);
+      }, 380);
     }
   };
 
@@ -898,6 +928,7 @@ function Notes({ initialType }) {
       clearTimeout(cardTapTimersRef.current[itemId]);
       delete cardTapTimersRef.current[itemId];
     }
+    cardLastTapTimeRef.current[itemId] = 0;
     triggerDoubleTapLike(item, e);
   };
 

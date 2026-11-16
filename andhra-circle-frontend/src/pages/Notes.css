@@ -833,6 +833,10 @@
   box-shadow: 0 2px 8px rgba(1, 62, 55, 0.04);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Double-tap Instagram-style Floating Heart Pop */

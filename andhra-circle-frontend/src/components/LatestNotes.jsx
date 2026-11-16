@@ -232,7 +232,7 @@ function LatestNotes({ search = "" }) {
     const now = Date.now();
     const lastTap = lastTapTimeRef.current[noteId] || 0;
 
-    if (now - lastTap < 350) {
+    if (now - lastTap < 400 && now - lastTap > 40) {
       lastTapTimeRef.current[noteId] = 0;
       triggerDoubleTapLike(note, e);
     } else {
