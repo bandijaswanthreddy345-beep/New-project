@@ -3,5 +3,6 @@ node_modules
 andhra-circle-backend/uploads/
 dist
 dist-ssr
+public
 *.local
 .DS_Store

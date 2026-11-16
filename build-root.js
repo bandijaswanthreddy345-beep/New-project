@@ -14,10 +14,16 @@ execSync("npm install", { cwd: frontendDir, stdio: "inherit" });
 console.log("⚡ Building frontend with Vite...");
 execSync("npm run build", { cwd: frontendDir, stdio: "inherit" });
 
-console.log("📁 Mirroring build output to root ./dist...");
+console.log("📁 Mirroring build output to root ./dist and ./public...");
 if (fs.existsSync(rootDist)) {
   fs.rmSync(rootDist, { recursive: true, force: true });
 }
 fs.cpSync(frontendDist, rootDist, { recursive: true });
 
-console.log("✅ Build complete! Assets ready in ./dist and ./andhra-circle-frontend/dist");
+const rootPublic = path.join(__dirname, "public");
+if (fs.existsSync(rootPublic)) {
+  fs.rmSync(rootPublic, { recursive: true, force: true });
+}
+fs.cpSync(frontendDist, rootPublic, { recursive: true });
+
+console.log("✅ Build complete! Assets ready in ./dist, ./public, and ./andhra-circle-frontend/dist");
