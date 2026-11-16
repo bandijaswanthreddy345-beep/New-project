@@ -169,14 +169,7 @@ function NoteDetails() {
         setLoading(true);
         setError("");
 
-        console.log("=================================");
-        console.log("NOTE DETAILS");
-        console.log("NOTE ID:", id);
-
         const response = await API.get(`/notes/${id}`);
-
-        console.log("NOTE RESPONSE:", response.data);
-        console.log("=================================");
 
         if (!mounted) return;
 
@@ -299,6 +292,7 @@ function NoteDetails() {
 
     return `${BACKEND_URL}/${value}`;
   };
+
 
   // =========================================================
   // BUILD EMBED PDF URL (SAFE AGAINST CSP FRAME-ANCESTORS)

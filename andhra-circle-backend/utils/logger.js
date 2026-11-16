@@ -40,8 +40,36 @@ function formatLine(level, message, meta = {}) {
   return JSON.stringify(line);
 }
 
-function write(level, message, meta) {
+function write(level, message, meta = {}) {
   if (LEVEL_WEIGHT[level] < LEVEL_WEIGHT[MIN_LEVEL]) return;
+
+  const msg = typeof message === "string" ? message : (message?.message || String(message));
+
+  // In development, output clean human-readable logs instead of raw JSON strings
+  if (process.env.NODE_ENV !== "production") {
+    if (level === "debug") return;
+
+    if (level === "error") {
+      console.error(`❌ [Error] ${msg}`);
+    } else if (level === "warn") {
+      console.warn(`⚠️ [Warning] ${msg}`);
+    } else {
+      if (msg.includes("Server started")) {
+        console.log("=================================");
+        console.log(`🚀 Server running on port ${meta.port || 5000}`);
+        console.log(`🌐 http://localhost:${meta.port || 5000}`);
+        console.log("=================================");
+      } else if (msg.includes("MongoDB Connected Successfully")) {
+        console.log(`✅ MongoDB Connected Successfully (Database: ${meta.database || "test"})`);
+      } else if (msg.includes("MongoDB connection state")) {
+        console.log(`📡 ${msg}`);
+      } else {
+        console.log(`ℹ️ ${msg}`);
+      }
+    }
+    return;
+  }
+
   const line = formatLine(level, message, meta);
   if (level === "error") {
     process.stderr.write(line + "\n");

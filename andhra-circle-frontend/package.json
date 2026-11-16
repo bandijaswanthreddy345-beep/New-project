@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
     "axios": "^1.18.1",
     "border-beam": "^1.4.1",
     "clsx": "^2.1.1",
@@ -24,15 +27,11 @@
     "react-router-dom": "^7.18.1",
     "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.1",
-    "thinking-orbs": "^0.3.2"
+    "thinking-orbs": "^0.3.2",
+    "vite": "^8.1.0"
   },
   "devDependencies": {
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.2",
     "oxlint": "^1.69.0",
-    "sharp": "^0.35.5",
-    "vite": "^8.1.0",
     "vitest": "^5.1.0"
   }
 }

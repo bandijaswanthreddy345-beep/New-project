@@ -11,7 +11,6 @@ let isInitialized = false;
 
 function initErrorTracker(app) {
   if (!SENTRY_DSN) {
-    logger.info("Error tracking (Sentry) disabled: SENTRY_DSN not set");
     return;
   }
 
