@@ -5598,6 +5598,20 @@ textarea:focus-visible {
   box-sizing: border-box;
 }
 
+.notes-section .section-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: 0 auto 34px;
+}
+
+.notes-section .section-heading .section-tag {
+  position: static !important;
+  margin: 0 auto 12px auto !important;
+}
+
 .papers-section .section-heading,
 .lab-programs-section .section-heading,
 .notification-section .section-heading {

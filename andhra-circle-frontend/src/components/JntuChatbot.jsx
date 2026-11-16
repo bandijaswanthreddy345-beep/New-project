@@ -402,6 +402,7 @@ function JntuChatbot() {
   const [modalInput, setModalInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBarFocused, setIsBarFocused] = useState(false);
   const [thinkingState, setThinkingState] = useState("searching");
   const [thinkingLabel, setThinkingLabel] = useState("Searching verified resources...");
 
@@ -548,6 +549,19 @@ function JntuChatbot() {
       }, 100);
     }
   }, [isModalOpen, isTyping]);
+
+  // Lock body scroll and apply chatbot-modal-open class when modal is open
+  useEffect(() => {
+    if (isModalOpen && typeof document !== "undefined") {
+      document.body.classList.add("chatbot-modal-open");
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.classList.remove("chatbot-modal-open");
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isModalOpen]);
 
   // Handle ESC key to close modal overlay
   useEffect(() => {
@@ -1172,7 +1186,14 @@ function JntuChatbot() {
           HERO HOME COMMAND BAR (CLEAN TRIGGER BAR)
           ========================================================= */}
       <div className="hero-ai-bar-anchor">
-        <form className="hero-ai-bar" onSubmit={handleHeroSubmit}>
+        <form
+          className={`hero-ai-bar ${isBarFocused ? "is-focused" : ""}`}
+          onSubmit={handleHeroSubmit}
+          onClick={() => {
+            setIsBarFocused(true);
+            inputRef.current?.focus();
+          }}
+        >
           <div
             className={`hero-ai-avatar-badge ${isListening && listeningTarget === "hero" ? "is-listening" : ""}`}
             title={
@@ -1218,6 +1239,8 @@ function JntuChatbot() {
             }
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onFocus={() => setIsBarFocused(true)}
+            onBlur={() => setIsBarFocused(false)}
             onKeyDown={handleHeroKeyDown}
             aria-label="Ask JNTU AI"
             autoComplete="off"
@@ -1305,9 +1328,11 @@ function JntuChatbot() {
 
       {/* =========================================================
           POPUP MODAL & OVERLAY (COMMUNICATION IS DONE HERE)
-          Rendered via Portal to document.body to escape any parent stacking contexts
+          Rendered via React Portal directly into document.body
+          to eliminate any stacking context traps from parent/sibling
+          sections, 3D carousels, and floating action buttons.
           ========================================================= */}
-      {isModalOpen && createPortal(
+      {isModalOpen && typeof document !== "undefined" && createPortal(
         <div
           className="chat-modal-overlay"
           onClick={(e) => {

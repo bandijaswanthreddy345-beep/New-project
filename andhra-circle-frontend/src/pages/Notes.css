@@ -218,6 +218,21 @@
   object-fit: cover;
   border: 1.5px solid rgba(255, 239, 179, 0.4);
   background: #013e37;
+  display: block;
+}
+
+.profile-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffefb3;
+  background: linear-gradient(135deg, #0d453c 0%, #012420 100%);
+  border: 1.5px solid rgba(255, 239, 179, 0.45);
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.1);
+}
+
+.profile-avatar-fallback svg {
+  display: block;
 }
 
 .profile-avatar-placeholder {
@@ -261,12 +276,14 @@
 .profile-info {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   flex: 1;
+  min-width: 0;
 }
 
 .profile-name {
   color: #ffffff;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 750;
   line-height: 1.25;
 }
@@ -486,15 +503,18 @@
 
 .notes-search-metal-wrap {
   position: absolute;
-  left: 6px;
+  left: 7px;
   top: 50%;
   transform: translateY(-50%);
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  z-index: 10;
   width: 28px;
   height: 28px;
+  pointer-events: auto;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .notes-search-metal-wrap .metal-search-wrapper {
@@ -502,6 +522,12 @@
   height: 28px !important;
   min-width: 28px !important;
   min-height: 28px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .notes-metal-search-btn {
@@ -509,11 +535,20 @@
   height: 28px !important;
   min-width: 28px !important;
   min-height: 28px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  cursor: pointer;
 }
 
 .notes-metal-search-btn .metal-search-icon {
   width: 13.5px !important;
   height: 13.5px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .notes-search-input {
@@ -792,8 +827,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 18px;
   box-shadow: 0 2px 8px rgba(1, 62, 55, 0.04);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
 
 .notes-folder-card:hover {
@@ -802,10 +839,17 @@
   transform: translateY(-2px);
 }
 
+.notes-folder-card:focus-visible {
+  outline: 2px solid #013e37;
+  outline-offset: 2px;
+}
+
 .folder-card-left {
   display: flex;
   align-items: center;
   gap: 18px;
+  flex: 1;
+  min-width: 0;
 }
 
 .folder-svg-icon {
@@ -818,7 +862,9 @@
 .folder-card-meta {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
 }
 
 .folder-card-title {
@@ -827,34 +873,76 @@
   color: #012622;
   margin: 0;
   letter-spacing: -0.2px;
+  word-break: break-word;
 }
 
 .folder-card-sub {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
+  gap: 6px 8px;
+  font-size: 12px;
   color: #2d544f;
   margin: 0;
   font-weight: 500;
 }
 
-.folder-branch-tag {
-  display: inline-block;
-  padding: 1px 7px;
-  border-radius: 5px;
-  font-size: 11px;
+/* Individual Metadata Tag Pills (Guaranteed No Internal Wrap) */
+.folder-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2.5px 8.5px;
+  border-radius: 6px;
+  font-size: 11.5px;
   font-weight: 700;
-  background: #e6f3f1;
-  color: #013e37;
-  letter-spacing: 0.3px;
+  line-height: 1.25;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  letter-spacing: 0.2px;
+  transition: all 0.15s ease;
 }
 
-/* Card Actions (Download + View) */
+.folder-branch-tag {
+  background: #e6f3f1;
+  color: #013e37;
+  border: 1px solid rgba(1, 62, 55, 0.14);
+}
+
+.folder-sem-tag {
+  background: #f0f7f5;
+  color: #02594f;
+  border: 1px solid #d2e7e1;
+  font-weight: 600;
+}
+
+.folder-scheme-tag {
+  background: #fdf8eb;
+  color: #875f00;
+  border: 1px solid #f1e1af;
+  font-weight: 600;
+}
+
+.folder-code-tag {
+  background: #f4f6f8;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+}
+
+/* Card Actions (View) */
 .folder-card-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Views and downloads stats on card - visible ONLY on mobile version */
+.folder-card-stats-mobile {
+  display: none !important;
 }
 
 .folder-download-btn {
@@ -934,17 +1022,28 @@
   background: radial-gradient(ellipse at 35% 20%, #07574c 0%, #01352f 72%, #00241f 100%) !important;
   color: #ffefb3;
   border: 1px solid rgba(255, 239, 179, 0.48) !important;
-  padding: 8px 22px;
+  padding: 8px 20px;
   border-radius: 999px;
   font-size: 13.5px;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.2s ease;
   letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   box-shadow:
     0 4px 12px rgba(0, 36, 31, 0.28),
     inset 0 1px 1px rgba(255, 255, 255, 0.24),
     inset 0 -2px 3px rgba(0, 0, 0, 0.32) !important;
+}
+
+.folder-view-btn-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  opacity: 0.95;
 }
 
 .folder-view-btn:focus-visible {
@@ -1262,13 +1361,191 @@
   }
 
   .notes-folder-card {
-    flex-wrap: wrap;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .notes-folder-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 16px;
     gap: 12px;
+    border-radius: 14px;
+  }
+
+  .folder-card-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    width: 100%;
+  }
+
+  .folder-svg-icon {
+    width: 36px;
+    height: 30px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .folder-card-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .folder-card-title {
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 750;
+    color: #012622;
+    word-break: break-word;
+  }
+
+  .folder-card-sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 7px;
+    margin-top: 2px;
+    width: 100%;
+  }
+
+  .folder-tag {
+    font-size: 11px;
+    padding: 2.5px 7.5px;
+    white-space: nowrap !important;
   }
 
   .folder-card-actions {
     width: 100%;
-    justify-content: flex-end;
+    margin-top: 2px;
+    padding-top: 10px;
+    border-top: 1px solid #edf5f2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  /* Left-side views and downloads stats (visible only in mobile version) */
+  .folder-card-stats-mobile {
+    display: flex !important;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13.5px;
+    font-weight: 750;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .folder-stat-views {
+    color: #0d9488;
+  }
+
+  .folder-stat-views svg {
+    color: #0d9488;
+    stroke: currentColor;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-views .folder-stat-count {
+    color: #0f766e;
+    font-weight: 800;
+    font-size: 13px;
+  }
+
+  .folder-stat-downloads {
+    color: #2563eb;
+  }
+
+  .folder-stat-downloads svg {
+    color: #2563eb;
+    stroke: currentColor;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-downloads .folder-stat-count {
+    color: #1d4ed8;
+    font-weight: 800;
+    font-size: 13px;
+  }
+
+  .folder-stat-likes {
+    color: #e11d48;
+  }
+
+  .folder-stat-likes svg {
+    color: #e11d48;
+    fill: currentColor;
+    width: 13.5px;
+    height: 13.5px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-likes .folder-stat-count {
+    color: #be123c;
+    font-weight: 800;
+    font-size: 13px;
+  }
+
+  /* Minimized right-aligned View button on mobile */
+  .folder-view-metal-wrap {
+    width: auto !important;
+    display: inline-flex !important;
+    border-radius: 999px !important;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .folder-view-btn {
+    width: auto !important;
+    min-height: 33px !important;
+    height: 33px !important;
+    padding: 0 16px !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    letter-spacing: 0.2px !important;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .folder-view-btn-icon {
+    width: 13.5px !important;
+    height: 13.5px !important;
+    flex-shrink: 0;
+  }
+
+  .notes-search-metal-wrap {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 10 !important;
+  }
+
+  .notes-search-metal-wrap .metal-search-wrapper,
+  .notes-metal-search-btn {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 }
 
@@ -1326,5 +1603,66 @@
     grid-column: auto;
     overflow: hidden;
     border-radius: 12px;
+  }
+
+  .notes-folder-card {
+    padding: 13px 13px;
+    gap: 10px;
+  }
+
+  .folder-card-left {
+    gap: 11px;
+  }
+
+  .folder-svg-icon {
+    width: 32px;
+    height: 27px;
+  }
+
+  .folder-card-title {
+    font-size: 14.5px;
+  }
+
+  .folder-card-sub {
+    gap: 5px 6px;
+  }
+
+  .folder-tag {
+    font-size: 10.5px;
+    padding: 2px 6.5px;
+  }
+
+  .folder-card-actions {
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .folder-card-stats-mobile {
+    gap: 10px;
+  }
+
+  .folder-stat-chip {
+    font-size: 12.5px;
+    gap: 4px;
+  }
+
+  .folder-stat-views svg,
+  .folder-stat-downloads svg,
+  .folder-stat-likes svg {
+    width: 13.5px;
+    height: 13.5px;
+  }
+
+  .folder-stat-views .folder-stat-count,
+  .folder-stat-downloads .folder-stat-count,
+  .folder-stat-likes .folder-stat-count {
+    font-size: 12px;
+  }
+
+  .folder-view-btn {
+    padding: 0 14px !important;
+    font-size: 12px !important;
+    height: 31px !important;
+    min-height: 31px !important;
   }
 }
