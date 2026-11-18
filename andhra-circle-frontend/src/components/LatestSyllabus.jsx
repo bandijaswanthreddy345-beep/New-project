@@ -414,6 +414,63 @@ function LatestSyllabus({ search = "" }) {
                 {/* Spacer */}
                 <div className="resource-content-spacer" />
 
+                {/* Professional Metrics Bar & Like Section */}
+                <div className="resource-stats">
+                  <div className="resource-stats-left">
+                    <span
+                      className="stat-chip stat-chip-views"
+                      title={`${item.views || 0} Total Views`}
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span className="stat-count">{item.views || 0}</span>
+                    </span>
+
+                    <span
+                      className="stat-chip stat-chip-downloads"
+                      title={`${item.downloads || 0} Total Downloads`}
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                      </svg>
+                      <span className="stat-count">{item.downloads || 0}</span>
+                    </span>
+                  </div>
+
+                  <LikeReactionButton
+                    isLiked={likedSyllabusIds.has(item._id)}
+                    count={item.likes || 0}
+                    onToggle={(e) => handleToggleLike(item, e)}
+                    title={
+                      likedSyllabusIds.has(item._id)
+                        ? "Liked"
+                        : "Like syllabus copy"
+                    }
+                  />
+                </div>
+
                 {/* Action Buttons */}
                 <div className="resource-buttons">
                   <button

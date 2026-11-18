@@ -592,8 +592,39 @@ function LatestNotes({ search = "" }) {
                   {getSubjectSnippet(note)}
                 </p>
 
-                {/* Spacer to push buttons cleanly to bottom */}
+                {/* Spacer to push stats to bottom */}
                 <div className="resource-content-spacer" />
+
+                {/* ==========================================
+                    PROFESSIONAL METRICS & LIKE STATS BAR
+                ========================================== */}
+                <div className="resource-stats">
+                  <div className="resource-stats-left">
+                    <span className="stat-chip stat-chip-views" title={`${note.views || 0} Total Views`}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span className="stat-count">{note.views || 0}</span>
+                    </span>
+
+                    <span className="stat-chip stat-chip-downloads" title={`${note.downloads || 0} Total Downloads`}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                      </svg>
+                      <span className="stat-count">{note.downloads || 0}</span>
+                    </span>
+                  </div>
+
+                  <LikeReactionButton
+                    isLiked={likedNoteIds.has(note._id)}
+                    count={note.likes || 0}
+                    onToggle={(e) => handleToggleLike(note, e)}
+                    title={likedNoteIds.has(note._id) ? "Liked" : "Like note"}
+                  />
+                </div>
 
                 {/* ==========================================
                     ACTION BUTTONS

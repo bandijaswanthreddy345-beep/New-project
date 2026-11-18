@@ -1566,10 +1566,111 @@
 
   .folder-card-actions {
     width: 100%;
-    margin-top: 4px;
+    margin-top: 2px;
+    padding-top: 10px;
+    border-top: 1px solid #edf5f2;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  /* Left-side views and downloads stats (visible only in mobile version) */
+  .folder-card-stats-mobile {
+    display: flex !important;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13.5px;
+    font-weight: 750;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .folder-stat-views {
+    color: #0d9488;
+  }
+
+  .folder-stat-views svg {
+    color: #0d9488;
+    stroke: currentColor;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-views .folder-stat-count {
+    color: #0f766e;
+    font-weight: 800;
+    font-size: 13px;
+  }
+
+  .folder-stat-downloads {
+    color: #2563eb;
+  }
+
+  .folder-stat-downloads svg {
+    color: #2563eb;
+    stroke: currentColor;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-downloads .folder-stat-count {
+    color: #1d4ed8;
+    font-weight: 800;
+    font-size: 13px;
+  }
+
+  .folder-stat-likes {
+    color: #e11d48;
+  }
+
+  .folder-stat-likes svg {
+    color: #e11d48;
+    fill: currentColor;
+    width: 13.5px;
+    height: 13.5px;
+    flex-shrink: 0;
+  }
+
+  .folder-stat-likes .folder-stat-count {
+    color: #be123c;
+    font-weight: 800;
+    font-size: 13px;
+  }
+
+  .folder-stat-likes-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.15s ease;
+    user-select: none;
+  }
+
+  .folder-stat-likes-btn:hover {
+    transform: scale(1.12);
+  }
+
+  .folder-stat-likes-btn:active {
+    transform: scale(0.9);
+  }
+
+  .folder-stat-likes-btn.is-liked svg {
+    fill: #e11d48 !important;
+    color: #e11d48 !important;
+    filter: drop-shadow(0 0 4px rgba(225, 29, 72, 0.45));
   }
 
   /* Minimized right-aligned View button on mobile */
@@ -1703,8 +1804,30 @@
   }
 
   .folder-card-actions {
-    margin-top: 2px;
-    padding-top: 0;
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .folder-card-stats-mobile {
+    gap: 10px;
+  }
+
+  .folder-stat-chip {
+    font-size: 12.5px;
+    gap: 4px;
+  }
+
+  .folder-stat-views svg,
+  .folder-stat-downloads svg,
+  .folder-stat-likes svg {
+    width: 13.5px;
+    height: 13.5px;
+  }
+
+  .folder-stat-views .folder-stat-count,
+  .folder-stat-downloads .folder-stat-count,
+  .folder-stat-likes .folder-stat-count {
+    font-size: 12px;
   }
 
   .folder-view-btn {
