@@ -5,7 +5,7 @@ import API from "../api/api";
  * Delivers 0ms instantaneous data renders when the user opens the application.
  */
 
-const CACHE_PREFIX = "andhra_cache_v2_";
+const CACHE_PREFIX = "andhra_cache_v3_";
 const MEMORY_CACHE = new Map();
 const IN_FLIGHT_REQUESTS = new Map();
 
