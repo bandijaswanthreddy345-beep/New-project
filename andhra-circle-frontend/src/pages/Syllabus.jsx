@@ -7,6 +7,12 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { formatSemDisplay } from "../utils/validators";
 import { normalizeScheme } from "../utils/semester";
+import {
+  getCachedResource,
+  hasCachedResource,
+  fetchResourceWithCache,
+  updateCachedResourceItem,
+} from "../utils/resourceCache";
 import "./Syllabus.css";
 
 // Branch definitions matching homepage engineering departments
@@ -49,8 +55,8 @@ function Syllabus({ search: propSearch = "" }) {
 
   const isStandalonePage = location.pathname.startsWith("/syllabus") || location.pathname !== "/";
 
-  const [syllabusList, setSyllabusList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [syllabusList, setSyllabusList] = useState(() => getCachedResource("syllabus") || []);
+  const [loading, setLoading] = useState(() => !hasCachedResource("syllabus"));
   const [error, setError] = useState("");
 
   const urlSearch = searchParams.get("search") || searchParams.get("branch") || "";
@@ -77,25 +83,40 @@ function Syllabus({ search: propSearch = "" }) {
   });
 
   // ==========================================
-  // FETCH SYLLABUS DATA
+  // FETCH SYLLABUS DATA (STALE-WHILE-REVALIDATE)
   // ==========================================
   useEffect(() => {
     fetchSyllabus();
+
+    const handleUpdated = (e) => {
+      const fresh = e?.detail?.syllabus || getCachedResource("syllabus");
+      if (Array.isArray(fresh) && fresh.length > 0) {
+        setSyllabusList(fresh);
+        setLoading(false);
+      }
+    };
+    window.addEventListener("resourcesUpdated", handleUpdated);
+    return () => window.removeEventListener("resourcesUpdated", handleUpdated);
   }, []);
 
   const fetchSyllabus = async () => {
     try {
-      setLoading(true);
+      if (!hasCachedResource("syllabus")) {
+        setLoading(true);
+      }
       setError("");
-      const response = await API.get("/syllabus");
-      const data = Array.isArray(response.data) ? response.data : [];
-      setSyllabusList(data);
+      const data = await fetchResourceWithCache("syllabus", "/syllabus");
+      if (Array.isArray(data) && data.length > 0) {
+        setSyllabusList(data);
+      }
     } catch (err) {
       console.error("Fetch Syllabus Error:", err);
-      setError(
-        err.response?.data?.message || "Unable to load curriculum syllabus."
-      );
-      setSyllabusList([]);
+      if (!hasCachedResource("syllabus")) {
+        setError(
+          err.response?.data?.message || "Unable to load curriculum syllabus."
+        );
+        setSyllabusList([]);
+      }
     } finally {
       setLoading(false);
     }

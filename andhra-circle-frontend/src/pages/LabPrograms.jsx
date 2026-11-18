@@ -5,6 +5,12 @@ import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "../components/LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
 import { normalizeScheme } from "../utils/semester";
+import {
+  getCachedResource,
+  hasCachedResource,
+  fetchResourceWithCache,
+  updateCachedResourceItem,
+} from "../utils/resourceCache";
 
 const getLabSnippet = (program) => {
   if (program.description && program.description.trim().length > 10) {
@@ -19,8 +25,8 @@ const getLabSnippet = (program) => {
 function LabPrograms({ search = "" }) {
   const navigate = useNavigate();
 
-  const [labPrograms, setLabPrograms] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [labPrograms, setLabPrograms] = useState(() => getCachedResource("labs") || []);
+  const [loading, setLoading] = useState(() => !hasCachedResource("labs"));
   const [error, setError] = useState("");
   const [openingPdf, setOpeningPdf] = useState(null);
   const [downloadingPdf, setDownloadingPdf] = useState(null);
@@ -36,27 +42,42 @@ function LabPrograms({ search = "" }) {
   });
 
   // =========================================================
-  // FETCH LAB PROGRAMS
+  // FETCH LAB PROGRAMS (STALE-WHILE-REVALIDATE)
   // =========================================================
 
   useEffect(() => {
     fetchLabPrograms();
+
+    const handleUpdated = (e) => {
+      const fresh = e?.detail?.labPrograms || getCachedResource("labs");
+      if (Array.isArray(fresh) && fresh.length > 0) {
+        setLabPrograms(fresh);
+        setLoading(false);
+      }
+    };
+    window.addEventListener("resourcesUpdated", handleUpdated);
+    return () => window.removeEventListener("resourcesUpdated", handleUpdated);
   }, []);
 
   const fetchLabPrograms = async () => {
     try {
-      setLoading(true);
+      if (!hasCachedResource("labs")) {
+        setLoading(true);
+      }
       setError("");
 
-      const response = await API.get("/lab-programs");
-      const data = Array.isArray(response.data) ? response.data : [];
-      setLabPrograms(data);
+      const data = await fetchResourceWithCache("labs", "/lab-programs");
+      if (Array.isArray(data) && data.length > 0) {
+        setLabPrograms(data);
+      }
     } catch (err) {
       console.error("Lab Program Fetch Error:", err);
-      setError(
-        err.response?.data?.message || "Unable to load lab programs."
-      );
-      setLabPrograms([]);
+      if (!hasCachedResource("labs")) {
+        setError(
+          err.response?.data?.message || "Unable to load lab programs."
+        );
+        setLabPrograms([]);
+      }
     } finally {
       setLoading(false);
     }

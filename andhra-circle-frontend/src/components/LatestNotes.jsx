@@ -7,7 +7,12 @@ import LikeReactionButton from "./LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
 import { normalizeScheme } from "../utils/semester";
 import trigger100Hearts from "../utils/heartBurst";
-import { updateCachedResourceItem } from "../utils/resourceCache";
+import {
+  getCachedResource,
+  hasCachedResource,
+  fetchResourceWithCache,
+  updateCachedResourceItem,
+} from "../utils/resourceCache";
 
 const getSubjectSnippet = (item) => {
   if (item.description && item.description.trim().length > 10) {
@@ -22,8 +27,8 @@ const getSubjectSnippet = (item) => {
 function LatestNotes({ search = "" }) {
   const navigate = useNavigate();
 
-  const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [notes, setNotes] = useState(() => getCachedResource("notes") || []);
+  const [loading, setLoading] = useState(() => !hasCachedResource("notes"));
   const [blinkingNoteId, setBlinkingNoteId] = useState(null);
 
   // Double-tap heart pop animations & tap timer references
@@ -50,27 +55,39 @@ function LatestNotes({ search = "" }) {
   });
 
   // ==========================================
-  // FETCH NOTES
+  // FETCH NOTES (STALE-WHILE-REVALIDATE)
   // ==========================================
 
   useEffect(() => {
     fetchNotes();
+
+    const handleUpdated = (e) => {
+      const fresh = e?.detail?.notes || getCachedResource("notes");
+      if (Array.isArray(fresh) && fresh.length > 0) {
+        setNotes(fresh);
+        setLoading(false);
+      }
+    };
+    window.addEventListener("resourcesUpdated", handleUpdated);
+    return () => window.removeEventListener("resourcesUpdated", handleUpdated);
   }, []);
 
   const fetchNotes = async () => {
     try {
-      setLoading(true);
+      if (!hasCachedResource("notes")) {
+        setLoading(true);
+      }
 
-      const res = await API.get("/notes");
+      const data = await fetchResourceWithCache("notes", "/notes");
 
-      const data = Array.isArray(res.data)
-        ? res.data
-        : [];
-
-      setNotes(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setNotes(data);
+      }
     } catch (error) {
       console.error("Error fetching notes:", error);
-      setNotes([]);
+      if (!hasCachedResource("notes")) {
+        setNotes([]);
+      }
     } finally {
       setLoading(false);
     }

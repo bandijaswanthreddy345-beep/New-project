@@ -5,6 +5,12 @@ import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
 import { normalizeScheme } from "../utils/semester";
+import {
+  getCachedResource,
+  hasCachedResource,
+  fetchResourceWithCache,
+  updateCachedResourceItem,
+} from "../utils/resourceCache";
 
 const getSyllabusSnippet = (item) => {
   if (item.description && item.description.trim().length > 10) {
@@ -18,8 +24,8 @@ const getSyllabusSnippet = (item) => {
 
 function LatestSyllabus({ search = "" }) {
   const navigate = useNavigate();
-  const [syllabus, setSyllabus] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [syllabus, setSyllabus] = useState(() => getCachedResource("syllabus") || []);
+  const [loading, setLoading] = useState(() => !hasCachedResource("syllabus"));
   const [error, setError] = useState("");
 
   const [likedSyllabusIds, setLikedSyllabusIds] = useState(() => {
@@ -32,23 +38,38 @@ function LatestSyllabus({ search = "" }) {
   });
 
   // ==========================================
-  // FETCH SYLLABUS
+  // FETCH SYLLABUS (STALE-WHILE-REVALIDATE)
   // ==========================================
   useEffect(() => {
     fetchSyllabus();
+
+    const handleUpdated = (e) => {
+      const fresh = e?.detail?.syllabus || getCachedResource("syllabus");
+      if (Array.isArray(fresh) && fresh.length > 0) {
+        setSyllabus(fresh);
+        setLoading(false);
+      }
+    };
+    window.addEventListener("resourcesUpdated", handleUpdated);
+    return () => window.removeEventListener("resourcesUpdated", handleUpdated);
   }, []);
 
   const fetchSyllabus = async () => {
     try {
-      setLoading(true);
+      if (!hasCachedResource("syllabus")) {
+        setLoading(true);
+      }
       setError("");
-      const res = await API.get("/syllabus");
-      const data = Array.isArray(res.data) ? res.data : [];
-      setSyllabus(data);
+      const data = await fetchResourceWithCache("syllabus", "/syllabus");
+      if (Array.isArray(data) && data.length > 0) {
+        setSyllabus(data);
+      }
     } catch (err) {
       console.error("Error fetching syllabus:", err);
-      setError("Unable to load latest syllabus.");
-      setSyllabus([]);
+      if (!hasCachedResource("syllabus")) {
+        setError("Unable to load latest syllabus.");
+        setSyllabus([]);
+      }
     } finally {
       setLoading(false);
     }

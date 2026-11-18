@@ -5,6 +5,12 @@ import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import { formatSemDisplay } from "../utils/validators";
 import { normalizeScheme } from "../utils/semester";
+import {
+  getCachedResource,
+  hasCachedResource,
+  fetchResourceWithCache,
+  updateCachedResourceItem,
+} from "../utils/resourceCache";
 
 const getPaperSnippet = (paper) => {
   if (paper.description && paper.description.trim().length > 10) {
@@ -22,9 +28,9 @@ function QuestionPapers({ search = "" }) {
 
   const isStandalonePage = location.pathname.startsWith("/papers") || location.pathname !== "/";
 
-  const [papers, setPapers] = useState([]);
+  const [papers, setPapers] = useState(() => getCachedResource("papers") || []);
   const [blinkingPaperId, setBlinkingPaperId] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !hasCachedResource("papers"));
   const [error, setError] = useState("");
 
   // Instant resilient like reaction state
@@ -38,27 +44,42 @@ function QuestionPapers({ search = "" }) {
   });
 
   // ==========================================
-  // FETCH QUESTION PAPERS
+  // FETCH QUESTION PAPERS (STALE-WHILE-REVALIDATE)
   // ==========================================
 
   useEffect(() => {
     fetchPapers();
+
+    const handleUpdated = (e) => {
+      const fresh = e?.detail?.papers || getCachedResource("papers");
+      if (Array.isArray(fresh) && fresh.length > 0) {
+        setPapers(fresh);
+        setLoading(false);
+      }
+    };
+    window.addEventListener("resourcesUpdated", handleUpdated);
+    return () => window.removeEventListener("resourcesUpdated", handleUpdated);
   }, []);
 
   const fetchPapers = async () => {
     try {
-      setLoading(true);
+      if (!hasCachedResource("papers")) {
+        setLoading(true);
+      }
       setError("");
 
-      const response = await API.get("/papers");
-      const data = Array.isArray(response.data) ? response.data : [];
-      setPapers(data);
+      const data = await fetchResourceWithCache("papers", "/papers");
+      if (Array.isArray(data) && data.length > 0) {
+        setPapers(data);
+      }
     } catch (err) {
       console.error("Fetch Question Papers Error:", err);
-      setError(
-        err.response?.data?.message || "Unable to load question papers."
-      );
-      setPapers([]);
+      if (!hasCachedResource("papers")) {
+        setError(
+          err.response?.data?.message || "Unable to load question papers."
+        );
+        setPapers([]);
+      }
     } finally {
       setLoading(false);
     }

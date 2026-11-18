@@ -5,6 +5,11 @@ import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "./LikeReactionButton";
 import Footer from "./Footer";
 import AuthorProfile from "./AuthorProfile";
+import {
+  getCachedResource,
+  hasCachedResource,
+  fetchResourceWithCache,
+} from "../utils/resourceCache";
 
 // Curated official JNTU academic notices as standard fallback
 const CURATED_NOTICES = [
@@ -60,8 +65,8 @@ function Notifications({ search = "" }) {
   const urlSearch = searchParams.get("search") || "";
   const effectiveSearch = search || urlSearch;
 
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState(() => getCachedResource("notifications") || []);
+  const [loading, setLoading] = useState(() => !hasCachedResource("notifications"));
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -77,21 +82,40 @@ function Notifications({ search = "" }) {
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [toastMessage, setToastMessage] = useState("");
 
+  // ==========================================
+  // FETCH NOTIFICATIONS (STALE-WHILE-REVALIDATE)
+  // ==========================================
   useEffect(() => {
     fetchNotifications();
+
+    const handleUpdated = (e) => {
+      const fresh = e?.detail?.notifications || getCachedResource("notifications");
+      if (Array.isArray(fresh) && fresh.length > 0) {
+        setNotifications(fresh);
+        setLoading(false);
+      }
+    };
+    window.addEventListener("resourcesUpdated", handleUpdated);
+    return () => window.removeEventListener("resourcesUpdated", handleUpdated);
   }, []);
 
   const fetchNotifications = async () => {
     try {
-      setLoading(true);
+      if (!hasCachedResource("notifications")) {
+        setLoading(true);
+      }
       setError("");
 
-      const response = await API.get("/notifications");
-      setNotifications(Array.isArray(response.data) ? response.data : []);
-      setLastUpdated(new Date());
+      const data = await fetchResourceWithCache("notifications", "/notifications");
+      if (Array.isArray(data) && data.length > 0) {
+        setNotifications(data);
+        setLastUpdated(new Date());
+      }
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Unable to load notifications.");
+      if (!hasCachedResource("notifications")) {
+        setError(err.response?.data?.message || "Unable to load notifications.");
+      }
     } finally {
       setLoading(false);
     }

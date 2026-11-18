@@ -1,4 +1,5 @@
 import API from "../api/api.js";
+import { fetchResourceWithCache, getCachedResource } from "./resourceCache.js";
 import { R23_SUBJECTS_BY_BRANCH_SEM } from "../data/r23Subjects.js";
 
 // =========================================================================
@@ -767,15 +768,16 @@ export async function getAllResources(forceRefresh = false) {
   let dbResources = [];
   try {
     const [notesRes, papersRes, syllabusRes, notifsRes, labsRes] = await Promise.allSettled([
-      API.get("/notes"),
-      API.get("/papers"),
-      API.get("/syllabus"),
-      API.get("/notifications"),
-      API.get("/lab-programs"),
+      fetchResourceWithCache("notes", "/notes"),
+      fetchResourceWithCache("papers", "/papers"),
+      fetchResourceWithCache("syllabus", "/syllabus"),
+      fetchResourceWithCache("notifications", "/notifications"),
+      fetchResourceWithCache("labs", "/lab-programs"),
     ]);
 
     const extractArray = (res) => {
       if (res.status !== "fulfilled" || !res.value) return [];
+      if (Array.isArray(res.value)) return res.value;
       const data = res.value.data;
       if (Array.isArray(data)) return data;
       if (Array.isArray(data?.data)) return data.data;

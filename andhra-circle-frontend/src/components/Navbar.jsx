@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import { getStoredStudentData, getStudentAvatar, DEFAULT_STUDENT_AVATAR, logoutStudentProfile } from "../data/studentData";
+import { getCachedResource, fetchResourceWithCache } from "../utils/resourceCache";
 
 // Standard fallback notices for the pop-up preview
 const FALLBACK_NOTICES = [
@@ -126,12 +127,12 @@ function Navbar() {
     return isBTech;
   };
 
-  // Fetch real notifications and check for unseen B.Tech alerts
+  // Fetch real notifications and check for unseen B.Tech alerts (Cached & Deduplicated)
   const checkNotifications = async () => {
     try {
-      const res = await API.get("/notifications");
-      if (Array.isArray(res.data) && res.data.length > 0) {
-        const btechOnly = res.data.filter(isBTechNotice);
+      const data = await fetchResourceWithCache("notifications", "/notifications");
+      if (Array.isArray(data) && data.length > 0) {
+        const btechOnly = data.filter(isBTechNotice);
         setNotificationsList(btechOnly);
 
         const latest = btechOnly[0];

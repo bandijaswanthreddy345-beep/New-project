@@ -1,5 +1,6 @@
 import { useEffect, lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { prefetchHomeResources } from "./utils/resourceCache";
 
 // Home is loaded synchronously for fastest Initial Paint
 import Home from "./pages/Home";
@@ -107,6 +108,11 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  // Fast background prefetch of core resources & warm up backend
+  useEffect(() => {
+    prefetchHomeResources();
+  }, []);
 
   return (
     <>

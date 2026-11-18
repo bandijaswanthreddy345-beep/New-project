@@ -271,6 +271,7 @@ apiRouter.use((req, res, next) => {
 });
 
 apiRouter.use("/auth", require("./routes/authRoutes"));
+apiRouter.use("/feed", require("./routes/feedRoutes"));
 apiRouter.use("/upload", require("./routes/uploadRoutes"));
 apiRouter.use("/notes", require("./routes/noteRoutes"));
 apiRouter.use("/papers", require("./routes/paperRoutes"));
