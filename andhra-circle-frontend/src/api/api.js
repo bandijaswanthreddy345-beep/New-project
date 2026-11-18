@@ -24,7 +24,7 @@ export const BACKEND_URL = getBaseUrl();
 
 const API = axios.create({
   baseURL: `${BACKEND_URL}/api`,
-  timeout: 15000,
+  timeout: 45000,
 });
 
 // Simple in-memory client cache with TTL & request deduplication for read-only GET calls
@@ -107,7 +107,7 @@ API.interceptors.request.use(
   }
 );
 
-// Clear cache on mutating operations (POST, PUT, DELETE, PATCH)
+// Automatic retry interceptor for GET requests (handles Render cold-starts & transient connection glitches)
 API.interceptors.response.use(
   (response) => {
     const method = response.config?.method?.toLowerCase();
@@ -116,7 +116,29 @@ API.interceptors.response.use(
     }
     return response;
   },
-  (error) => {
+  async (error) => {
+    const config = error.config;
+    if (!config || (config.method && config.method.toLowerCase() !== "get")) {
+      return Promise.reject(error);
+    }
+
+    config.__retryCount = config.__retryCount || 0;
+    const maxRetries = 2;
+
+    const isRetryable =
+      error.code === "ECONNABORTED" ||
+      !error.response ||
+      error.response.status === 502 ||
+      error.response.status === 503 ||
+      error.response.status === 504;
+
+    if (isRetryable && config.__retryCount < maxRetries) {
+      config.__retryCount += 1;
+      const delayMs = config.__retryCount * 1500;
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      return API(config);
+    }
+
     return Promise.reject(error);
   }
 );

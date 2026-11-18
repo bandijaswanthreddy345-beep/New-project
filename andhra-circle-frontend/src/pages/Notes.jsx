@@ -17,8 +17,13 @@ import {
 import trigger100Hearts from "../utils/heartBurst";
 import "./Notes.css";
 
-// Branch definitions matching requested engineering departments: CSE, AIML, ME, CE, ECE, EEE
+// Branch definitions matching requested engineering departments: ALL, CSE, AIML, ME, CE, ECE, EEE
 const BRANCH_TABS = [
+  {
+    code: "ALL",
+    name: "All Branches",
+    aliases: ["all", "all branches", "*", "any"],
+  },
   {
     code: "CSE",
     name: "Computer Science Engineering",
@@ -120,7 +125,8 @@ const RESOURCE_CONFIG = {
     eyebrow: "JNTU Circle · Study Library",
     title: "Notes & Study Materials",
     subtitle: "Find lecture notes, module guides, and study resources for your engineering branch.",
-    searchPlaceholder: (branch) => `Search ${branch} notes, subjects, codes...`,
+    searchPlaceholder: (branch) =>
+      branch && branch !== "ALL" ? `Search ${branch} notes, subjects, codes...` : "Search all notes, subjects, codes...",
     emptyTitle: "No Notes Available",
     emptyDesc: "No study materials match your search or filter criteria for this department.",
   },
@@ -130,7 +136,8 @@ const RESOURCE_CONFIG = {
     eyebrow: "JNTU Circle · University Papers",
     title: "Question Papers",
     subtitle: "Access previous semester exam question papers, mid tests, and model papers.",
-    searchPlaceholder: (branch) => `Search ${branch} question papers, exams, years...`,
+    searchPlaceholder: (branch) =>
+      branch && branch !== "ALL" ? `Search ${branch} question papers, exams, years...` : "Search all question papers, exams, years...",
     emptyTitle: "No Question Papers Available",
     emptyDesc: "No examination papers match your search or filter criteria for this department.",
   },
@@ -140,7 +147,8 @@ const RESOURCE_CONFIG = {
     eyebrow: "JNTU Circle · Academic Curriculum",
     title: "Syllabus",
     subtitle: "Official university course curriculum, subject units, and academic regulations.",
-    searchPlaceholder: (branch) => `Search ${branch} syllabus, subjects, regulations...`,
+    searchPlaceholder: (branch) =>
+      branch && branch !== "ALL" ? `Search ${branch} syllabus, subjects, regulations...` : "Search all syllabus, subjects, regulations...",
     emptyTitle: "No Syllabus Available",
     emptyDesc: "No curriculum records match your search or filter criteria for this department.",
   },
@@ -150,7 +158,8 @@ const RESOURCE_CONFIG = {
     eyebrow: "JNTU Circle · Laboratory Manuals",
     title: "Lab Programs",
     subtitle: "Practical experiment codes, laboratory records, and viva preparation manuals.",
-    searchPlaceholder: (branch) => `Search ${branch} lab programs, experiments, codes...`,
+    searchPlaceholder: (branch) =>
+      branch && branch !== "ALL" ? `Search ${branch} lab programs, experiments, codes...` : "Search all lab programs, experiments, codes...",
     emptyTitle: "No Lab Programs Available",
     emptyDesc: "No laboratory materials match your search or filter criteria for this department.",
   },
@@ -189,13 +198,13 @@ function Notes({ initialType }) {
     setActiveResource(detected);
   }, [getResourceFromPath]);
 
-  // Initial branch from URL param or default to "CSE"
-  const urlBranch = (searchParams.get("branch") || searchParams.get("search") || "CSE").toUpperCase();
+  // Initial branch from URL param or default to "ALL"
+  const urlBranch = (searchParams.get("branch") || searchParams.get("search") || "ALL").toUpperCase();
   const matchedTab = BRANCH_TABS.find((tab) =>
     noteMatchesBranch(urlBranch, tab)
   );
 
-  const [activeBranch, setActiveBranch] = useState(matchedTab ? matchedTab.code : "CSE");
+  const [activeBranch, setActiveBranch] = useState(matchedTab ? matchedTab.code : "ALL");
   const [selectedSemester, setSelectedSemester] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -461,7 +470,7 @@ function Notes({ initialType }) {
           title: displayTitle,
           semester: sem,
           scheme: normalizeScheme(p),
-          branchCode: activeBranch,
+          branchCode: p.branch || (activeBranch === "ALL" ? "ALL" : activeBranch),
           extraBadge: metaItems.join(" • "),
           pdfUrl: p.pdfUrl || "",
           resourceType: "papers",
@@ -497,7 +506,7 @@ function Notes({ initialType }) {
           title: title,
           semester: sem,
           scheme: normalizeScheme(s),
-          branchCode: activeBranch,
+          branchCode: s.branch || (activeBranch === "ALL" ? "ALL" : activeBranch),
           extraBadge: metaItems.join(" • "),
           pdfUrl: s.pdfUrl || "",
           resourceType: "syllabus",
@@ -531,7 +540,7 @@ function Notes({ initialType }) {
           title: title,
           semester: sem,
           scheme: normalizeScheme(l),
-          branchCode: activeBranch,
+          branchCode: l.branch || (activeBranch === "ALL" ? "ALL" : activeBranch),
           extraBadge: metaItems.join(" • "),
           pdfUrl: l.pdfUrl || "",
           resourceType: "labs",

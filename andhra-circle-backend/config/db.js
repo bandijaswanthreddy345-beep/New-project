@@ -1,8 +1,44 @@
 const mongoose = require("mongoose");
 const logger = require("../utils/logger");
 
-const RETRY_INTERVAL_MS = 2000;
-const MAX_STARTUP_RETRIES = 5;
+const RETRY_INTERVAL_MS = 3000;
+const MAX_STARTUP_RETRIES = 10;
+
+let isReconnecting = false;
+let reconnectTimer = null;
+
+const scheduleReconnect = (uri, delayMs = 5000) => {
+  if (isReconnecting || mongoose.connection.readyState === 1) return;
+  if (reconnectTimer) clearTimeout(reconnectTimer);
+
+  isReconnecting = true;
+  logger.info(`[MongoDB] Scheduling auto-reconnect in ${Math.round(delayMs / 1000)}s...`);
+
+  reconnectTimer = setTimeout(async () => {
+    isReconnecting = false;
+    if (mongoose.connection.readyState === 1) return;
+
+    try {
+      logger.info("[MongoDB] Attempting reconnection to database...");
+      await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 20000,
+        connectTimeoutMS: 20000,
+        socketTimeoutMS: 45000,
+        maxPoolSize: 20,
+        minPoolSize: 2,
+        heartbeatFrequencyMS: 10000,
+        retryWrites: true,
+        w: "majority",
+      });
+      logger.info("[MongoDB] Successfully reconnected to database!");
+    } catch (err) {
+      logger.warn("[MongoDB] Reconnection attempt failed:", { error: err.message });
+      // Exponential backoff up to 20 seconds
+      const nextDelay = Math.min(delayMs * 1.5, 20000);
+      scheduleReconnect(uri, nextDelay);
+    }
+  }, delayMs);
+};
 
 const connectDB = async () => {
   const primaryUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/andhra-circle";
@@ -27,11 +63,14 @@ const connectDB = async () => {
       attempts++;
       try {
         const connection = await mongoose.connect(primaryUri, {
-          serverSelectionTimeoutMS: 5000,
-          connectTimeoutMS: 5000,
-          socketTimeoutMS: 30000,
-          maxPoolSize: 10,
+          serverSelectionTimeoutMS: 20000,
+          connectTimeoutMS: 20000,
+          socketTimeoutMS: 45000,
+          maxPoolSize: 20,
           minPoolSize: 2,
+          heartbeatFrequencyMS: 10000,
+          retryWrites: true,
+          w: "majority",
         });
 
         const isAtlas = connection.connection.host.includes("mongodb.net");
@@ -48,8 +87,8 @@ const connectDB = async () => {
           error: error.message,
         });
 
-        // If primary is Atlas and IP is blocked or network unavailable, attempt seamless fallback to local MongoDB
-        if (primaryUri !== localFallbackUri) {
+        // In local development only, attempt local MongoDB fallback
+        if (process.env.NODE_ENV !== "production" && primaryUri !== localFallbackUri) {
           try {
             logger.info("Attempting local MongoDB fallback at 127.0.0.1:27017...");
             const localConn = await mongoose.connect(localFallbackUri, {
@@ -70,17 +109,12 @@ const connectDB = async () => {
         }
 
         if (attempts >= MAX_STARTUP_RETRIES) {
-          logger.error("FATAL: MongoDB is not reachable (neither Atlas nor local MongoDB).", {
+          logger.error("MongoDB initial connection attempts exhausted. Server will stay online and retry in background.", {
             attempts,
           });
-
-          if (process.env.NODE_ENV === "production") {
-            process.exit(1);
-          } else {
-            logger.error("Database unavailable. Database operations will return 503.", {});
-            mongoose.set("bufferCommands", false);
-            return;
-          }
+          // Do NOT crash process.exit(1); keep server up so Render/Cloudflare don't crash
+          scheduleReconnect(primaryUri, 5000);
+          return;
         }
 
         await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL_MS));
@@ -90,14 +124,23 @@ const connectDB = async () => {
 
   mongoose.connection.on("connected", () => {
     logger.info("MongoDB connection state: CONNECTED");
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+    }
+    isReconnecting = false;
   });
 
   mongoose.connection.on("disconnected", () => {
-    logger.warn("MongoDB connection state: DISCONNECTED");
+    logger.warn("MongoDB connection state: DISCONNECTED. Initiating automatic recovery...");
+    scheduleReconnect(primaryUri, 3000);
   });
 
   mongoose.connection.on("error", (err) => {
     logger.error("MongoDB runtime error", { error: err.message });
+    if (mongoose.connection.readyState !== 1) {
+      scheduleReconnect(primaryUri, 3000);
+    }
   });
 
   await tryConnect();

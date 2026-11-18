@@ -71,26 +71,40 @@ initErrorTracker(app);
 app.use(requestId);
 
 // ==========================
-// HEALTH ENDPOINTS (/healthz & /readyz)
+// HEALTH ENDPOINTS (/health, /healthz, /ready, /readyz)
 // ==========================
 
-// Process alive check (cheap, public, no sensitive data)
-app.get("/healthz", (req, res) => {
+const healthHandler = (req, res) => {
   res.status(200).json({
     status: "ok",
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || "development",
   });
-});
+};
 
-// MongoDB readiness check with short 2s timeout
-app.get("/readyz", async (req, res) => {
+// Process alive check (cheap, public, no sensitive data)
+app.get("/health", healthHandler);
+app.get("/healthz", healthHandler);
+app.get("/api/health", healthHandler);
+app.get("/api/v1/health", healthHandler);
+
+// MongoDB readiness check with short timeout
+const readyHandler = async (req, res) => {
+  // If in the middle of connecting (readyState === 2), give it a moment to finish
+  if (mongoose.connection.readyState === 2) {
+    const start = Date.now();
+    while (mongoose.connection.readyState === 2 && Date.now() - start < 3000) {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    }
+  }
+
   const isConnected = mongoose.connection.readyState === 1;
 
   if (!isConnected) {
     return res.status(503).json({
       status: "unavailable",
-      message: "MongoDB is not running at 127.0.0.1:27017. Start the MongoDB service.",
+      message: "Database service is initializing or reconnecting. Please retry in a moment.",
       readyState: mongoose.connection.readyState,
     });
   }
@@ -115,10 +129,17 @@ app.get("/readyz", async (req, res) => {
     logger.warn("Readiness check ping failed", { error: err.message });
     return res.status(503).json({
       status: "unavailable",
-      message: "MongoDB is not running at 127.0.0.1:27017. Start the MongoDB service.",
+      message: "Database ping timed out or service is temporarily busy.",
     });
   }
-});
+};
+
+app.get("/ready", readyHandler);
+app.get("/readyz", readyHandler);
+app.get("/api/ready", readyHandler);
+app.get("/api/readyz", readyHandler);
+app.get("/api/v1/ready", readyHandler);
+app.get("/api/v1/readyz", readyHandler);
 
 // ==========================
 // MIDDLEWARE
@@ -271,15 +292,35 @@ app.get("/", (req, res) => {
 
 const apiRouter = express.Router();
 
-// Database readiness guard for API routes: return clear 503 if MongoDB is down
-apiRouter.use((req, res, next) => {
-  if (req.path.startsWith("/notifications/proxy-pdf")) {
+// Database readiness guard for API routes: wait gracefully if connecting, return 503 only if truly offline
+apiRouter.use(async (req, res, next) => {
+  if (
+    req.path.startsWith("/notifications/proxy-pdf") ||
+    req.path === "/health" ||
+    req.path === "/healthz" ||
+    req.path === "/ready" ||
+    req.path === "/readyz"
+  ) {
     return next();
   }
+
+  // If connection is in progress (readyState === 2), give it up to 4 seconds to finish
+  if (mongoose.connection.readyState === 2) {
+    const start = Date.now();
+    while (mongoose.connection.readyState === 2 && Date.now() - start < 4000) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+  }
+
   if (mongoose.connection.readyState !== 1) {
+    // If it's a home feed read request and we have memory cache, let it pass to feed controller
+    if (req.path.startsWith("/feed")) {
+      return next();
+    }
     return res.status(503).json({
       success: false,
-      message: "MongoDB is not running at 127.0.0.1:27017. Start the MongoDB service.",
+      message: "Database service is initializing or reconnecting. Please retry in a moment.",
+      retryAfter: 3,
     });
   }
   next();
