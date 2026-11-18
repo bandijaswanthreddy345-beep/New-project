@@ -20,7 +20,7 @@
     },
     {
       "src": "/(.*)",
-      "headers": { "cache-control": "public, max-age=0, must-revalidate" },
+      "headers": { "cache-control": "public, max-age=0, must-revalidate, s-maxage=0" },
       "dest": "/index.html"
     }
   ]
