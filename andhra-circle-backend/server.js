@@ -232,27 +232,30 @@ const SAFE_UPLOAD_TYPES = new Set([
   ".webp",
 ]);
 
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"), {
-    dotfiles: "deny",
-    index: false,
-    maxAge: "7d",
-    etag: true,
-    lastModified: true,
-    setHeaders: (res, filePath) => {
-      res.setHeader("X-Content-Type-Options", "nosniff");
-      res.setHeader("Cache-Control", "public, max-age=604800, immutable");
+const uploadStaticOptions = {
+  dotfiles: "deny",
+  index: false,
+  maxAge: "7d",
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Cache-Control", "public, max-age=604800, immutable");
 
-      // Anything that is not a plain PDF/image (e.g. an old .html upload)
-      // is forced to download so it can never run as a web page.
-      if (!SAFE_UPLOAD_TYPES.has(path.extname(filePath).toLowerCase())) {
-        res.setHeader("Content-Type", "application/octet-stream");
-        res.setHeader("Content-Disposition", "attachment");
-      }
-    },
-  })
-);
+    // Anything that is not a plain PDF/image (e.g. an old .html upload)
+    // is forced to download so it can never run as a web page.
+    if (!SAFE_UPLOAD_TYPES.has(path.extname(filePath).toLowerCase())) {
+      res.setHeader("Content-Type", "application/octet-stream");
+      res.setHeader("Content-Disposition", "attachment");
+    }
+  },
+};
+
+// 1. Serve from andhra-circle-backend/uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads"), uploadStaticOptions));
+
+// 2. Fallback serve from root /uploads (for local dev and backward compatibility)
+app.use("/uploads", express.static(path.join(__dirname, "../uploads"), uploadStaticOptions));
 
 // ==========================
 // HOME ROUTE
