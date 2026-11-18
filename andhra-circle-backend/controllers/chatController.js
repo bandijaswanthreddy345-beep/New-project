@@ -77,7 +77,7 @@ async function underDailyCap() {
         $setOnInsert: { key, type: "ai_daily_cap" },
         $set: { expiresAt },
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: "after" }
     );
 
     return (doc.count <= DAILY_CAP);
@@ -325,20 +325,24 @@ exports.chat = async (req, res) => {
             model: gModel,
             messages: groqMessages,
             temperature: 0.3,
-            max_completion_tokens: 1024,
+            max_tokens: 1024,
           }),
         }, { breakerName: "groq", timeoutMs: TIMEOUT_MS });
 
         if (!response.ok) continue;
 
         const data = await response.json();
-        const reply = asString(data.choices?.[0]?.message?.content).trim();
+        let reply = asString(data.choices?.[0]?.message?.content).trim();
+        if (reply) {
+          reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+        }
         if (!reply) continue;
 
-        const { cleanReply, sources } = extractSourcesAndCleanReply(reply, retrievedItems);
         const payload = {
-          reply: cleanReply,
+          success: true,
+          reply: reply.slice(0, 4000),
           sources,
+          suggestedQuestions,
           provider: "groq",
           model: data.model || gModel,
         };
