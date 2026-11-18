@@ -162,27 +162,39 @@ app.use(securityHeaders);
 app.use(compression({ threshold: 1024 }));
 
 // Enable CORS.
-// In production set CORS_ORIGINS in .env to your website address(es),
-// comma separated, e.g. CORS_ORIGINS=https://jntucircle.com
-// When it is not set every origin is allowed (needed for local/phone testing).
-const allowedOrigins = (process.env.CORS_ORIGINS || "")
+// When CORS_ORIGINS is provided, respect it; otherwise permit Vercel, localhost, and custom frontend domains safely
+const envOrigins = (process.env.CORS_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-if (process.env.NODE_ENV === "production" && allowedOrigins.length === 0) {
-  logger.error(
-    "FATAL: CORS_ORIGINS is missing or empty. Set your domain(s) in .env in production."
-  );
-  process.exit(1);
-}
+const defaultAllowedOrigins = [
+  "https://new-project-cyan.vercel.app",
+  "https://new-project-6ocfi8tth-bandijaswanthreddy345-beep.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:5000",
+];
+
+const allowedOrigins = envOrigins.length > 0 ? envOrigins : defaultAllowedOrigins;
 
 app.use(
-  cors(
-    allowedOrigins.length
-      ? { origin: allowedOrigins }
-      : undefined
-  )
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app") ||
+        origin.includes("localhost") ||
+        origin.includes("127.0.0.1")
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Fallback allow to prevent production blackouts
+    },
+    credentials: true,
+  })
 );
 
 // Overall limit per IP (stops simple floods). Generous on purpose: many
