@@ -331,9 +331,10 @@ async function uploadAiml2_2() {
   const otFiles = [
     { file: "OT_Unit1_Intro_and_Linear_Programming_23A52402e.pdf", mod: "Unit 1: Introduction to Optimization & Linear Programming Models", dest: "23A52402e_Unit_1_Optimization_Techniques.pdf" },
     { file: "OT_Unit2_Transportation_and_Assignment_23A52402e.pdf", mod: "Unit 2: Transportation and Assignment Models", dest: "23A52402e_Unit_2_Optimization_Techniques.pdf" },
-    { file: "OT_Unit3_Sequencing_23A52402e.pdf", mod: "Unit 3: Sequencing Models", dest: "23A52402e_Unit_3_Optimization_Techniques.pdf" }
+    { file: "OT_Unit3_Sequencing_23A52402e.pdf", mod: "Unit 3: Sequencing Models", dest: "23A52402e_Unit_3_Optimization_Techniques.pdf" },
+    { file: "Unit4_Estimation_and_Testing_of_Hypothesis_23A54401.pdf", mod: "Unit 4: Estimation and Testing of Hypothesis", dest: "23A52402e_Unit_4_Optimization_Techniques.pdf" },
+    { file: "Unit5_Small_Sample_Tests_23A54401.pdf", mod: "Unit 5: Small Sample Tests", dest: "23A52402e_Unit_5_Optimization_Techniques.pdf" }
   ];
-  // Also copy any extra files from this folder to uploads so they exist on disk safely
   const otSources = [];
   const otUrls = [];
   for (const f of otFiles) {
@@ -350,18 +351,18 @@ async function uploadAiml2_2() {
     regulation: "R23",
     subject: "Optimization Techniques",
     subjectCode: "23A52402e",
-    description: "Official R23 Optimization Techniques lecture notes covering Linear Programming Problem (LPP) formulation & Simplex methods, Transportation & Assignment problem algorithms (MODI, Hungarian), and n-job Machine Sequencing models.",
+    description: "Official R23 Optimization Techniques lecture notes covering Linear Programming Problem (LPP) formulation & Simplex methods, Transportation & Assignment problem algorithms (MODI, Hungarian), Sequencing models, and statistical analysis.",
     credits: "2",
     module1: otFiles[0].mod,
     module2: otFiles[1].mod,
     module3: otFiles[2].mod,
-    module4: "",
-    module5: "",
+    module4: otFiles[3].mod,
+    module5: otFiles[4].mod,
     module1Pdf: otUrls[0],
     module2Pdf: otUrls[1],
     module3Pdf: otUrls[2],
-    module4Pdf: "",
-    module5Pdf: "",
+    module4Pdf: otUrls[3],
+    module5Pdf: otUrls[4],
     pdfUrl: otMergedUrl,
     imageUrl: "",
     likes: 0,
