@@ -405,6 +405,14 @@
   border-left: 1.5px solid #dce8e4;
 }
 
+.hero-subject-item:first-child,
+.hero-subject-item:only-child,
+.hero-subject-code:first-child,
+.hero-subject-code:only-child {
+  padding-left: 0;
+  border-left: none;
+}
+
 .hero-tag-label {
   display: block;
   margin-bottom: 5px;
@@ -2454,6 +2462,12 @@
     padding-left: 14px;
     border-top: 0;
     border-left: 1px solid rgba(1, 62, 55, 0.12);
+  }
+
+  .hero-subject-code:first-child,
+  .hero-subject-code:only-child {
+    padding-left: 0 !important;
+    border-left: none !important;
   }
 
   .note-main {

@@ -444,6 +444,17 @@ function NoteDetails() {
   const branch = note?.branch || "";
   const semester = normalizeSemester(note?.semester || "");
 
+  // Prevent duplicate subject name display if title already contains or equals the subject name
+  const normTitle = String(title || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  const normSubject = String(subject || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  const isSubjectDuplicate =
+    !subject ||
+    !normSubject ||
+    normTitle === normSubject ||
+    normTitle.includes(normSubject) ||
+    normSubject.includes(normTitle);
+
   // =========================================================
   // CREDITS
   // =========================================================
@@ -1176,9 +1187,9 @@ function NoteDetails() {
                 <h1>{title}</h1>
               </div>
 
-              {(subject || subjectCode) && (
+              {((subject && !isSubjectDuplicate) || subjectCode) && (
                 <div className="hero-subject-details">
-                  {subject && (
+                  {subject && !isSubjectDuplicate && (
                     <div className="hero-subject-item">
                       <span>SUBJECT</span>
                       <strong>{subject}</strong>

@@ -586,6 +586,12 @@
     text-align: left !important;
   }
 
+  .hero-subject-code:first-child,
+  .hero-subject-code:only-child {
+    padding-left: 0 !important;
+    border-left: none !important;
+  }
+
   .hero-subject-code>span {
     margin-bottom: 2px !important;
   }
