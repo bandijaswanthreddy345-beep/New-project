@@ -278,6 +278,78 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"), uploadStatic
 // 2. Fallback serve from root /uploads (for local dev and backward compatibility)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"), uploadStaticOptions));
 
+// 3. Intelligent fallback for /uploads/:filename (resolves naming variations, case sensitivity, aliases)
+app.get("/uploads/:filename", (req, res, next) => {
+  const rawRequested = decodeURIComponent(req.params.filename || "").split("?")[0].split("#")[0];
+  if (!rawRequested) return next();
+
+  const uploadsDir1 = path.join(__dirname, "uploads");
+  const uploadsDir2 = path.join(__dirname, "../uploads");
+
+  // Direct check
+  for (const dir of [uploadsDir1, uploadsDir2]) {
+    const directPath = path.join(dir, rawRequested);
+    if (fs.existsSync(directPath)) {
+      return res.sendFile(directPath);
+    }
+  }
+
+  // Alias / Variation checks
+  const variations = [
+    rawRequested.replace("_Complete_Notes", ""),
+    rawRequested.replace("_Lab_Manual", "_Lab"),
+    rawRequested.replace("_Manual", ""),
+    rawRequested.replace(/[-_]/g, "_"),
+    rawRequested.replace(/[-_]/g, "-"),
+  ];
+
+  const files1 = fs.existsSync(uploadsDir1) ? fs.readdirSync(uploadsDir1) : [];
+  const files2 = fs.existsSync(uploadsDir2) ? fs.readdirSync(uploadsDir2) : [];
+  const allFiles = [...new Set([...files1, ...files2])];
+
+  // Try variations
+  for (const v of variations) {
+    if (v && v !== rawRequested) {
+      for (const dir of [uploadsDir1, uploadsDir2]) {
+        const p = path.join(dir, v);
+        if (fs.existsSync(p)) {
+          return res.sendFile(p);
+        }
+      }
+    }
+  }
+
+  // Prefix match (e.g. course code prefix 23A03601T)
+  const codeMatch = rawRequested.match(/^([0-9]{2}[A-Z][0-9]{2,5}[a-z]?)/i);
+  if (codeMatch) {
+    const code = codeMatch[1].toLowerCase();
+    const candidate = allFiles.find((f) => f.toLowerCase().startsWith(code) && f.toLowerCase().endsWith(".pdf"));
+    if (candidate) {
+      for (const dir of [uploadsDir1, uploadsDir2]) {
+        const p = path.join(dir, candidate);
+        if (fs.existsSync(p)) {
+          return res.sendFile(p);
+        }
+      }
+    }
+  }
+
+  // Fallback to sample_study_material.pdf if requested is a sample or general PDF
+  if (rawRequested.toLowerCase().includes("sample")) {
+    for (const dir of [uploadsDir1, uploadsDir2]) {
+      const p = path.join(dir, "sample_study_material.pdf");
+      if (fs.existsSync(p)) {
+        return res.sendFile(p);
+      }
+    }
+  }
+
+  return res.status(404).json({
+    status: "fail",
+    message: `Requested file '${rawRequested}' not found on server.`,
+  });
+});
+
 // ==========================
 // HOME ROUTE
 // ==========================
