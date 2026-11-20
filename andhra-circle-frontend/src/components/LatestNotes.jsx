@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
@@ -259,33 +259,27 @@ function LatestNotes({ search = "" }) {
   };
 
   // ==========================================
-  // SEARCH FILTER
+  // SEARCH FILTER (MEMOIZED & OPTIMIZED)
   // ==========================================
 
   const searchText = String(search || "")
     .trim()
     .toLowerCase();
 
-  const filteredNotes = notes.filter((note) => {
-    if (!searchText) return true;
-    return (
-      String(note.title || "")
-        .toLowerCase()
-        .includes(searchText) ||
-      String(note.branch || "")
-        .toLowerCase()
-        .includes(searchText) ||
-      String(note.semester || "")
-        .toLowerCase()
-        .includes(searchText) ||
-      String(note.subject || "")
-        .toLowerCase()
-        .includes(searchText) ||
-      String(note.description || "")
-        .toLowerCase()
-        .includes(searchText)
+  const filteredNotes = useMemo(() => {
+    if (!searchText) return notes;
+    return notes.filter((note) =>
+      String(note.title || "").toLowerCase().includes(searchText) ||
+      String(note.branch || "").toLowerCase().includes(searchText) ||
+      String(note.semester || "").toLowerCase().includes(searchText) ||
+      String(note.subject || "").toLowerCase().includes(searchText) ||
+      String(note.description || "").toLowerCase().includes(searchText)
     );
-  });
+  }, [notes, searchText]);
+
+  const displayedNotes = useMemo(() => {
+    return filteredNotes.slice(0, 12);
+  }, [filteredNotes]);
 
   // ==========================================
   // IMAGE URL
@@ -518,7 +512,7 @@ function LatestNotes({ search = "" }) {
         </div>
       ) : (
         <div className="notes-grid">
-          {filteredNotes.map((note) => (
+          {displayedNotes.map((note) => (
             <article
               className="resource-card"
               key={note._id}
@@ -541,6 +535,8 @@ function LatestNotes({ search = "" }) {
                 <img
                   src={getImageUrl(note.imageUrl)}
                   alt={getDisplayTitle(note)}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = defaultBanner;
@@ -661,7 +657,17 @@ function LatestNotes({ search = "" }) {
         </div>
       )}
 
-
+      {filteredNotes.length > 12 && (
+        <div className="view-more-container">
+          <button
+            type="button"
+            className="view-all-resources-btn"
+            onClick={() => navigate("/notes")}
+          >
+            View All Notes ({filteredNotes.length}) →
+          </button>
+        </div>
+      )}
     </section>
   );
 }

@@ -353,7 +353,7 @@ exports.chat = async (req, res) => {
 
         return res.json(payload);
       } catch (err) {
-        console.error(`Groq error (${gModel}):`, err.name || err.message);
+        console.error(`Groq error (${gModel}):`, err.message || err.name);
       }
     }
   }

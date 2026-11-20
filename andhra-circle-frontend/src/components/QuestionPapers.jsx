@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
@@ -86,14 +86,14 @@ function QuestionPapers({ search = "" }) {
   };
 
   // ==========================================
-  // SEARCH FILTER
+  // SEARCH FILTER (MEMOIZED & OPTIMIZED)
   // ==========================================
 
   const searchText = String(search || "").trim().toLowerCase();
 
-  const filteredPapers = papers.filter((paper) => {
-    if (!searchText) return true;
-    return (
+  const filteredPapers = useMemo(() => {
+    if (!searchText) return papers;
+    return papers.filter((paper) =>
       String(paper.title || "").toLowerCase().includes(searchText) ||
       String(paper.branch || "").toLowerCase().includes(searchText) ||
       String(paper.semester || "").toLowerCase().includes(searchText) ||
@@ -102,7 +102,11 @@ function QuestionPapers({ search = "" }) {
       String(paper.subject || "").toLowerCase().includes(searchText) ||
       String(paper.subjectCode || "").toLowerCase().includes(searchText)
     );
-  });
+  }, [papers, searchText]);
+
+  const displayedPapers = useMemo(() => {
+    return isStandalonePage ? filteredPapers : filteredPapers.slice(0, 12);
+  }, [filteredPapers, isStandalonePage]);
 
   // ==========================================
   // TITLE & CONTEXT HELPERS
@@ -430,13 +434,15 @@ function QuestionPapers({ search = "" }) {
         </div>
       ) : (
         <div className="papers-grid">
-          {filteredPapers.map((paper) => (
+          {displayedPapers.map((paper) => (
             <article className="resource-card" key={paper._id}>
               {/* Cover Banner */}
               <div className="resource-image">
                 <img
                   src={defaultBanner}
                   alt={getPaperDisplayTitle(paper)}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <span className="read-time">
                   {paper.examType || "Question Paper"}
@@ -543,6 +549,18 @@ function QuestionPapers({ search = "" }) {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {!isStandalonePage && filteredPapers.length > 12 && (
+        <div className="view-more-container">
+          <button
+            type="button"
+            className="view-all-resources-btn"
+            onClick={() => navigate("/papers")}
+          >
+            View All Question Papers ({filteredPapers.length}) →
+          </button>
         </div>
       )}
     </section>

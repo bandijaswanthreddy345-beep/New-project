@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
@@ -76,13 +76,13 @@ function LatestSyllabus({ search = "" }) {
   };
 
   // ==========================================
-  // SEARCH FILTER
+  // SEARCH FILTER (MEMOIZED & OPTIMIZED)
   // ==========================================
   const searchText = String(search || "").trim().toLowerCase();
 
-  const filteredSyllabus = syllabus.filter((item) => {
-    if (!searchText) return true;
-    return (
+  const filteredSyllabus = useMemo(() => {
+    if (!searchText) return syllabus;
+    return syllabus.filter((item) =>
       String(item.title || "").toLowerCase().includes(searchText) ||
       String(item.branch || "").toLowerCase().includes(searchText) ||
       String(item.semester || "").toLowerCase().includes(searchText) ||
@@ -90,7 +90,11 @@ function LatestSyllabus({ search = "" }) {
       String(item.subjectCode || "").toLowerCase().includes(searchText) ||
       String(item.description || "").toLowerCase().includes(searchText)
     );
-  });
+  }, [syllabus, searchText]);
+
+  const displayedSyllabus = useMemo(() => {
+    return filteredSyllabus.slice(0, 12);
+  }, [filteredSyllabus]);
 
   // ==========================================
   // HELPERS
@@ -359,13 +363,15 @@ function LatestSyllabus({ search = "" }) {
         </div>
       ) : (
         <div className="papers-grid">
-          {filteredSyllabus.map((item) => (
+          {displayedSyllabus.map((item) => (
             <article className="resource-card" key={item._id}>
               {/* Cover Banner */}
               <div className="resource-image">
                 <img
                   src={defaultBanner}
                   alt={getSyllabusDisplayTitle(item)}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="resource-image-overlay" />
                 <span className="read-time">
@@ -519,6 +525,18 @@ function LatestSyllabus({ search = "" }) {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {filteredSyllabus.length > 12 && (
+        <div className="view-more-container">
+          <button
+            type="button"
+            className="view-all-resources-btn"
+            onClick={() => navigate("/syllabus")}
+          >
+            View All Syllabus ({filteredSyllabus.length}) →
+          </button>
         </div>
       )}
     </section>

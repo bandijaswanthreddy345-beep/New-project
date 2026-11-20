@@ -7,7 +7,21 @@ const MAX_STARTUP_RETRIES = 10;
 let isReconnecting = false;
 let reconnectTimer = null;
 
-const scheduleReconnect = (uri, delayMs = 5000) => {
+const getMongoOptions = () => ({
+  dbName: process.env.DB_NAME || "test",
+  serverSelectionTimeoutMS: 15000,
+  connectTimeoutMS: 15000,
+  socketTimeoutMS: 30000,
+  maxPoolSize: 25,
+  minPoolSize: 2,
+  maxIdleTimeMS: 30000, // Recycle idle TCP connections after 30s to avoid stale Atlas sockets
+  heartbeatFrequencyMS: 5000, // Probe cluster every 5s for fast failure detection & auto-healing
+  retryWrites: true,
+  w: "majority",
+  autoIndex: false,
+});
+
+const scheduleReconnect = (uri, delayMs = 3000) => {
   if (isReconnecting || mongoose.connection.readyState === 1) return;
   if (reconnectTimer) clearTimeout(reconnectTimer);
 
@@ -20,16 +34,7 @@ const scheduleReconnect = (uri, delayMs = 5000) => {
 
     try {
       logger.info("[MongoDB] Attempting reconnection to database...");
-      await mongoose.connect(uri, {
-        serverSelectionTimeoutMS: 20000,
-        connectTimeoutMS: 20000,
-        socketTimeoutMS: 45000,
-        maxPoolSize: 20,
-        minPoolSize: 2,
-        heartbeatFrequencyMS: 10000,
-        retryWrites: true,
-        w: "majority",
-      });
+      await mongoose.connect(uri, getMongoOptions());
       logger.info("[MongoDB] Successfully reconnected to database!");
     } catch (err) {
       logger.warn("[MongoDB] Reconnection attempt failed:", { error: err.message });
@@ -44,34 +49,13 @@ const connectDB = async () => {
   const primaryUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/andhra-circle";
   const localFallbackUri = "mongodb://127.0.0.1:27017/andhra-circle";
 
-  // Check if connection string specifies a database name without printing the URI
-  try {
-    const rawPath = primaryUri.split("?")[0].replace(/^mongodb(\+srv)?:\/\//, "");
-    const slashIdx = rawPath.indexOf("/");
-    const dbNamePart = slashIdx !== -1 ? rawPath.slice(slashIdx + 1).trim() : "";
-    if (!dbNamePart) {
-      logger.warn("WARNING: MongoDB connection string has no database name specified. It will default to 'test' or MongoDB default.");
-    }
-  } catch {
-    // ignore parse error
-  }
-
   let attempts = 0;
 
   const tryConnect = async () => {
     while (attempts < MAX_STARTUP_RETRIES) {
       attempts++;
       try {
-        const connection = await mongoose.connect(primaryUri, {
-          serverSelectionTimeoutMS: 20000,
-          connectTimeoutMS: 20000,
-          socketTimeoutMS: 45000,
-          maxPoolSize: 20,
-          minPoolSize: 2,
-          heartbeatFrequencyMS: 10000,
-          retryWrites: true,
-          w: "majority",
-        });
+        const connection = await mongoose.connect(primaryUri, getMongoOptions());
 
         const isAtlas = connection.connection.host.includes("mongodb.net");
         logger.info("MongoDB Connected Successfully", {

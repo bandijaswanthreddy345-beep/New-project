@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
 import LikeReactionButton from "../components/LikeReactionButton";
@@ -24,6 +24,9 @@ const getLabSnippet = (program) => {
 
 function LabPrograms({ search = "" }) {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isStandalonePage = location.pathname.startsWith("/lab") || location.pathname !== "/";
 
   const [labPrograms, setLabPrograms] = useState(() => getCachedResource("labs") || []);
   const [loading, setLoading] = useState(() => !hasCachedResource("labs"));
@@ -84,14 +87,14 @@ function LabPrograms({ search = "" }) {
   };
 
   // =========================================================
-  // SEARCH FILTER
+  // SEARCH FILTER (MEMOIZED & OPTIMIZED)
   // =========================================================
 
   const searchText = String(search || "").trim().toLowerCase();
 
-  const filteredPrograms = labPrograms.filter((program) => {
-    if (!searchText) return true;
-    return (
+  const filteredPrograms = useMemo(() => {
+    if (!searchText) return labPrograms;
+    return labPrograms.filter((program) =>
       String(program.title || "").toLowerCase().includes(searchText) ||
       String(program.subject || "").toLowerCase().includes(searchText) ||
       String(program.subjectCode || "").toLowerCase().includes(searchText) ||
@@ -99,7 +102,11 @@ function LabPrograms({ search = "" }) {
       String(program.semester || "").toLowerCase().includes(searchText) ||
       String(program.description || "").toLowerCase().includes(searchText)
     );
-  });
+  }, [labPrograms, searchText]);
+
+  const displayedPrograms = useMemo(() => {
+    return isStandalonePage ? filteredPrograms : filteredPrograms.slice(0, 12);
+  }, [filteredPrograms, isStandalonePage]);
 
   // =========================================================
   // TITLE FORMATTER & CONTEXT
@@ -439,13 +446,15 @@ function LabPrograms({ search = "" }) {
         </div>
       ) : (
         <div className="papers-grid">
-          {filteredPrograms.map((program) => (
+          {displayedPrograms.map((program) => (
             <article className="resource-card" key={program._id}>
               {/* Cover Banner */}
               <div className="resource-image">
                 <img
                   src={defaultBanner}
                   alt={getLabDisplayTitle(program)}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <span className="read-time">Lab Program</span>
               </div>
@@ -558,6 +567,18 @@ function LabPrograms({ search = "" }) {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {!isStandalonePage && filteredPrograms.length > 12 && (
+        <div className="view-more-container">
+          <button
+            type="button"
+            className="view-all-resources-btn"
+            onClick={() => navigate("/lab-programs")}
+          >
+            View All Lab Programs ({filteredPrograms.length}) →
+          </button>
         </div>
       )}
     </section>

@@ -133,7 +133,7 @@ exports.likeComment = async (req, res) => {
     const comment = await Comment.findByIdAndUpdate(
       req.params.id,
       { $inc: { likes: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     ).select("-email");
 
     if (!comment) {
@@ -159,7 +159,7 @@ exports.dislikeComment = async (req, res) => {
     const comment = await Comment.findByIdAndUpdate(
       req.params.id,
       { $inc: { dislikes: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     ).select("-email");
 
     if (!comment) {
@@ -199,7 +199,7 @@ exports.updateComment = async (req, res) => {
     const updated = await Comment.findByIdAndUpdate(
       req.params.id,
       { comment: comment.trim() },
-      { new: true }
+      { returnDocument: "after" }
     ).select("-email");
 
     if (!updated) {

@@ -9278,3 +9278,46 @@ body.chat-modal-open {
     font-size: 13.5px !important;
   }
 }
+
+/* =========================================================
+   HOMEPAGE RESOURCE SECTION "VIEW ALL" ACTION BUTTON
+   ========================================================= */
+.view-more-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  padding-bottom: 1rem;
+  width: 100%;
+}
+
+.view-all-resources-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 26px;
+  background: linear-gradient(135deg, #013a33 0%, #02594f 100%);
+  color: #f7f3e8;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(1, 58, 51, 0.2);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.view-all-resources-btn:hover {
+  background: linear-gradient(135deg, #024f46 0%, #037064 100%);
+  border-color: rgba(212, 175, 55, 0.8);
+  box-shadow: 0 6px 20px rgba(1, 58, 51, 0.35), 0 0 12px rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  color: #ffffff;
+}
+
+.view-all-resources-btn:active {
+  transform: translateY(0);
+}

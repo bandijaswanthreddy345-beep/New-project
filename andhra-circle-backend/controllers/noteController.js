@@ -264,7 +264,7 @@ exports.updateNote = async (req, res) => {
       req.params.id,
       { $set: updateData },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }
     );
@@ -429,7 +429,7 @@ exports.likeNote = async (req, res) => {
       note = await Note.findOneAndUpdate(
         { _id: req.params.id, likes: { $gt: 0 } },
         { $inc: { likes: change } },
-        { new: true }
+        { returnDocument: "after" }
       );
       if (!note) {
         note = await Note.findById(req.params.id);
@@ -438,7 +438,7 @@ exports.likeNote = async (req, res) => {
       note = await Note.findByIdAndUpdate(
         req.params.id,
         { $inc: { likes: change } },
-        { new: true }
+        { returnDocument: "after" }
       );
     }
 
@@ -467,7 +467,7 @@ exports.increaseViews = async (req, res) => {
     const note = await Note.findByIdAndUpdate(
       req.params.id,
       { $inc: { views: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!note) {
@@ -495,7 +495,7 @@ exports.increaseDownloads = async (req, res) => {
     const note = await Note.findByIdAndUpdate(
       req.params.id,
       { $inc: { downloads: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!note) {
