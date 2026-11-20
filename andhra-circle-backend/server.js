@@ -285,16 +285,43 @@ app.get("/uploads/:filename", (req, res, next) => {
 
   const uploadsDir1 = path.join(__dirname, "uploads");
   const uploadsDir2 = path.join(__dirname, "../uploads");
+  const validDirs = [uploadsDir1, uploadsDir2].filter((d) => fs.existsSync(d));
 
-  // Direct check
-  for (const dir of [uploadsDir1, uploadsDir2]) {
+  const safeSend = (filePath) => {
+    try {
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        return res.sendFile(filePath, (err) => {
+          if (err && !res.headersSent) {
+            return res.status(404).json({
+              status: "fail",
+              message: `Requested file '${rawRequested}' could not be served.`,
+            });
+          }
+        });
+      }
+    } catch {}
+    return false;
+  };
+
+  // 1. Direct check
+  for (const dir of validDirs) {
     const directPath = path.join(dir, rawRequested);
-    if (fs.existsSync(directPath)) {
-      return res.sendFile(directPath);
-    }
+    if (safeSend(directPath)) return;
   }
 
-  // Alias / Variation checks
+  // 2. Direct Case-Insensitive check (critical for Linux deployment vs Windows casing)
+  const reqLower = rawRequested.toLowerCase();
+  for (const dir of validDirs) {
+    try {
+      const files = fs.readdirSync(dir);
+      const exactCaseInsensitiveMatch = files.find((f) => f.toLowerCase() === reqLower);
+      if (exactCaseInsensitiveMatch) {
+        if (safeSend(path.join(dir, exactCaseInsensitiveMatch))) return;
+      }
+    } catch {}
+  }
+
+  // 3. Alias / Variation checks
   const variations = [
     rawRequested.replace("_Complete_Notes", ""),
     rawRequested.replace("_Lab_Manual", "_Lab"),
@@ -303,44 +330,55 @@ app.get("/uploads/:filename", (req, res, next) => {
     rawRequested.replace(/[-_]/g, "-"),
   ];
 
-  const files1 = fs.existsSync(uploadsDir1) ? fs.readdirSync(uploadsDir1) : [];
-  const files2 = fs.existsSync(uploadsDir2) ? fs.readdirSync(uploadsDir2) : [];
-  const allFiles = [...new Set([...files1, ...files2])];
-
-  // Try variations
   for (const v of variations) {
     if (v && v !== rawRequested) {
-      for (const dir of [uploadsDir1, uploadsDir2]) {
-        const p = path.join(dir, v);
-        if (fs.existsSync(p)) {
-          return res.sendFile(p);
-        }
+      const vLower = v.toLowerCase();
+      for (const dir of validDirs) {
+        if (safeSend(path.join(dir, v))) return;
+        try {
+          const files = fs.readdirSync(dir);
+          const vMatch = files.find((f) => f.toLowerCase() === vLower);
+          if (vMatch && safeSend(path.join(dir, vMatch))) return;
+        } catch {}
       }
     }
   }
 
-  // Prefix match (e.g. course code prefix 23A03601T)
+  // 4. Prefix match (e.g. course code prefix 23A52701c)
   const codeMatch = rawRequested.match(/^([0-9]{2}[A-Z][0-9]{2,5}[a-z]?)/i);
   if (codeMatch) {
     const code = codeMatch[1].toLowerCase();
-    const candidate = allFiles.find((f) => f.toLowerCase().startsWith(code) && f.toLowerCase().endsWith(".pdf"));
-    if (candidate) {
-      for (const dir of [uploadsDir1, uploadsDir2]) {
-        const p = path.join(dir, candidate);
-        if (fs.existsSync(p)) {
-          return res.sendFile(p);
+    for (const dir of validDirs) {
+      try {
+        const files = fs.readdirSync(dir);
+        // Prioritize unit matching if requested file contains "unit"
+        const isUnitReq = rawRequested.toLowerCase().includes("unit");
+        let candidate = null;
+        if (isUnitReq) {
+          const unitMatch = rawRequested.match(/unit[_-]?([0-9ivx]+)/i);
+          if (unitMatch) {
+            const unitToken = unitMatch[1].toLowerCase();
+            candidate = files.find(
+              (f) =>
+                f.toLowerCase().startsWith(code) &&
+                f.toLowerCase().includes("unit") &&
+                f.toLowerCase().includes(unitToken) &&
+                f.toLowerCase().endsWith(".pdf")
+            );
+          }
         }
-      }
+        if (!candidate) {
+          candidate = files.find((f) => f.toLowerCase().startsWith(code) && f.toLowerCase().endsWith(".pdf"));
+        }
+        if (candidate && safeSend(path.join(dir, candidate))) return;
+      } catch {}
     }
   }
 
-  // Fallback to sample_study_material.pdf if requested is a sample or general PDF
+  // 5. Fallback to sample_study_material.pdf if requested is a sample or general PDF
   if (rawRequested.toLowerCase().includes("sample")) {
-    for (const dir of [uploadsDir1, uploadsDir2]) {
-      const p = path.join(dir, "sample_study_material.pdf");
-      if (fs.existsSync(p)) {
-        return res.sendFile(p);
-      }
+    for (const dir of validDirs) {
+      if (safeSend(path.join(dir, "sample_study_material.pdf"))) return;
     }
   }
 
