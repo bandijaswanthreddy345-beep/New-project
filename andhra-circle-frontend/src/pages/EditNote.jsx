@@ -254,14 +254,14 @@ function EditNote() {
         ================================================== */}
         <div className="upload-section-divider">
           <h2>
-            <span>📄</span> Standard Notes
-            <span className="upload-badge-pill">Material 1</span>
+            <span>📄</span> Section 1: Notes 1 (Standard / Printed)
+            <span className="upload-badge-pill">Notes 1</span>
           </h2>
         </div>
 
         <div className="upload-file-wrapper">
           <label>
-            <span>Complete Notes PDF</span>
+            <span>Complete Notes 1 PDF</span>
             {existingPdfUrl && (
               <small style={{ color: "#0d9488" }}>
                 Current: {existingPdfUrl.split("/").pop()}
@@ -313,8 +313,8 @@ function EditNote() {
           <div className="handwritten-toggle-left">
             <div className="handwritten-toggle-icon">✍️</div>
             <div className="handwritten-toggle-text">
-              <h3>Handwritten Notes (Material 2)</h3>
-              <p>Enable to provide a second set of handwritten notes for students.</p>
+              <h3>Section 2: Notes 2 (Handwritten Notes)</h3>
+              <p>Turn on ONLY if you have a second set of handwritten notes for this same subject.</p>
             </div>
           </div>
           <input
@@ -330,8 +330,8 @@ function EditNote() {
           <div className="handwritten-panel">
             <div className="upload-section-divider" style={{ marginTop: 0 }}>
               <h2>
-                <span>✍️</span> Handwritten Notes Details
-                <span className="upload-badge-pill handwritten">Material 2</span>
+                <span>✍️</span> Notes 2 (Handwritten) Details
+                <span className="upload-badge-pill handwritten">Notes 2</span>
               </h2>
             </div>
 

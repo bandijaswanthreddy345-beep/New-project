@@ -252,19 +252,22 @@ function UploadNote() {
         </div>
 
         {/* ==================================================
-            STANDARD NOTES (MATERIAL 1)
+            STANDARD NOTES (NOTES 1)
         ================================================== */}
         <div className="upload-section-divider">
           <h2>
-            <span>📄</span> Standard Notes
-            <span className="upload-badge-pill">Material 1</span>
+            <span>📄</span> Section 1: Notes 1 (Standard / Printed)
+            <span className="upload-badge-pill">Notes 1</span>
           </h2>
         </div>
+        <p style={{ fontSize: "12.5px", color: "#64748b", margin: "-6px 0 14px", lineHeight: "1.4" }}>
+          💡 Always upload the primary material here. If you have only 1 set of notes for this subject, upload it here and leave the Handwritten section below turned off.
+        </p>
 
         <div className="upload-file-wrapper">
           <label>
-            <span>Complete Notes PDF (Full Textbook / Material 1)</span>
-            <small style={{ color: "#6b7280" }}>Optional</small>
+            <span>Complete Notes 1 PDF (Full Subject Material)</span>
+            <small style={{ color: "#6b7280" }}>Optional if units uploaded below</small>
           </label>
           <input
             type="file"
@@ -310,7 +313,7 @@ function UploadNote() {
         </div>
 
         {/* ==================================================
-            HANDWRITTEN NOTES SECTION (MATERIAL 2)
+            HANDWRITTEN NOTES SECTION (NOTES 2)
         ================================================== */}
         <div
           className="handwritten-toggle-card"
@@ -319,8 +322,8 @@ function UploadNote() {
           <div className="handwritten-toggle-left">
             <div className="handwritten-toggle-icon">✍️</div>
             <div className="handwritten-toggle-text">
-              <h3>Upload Handwritten Notes (Material 2)</h3>
-              <p>Check this if you have a second set of handwritten notes for this subject.</p>
+              <h3>Section 2: Notes 2 (Handwritten Notes)</h3>
+              <p>Turn on ONLY if you have a second set of notes (Notes 2 / Handwritten) for this same subject.</p>
             </div>
           </div>
           <input
@@ -336,8 +339,8 @@ function UploadNote() {
           <div className="handwritten-panel">
             <div className="upload-section-divider" style={{ marginTop: 0 }}>
               <h2>
-                <span>✍️</span> Handwritten Notes Details
-                <span className="upload-badge-pill handwritten">Material 2</span>
+                <span>✍️</span> Notes 2 (Handwritten) Details
+                <span className="upload-badge-pill handwritten">Notes 2</span>
               </h2>
             </div>
 
