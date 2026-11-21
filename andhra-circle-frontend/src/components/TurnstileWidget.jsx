@@ -1,6 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAF952O_X3zyuNtUr";
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname === "::1");
+
+// Cloudflare official dummy testing sitekey (Always passes, works on localhost without domain or CSP errors): 1x00000000000000000000AA
+const SITE_KEY =
+  import.meta.env.VITE_TURNSTILE_SITE_KEY ||
+  (isLocalhost ? "1x00000000000000000000AA" : "0x4AAAAAAF952O_X3zyuNtUr");
 
 function loadTurnstileScript() {
   if (typeof window === "undefined") return Promise.resolve();

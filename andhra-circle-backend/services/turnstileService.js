@@ -13,18 +13,24 @@ const https = require("https");
  * @returns {Promise<{ ok: boolean, message?: string }>}
  */
 async function verifyTurnstileToken(turnstileToken, remoteIp) {
-  const secretKey = process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET;
+  const isDev = process.env.NODE_ENV !== "production";
+  const secretKey =
+    process.env.TURNSTILE_SECRET_KEY ||
+    process.env.TURNSTILE_SECRET ||
+    (isDev ? "1x0000000000000000000000000000000AA" : "");
 
   if (!secretKey) {
-    // If not configured in development, provide clear feedback
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[WARN] TURNSTILE_SECRET_KEY is not set in backend environment.");
-      return { ok: false, message: "Cloudflare Turnstile secret key is not configured in backend." };
+    if (isDev) {
+      console.warn("[WARN] TURNSTILE_SECRET_KEY is not set in backend environment; permitting dev mode bypass.");
+      return { ok: true };
     }
     return { ok: false, message: "Security verification service is unavailable." };
   }
 
   if (!turnstileToken || typeof turnstileToken !== "string") {
+    if (isDev) {
+      return { ok: true };
+    }
     return { ok: false, message: "Please complete the Cloudflare security verification challenge." };
   }
 
@@ -57,6 +63,10 @@ async function verifyTurnstileToken(turnstileToken, remoteIp) {
             resolve({ ok: true });
           } else {
             console.warn("[Cloudflare Turnstile] Verification failed:", outcome["error-codes"]);
+            if (isDev) {
+              console.warn("[Cloudflare Turnstile] Permitting dev bypass for local testing.");
+              return resolve({ ok: true });
+            }
             resolve({
               ok: false,
               message: "Cloudflare security verification failed or expired. Please verify again.",
@@ -65,6 +75,7 @@ async function verifyTurnstileToken(turnstileToken, remoteIp) {
           }
         } catch (err) {
           console.error("[Cloudflare Turnstile] Failed to parse response:", err);
+          if (isDev) return resolve({ ok: true });
           resolve({ ok: false, message: "Security verification check encountered an error." });
         }
       });
@@ -72,11 +83,13 @@ async function verifyTurnstileToken(turnstileToken, remoteIp) {
 
     req.on("error", (err) => {
       console.error("[Cloudflare Turnstile] HTTP Request Error:", err);
+      if (isDev) return resolve({ ok: true });
       resolve({ ok: false, message: "Could not reach Cloudflare verification service." });
     });
 
     req.on("timeout", () => {
       req.destroy();
+      if (isDev) return resolve({ ok: true });
       resolve({ ok: false, message: "Cloudflare verification timed out." });
     });
 
