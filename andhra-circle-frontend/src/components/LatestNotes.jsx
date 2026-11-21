@@ -576,6 +576,20 @@ function LatestNotes({ search = "" }) {
                       Sem {String(formatSemDisplay(note.semester)).replace(/^sem\s*/i, "")}
                     </span>
                   )}
+                  {(note.hasHandwritten || note.handwrittenPdfUrl) && (
+                    <span
+                      className="card-code-badge"
+                      style={{
+                        background: "#fef3c7",
+                        color: "#92400e",
+                        borderColor: "#fde68a",
+                        fontWeight: 600,
+                      }}
+                      title="Handwritten notes available"
+                    >
+                      ✍️ Handwritten
+                    </span>
+                  )}
                 </div>
 
                 {/* Subject Name */}

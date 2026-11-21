@@ -26,6 +26,25 @@ exports.createNote = async (req, res) => {
     const module4Pdf = req.files?.module4Pdf?.[0];
     const module5Pdf = req.files?.module5Pdf?.[0];
 
+    // Handwritten Notes Files (Material 2)
+    const handwrittenPdf = req.files?.handwrittenPdf?.[0];
+    const handwrittenModule1Pdf = req.files?.handwrittenModule1Pdf?.[0];
+    const handwrittenModule2Pdf = req.files?.handwrittenModule2Pdf?.[0];
+    const handwrittenModule3Pdf = req.files?.handwrittenModule3Pdf?.[0];
+    const handwrittenModule4Pdf = req.files?.handwrittenModule4Pdf?.[0];
+    const handwrittenModule5Pdf = req.files?.handwrittenModule5Pdf?.[0];
+
+    const hasHandwritten = Boolean(
+      handwrittenPdf ||
+      handwrittenModule1Pdf ||
+      handwrittenModule2Pdf ||
+      handwrittenModule3Pdf ||
+      handwrittenModule4Pdf ||
+      handwrittenModule5Pdf ||
+      req.body.hasHandwritten === "true" ||
+      req.body.hasHandwritten === true
+    );
+
     if (!req.body.branch) {
       return res.status(400).json({
         message: "Branch is required",
@@ -82,6 +101,16 @@ exports.createNote = async (req, res) => {
         ? `/uploads/${image.filename}`
         : "",
 
+      // Handwritten Notes (Material 2)
+      hasHandwritten,
+      handwrittenCredits: String(req.body.handwrittenCredits || "").trim().slice(0, 100),
+      handwrittenPdfUrl: handwrittenPdf ? `/uploads/${handwrittenPdf.filename}` : "",
+      handwrittenModule1Pdf: handwrittenModule1Pdf ? `/uploads/${handwrittenModule1Pdf.filename}` : "",
+      handwrittenModule2Pdf: handwrittenModule2Pdf ? `/uploads/${handwrittenModule2Pdf.filename}` : "",
+      handwrittenModule3Pdf: handwrittenModule3Pdf ? `/uploads/${handwrittenModule3Pdf.filename}` : "",
+      handwrittenModule4Pdf: handwrittenModule4Pdf ? `/uploads/${handwrittenModule4Pdf.filename}` : "",
+      handwrittenModule5Pdf: handwrittenModule5Pdf ? `/uploads/${handwrittenModule5Pdf.filename}` : "",
+
       likes: 0,
       views: 0,
       downloads: 0,
@@ -136,7 +165,7 @@ exports.getNotes = async (req, res) => {
 
     // Exclude heavy module outline text from list view
     const listFields =
-      "_id title branch semester subject subjectCode imageUrl pdfUrl views downloads likes createdAt";
+      "_id title branch semester subject subjectCode imageUrl pdfUrl handwrittenPdfUrl hasHandwritten views downloads likes createdAt";
 
     let query = Note.find(filter)
       .select(listFields)
@@ -258,6 +287,47 @@ exports.updateNote = async (req, res) => {
     if (req.files?.module5Pdf?.[0]) {
       updateData.module5Pdf =
         `/uploads/${req.files.module5Pdf[0].filename}`;
+    }
+
+    // ==========================
+    // HANDWRITTEN NOTES (MATERIAL 2)
+    // ==========================
+    if (req.body.handwrittenCredits !== undefined) {
+      updateData.handwrittenCredits = String(req.body.handwrittenCredits || "").trim().slice(0, 100);
+    }
+
+    if (req.body.hasHandwritten !== undefined) {
+      updateData.hasHandwritten = req.body.hasHandwritten === "true" || req.body.hasHandwritten === true;
+    }
+
+    if (req.files?.handwrittenPdf?.[0]) {
+      updateData.handwrittenPdfUrl = `/uploads/${req.files.handwrittenPdf[0].filename}`;
+      updateData.hasHandwritten = true;
+    }
+
+    if (req.files?.handwrittenModule1Pdf?.[0]) {
+      updateData.handwrittenModule1Pdf = `/uploads/${req.files.handwrittenModule1Pdf[0].filename}`;
+      updateData.hasHandwritten = true;
+    }
+
+    if (req.files?.handwrittenModule2Pdf?.[0]) {
+      updateData.handwrittenModule2Pdf = `/uploads/${req.files.handwrittenModule2Pdf[0].filename}`;
+      updateData.hasHandwritten = true;
+    }
+
+    if (req.files?.handwrittenModule3Pdf?.[0]) {
+      updateData.handwrittenModule3Pdf = `/uploads/${req.files.handwrittenModule3Pdf[0].filename}`;
+      updateData.hasHandwritten = true;
+    }
+
+    if (req.files?.handwrittenModule4Pdf?.[0]) {
+      updateData.handwrittenModule4Pdf = `/uploads/${req.files.handwrittenModule4Pdf[0].filename}`;
+      updateData.hasHandwritten = true;
+    }
+
+    if (req.files?.handwrittenModule5Pdf?.[0]) {
+      updateData.handwrittenModule5Pdf = `/uploads/${req.files.handwrittenModule5Pdf[0].filename}`;
+      updateData.hasHandwritten = true;
     }
 
     const note = await Note.findByIdAndUpdate(

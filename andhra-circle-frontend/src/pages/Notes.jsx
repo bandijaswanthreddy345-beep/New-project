@@ -423,6 +423,8 @@ function Notes({ initialType }) {
           branchCode: n.branch || activeBranch,
           extraBadge: n.subjectCode || "",
           pdfUrl: n.pdfUrl || "",
+          hasHandwritten: Boolean(n.hasHandwritten || n.handwrittenPdfUrl),
+          handwrittenPdfUrl: n.handwrittenPdfUrl || "",
           resourceType: "notes",
           views: n.views || 0,
           downloads: n.downloads || 0,
@@ -1354,6 +1356,19 @@ function Notes({ initialType }) {
                             {item.extraBadge && (
                               <span className="folder-tag folder-code-tag">
                                 {item.extraBadge}
+                              </span>
+                            )}
+                            {item.hasHandwritten && (
+                              <span
+                                className="folder-tag"
+                                style={{
+                                  background: "#fef3c7",
+                                  color: "#92400e",
+                                  borderColor: "#fde68a",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                ✍️ Handwritten
                               </span>
                             )}
                           </div>

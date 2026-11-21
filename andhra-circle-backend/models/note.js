@@ -140,6 +140,51 @@ const noteSchema = new mongoose.Schema(
     },
 
     // ==========================================
+    // HANDWRITTEN NOTES (MATERIAL 2)
+    // ==========================================
+
+    hasHandwritten: {
+      type: Boolean,
+      default: false,
+    },
+
+    handwrittenCredits: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    handwrittenPdfUrl: {
+      type: String,
+      default: "",
+    },
+
+    handwrittenModule1Pdf: {
+      type: String,
+      default: "",
+    },
+
+    handwrittenModule2Pdf: {
+      type: String,
+      default: "",
+    },
+
+    handwrittenModule3Pdf: {
+      type: String,
+      default: "",
+    },
+
+    handwrittenModule4Pdf: {
+      type: String,
+      default: "",
+    },
+
+    handwrittenModule5Pdf: {
+      type: String,
+      default: "",
+    },
+
+    // ==========================================
     // STATISTICS
     // ==========================================
 

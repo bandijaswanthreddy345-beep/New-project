@@ -82,6 +82,32 @@ router.post(
       name: "image",
       maxCount: 1,
     },
+
+    // Handwritten Notes (Material 2)
+    {
+      name: "handwrittenPdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule1Pdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule2Pdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule3Pdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule4Pdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule5Pdf",
+      maxCount: 1,
+    },
   ]),
   verifyMagicBytes,
   createNote
@@ -128,6 +154,32 @@ router.put(
 
     {
       name: "image",
+      maxCount: 1,
+    },
+
+    // Handwritten Notes (Material 2)
+    {
+      name: "handwrittenPdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule1Pdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule2Pdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule3Pdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule4Pdf",
+      maxCount: 1,
+    },
+    {
+      name: "handwrittenModule5Pdf",
       maxCount: 1,
     },
   ]),

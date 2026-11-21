@@ -464,53 +464,69 @@ function NoteDetails() {
   const year = note?.year || "";
 
   // =========================================================
-  // UNITS
-  //
-  // IMPORTANT:
-  // Backend fields remain module1/module2/... to avoid
-  // breaking the existing database and API.
-  //
-  // Only the user-facing terminology is changed to Units.
+  // UNITS & MATERIAL SETS (STANDARD VS HANDWRITTEN)
   // =========================================================
+
+  const hasHandwritten = Boolean(
+    note?.hasHandwritten ||
+    note?.handwrittenPdfUrl ||
+    note?.handwrittenModule1Pdf ||
+    note?.handwrittenModule2Pdf ||
+    note?.handwrittenModule3Pdf ||
+    note?.handwrittenModule4Pdf ||
+    note?.handwrittenModule5Pdf
+  );
+
+  const [activeMaterial, setActiveMaterial] = useState("standard");
 
   const units = useMemo(() => {
     if (!note) return [];
 
-    const defaultPdf = note.pdfUrl || "";
+    const isHandwritten = activeMaterial === "handwritten" && hasHandwritten;
 
     return [
       {
         number: 1,
         title: note.module1Title || note.module1 || "Unit 1",
         notes: note.module1 || "",
-        pdf: note.module1Pdf || note.pdfUrl || "",
+        pdf: isHandwritten
+          ? (note.handwrittenModule1Pdf || note.handwrittenPdfUrl || "")
+          : (note.module1Pdf || note.pdfUrl || ""),
       },
       {
         number: 2,
         title: note.module2Title || note.module2 || "Unit 2",
         notes: note.module2 || "",
-        pdf: note.module2Pdf || note.pdfUrl || "",
+        pdf: isHandwritten
+          ? (note.handwrittenModule2Pdf || note.handwrittenPdfUrl || "")
+          : (note.module2Pdf || note.pdfUrl || ""),
       },
       {
         number: 3,
         title: note.module3Title || note.module3 || "Unit 3",
         notes: note.module3 || "",
-        pdf: note.module3Pdf || note.pdfUrl || "",
+        pdf: isHandwritten
+          ? (note.handwrittenModule3Pdf || note.handwrittenPdfUrl || "")
+          : (note.module3Pdf || note.pdfUrl || ""),
       },
       {
         number: 4,
         title: note.module4Title || note.module4 || "Unit 4",
         notes: note.module4 || "",
-        pdf: note.module4Pdf || note.pdfUrl || "",
+        pdf: isHandwritten
+          ? (note.handwrittenModule4Pdf || note.handwrittenPdfUrl || "")
+          : (note.module4Pdf || note.pdfUrl || ""),
       },
       {
         number: 5,
         title: note.module5Title || note.module5 || "Unit 5",
         notes: note.module5 || "",
-        pdf: note.module5Pdf || note.pdfUrl || "",
+        pdf: isHandwritten
+          ? (note.handwrittenModule5Pdf || note.handwrittenPdfUrl || "")
+          : (note.module5Pdf || note.pdfUrl || ""),
       },
     ];
-  }, [note]);
+  }, [note, activeMaterial, hasHandwritten]);
 
   // =========================================================
   // UNIT TOGGLE
@@ -1231,6 +1247,12 @@ function NoteDetails() {
                     <strong className="hero-tag-value">{year}</strong>
                   </div>
                 )}
+                {hasHandwritten && (
+                  <div className="hero-tag hero-tag-card hero-tag-handwritten" title="Both Standard and Handwritten Notes are available for this subject">
+                    <span className="hero-tag-label">NOTE SETS</span>
+                    <strong className="hero-tag-value">2 Sets (✍️ Handwritten)</strong>
+                  </div>
+                )}
               </div>
 
               <div className="hero-action-buttons-group">
@@ -1312,6 +1334,49 @@ function NoteDetails() {
             </div>
 
           </div>
+
+          {hasHandwritten && (
+            <div className="material-tabs-wrapper">
+              <div className="material-tabs-container">
+                <button
+                  type="button"
+                  className={`material-tab-btn ${activeMaterial === "standard" ? "active" : ""}`}
+                  onClick={() => {
+                    setActiveMaterial("standard");
+                    setOpenUnit(null);
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  <span>Standard Notes (Set 1)</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`material-tab-btn handwritten ${activeMaterial === "handwritten" ? "active" : ""}`}
+                  onClick={() => {
+                    setActiveMaterial("handwritten");
+                    setOpenUnit(null);
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                  </svg>
+                  <span>Handwritten Notes (Set 2)</span>
+                  <span className="material-tab-badge">✍️ Handwritten</span>
+                </button>
+              </div>
+
+              {activeMaterial === "handwritten" && note.handwrittenCredits && (
+                <div className="material-author-note">
+                  ✍️ Handwritten Notes prepared by: <strong>{note.handwrittenCredits}</strong>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="modules-list">
 
