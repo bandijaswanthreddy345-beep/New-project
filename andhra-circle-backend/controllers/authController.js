@@ -307,8 +307,22 @@ exports.forgotPassword = async (req, res) => {
 
     await user.save();
 
-    const frontendBase = process.env.FRONTEND_URL || "http://localhost:5173";
-    resetUrl = `${frontendBase}/reset-password/${resetToken}`;
+    // Determine frontend base URL:
+    // 1. If request origin is a public web origin (e.g. *.vercel.app, custom domain), use it
+    // 2. Otherwise use FRONTEND_URL from environment
+    // 3. Default to public deployed frontend (https://new-project-cyan.vercel.app) so reset links work on mobile devices
+    let frontendBase = process.env.FRONTEND_URL;
+    if (
+      req.headers.origin &&
+      !req.headers.origin.includes("localhost") &&
+      !req.headers.origin.includes("127.0.0.1")
+    ) {
+      frontendBase = req.headers.origin;
+    }
+    if (!frontendBase || frontendBase === "http://localhost:5173") {
+      frontendBase = "https://new-project-cyan.vercel.app";
+    }
+    resetUrl = `${frontendBase.replace(/\/+$/, "")}/reset-password/${resetToken}`;
 
     // SECURITY: the reset link/token is deliberately NOT logged anymore.
     // Anyone who can read the server logs could otherwise take over accounts.
@@ -346,6 +360,8 @@ exports.forgotPassword = async (req, res) => {
         link: resetUrl,
         reset_link: resetUrl,
         resetUrl: resetUrl,
+        company_name: "Andhra Circle",
+        app_name: "Andhra Circle",
       },
       {
         publicKey,
