@@ -276,6 +276,8 @@ exports.forgotPassword = async (req, res) => {
         "If this email is registered, a password reset link has been sent to it",
     });
 
+  let resetUrl = "";
+
   try {
     const email = asString(req.body?.email).toLowerCase();
 
@@ -306,7 +308,7 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     const frontendBase = process.env.FRONTEND_URL || "http://localhost:5173";
-    const resetUrl = `${frontendBase}/reset-password/${resetToken}`;
+    resetUrl = `${frontendBase}/reset-password/${resetToken}`;
 
     // SECURITY: the reset link/token is deliberately NOT logged anymore.
     // Anyone who can read the server logs could otherwise take over accounts.
