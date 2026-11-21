@@ -337,7 +337,13 @@ exports.forgotPassword = async (req, res) => {
       templateId,
       {
         email: user.email,
+        to_email: user.email,
+        user_email: user.email,
+        name: user.name || "Student",
+        to_name: user.name || "Student",
         link: resetUrl,
+        reset_link: resetUrl,
+        resetUrl: resetUrl,
       },
       {
         publicKey,
