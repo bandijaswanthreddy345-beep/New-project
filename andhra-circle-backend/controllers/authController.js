@@ -323,8 +323,10 @@ exports.forgotPassword = async (req, res) => {
         "[WARN] Email service is not fully configured (missing EMAILJS_SERVICE_ID or credentials). Cannot dispatch reset email."
       );
       if (process.env.NODE_ENV !== "production") {
-        return res.status(503).json({
-          message: "Email service is temporarily unavailable. Please configure EMAILJS_SERVICE_ID in the backend.",
+        console.info(`[DEV] Password reset link for ${user.email}: ${resetUrl}`);
+        return res.status(200).json({
+          message:
+            "Password reset link generated! (In local development mode, check your backend terminal for the reset URL).",
         });
       }
       return genericResponse();
