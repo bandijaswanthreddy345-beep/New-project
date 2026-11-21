@@ -355,8 +355,14 @@ exports.forgotPassword = async (req, res) => {
   } catch (error) {
     console.error("Forgot Password Error:", error);
 
+    const devDetails = error?.text || error?.message || "Unknown error";
+    const devMessage =
+      process.env.NODE_ENV !== "production"
+        ? `EmailJS Error: ${devDetails}. (Development reset link: ${resetUrl})`
+        : "Unable to send password reset email";
+
     res.status(500).json({
-      message: "Unable to send password reset email",
+      message: devMessage,
     });
   }
 };
