@@ -1,6 +1,7 @@
 const Note = require("../models/note");
 const recordAuditLog = require("../services/auditLogger");
 const { bumpContentVersion } = require("../utils/contentVersion");
+const feedController = require("./feedController");
 
 // ==========================================
 // CREATE NOTE
@@ -174,7 +175,7 @@ exports.getNotes = async (req, res) => {
 
     res.setHeader(
       "Cache-Control",
-      "public, max-age=60, stale-while-revalidate=120"
+      "no-cache, must-revalidate"
     );
 
     if (limit) {
@@ -518,6 +519,10 @@ exports.likeNote = async (req, res) => {
       });
     }
 
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("notes", req.params.id, { likes: note.likes });
+    }
+
     res.status(200).json(note);
   } catch (error) {
     console.error("Like Note Error:", error);
@@ -546,6 +551,10 @@ exports.increaseViews = async (req, res) => {
       });
     }
 
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("notes", req.params.id, { views: note.views });
+    }
+
     res.status(200).json(note);
   } catch (error) {
     console.error("Increase Views Error:", error);
@@ -572,6 +581,10 @@ exports.increaseDownloads = async (req, res) => {
       return res.status(404).json({
         message: "Note not found",
       });
+    }
+
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("notes", req.params.id, { downloads: note.downloads });
     }
 
     res.status(200).json(note);

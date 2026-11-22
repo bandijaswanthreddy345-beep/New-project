@@ -317,7 +317,22 @@ function Notes({ initialType }) {
       setLoading(false);
     };
 
+    const handleResourceItemUpdated = (e) => {
+      if (!isMounted || !e?.detail) return;
+      const { key, itemId, patch } = e.detail;
+      if (!itemId || !patch) return;
+      const updateFn = (prevList) =>
+        prevList.map((res) =>
+          res._id === itemId || res.id === itemId ? { ...res, ...patch } : res
+        );
+      if (key === "notes") setNotesData(updateFn);
+      else if (key === "papers") setPapersData(updateFn);
+      else if (key === "syllabus") setSyllabusData(updateFn);
+      else if (key === "labs") setLabsData(updateFn);
+    };
+
     window.addEventListener("resourcesUpdated", handleResourcesUpdated);
+    window.addEventListener("resourceItemUpdated", handleResourceItemUpdated);
 
     const fetchAllResources = async () => {
       try {
@@ -363,6 +378,7 @@ function Notes({ initialType }) {
     return () => {
       isMounted = false;
       window.removeEventListener("resourcesUpdated", handleResourcesUpdated);
+      window.removeEventListener("resourceItemUpdated", handleResourceItemUpdated);
     };
   }, []);
 
@@ -776,41 +792,49 @@ function Notes({ initialType }) {
   const handleViewItem = async (item) => {
     const itemId = item.id;
 
-    // 1. Instantly register view count on backend & sync local cache
+    // 1. Instantly register view count on backend & sync local cache with session deduplication
     if (itemId) {
-      if (item.resourceType === "papers") {
-        API.put(`/papers/${itemId}/view`).catch(() => { });
-      } else if (item.resourceType === "syllabus") {
-        API.put(`/syllabus/${itemId}/view`).catch(() => { });
-      } else if (item.resourceType === "labs") {
-        API.put(`/lab-programs/${itemId}/view`).catch(() => { });
-      } else {
-        API.put(`/notes/${itemId}/view`).catch(() => { });
+      const sessionKey = (item.resourceType === "notes" || !item.resourceType)
+        ? `viewed_note_${itemId}`
+        : `viewed_${item.resourceType}_${itemId}`;
+      const isAlreadyCounted = Boolean(sessionStorage.getItem(sessionKey));
+
+      if (!isAlreadyCounted) {
+        sessionStorage.setItem(sessionKey, "true");
+        if (item.resourceType === "papers") {
+          API.put(`/papers/${itemId}/view`).catch(() => { });
+        } else if (item.resourceType === "syllabus") {
+          API.put(`/syllabus/${itemId}/view`).catch(() => { });
+        } else if (item.resourceType === "labs") {
+          API.put(`/lab-programs/${itemId}/view`).catch(() => { });
+        } else {
+          API.put(`/notes/${itemId}/view`).catch(() => { });
+        }
+
+        const resKey =
+          item.resourceType === "papers"
+            ? "papers"
+            : item.resourceType === "syllabus"
+            ? "syllabus"
+            : item.resourceType === "labs"
+            ? "labs"
+            : "notes";
+        const newViews = (item.views || 0) + 1;
+        updateCachedResourceItem(resKey, itemId, { views: newViews });
+
+        // Optimistic update in active data store
+        const updateViews = (prevList) =>
+          prevList.map((res) =>
+            res._id === itemId || res.id === itemId
+              ? { ...res, views: (res.views || 0) + 1 }
+              : res
+          );
+
+        if (item.resourceType === "papers") setPapersData(updateViews);
+        else if (item.resourceType === "syllabus") setSyllabusData(updateViews);
+        else if (item.resourceType === "labs") setLabsData(updateViews);
+        else setNotesData(updateViews);
       }
-
-      const resKey =
-        item.resourceType === "papers"
-          ? "papers"
-          : item.resourceType === "syllabus"
-          ? "syllabus"
-          : item.resourceType === "labs"
-          ? "labs"
-          : "notes";
-      const newViews = (item.views || 0) + 1;
-      updateCachedResourceItem(resKey, itemId, { views: newViews });
-
-      // Optimistic update in active data store
-      const updateViews = (prevList) =>
-        prevList.map((res) =>
-          res._id === itemId || res.id === itemId
-            ? { ...res, views: (res.views || 0) + 1 }
-            : res
-        );
-
-      if (item.resourceType === "papers") setPapersData(updateViews);
-      else if (item.resourceType === "syllabus") setSyllabusData(updateViews);
-      else if (item.resourceType === "labs") setLabsData(updateViews);
-      else setNotesData(updateViews);
     }
 
     if (item.resourceType === "notes" && item.id) {

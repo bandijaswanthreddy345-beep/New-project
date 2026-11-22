@@ -1,5 +1,6 @@
 const LabProgram = require("../models/LabProgram");
 const recordAuditLog = require("../services/auditLogger");
+const feedController = require("./feedController");
 
 // ==========================================
 // CREATE LAB PROGRAM
@@ -68,6 +69,7 @@ exports.getLabPrograms = async (req, res) => {
       createdAt: -1,
     });
 
+    res.setHeader("Cache-Control", "no-cache, must-revalidate");
     res.status(200).json(labPrograms);
   } catch (error) {
     console.warn("Get Lab Programs Warning:", error.message);
@@ -237,6 +239,10 @@ exports.likeLabProgram = async (req, res) => {
       });
     }
 
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("labPrograms", req.params.id, { likes: labProgram.likes });
+    }
+
     res.status(200).json(labProgram);
   } catch (error) {
     console.error("Like Lab Program Error:", error);
@@ -263,6 +269,10 @@ exports.increaseViews = async (req, res) => {
       });
     }
 
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("labPrograms", req.params.id, { views: labProgram.views });
+    }
+
     res.status(200).json(labProgram);
   } catch (error) {
     console.error("View Lab Program Error:", error);
@@ -287,6 +297,10 @@ exports.increaseDownloads = async (req, res) => {
       return res.status(404).json({
         message: "Lab program not found",
       });
+    }
+
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("labPrograms", req.params.id, { downloads: labProgram.downloads });
     }
 
     res.status(200).json(labProgram);

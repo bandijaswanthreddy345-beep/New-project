@@ -1,5 +1,6 @@
 const Paper = require("../models/paper");
 const recordAuditLog = require("../services/auditLogger");
+const feedController = require("./feedController");
 
 // ==========================================
 // CREATE PAPER
@@ -78,7 +79,7 @@ exports.getPapers = async (req, res) => {
 
     res.setHeader(
       "Cache-Control",
-      "public, max-age=60, stale-while-revalidate=120"
+      "no-cache, must-revalidate"
     );
 
     if (limit) {
@@ -260,6 +261,10 @@ exports.likePaper = async (req, res) => {
       });
     }
 
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("papers", req.params.id, { likes: paper.likes });
+    }
+
     res.status(200).json(paper);
   } catch (error) {
     console.error("Like Paper Error:", error);
@@ -288,6 +293,10 @@ exports.increaseViews = async (req, res) => {
       });
     }
 
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("papers", req.params.id, { views: paper.views });
+    }
+
     res.status(200).json(paper);
   } catch (error) {
     console.error("View Error:", error);
@@ -314,6 +323,10 @@ exports.increaseDownloads = async (req, res) => {
       return res.status(404).json({
         message: "Paper not found",
       });
+    }
+
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("papers", req.params.id, { downloads: paper.downloads });
     }
 
     res.status(200).json(paper);

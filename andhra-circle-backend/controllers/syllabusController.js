@@ -1,5 +1,6 @@
 const Syllabus = require("../models/syllabus");
 const recordAuditLog = require("../services/auditLogger");
+const feedController = require("./feedController");
 
 // Create Syllabus
 exports.createSyllabus = async (req, res) => {
@@ -68,7 +69,7 @@ exports.getSyllabus = async (req, res) => {
 
     res.setHeader(
       "Cache-Control",
-      "public, max-age=60, stale-while-revalidate=120"
+      "no-cache, must-revalidate"
     );
 
     if (limit) {
@@ -228,6 +229,10 @@ exports.likeSyllabus = async (req, res) => {
       });
     }
 
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("syllabus", req.params.id, { likes: syllabus.likes });
+    }
+
     res.status(200).json(syllabus);
   } catch (error) {
     console.error("Like Syllabus Error:", error);
@@ -254,6 +259,10 @@ exports.increaseViews = async (req, res) => {
       });
     }
 
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("syllabus", req.params.id, { views: syllabus.views });
+    }
+
     res.status(200).json(syllabus);
   } catch (error) {
     console.error("View Syllabus Error:", error);
@@ -278,6 +287,10 @@ exports.increaseDownloads = async (req, res) => {
       return res.status(404).json({
         message: "Syllabus not found",
       });
+    }
+
+    if (feedController?.updateFeedResourceStats) {
+      feedController.updateFeedResourceStats("syllabus", req.params.id, { downloads: syllabus.downloads });
     }
 
     res.status(200).json(syllabus);

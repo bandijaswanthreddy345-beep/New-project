@@ -68,8 +68,22 @@ function LatestNotes({ search = "" }) {
         setLoading(false);
       }
     };
+
+    const handleItemUpdated = (e) => {
+      if (e?.detail?.key === "notes" && e?.detail?.itemId && e?.detail?.patch) {
+        const { itemId, patch } = e.detail;
+        setNotes((prev) =>
+          prev.map((n) => (n._id === itemId || n.id === itemId ? { ...n, ...patch } : n))
+        );
+      }
+    };
+
     window.addEventListener("resourcesUpdated", handleUpdated);
-    return () => window.removeEventListener("resourcesUpdated", handleUpdated);
+    window.addEventListener("resourceItemUpdated", handleItemUpdated);
+    return () => {
+      window.removeEventListener("resourcesUpdated", handleUpdated);
+      window.removeEventListener("resourceItemUpdated", handleItemUpdated);
+    };
   }, []);
 
   const fetchNotes = async () => {
@@ -324,17 +338,24 @@ function LatestNotes({ search = "" }) {
   const handleView = async (note) => {
     setBlinkingNoteId(note._id);
     try {
-      API.put(`/notes/${note._id}/view`).catch(() => { });
-      setNotes((prev) =>
-        prev.map((item) =>
-          item._id === note._id
-            ? {
-              ...item,
-              views: (item.views || 0) + 1,
-            }
-            : item
-        )
-      );
+      const sessionKey = `viewed_note_${note._id}`;
+      const isAlreadyCounted = Boolean(sessionStorage.getItem(sessionKey));
+      if (!isAlreadyCounted) {
+        sessionStorage.setItem(sessionKey, "true");
+        API.put(`/notes/${note._id}/view`).catch(() => { });
+        const newViews = (note.views || 0) + 1;
+        setNotes((prev) =>
+          prev.map((item) =>
+            item._id === note._id
+              ? {
+                ...item,
+                views: newViews,
+              }
+              : item
+          )
+        );
+        updateCachedResourceItem("notes", note._id, { views: newViews });
+      }
     } catch (error) {
       console.error("Error updating view count:", error);
     }

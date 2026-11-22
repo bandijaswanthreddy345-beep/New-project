@@ -90,6 +90,14 @@ export function updateCachedResourceItem(key, itemId, patch) {
   });
 
   setCachedResource(key, updated);
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("resourceItemUpdated", {
+        detail: { key, itemId, patch, updatedItems: updated },
+      })
+    );
+  }
 }
 
 /**

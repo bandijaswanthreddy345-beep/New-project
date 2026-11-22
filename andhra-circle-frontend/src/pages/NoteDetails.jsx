@@ -6,7 +6,7 @@ import { normalizeSemester, normalizeScheme } from "../utils/semester";
 import { getStoredStudentData } from "../data/studentData";
 import { formatSemDisplay } from "../utils/validators";
 import trigger100Hearts from "../utils/heartBurst";
-import { updateCachedResourceItem } from "../utils/resourceCache";
+import { updateCachedResourceItem, getCachedResource } from "../utils/resourceCache";
 import "./NoteDetails.css";
 
 function formatFriendlySemester(sem) {
@@ -263,21 +263,33 @@ function NoteDetails() {
         setLoading(true);
         setError("");
 
-        // Register view count on backend
-        API.put(`/notes/${id}/view`)
-          .then((res) => {
-            if (res.data && typeof res.data.views === "number") {
-              setNote((prev) => (prev ? { ...prev, views: res.data.views } : prev));
-              updateCachedResourceItem("notes", id, { views: res.data.views });
-            }
-          })
-          .catch(() => { });
+        // Check if note is cached to avoid showing lower views during fetch
+        const cachedList = getCachedResource("notes") || [];
+        const cachedNote = cachedList.find((item) => item._id === id || item.id === id);
+        const cachedViews = typeof cachedNote?.views === "number" ? cachedNote.views : 0;
 
-        const response = await API.get(`/notes/${id}`);
+        // Session deduplication: track viewed note in sessionStorage
+        const sessionKey = `viewed_note_${id}`;
+        const alreadyCounted = Boolean(sessionStorage.getItem(sessionKey));
+
+        let viewPromise = null;
+        if (!alreadyCounted) {
+          sessionStorage.setItem(sessionKey, "true");
+          viewPromise = API.put(`/notes/${id}/view`).catch((err) => {
+            console.warn("View registration error:", err);
+            return null;
+          });
+        }
+
+        // Fetch note details and wait for view increment if triggered
+        const [viewRes, response] = await Promise.all([
+          viewPromise,
+          API.get(`/notes/${id}`),
+        ]);
 
         if (!mounted) return;
 
-        const responseData = response.data;
+        const responseData = response?.data;
 
         const noteData =
           responseData?.note ||
@@ -290,9 +302,22 @@ function NoteDetails() {
           return;
         }
 
-        setNote(noteData);
+        // Determine most accurate view count:
+        // Must never regress below server PUT result, cached views, or GET response.
+        const putViews = (viewRes?.data && typeof viewRes.data.views === "number")
+          ? viewRes.data.views
+          : 0;
+        const getViews = typeof noteData.views === "number" ? noteData.views : 0;
+        const resolvedViews = Math.max(getViews, putViews, cachedViews);
+
+        const finalNote = {
+          ...noteData,
+          views: resolvedViews,
+        };
+
+        setNote(finalNote);
         updateCachedResourceItem("notes", id, {
-          views: noteData.views,
+          views: resolvedViews,
           likes: noteData.likes,
           downloads: noteData.downloads,
         });
@@ -1253,6 +1278,16 @@ function NoteDetails() {
                     <strong className="hero-tag-value">2 Sets (✍️ Handwritten)</strong>
                   </div>
                 )}
+                <div className="hero-tag hero-tag-card hero-tag-views" title="Total Views">
+                  <span className="hero-tag-label">VIEWS</span>
+                  <strong className="hero-tag-value">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "4px" }}>
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    {note?.views || 0}
+                  </strong>
+                </div>
               </div>
 
               <div className="hero-action-buttons-group">

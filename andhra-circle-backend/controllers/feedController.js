@@ -19,6 +19,18 @@ exports.invalidateFeedCache = () => {
 };
 
 /**
+ * Optimistically patch stats (views, downloads, likes) in active in-memory feed cache
+ */
+exports.updateFeedResourceStats = (resourceType, id, stats) => {
+  if (!feedCache || !feedCache[resourceType] || !Array.isArray(feedCache[resourceType])) return;
+  const list = feedCache[resourceType];
+  const item = list.find((it) => String(it._id) === String(id) || String(it.id) === String(id));
+  if (item) {
+    Object.assign(item, stats);
+  }
+};
+
+/**
  * Consolidated Home Feed Controller
  * Fetches all essential academic resources in 1 single optimized parallel query.
  * Delivers responses in <5ms when cached.
@@ -41,7 +53,7 @@ exports.getHomeFeed = async (req, res) => {
 
     const now = Date.now();
     if (feedCache && now < feedCacheExpiry) {
-      res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=120");
+      res.setHeader("Cache-Control", "no-cache, must-revalidate");
       res.setHeader("X-Cache", "HIT");
       return res.status(200).json(feedCache);
     }
@@ -81,7 +93,7 @@ exports.getHomeFeed = async (req, res) => {
     feedCache = result;
     feedCacheExpiry = now + CACHE_TTL_MS;
 
-    res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=120");
+    res.setHeader("Cache-Control", "no-cache, must-revalidate");
     res.setHeader("X-Cache", "MISS");
     return res.status(200).json(result);
   } catch (error) {
