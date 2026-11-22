@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { BACKEND_URL } from "../api/api";
+import API, { BACKEND_URL } from "../api/api";
 import defaultBanner from "../assets/banner.webp";
 import { performSearch, formatResourceAction } from "../utils/searchEngine";
 import { formatSemDisplay } from "../utils/validators";
 import { normalizeScheme } from "../utils/semester";
+import { updateCachedResourceItem } from "../utils/resourceCache";
 import "./SearchResults.css";
 
 const PAGE_SIZE = 15;
@@ -295,6 +296,14 @@ function SearchResults() {
 
   const openItem = (item) => {
     if (!item) return;
+
+    if (item.type === "Notes" && item._id && !item.isCurriculum) {
+      API.put(`/notes/${item._id}/view`).catch(() => {});
+      const newViews = (item.views || 0) + 1;
+      updateCachedResourceItem("notes", item._id, { views: newViews });
+      navigate(`/notes/${item._id}`, { state: { viewIncremented: true } });
+      return;
+    }
 
     const action = formatResourceAction(item);
     if (action.path) {

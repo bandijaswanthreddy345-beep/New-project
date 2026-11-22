@@ -264,11 +264,12 @@ function LatestNotes({ search = "" }) {
     const now = Date.now();
     const lastTap = lastTapTimeRef.current[noteId] || 0;
 
-    if (now - lastTap < 400 && now - lastTap > 40) {
+    if (now - lastTap < 350 && now - lastTap > 40) {
       lastTapTimeRef.current[noteId] = 0;
       triggerDoubleTapLike(note, e);
     } else {
       lastTapTimeRef.current[noteId] = now;
+      handleView(note);
     }
   };
 
@@ -335,35 +336,35 @@ function LatestNotes({ search = "" }) {
   // VIEW COMPLETE NOTE
   // ==========================================
 
-  const handleView = async (note) => {
-    setBlinkingNoteId(note._id);
-    try {
-      const sessionKey = `viewed_note_${note._id}`;
-      const isAlreadyCounted = Boolean(sessionStorage.getItem(sessionKey));
-      if (!isAlreadyCounted) {
-        sessionStorage.setItem(sessionKey, "true");
-        API.put(`/notes/${note._id}/view`).catch(() => { });
-        const newViews = (note.views || 0) + 1;
-        setNotes((prev) =>
-          prev.map((item) =>
-            item._id === note._id
-              ? {
-                ...item,
-                views: newViews,
-              }
-              : item
-          )
-        );
-        updateCachedResourceItem("notes", note._id, { views: newViews });
-      }
-    } catch (error) {
-      console.error("Error updating view count:", error);
-    }
+  const handleView = (note) => {
+    const noteId = note._id;
+    if (!noteId) return;
 
-    setTimeout(() => {
-      setBlinkingNoteId(null);
-      navigate(`/notes/${note._id}`);
-    }, 650);
+    // 1. Calculate new views count (+1)
+    const newViews = (note.views || 0) + 1;
+
+    // 2. Immediately update local state in 0ms
+    setNotes((prev) =>
+      prev.map((item) =>
+        item._id === noteId
+          ? {
+            ...item,
+            views: newViews,
+          }
+          : item
+      )
+    );
+
+    // 3. Immediately update client cache & broadcast event (0ms)
+    updateCachedResourceItem("notes", noteId, { views: newViews });
+
+    // 4. Immediately trigger asynchronous backend persistence
+    API.put(`/notes/${noteId}/view`).catch((err) => {
+      console.warn("View registration error:", err);
+    });
+
+    // 5. Navigate immediately with 0ms delay
+    navigate(`/notes/${noteId}`, { state: { viewIncremented: true } });
   };
 
   // ==========================================

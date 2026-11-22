@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import API, { BACKEND_URL } from "../api/api";
 import AuthorProfile from "../components/AuthorProfile";
 import { normalizeSemester, normalizeScheme } from "../utils/semester";
@@ -46,9 +46,21 @@ function NoteDetails() {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [note, setNote] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Instant 0ms cache retrieval: note renders immediately on first frame
+  const [note, setNote] = useState(() => {
+    if (!id) return null;
+    const cachedList = getCachedResource("notes") || [];
+    const found = cachedList.find((item) => item._id === id || item.id === id);
+    return found || null;
+  });
+  const [loading, setLoading] = useState(() => {
+    if (!id) return true;
+    const cachedList = getCachedResource("notes") || [];
+    const found = cachedList.find((item) => item._id === id || item.id === id);
+    return !found;
+  });
   const [error, setError] = useState("");
   const [openUnit, setOpenUnit] = useState(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -260,28 +272,22 @@ function NoteDetails() {
       }
 
       try {
-        setLoading(true);
+        // Only show full loading screen if note is not already available in cache
+        if (!note) {
+          setLoading(true);
+        }
         setError("");
 
-        // Check if note is cached to avoid showing lower views during fetch
-        const cachedList = getCachedResource("notes") || [];
-        const cachedNote = cachedList.find((item) => item._id === id || item.id === id);
-        const cachedViews = typeof cachedNote?.views === "number" ? cachedNote.views : 0;
-
-        // Session deduplication: track viewed note in sessionStorage
-        const sessionKey = `viewed_note_${id}`;
-        const alreadyCounted = Boolean(sessionStorage.getItem(sessionKey));
-
+        // If accessed directly (not from a card click navigation), register view
         let viewPromise = null;
-        if (!alreadyCounted) {
+        const alreadyCountedInNav = Boolean(location.state?.viewIncremented);
+        const sessionKey = `view_session_${id}`;
+        if (!alreadyCountedInNav && !sessionStorage.getItem(sessionKey)) {
           sessionStorage.setItem(sessionKey, "true");
-          viewPromise = API.put(`/notes/${id}/view`).catch((err) => {
-            console.warn("View registration error:", err);
-            return null;
-          });
+          viewPromise = API.put(`/notes/${id}/view`).catch(() => null);
         }
 
-        // Fetch note details and wait for view increment if triggered
+        // Fetch note details from server
         const [viewRes, response] = await Promise.all([
           viewPromise,
           API.get(`/notes/${id}`),
@@ -302,24 +308,24 @@ function NoteDetails() {
           return;
         }
 
-        // Determine most accurate view count:
-        // Must never regress below server PUT result, cached views, or GET response.
         const putViews = (viewRes?.data && typeof viewRes.data.views === "number")
           ? viewRes.data.views
           : 0;
-        const getViews = typeof noteData.views === "number" ? noteData.views : 0;
-        const resolvedViews = Math.max(getViews, putViews, cachedViews);
+        const serverViews = typeof noteData.views === "number" ? noteData.views : 0;
 
-        const finalNote = {
-          ...noteData,
-          views: resolvedViews,
-        };
-
-        setNote(finalNote);
-        updateCachedResourceItem("notes", id, {
-          views: resolvedViews,
-          likes: noteData.likes,
-          downloads: noteData.downloads,
+        setNote((prev) => {
+          const currentViews = prev?.views || 0;
+          const bestViews = Math.max(currentViews, serverViews, putViews);
+          const finalNote = {
+            ...noteData,
+            views: bestViews,
+          };
+          updateCachedResourceItem("notes", id, {
+            views: bestViews,
+            likes: noteData.likes,
+            downloads: noteData.downloads,
+          });
+          return finalNote;
         });
       } catch (err) {
         console.error("NOTE DETAILS ERROR:", err);

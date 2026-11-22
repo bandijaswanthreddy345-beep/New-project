@@ -789,56 +789,51 @@ function Notes({ initialType }) {
   };
 
   // Handle View Action
-  const handleViewItem = async (item) => {
-    const itemId = item.id;
+  const handleViewItem = (item) => {
+    const itemId = item.id || item._id;
+    if (!itemId) return;
 
-    // 1. Instantly register view count on backend & sync local cache with session deduplication
-    if (itemId) {
-      const sessionKey = (item.resourceType === "notes" || !item.resourceType)
-        ? `viewed_note_${itemId}`
-        : `viewed_${item.resourceType}_${itemId}`;
-      const isAlreadyCounted = Boolean(sessionStorage.getItem(sessionKey));
+    const resKey =
+      item.resourceType === "papers"
+        ? "papers"
+        : item.resourceType === "syllabus"
+        ? "syllabus"
+        : item.resourceType === "labs"
+        ? "labs"
+        : "notes";
 
-      if (!isAlreadyCounted) {
-        sessionStorage.setItem(sessionKey, "true");
-        if (item.resourceType === "papers") {
-          API.put(`/papers/${itemId}/view`).catch(() => { });
-        } else if (item.resourceType === "syllabus") {
-          API.put(`/syllabus/${itemId}/view`).catch(() => { });
-        } else if (item.resourceType === "labs") {
-          API.put(`/lab-programs/${itemId}/view`).catch(() => { });
-        } else {
-          API.put(`/notes/${itemId}/view`).catch(() => { });
-        }
+    const newViews = (item.views || 0) + 1;
 
-        const resKey =
-          item.resourceType === "papers"
-            ? "papers"
-            : item.resourceType === "syllabus"
-            ? "syllabus"
-            : item.resourceType === "labs"
-            ? "labs"
-            : "notes";
-        const newViews = (item.views || 0) + 1;
-        updateCachedResourceItem(resKey, itemId, { views: newViews });
+    // 1. Instantly register optimistic view count in active UI state (0ms)
+    const updateViews = (prevList) =>
+      prevList.map((res) =>
+        res._id === itemId || res.id === itemId
+          ? { ...res, views: (res.views || 0) + 1 }
+          : res
+      );
 
-        // Optimistic update in active data store
-        const updateViews = (prevList) =>
-          prevList.map((res) =>
-            res._id === itemId || res.id === itemId
-              ? { ...res, views: (res.views || 0) + 1 }
-              : res
-          );
+    if (resKey === "papers") setPapersData(updateViews);
+    else if (resKey === "syllabus") setSyllabusData(updateViews);
+    else if (resKey === "labs") setLabsData(updateViews);
+    else setNotesData(updateViews);
 
-        if (item.resourceType === "papers") setPapersData(updateViews);
-        else if (item.resourceType === "syllabus") setSyllabusData(updateViews);
-        else if (item.resourceType === "labs") setLabsData(updateViews);
-        else setNotesData(updateViews);
-      }
+    // 2. Instantly update client cache & broadcast event across windows (0ms)
+    updateCachedResourceItem(resKey, itemId, { views: newViews });
+
+    // 3. Fire asynchronous backend persistence
+    if (resKey === "papers") {
+      API.put(`/papers/${itemId}/view`).catch(() => { });
+    } else if (resKey === "syllabus") {
+      API.put(`/syllabus/${itemId}/view`).catch(() => { });
+    } else if (resKey === "labs") {
+      API.put(`/lab-programs/${itemId}/view`).catch(() => { });
+    } else {
+      API.put(`/notes/${itemId}/view`).catch(() => { });
     }
 
-    if (item.resourceType === "notes" && item.id) {
-      navigate(`/notes/${item.id}`);
+    // 4. Navigate to details or viewer immediately
+    if ((resKey === "notes" || !item.resourceType) && itemId) {
+      navigate(`/notes/${itemId}`, { state: { viewIncremented: true } });
       return;
     }
 
@@ -847,8 +842,8 @@ function Notes({ initialType }) {
       navigate(`/pdf/${encodeURIComponent(fileName)}`);
     } else if (item.pdfUrl) {
       window.open(getPdfUrl(item.pdfUrl), "_blank");
-    } else if (item.id) {
-      navigate(`/notes/${item.id}`);
+    } else if (itemId) {
+      navigate(`/notes/${itemId}`, { state: { viewIncremented: true } });
     } else {
       alert("No document file is attached to this record.");
     }
@@ -941,7 +936,7 @@ function Notes({ initialType }) {
       cardTapTimersRef.current[itemId] = setTimeout(() => {
         delete cardTapTimersRef.current[itemId];
         handleViewItem(item);
-      }, 380);
+      }, 200);
     }
   };
 
