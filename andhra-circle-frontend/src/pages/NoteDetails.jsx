@@ -515,48 +515,31 @@ function NoteDetails() {
 
     const isHandwritten = activeMaterial === "handwritten" && hasHandwritten;
 
-    return [
-      {
-        number: 1,
-        title: note.module1Title || note.module1 || "Unit 1",
-        notes: note.module1 || "",
-        pdf: isHandwritten
-          ? (note.handwrittenModule1Pdf || note.handwrittenPdfUrl || "")
-          : (note.module1Pdf || note.pdfUrl || ""),
-      },
-      {
-        number: 2,
-        title: note.module2Title || note.module2 || "Unit 2",
-        notes: note.module2 || "",
-        pdf: isHandwritten
-          ? (note.handwrittenModule2Pdf || note.handwrittenPdfUrl || "")
-          : (note.module2Pdf || note.pdfUrl || ""),
-      },
-      {
-        number: 3,
-        title: note.module3Title || note.module3 || "Unit 3",
-        notes: note.module3 || "",
-        pdf: isHandwritten
-          ? (note.handwrittenModule3Pdf || note.handwrittenPdfUrl || "")
-          : (note.module3Pdf || note.pdfUrl || ""),
-      },
-      {
-        number: 4,
-        title: note.module4Title || note.module4 || "Unit 4",
-        notes: note.module4 || "",
-        pdf: isHandwritten
-          ? (note.handwrittenModule4Pdf || note.handwrittenPdfUrl || "")
-          : (note.module4Pdf || note.pdfUrl || ""),
-      },
-      {
-        number: 5,
-        title: note.module5Title || note.module5 || "Unit 5",
-        notes: note.module5 || "",
-        pdf: isHandwritten
-          ? (note.handwrittenModule5Pdf || note.handwrittenPdfUrl || "")
-          : (note.module5Pdf || note.pdfUrl || ""),
-      },
-    ];
+    const candidateUnits = [1, 2, 3, 4, 5].map((num) => {
+      const stdPdf = note[`module${num}Pdf`] || (num === 1 ? note.pdfUrl : "") || "";
+      const hwPdf = note[`handwrittenModule${num}Pdf`] || (num === 1 ? note.handwrittenPdfUrl : "") || "";
+      const activePdf = isHandwritten ? hwPdf : stdPdf;
+
+      return {
+        number: num,
+        title: note[`module${num}Title`] || note[`module${num}`] || `Unit ${num}`,
+        notes: note[`module${num}`] || "",
+        pdf: activePdf,
+        hasContent: Boolean(
+          (stdPdf && stdPdf.trim() !== "") ||
+          (hwPdf && hwPdf.trim() !== "") ||
+          (note[`module${num}Title`] && String(note[`module${num}Title`]).trim() !== "") ||
+          (note[`module${num}`] && String(note[`module${num}`]).trim() !== "")
+        ),
+      };
+    });
+
+    const validUnits = candidateUnits.filter((u, index) => {
+      if (index === 0) return Boolean(u.pdf || u.notes || note.title);
+      return u.hasContent;
+    });
+
+    return validUnits.length > 0 ? validUnits : [candidateUnits[0]];
   }, [note, activeMaterial, hasHandwritten]);
 
   // =========================================================
