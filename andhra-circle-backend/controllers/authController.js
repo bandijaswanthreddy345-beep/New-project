@@ -309,16 +309,20 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     // Determine frontend base URL:
-    // 1. In development, prefer req.headers.origin (e.g. http://localhost:5173) so local testing works seamlessly
-    // 2. In production, if request origin is a public web origin (e.g. *.vercel.app, custom domain), use it
-    // 3. Otherwise fallback to FRONTEND_URL or deployed Vercel domain
+    // 1. If request origin is a public web origin (e.g. *.vercel.app, custom domain), use it
+    // 2. Otherwise use FRONTEND_URL (default: https://new-project-cyan.vercel.app)
+    // IMPORTANT: Never use localhost in email links, because users read emails on mobile devices
+    // where localhost will fail with ERR_CONNECTION_REFUSED.
     let frontendBase = process.env.FRONTEND_URL || "https://new-project-cyan.vercel.app";
-    if (req.headers.origin) {
-      if (process.env.NODE_ENV !== "production") {
-        frontendBase = req.headers.origin;
-      } else if (!req.headers.origin.includes("localhost") && !req.headers.origin.includes("127.0.0.1")) {
-        frontendBase = req.headers.origin;
-      }
+    if (
+      req.headers.origin &&
+      !req.headers.origin.includes("localhost") &&
+      !req.headers.origin.includes("127.0.0.1")
+    ) {
+      frontendBase = req.headers.origin;
+    }
+    if (!frontendBase || frontendBase.includes("localhost") || frontendBase.includes("127.0.0.1")) {
+      frontendBase = "https://new-project-cyan.vercel.app";
     }
     resetUrl = `${frontendBase.replace(/\/+$/, "")}/reset-password/${resetToken}`;
 
