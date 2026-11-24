@@ -308,27 +308,24 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     // Determine frontend base URL:
-    // 1. If request origin is a public web origin (e.g. *.vercel.app, custom domain), use it
-    // 2. Otherwise use FRONTEND_URL from environment
-    // 3. Default to public deployed frontend (https://new-project-cyan.vercel.app) so reset links work on mobile devices
-    let frontendBase = process.env.FRONTEND_URL;
-    if (
-      req.headers.origin &&
-      !req.headers.origin.includes("localhost") &&
-      !req.headers.origin.includes("127.0.0.1")
-    ) {
-      frontendBase = req.headers.origin;
-    }
-    if (!frontendBase || frontendBase === "http://localhost:5173") {
-      frontendBase = "https://new-project-cyan.vercel.app";
+    // 1. In development, prefer req.headers.origin (e.g. http://localhost:5173) so local testing works seamlessly
+    // 2. In production, if request origin is a public web origin (e.g. *.vercel.app, custom domain), use it
+    // 3. Otherwise fallback to FRONTEND_URL or deployed Vercel domain
+    let frontendBase = process.env.FRONTEND_URL || "https://new-project-cyan.vercel.app";
+    if (req.headers.origin) {
+      if (process.env.NODE_ENV !== "production") {
+        frontendBase = req.headers.origin;
+      } else if (!req.headers.origin.includes("localhost") && !req.headers.origin.includes("127.0.0.1")) {
+        frontendBase = req.headers.origin;
+      }
     }
     resetUrl = `${frontendBase.replace(/\/+$/, "")}/reset-password/${resetToken}`;
 
-    // SECURITY: the reset link/token is deliberately NOT logged anymore.
-    // Anyone who can read the server logs could otherwise take over accounts.
+    // SECURITY: the reset link/token is deliberately NOT logged in production.
+    // In development mode, we log it to console to assist local testing.
 
     // If EmailJS credentials are not fully configured (e.g. EMAILJS_SERVICE_ID missing in dev),
-    // warn in server log without crashing and return a clear 503 response.
+    // warn in server log without crashing and return a clear response.
     const serviceId = process.env.EMAILJS_SERVICE_ID;
     const templateId = process.env.EMAILJS_TEMPLATE_ID;
     const publicKey = process.env.EMAILJS_PUBLIC_KEY;
@@ -342,42 +339,60 @@ exports.forgotPassword = async (req, res) => {
         console.info(`[DEV] Password reset link for ${user.email}: ${resetUrl}`);
         return res.status(200).json({
           message:
-            "Password reset link generated! (In local development mode, check your backend terminal for the reset URL).",
+            "Password reset link generated! (Email service not configured in dev; use the reset link below).",
+          resetUrl,
         });
       }
       return genericResponse();
     }
 
-    await emailjs.send(
-      serviceId,
-      templateId,
-      {
-        email: user.email,
-        to_email: user.email,
-        user_email: user.email,
-        name: user.name || "Student",
-        to_name: user.name || "Student",
-        link: resetUrl,
-        reset_link: resetUrl,
-        resetUrl: resetUrl,
-        company_name: "Andhra Circle",
-        app_name: "Andhra Circle",
-      },
-      {
-        publicKey,
-        privateKey,
-      }
-    );
+    try {
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          email: user.email,
+          to_email: user.email,
+          user_email: user.email,
+          name: user.name || "Student",
+          to_name: user.name || "Student",
+          link: resetUrl,
+          reset_link: resetUrl,
+          resetUrl: resetUrl,
+          company_name: "Andhra Circle",
+          app_name: "Andhra Circle",
+        },
+        {
+          publicKey,
+          privateKey,
+        }
+      );
 
-    return genericResponse();
+      return genericResponse();
+    } catch (emailErr) {
+      const emailErrMsg = emailErr?.text || emailErr?.message || "Unknown email error";
+      console.error("[AUTH] EmailJS delivery failed:", emailErrMsg);
+
+      if (process.env.NODE_ENV !== "production") {
+        console.info(`[DEV] Password reset link for ${user.email}: ${resetUrl}`);
+        return res.status(200).json({
+          message: `Password reset link created! (Email service note: ${emailErrMsg}). In development, you can use the direct link below:`,
+          resetUrl,
+        });
+      }
+
+      return res.status(503).json({
+        message: "Email delivery service is temporarily unavailable. Please try again later or contact support.",
+      });
+    }
   } catch (error) {
     console.error("Forgot Password Error:", error);
 
     const devDetails = error?.text || error?.message || "Unknown error";
     const devMessage =
       process.env.NODE_ENV !== "production"
-        ? `EmailJS Error: ${devDetails}. (Development reset link: ${resetUrl})`
-        : "Unable to send password reset email";
+        ? `Server Error: ${devDetails}. (Development reset link: ${resetUrl})`
+        : "Unable to process password reset request";
 
     res.status(500).json({
       message: devMessage,
