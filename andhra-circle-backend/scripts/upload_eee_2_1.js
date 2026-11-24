@@ -6,6 +6,7 @@ const { PDFDocument } = require("pdf-lib");
 require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
 const Note = require("../models/Note");
+const LabProgram = require("../models/LabProgram");
 const { invalidateFeedCache } = require("../controllers/feedController");
 
 const SOURCE_BASE = "C:\\Users\\B Keerthi\\Downloads\\EEE\\2-1";
@@ -72,9 +73,10 @@ async function uploadEee2_1() {
   });
   console.log("Connected to MongoDB successfully!\n");
 
-  console.log("Cleaning any previous EEE 2-1 notes to avoid duplicates...");
+  console.log("Cleaning any previous EEE 2-1 notes and lab programs to avoid duplicates...");
   const delNotes = await Note.deleteMany({ branch: "EEE", semester: "2-1" });
-  console.log(`  [CLEANUP] Deleted ${delNotes.deletedCount} existing notes.\n`);
+  const delLabs = await LabProgram.deleteMany({ branch: "EEE", semester: "2-1" });
+  console.log(`  [CLEANUP] Deleted ${delNotes.deletedCount} notes and ${delLabs.deletedCount} lab programs.\n`);
 
   const results = [];
 
@@ -184,7 +186,7 @@ async function uploadEee2_1() {
   const ecaLabUrl = copyFileSafe(ecaLabSrc, "EEE_2-1_23A02302P_Electrical_Circuit_Analysis_II_Simulation_Lab_Manual.pdf");
   copyFileSafe(ecaLabSrc, ecaLabFile);
 
-  const ecaLabDoc = await Note.create({
+  const ecaLabDoc = await LabProgram.create({
     title: "Electrical Circuit Analysis -II & Simulation Lab Manual",
     branch: "EEE",
     semester: "2-1",
@@ -192,17 +194,6 @@ async function uploadEee2_1() {
     subject: "Electrical Circuit Analysis -II and Simulation Lab",
     subjectCode: "23A02302P",
     description: "Laboratory manual, simulation procedures (MATLAB/Simulink/PSPICE), circuit diagrams, and experimental inputs & outputs for Electrical Circuit Analysis -II and Simulation Lab (23A02302P) under JNTU R23 Curriculum for EEE 2-1 semester.",
-    credits: "1.5",
-    module1: "Complete Laboratory Manual, Simulation Inputs & Experimental Outputs",
-    module2: "",
-    module3: "",
-    module4: "",
-    module5: "",
-    module1Pdf: ecaLabUrl,
-    module2Pdf: "",
-    module3Pdf: "",
-    module4Pdf: "",
-    module5Pdf: "",
     pdfUrl: ecaLabUrl,
     downloads: 0,
     views: 0,
@@ -269,7 +260,7 @@ async function uploadEee2_1() {
   const dcmtLabUrl = copyFileSafe(dcmtLabSrc, "EEE_2-1_23A02303P_DC_Machines_and_Transformers_Lab_Manual.pdf");
   copyFileSafe(dcmtLabSrc, dcmtLabFile);
 
-  const dcmtLabDoc = await Note.create({
+  const dcmtLabDoc = await LabProgram.create({
     title: "DC Machines & Transformers Lab Manual",
     branch: "EEE",
     semester: "2-1",
@@ -277,17 +268,6 @@ async function uploadEee2_1() {
     subject: "DC Machines & Transformers Lab",
     subjectCode: "23A02303P",
     description: "Comprehensive laboratory manual, circuit connections, testing procedures, calculations, and experimental input/output data for DC Machines & Transformers Lab (23A02303P) under JNTU R23 Curriculum for EEE 2-1 semester.",
-    credits: "1.5",
-    module1: "Complete Laboratory Manual, Experimental Procedures & Observation Records",
-    module2: "",
-    module3: "",
-    module4: "",
-    module5: "",
-    module1Pdf: dcmtLabUrl,
-    module2Pdf: "",
-    module3Pdf: "",
-    module4Pdf: "",
-    module5Pdf: "",
     pdfUrl: dcmtLabUrl,
     downloads: 0,
     views: 0,
