@@ -7,14 +7,12 @@ function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [resetUrl, setResetUrl] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
-    setResetUrl("");
 
     try {
       setLoading(true);
@@ -22,10 +20,7 @@ function ForgotPassword() {
         email,
       });
 
-      setMessage(res.data.message || "Password reset link sent to your email!");
-      if (res.data.resetUrl) {
-        setResetUrl(res.data.resetUrl);
-      }
+      setMessage(res.data.message || "Password reset instructions sent to your email!");
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -107,35 +102,20 @@ function ForgotPassword() {
 
         {/* Success Alert */}
         {message && (
-          <div className="login-alert" style={{ background: "#ecfdf5", border: "1px solid #a7f3d0", color: "#065f46", display: "flex", flexDirection: "column", gap: "8px" }} role="status">
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <svg
-                className="login-alert-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              <span>{message}</span>
-            </div>
-            {resetUrl && (
-              <div style={{ marginTop: "6px", padding: "10px 12px", background: "#f0fdf4", borderRadius: "8px", border: "1px dashed #86efac", wordBreak: "break-all" }}>
-                <span style={{ fontSize: "0.82rem", fontWeight: "700", display: "block", marginBottom: "4px", color: "#166534" }}>
-                  Direct Recovery Link:
-                </span>
-                <a
-                  href={resetUrl}
-                  style={{ color: "#0284c7", fontWeight: "600", textDecoration: "underline", fontSize: "0.88rem" }}
-                >
-                  Click here to reset password
-                </a>
-              </div>
-            )}
+          <div className="login-alert" style={{ background: "#ecfdf5", border: "1px solid #a7f3d0", color: "#065f46" }} role="status">
+            <svg
+              className="login-alert-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span>{message}</span>
           </div>
         )}
 

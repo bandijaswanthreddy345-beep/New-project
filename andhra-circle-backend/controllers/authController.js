@@ -270,11 +270,11 @@ exports.loginUser = async (req, res) => {
 // Forgot Password
 // ==========================================
 exports.forgotPassword = async (req, res) => {
-  // Same answer whether or not the email exists (no account enumeration)
+  // Same answer whether or not the email exists (prevents account enumeration & token leakage)
   const genericResponse = () =>
     res.status(200).json({
       message:
-        "If this email is registered, a password reset link has been sent to it",
+        "If this email is registered, a password reset link has been sent to it. Please check your inbox and spam folder.",
     });
 
   let resetUrl = "";
@@ -339,15 +339,10 @@ exports.forgotPassword = async (req, res) => {
 
     if (!serviceId || !templateId || !publicKey || !privateKey) {
       console.warn(
-        "[WARN] Email service is not fully configured (missing EMAILJS_SERVICE_ID or credentials). Cannot dispatch reset email."
+        "[WARN] Email service is not fully configured (missing EMAILJS credentials). Cannot dispatch reset email."
       );
       if (process.env.NODE_ENV !== "production") {
         console.info(`[DEV] Password reset link for ${user.email}: ${resetUrl}`);
-        return res.status(200).json({
-          message:
-            "Password reset link generated! (Email service not configured in dev; use the reset link below).",
-          resetUrl,
-        });
       }
       return genericResponse();
     }
@@ -381,27 +376,17 @@ exports.forgotPassword = async (req, res) => {
 
       if (process.env.NODE_ENV !== "production") {
         console.info(`[DEV] Password reset link for ${user.email}: ${resetUrl}`);
-        return res.status(200).json({
-          message: `Password reset link created! (Email service note: ${emailErrMsg}). In development, you can use the direct link below:`,
-          resetUrl,
-        });
       }
 
       return res.status(503).json({
-        message: "Email delivery service is temporarily unavailable. Please try again later or contact support.",
+        message: "Unable to deliver password reset email right now. Please try again shortly or contact support.",
       });
     }
   } catch (error) {
     console.error("Forgot Password Error:", error);
 
-    const devDetails = error?.text || error?.message || "Unknown error";
-    const devMessage =
-      process.env.NODE_ENV !== "production"
-        ? `Server Error: ${devDetails}. (Development reset link: ${resetUrl})`
-        : "Unable to process password reset request";
-
     res.status(500).json({
-      message: devMessage,
+      message: "Unable to process password reset request. Please try again later.",
     });
   }
 };
