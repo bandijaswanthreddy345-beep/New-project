@@ -205,7 +205,7 @@ function Login() {
               <h2 className="login-brand-name">
                 <span className="font-deltha">JNTU</span> Circle
               </h2>
-              <span className="login-brand-tagline">Academic Resource Hub</span>
+              <span className="login-brand-tagline">Resource Hub</span>
             </div>
           </Link>
         </div>

@@ -384,7 +384,7 @@ function Navbar() {
 
           <div className="logo-text">
             <h2><span className="font-deltha">JNTU</span> Circle</h2>
-            <span>Academic Resource Hub</span>
+            <span>Resource Hub</span>
           </div>
         </Link>
       </div>

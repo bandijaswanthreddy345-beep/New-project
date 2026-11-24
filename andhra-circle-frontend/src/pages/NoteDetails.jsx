@@ -1156,7 +1156,7 @@ function NoteDetails() {
                 <span className="font-deltha">JNTU</span> Circle
               </h2>
               <span className="notif-brand-subtitle">
-                Academic Resource Hub
+                Resource Hub
               </span>
             </div>
           </div>

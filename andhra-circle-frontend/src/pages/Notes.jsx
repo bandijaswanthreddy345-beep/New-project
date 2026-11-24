@@ -1013,7 +1013,7 @@ function Notes({ initialType }) {
             <img src="/jntu-circle-logo.png" alt="JNTU Circle" className="sidebar-logo-img" />
             <div className="sidebar-brand-text">
               <h2><span className="font-deltha">JNTU</span> Circle</h2>
-              <span>Academic Resource Hub</span>
+              <span>Resource Hub</span>
             </div>
           </div>
 

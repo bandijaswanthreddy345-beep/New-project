@@ -109,6 +109,7 @@
   font-weight: 600;
   letter-spacing: 0.3px;
   margin-top: 2px;
+  white-space: nowrap;
 }
 
 /* Navigation Links */
@@ -1397,6 +1398,7 @@
     font-weight: 600;
     letter-spacing: 0.3px;
     margin-top: 2px;
+    white-space: nowrap;
   }
 
   .sidebar-nav {
