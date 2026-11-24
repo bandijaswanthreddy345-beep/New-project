@@ -1,3 +1,4 @@
+const path = require("path");
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -323,6 +324,11 @@ exports.forgotPassword = async (req, res) => {
 
     // SECURITY: the reset link/token is deliberately NOT logged in production.
     // In development mode, we log it to console to assist local testing.
+
+    // Always reload latest .env from disk so credential changes apply immediately
+    try {
+      require("dotenv").config({ path: path.join(__dirname, "../.env"), override: true });
+    } catch (_) {}
 
     // If EmailJS credentials are not fully configured (e.g. EMAILJS_SERVICE_ID missing in dev),
     // warn in server log without crashing and return a clear response.
